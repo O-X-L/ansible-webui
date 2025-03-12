@@ -67,6 +67,8 @@ See also: [Contributing](https://github.com/O-X-L/ansible-webui/blob/latest/CONT
 
 <img src="https://contrib.rocks/image?repo=O-X-L/ansible-webui&max=5" />
 
+<img src="https://contrib.rocks/image?repo=ansibleguy/webui&max=5" />
+
 ----
 
 ## Roadmap
@@ -76,6 +78,7 @@ See also: [Contributing](https://github.com/O-X-L/ansible-webui/blob/latest/CONT
 - [ ] Refactor WebUI => SvelteJS & TailwindCSS
 - [ ] Data-update over Websockets
 - [ ] Migrate permissions to Django-builtin ones
+- [ ] Django 5.1
 
 ### Full
 
