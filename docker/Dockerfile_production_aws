@@ -1,9 +1,9 @@
 ARG AW_VERSION=0.0
 
-# BUILD: docker build -f Dockerfile_production_aws -t "ansible0guy/webui-aws:<VERSION>" --build-arg "AW_VERSION=<VERSION>" --no-cache --progress=plain .
+# BUILD: docker build -f Dockerfile_production_aws -t "oxlorg/ansible-webui-aws:<VERSION>" --build-arg "AW_VERSION=<VERSION>" --no-cache --progress=plain .
 
 # references:
-#   https://github.com/ansibleguy/webui/discussions/5
+#   https://github.com/O-X-L/ansible-webui/discussions/5
 #   https://github.com/aws/session-manager-plugin/issues/12#issuecomment-972880203
 #   https://github.com/aws/session-manager-plugin/blob/mainline/Dockerfile
 #   https://github.com/aws/session-manager-plugin/blob/mainline/makefile

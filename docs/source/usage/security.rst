@@ -11,7 +11,7 @@ Ansible needs to handle sensible secrets like administrative passwords to functi
 
 That's why it is very important to keep security in our mind.
 
-You are very welcome to search for security vulnerabilities and `report them <https://github.com/ansibleguy/webui/issues>`_!
+You are very welcome to search for security vulnerabilities and `report them <https://github.com/O-X-L/ansible-webui/issues>`_!
 
 ----
 
@@ -64,7 +64,7 @@ Setup
 
 * You should use a proxy like nginx in front of AW
 
-    Recommended Config: (`Example <https://github.com/ansibleguy/webui/blob/latest/examples/nginx.conf>`_)
+    Recommended Config: (`Example <https://github.com/O-X-L/ansible-webui/blob/latest/examples/nginx.conf>`_)
 
     * use HTTPS with a valid certificate
 
@@ -76,7 +76,7 @@ Setup
 
     * serve static files using the proxy
 
-        :code:`/static/ => ${PATH_VENV}/lib/python${PY_VERSION}/site-packages/ansible-webui/aw/static/`
+        :code:`/static/ => ${PATH_VENV}/lib/python${PY_VERSION}/site-packages/oxl_ansible_webui/aw/static/`
 
 * Make sure the Account passwords and API keys are kept/used safe
 

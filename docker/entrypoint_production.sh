@@ -2,4 +2,4 @@
 
 . /entrypoint_requirements.sh
 
-python3 -m ansibleguy-webui
+oxl-ansible-webui

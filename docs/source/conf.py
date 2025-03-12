@@ -1,9 +1,9 @@
 from datetime import datetime
 
 # pylint: disable=W0622
-project = 'AnsibleGuy WebUI'
-copyright = f'{datetime.now().year}, AnsibleGuy'
-author = 'AnsibleGuy'
+project = 'Ansible WebUI'
+copyright = f'{datetime.now().year}, OXL'
+author = 'OXL'
 extensions = ['piccolo_theme']
 templates_path = ['_templates']
 exclude_patterns = []
@@ -21,8 +21,8 @@ source_suffix = {
     '.md': 'markdown',
 }
 html_theme_options = {
-    'banner_text': '<a href="https://github.com/ansibleguy/webui">Repository on GitHub</a> | '
-                   '<a href="https://github.com/ansibleguy/webui/issues/new/choose">Report Errors</a> | '
+    'banner_text': '<a href="https://github.com/O-X-L/ansible-webui">Repository on GitHub</a> | '
+                   '<a href="https://github.com/O-X-L/ansible-webui/issues/new/choose">Report Errors</a> | '
                    '<a href="https://www.o-x-l.com">Get Support</a>'
 }
 html_short_title = 'Ansible WebUI'

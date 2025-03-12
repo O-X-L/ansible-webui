@@ -6,14 +6,14 @@ We're also open to allow co-maintainers.
 
 ## What to contribute?
 
-* [Find and report issues/bugs](https://github.com/ansibleguy/webui/issues/new)
-* [Start Discussions about Implementations/Optimizations](https://github.com/ansibleguy/webui/discussions/new/choose)
+* [Find and report issues/bugs](https://github.com/O-X-L/ansible-webui/issues/new)
+* [Start Discussions about Implementations/Optimizations](https://github.com/O-X-L/ansible-webui/discussions/new/choose)
 * Help optimizing/polishing the frontend is very welcome
   * Fix/optimize styles/css
   * Extend/fix/optimize JS
 
 * Add Unit-Tests (*pytest*)
-* Add [Integration-Tests](https://github.com/ansibleguy/webui/tree/latest/test/integration) for the Web-UI and/or API
+* Add [Integration-Tests](https://github.com/O-X-L/ansible-webui/tree/latest/test/integration) for the Web-UI and/or API
 
 Read into the [Troubleshooting Guide](https://webui.ansibleguy.net/usage/troubleshooting.html) to get some insight on how the stack works.
 
@@ -54,7 +54,7 @@ Read into the [Troubleshooting Guide](https://webui.ansibleguy.net/usage/trouble
 
 ```bash
 # download
-git clone https://github.com/ansibleguy/webui
+git clone https://github.com/O-X-L/ansible-webui
 
 # install dependencies (venv recommended)
 cd webui
@@ -63,13 +63,13 @@ bash scripts/update_version.sh
 export AW_VERSION="$(cat VERSION)"
 
 # run
-python3 src/ansibleguy-webui/
+python3 src/oxl_ansible_webui/
 ```
 
 ### Using Docker
 
 ```bash
-docker image pull ansible0guy/webui:dev
+docker image pull oxlorg/ansible-webui:dev
 cd ${PATH_TO_SRC}  # repository root directory
 docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awtest:/data --volume $(pwd):/aw ansible0guy/webui:dev
 ```

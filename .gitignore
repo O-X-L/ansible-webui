@@ -1,7 +1,7 @@
 .idea/
 dist/
 venv/
-ansible_webui.egg-info/
+oxl_ansible_webui.egg-info/
 __pychache__.py
 **/aw*.db
 **/aw*.db.*bak*

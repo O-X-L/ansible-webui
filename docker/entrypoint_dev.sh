@@ -11,4 +11,4 @@ pip install --upgrade -r /aw/requirements.txt --root-user-action=ignore --no-war
 
 . /entrypoint_requirements.sh
 
-python3 /aw/src/ansibleguy-webui/
+python3 /aw/src/oxl_ansible_webui/

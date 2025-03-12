@@ -43,7 +43,7 @@ HTML_META="${HTML_META}<link rel=\"icon\" type=\"image/webp\" href=\"https://fil
 HTML_META_EN="${HTML_META}"  # <link rel=\"alternate\" href=\"https://docs.o-x-l.at\" hreflang=\"de\">
 # HTML_LOGO_LINK_SRC='href=".*Go to homepage"'
 # HTML_LOGO_LINK_EN='href="https://www.o-x-l.com" class="oxl-nav-logo" title="OXL IT Services Website"'
-HTML_TITLE_BAD_EN='AnsibleGuy WebUI  documentation'
+HTML_TITLE_BAD_EN='Ansible WebUI  documentation'
 HTML_TITLE_OK='Simple Ansible WebUI'
 HTML_LANG_NONE='<html'
 HTML_LANG_EN='html lang="en"'

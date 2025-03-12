@@ -15,8 +15,8 @@ body:
 
         - [ ] Read the troubleshooting info: [Troubleshooting](https://webui.ansibleguy.net/usage/troubleshooting.html)
 
-        - [ ] Check if there are existing [issues](https://github.com/ansibleguy/webui/issues)
-        or [discussions](https://github.com/ansibleguy/webui/discussions) regarding your topic
+        - [ ] Check if there are existing [issues](https://github.com/O-X-L/ansible-webui/issues)
+        or [discussions](https://github.com/O-X-L/ansible-webui/discussions) regarding your topic
 
   - type: textarea
     id: versions

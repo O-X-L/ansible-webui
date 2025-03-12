@@ -1,9 +1,7 @@
 # Basic WebUI for using Ansible
 
-<a href='https://ko-fi.com/ansible0guy' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy me a coffee' />
-
-[![Lint](https://github.com/ansibleguy/webui/actions/workflows/lint.yml/badge.svg?branch=latest)](https://github.com/ansibleguy/webui/actions/workflows/lint.yml)
-[![Test](https://github.com/ansibleguy/webui/actions/workflows/test.yml/badge.svg?branch=latest)](https://github.com/ansibleguy/webui/actions/workflows/test.yml)
+[![Lint](https://github.com/O-X-L/ansible-webui/actions/workflows/lint.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/lint.yml)
+[![Test](https://github.com/O-X-L/ansible-webui/actions/workflows/test.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/test.yml)
 
 **DISCLAIMER**: This is an **unofficial community project**! Do not confuse it with the vanilla [Ansible](https://ansible.com/) product!
 
@@ -17,26 +15,26 @@ Keep it simple.
 
 ### Local - PIP
 
-Requires Python >=3.10
+Requires Python >=3.11
 
 ```bash
 # install
-python3 -m pip install ansibleguy-webui
+python3 -m pip install oxl-ansible-webui
 
 # run
-python3 -m ansibleguy-webui
+oxl-ansible-webui
 ```
 
 ### Docker
 
-Images: [webui](https://hub.docker.com/r/ansible0guy/webui), [webui-unprivileged](https://hub.docker.com/r/ansible0guy/webui-unprivileged), [webui-aws](https://hub.docker.com/r/ansible0guy/webui-aws)
+Images: [ansible-webui](https://hub.docker.com/r/oxlorg/ansible-webui), [ansible-webui-unprivileged](https://hub.docker.com/r/oxlorg/ansible-webui-unprivileged), [ansible-webui-aws](https://hub.docker.com/r/oxlorg/ansible-webui-aws)
 
 ```bash
 docker image pull ansible0guy/webui:latest
-docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 ansible0guy/webui:latest
+docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 oxlorg/ansible-webui:latest
 
 # or with persistent data (volumes: /data = storage for logs & DB, /play = ansible playbook base-directory)
-docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play ansible0guy/webui:latest
+docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play oxlorg/ansible-webui:latest
 ```
 
 ----
@@ -61,29 +59,25 @@ Login: User `demo`, Password `Ansible1337`
 
 ## Contribute
 
-Feel free to contribute to this project using [pull-requests](https://github.com/ansibleguy/webui/pulls), [issues](https://github.com/ansibleguy/webui/issues) and [discussions](https://github.com/ansibleguy/webui/discussions)!
+Feel free to contribute to this project using [pull-requests](https://github.com/O-X-L/ansible-webui/pulls), [issues](https://github.com/O-X-L/ansible-webui/issues) and [discussions](https://github.com/O-X-L/ansible-webui/discussions)!
 
-Testers are also very welcome! Please [give feedback](https://github.com/ansibleguy/webui/discussions)
+Testers are also very welcome! Please [give feedback](https://github.com/O-X-L/ansible-webui/discussions)
 
-See also: [Contributing](https://github.com/ansibleguy/webui/blob/latest/CONTRIBUTE.md)
+See also: [Contributing](https://github.com/O-X-L/ansible-webui/blob/latest/CONTRIBUTE.md)
 
-<img src="https://contrib.rocks/image?repo=ansibleguy/webui&max=5" />
-
-----
-
-## Advertisement
-
-* Need **professional support** using Ansible? Contact us:
-
-  E-Mail: [contact@oxl.at](mailto:contact@oxl.at)
-
-  Tel: [+43 3115 40 900 0](tel:+433115409000)
-
-  Web: [EN](https://www.o-x-l.com) | [DE](https://www.oxl.at)
+<img src="https://contrib.rocks/image?repo=O-X-L/ansible-webui&max=5" />
 
 ----
 
 ## Roadmap
+
+### V1.0
+
+- [ ] Refactor WebUI => SvelteJS & TailwindCSS
+- [ ] Data-update over Websockets
+- [ ] Migrate permissions to Django-builtin ones
+
+### Full
 
 - [x] Ansible Config
 

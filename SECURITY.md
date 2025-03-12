@@ -13,6 +13,6 @@ If you find any security issue - we are happy to fix them.
 
 ## Reporting a Vulnerability
 
-You can currently report security vulnerabilities [as issues](https://github.com/ansibleguy/webui/issues/new/choose)
+You can currently report security vulnerabilities [as issues](https://github.com/O-X-L/ansible-webui/issues/new/choose)
 
 We will try to get back to you as soon as possible.

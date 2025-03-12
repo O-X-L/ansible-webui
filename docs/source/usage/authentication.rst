@@ -11,7 +11,7 @@ In case your primary authentication method is not working for some reason - you 
 SAML SSO
 ********
 
-**Tested config examples**: `Google Workspace <https://github.com/ansibleguy/webui/blob/latest/examples/saml_google_workspace.yml>`_
+**Tested config examples**: `Google Workspace <https://github.com/O-X-L/ansible-webui/blob/latest/examples/saml_google_workspace.yml>`_
 
 This app is integrating the `grafana/django-saml2-auth module <https://github.com/grafana/django-saml2-auth>`_ (indirect `pysaml2 <https://github.com/IdentityPython/pysaml2>`_).
 
@@ -91,4 +91,4 @@ Example:
 .. code-block:: bash
 
     # save all needed SAML files to /etc/ansible-webui/ on your host system
-    sudo docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --env AW_CONFIG=/etc/aw/config.yml --volume /etc/ansible-webui/:/etc/aw/ ansible0guy/webui:latest
+    sudo docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --env AW_CONFIG=/etc/aw/config.yml --volume /etc/ansible-webui/:/etc/aw/ oxlorg/ansible-webui:latest

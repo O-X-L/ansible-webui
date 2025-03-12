@@ -13,7 +13,7 @@ This project has a API first development approach!
 
 To use the API you have to create an API key. You can use the UI at :code:`Settings - API Keys` to do so.
 
-You can also create API keys using the CLI: :code:`python3 -m ansibleguy-webui.cli -a api-key.create -p <USER>`
+You can also create API keys using the CLI: :code:`oxl-ansible-webui-cli -a api-key.create -p <USER>`
 
 Examples
 ********

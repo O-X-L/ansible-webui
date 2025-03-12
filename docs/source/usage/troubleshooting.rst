@@ -12,7 +12,7 @@ Troubleshooting
 Topology
 ********
 
-AnsibleGuy WebUI is made of a few main components.
+This Ansible-WebUI is made of a few main components.
 
 It will be beneficial for the troubleshooting process if we find out in which the error occurs.
 
@@ -38,7 +38,7 @@ Versions
 
 You can find the versions of software packages in use at the :code:`System - Environment` page.
 
-Alternatively you can check it from the cli: :code:`python3 -m ansibleguy-webui.cli --version`
+Alternatively you can check it from the cli: :code:`oxl-ansible-webui-cli --version`
 
 ----
 
@@ -214,12 +214,12 @@ Connection in use
   .. code-block:: bash
 
       # find it
-      pgrep -f ansibleguy-webui
+      pgrep -f oxl-ansible-webui
       netstat -tulpn | grep 8000
-      ps -aux | grep ansibleguy-webui | grep -v grep
+      ps -aux | grep oxl-ansible-webui | grep -v grep
 
       # kill it
-      pkill -f ansibleguy-webui
+      pkill -f oxl-ansible-webui
       kill -9 <PID>
 
 ----
@@ -287,7 +287,7 @@ Database Migration Issues
         export AW_DB=<PATH-TO-YOUR-DB>
 
         # upgrade DB schema
-        python3 -m ansibleguy-webui.manage migrate
+        oxl-ansible-webui-manage migrate
 
 ----
 
@@ -301,7 +301,7 @@ Database Migration Issues
 
 * You will have to find out which migrations were already applied:
 
-  :code:`python3 -m ansibleguy-webui.manage showmigrations`
+  :code:`oxl-ansible-webui-manage showmigrations`
 
   * Or check your database manually:
 
@@ -318,17 +318,17 @@ Database Migration Issues
           .table
           .schema <TABLE>
 
-* Check which migrations are available: :code:`python3 -m ansibleguy-webui.cli -a migrations.list`
+* Check which migrations are available: :code:`oxl-ansible-webui-cli -a migrations.list`
 
 * With that information you should be able to determine which migrations you can :code:`fake` and which ones to apply.
 
     .. code-block:: bash
 
         # migrations that are available and already are applied to the database - can be faked (only last one)
-        python3 -m ansibleguy-webui.manage migrate --fake aw 0001_v0_0_12
+        oxl-ansible-webui-manage migrate --fake aw 0001_v0_0_12
 
         # you should then be able to apply the un-applied migrations
-        python3 -m ansibleguy-webui.manage migrate aw 0002_v0_0_13
+        oxl-ansible-webui-manage migrate aw 0002_v0_0_13
 
 ----
 

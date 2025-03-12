@@ -3,13 +3,13 @@ requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ansibleguy-webui"
+name = "oxl-ansible-webui"
 authors = [
-    {name = "AnsibleGuy", email = "contact@ansibleguy.net"},
+    {name = "OXL IT-Services", email = "contact@OXL.at"},
 ]
 description = "Basic WebUI for using Ansible"
 readme = "README.md"
-requires-python = ">=3.10"  # django 5.0
+requires-python = ">=3.11"
 keywords = ["ansible", "webui", "automation", "iac"]
 license = {file = "LICENSE.txt"}
 classifiers = [
@@ -20,10 +20,10 @@ classifiers = [
 dynamic = ["dependencies", "version"]
 
 [project.urls]
-Homepage = "https://github.com/ansibleguy/webui"
+Homepage = "https://github.com/O-X-L/ansible-webui"
 Documentation = "https://webui.ansibleguy.net/"
-Repository = "https://github.com/ansibleguy/webui.git"
-Issues = "https://github.com/ansibleguy/issues"
+Repository = "https://github.com/O-X-L/ansible-webui.git"
+Issues = "https://github.com/O-X-L/ansible-webui/issues"
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
@@ -35,6 +35,7 @@ where = ["src"]
 [tool.setuptools.package-data]
 "*" = ["*.html", "*.js", "*.css", "*.svg", "*.txt"]
 
-# [project.scripts]
-# ansibleguy-webui = "ansibleguy-webui.__main__"
-# ansibleguy-webui-db = "ansibleguy-webui.manage"
+[project.scripts]
+oxl-ansible-webui = "oxl_ansible_webui:main"
+oxl-ansible-webui-cli = "oxl_ansible_webui:cli"
+oxl-ansible-webui-manage = "oxl_ansible_webui:manage"

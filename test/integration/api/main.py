@@ -88,7 +88,7 @@ def test_add():
 
         # repos
         {'l': 'repository', 'd': {
-            'name': 'gitty1', 'rtype': 2, 'git_origin': 'https://github.com/ansibleguy/webui.git',
+            'name': 'gitty1', 'rtype': 2, 'git_origin': 'https://github.com/O-X-L/ansible-webui.git',
             'git_branch': 'latest',
         }},
         {'l': 'repository', 'd': {'name': 'staticy1', 'rtype': 1, 'static_path': '/etc/ansible/repo'}},

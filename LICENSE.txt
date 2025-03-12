@@ -637,5 +637,5 @@ copy of the Program in return for a fee.
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    E-Mail: contact@ansibleguy.net
-    Web: https://github.com/ansibleguy
+    E-Mail: contact@OXL.at
+    Web: https://github.com/O-X-L

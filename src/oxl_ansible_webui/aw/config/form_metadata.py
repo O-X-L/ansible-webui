@@ -77,7 +77,7 @@ FORM_LABEL = {
             'db_migrate': 'Database auto-upgrade',
             'serve_static': 'Serving static files',
             'deployment': 'Deployment',
-            'version': 'AnsibleGuy WebUI Version',
+            'version': 'Ansible-WebUI Version',
             'logo_url': 'URL to a Logo to use',
             'ara_server': 'ARA Server URL',
             'global_environment_vars': 'Global Environmental Variables',
@@ -148,8 +148,8 @@ FORM_HELP = {
         'repository': {
             'static_path': 'Path to the local static repository/playbook-base-directory',
             'git_origin': "Full URL to the remote repository. "
-                          "Per example: '<a href=\"https://github.com/ansibleguy/webui.git\">"
-                          "https://github.com/ansibleguy/webui.git'</a>'",
+                          "Per example: '<a href=\"https://github.com/O-X-L/ansible-webui.git\">"
+                          "https://github.com/O-X-L/ansible-webui.git'</a>'",
             'git_credentials': "Credentials for connecting to the origin. "
                                "'Connect User', 'Connect Password' and 'SSH Private Key' are used",
             'git_playbook_base': 'Relative path to the Playbook base-directory relative from the repository root',

@@ -8,7 +8,7 @@ DIR_DATA='/var/local/ansible-webui/'
 DIR_PLAY="${DIR_DATA}play/"
 DIR_LOG="${DIR_DATA}log/"
 AW_USER='ansible-webui'
-IMAGE='ansible0guy/webui-unprivileged:latest'
+IMAGE='oxlorg/ansible-webui-unprivileged:latest'
 
 # useradd $AW_USER --shell /usr/sbin/nologin --uid 8785 --user-group
 
