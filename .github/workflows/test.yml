@@ -125,7 +125,7 @@ jobs:
           python3 test/integration/api/main.py
           sleep 1
 
-          pkill -f 'oxl-ansible-webui'
+          pkill -f oxl_ansible_webui
 
       - name: Running Integration Tests - AUTH SAML
         run: |
@@ -143,4 +143,4 @@ jobs:
           python3 test/integration/auth/saml.py
           sleep 1
 
-          pkill -f 'oxl-ansible-webui'
+          pkill -f oxl_ansible_webui

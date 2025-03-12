@@ -219,7 +219,7 @@ Connection in use
       ps -aux | grep oxl-ansible-webui | grep -v grep
 
       # kill it
-      pkill -f oxl-ansible-webui
+      pkill -f oxl_ansible_webui
       kill -9 <PID>
 
 ----
