@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-def run():
+def entrypoint():
     # pylint: disable=E0401
     from sys import argv as sys_argv
     from sys import exit as sys_exit
@@ -34,4 +34,4 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    entrypoint()
