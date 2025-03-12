@@ -17,7 +17,7 @@ on:
       - '.github/workflows/test.yml'
       - 'requirements_test.txt'
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     defaults:
