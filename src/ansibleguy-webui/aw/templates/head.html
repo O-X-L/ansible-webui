@@ -1,0 +1,37 @@
+{% load util %}
+{% load static %}
+<title>Ansible WebUI</title>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark" />
+{% if script_unsafe_inline is none %}
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'">
+{% else %}
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline'">
+{% endif %}
+{% comment %}
+  CSP NOTES:
+  fontawesome will fail if style-src is restricted
+  script-src unsafe-eval is for the setInterval calls..
+  script_unsafe_inline is for template-generated inline-scripts (only on job-edit view)
+{% endcomment %}
+<link rel="icon" {% if get_logo|find:"svg" %}type="image/svg"{% endif %} href="{% get_logo %}" referrerpolicy="no-referrer">
+
+<link href="{% static 'vendor/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css" crossorigin="anonymous" referrerpolicy="no-referrer">
+<!--<link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css" crossorigin="anonymous" referrerpolicy="no-referrer">-->
+
+<script src="{% static 'vendor/js/bootstrap.min.js' %}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{% static 'vendor/js/jquery.min.js' %}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{% static 'vendor/js/popper.min.js' %}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{% static 'fontawesomefree/js/fontawesome.js' %}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{% static 'fontawesomefree/js/solid.js' %}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{% static 'fontawesomefree/js/brands.js' %}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/aw.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/aw_mobile.css' %}">
+<script src="{% static 'js/aw.js' %}"></script>

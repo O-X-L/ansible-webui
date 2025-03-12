@@ -1,0 +1,95 @@
+{% load util %}
+{% load static %}
+<div class="aw-nav">
+    <nav class="aw-nav-container navbar navbar-expand-md">  <!-- navbar-dark bg-dark -->
+        <a class="navbar-brand" href="/">
+            <img loading="lazy" src="{% get_logo %}" alt="HOME" onerror="this.style.display='none'" width="40" height="40" class="aw-nav-icon" referrerpolicy="no-referrer">
+        </a>
+        <button class="navbar-toggler aw-nav-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="navbar-toggler-icon fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse mr-auto" id="navbarToggleExternalContent">
+        {% if user.is_authenticated %}
+            <!-- START left navbar -->
+            {% set_var 'left'|get_nav as nav_left %}
+                <ul class="navbar-nav aw-nav-left">
+                    {% for nav_key, nav_config in nav_left.items %}
+                        {% if nav_config|get_type == 'str' %}
+                            <!-- START basic link -->
+                            <li class="nav-item aw-nav-main">
+                                <a class="nav-link aw-nav-main-a1" href="{{ nav_config }}">
+                                    {{ nav_key | safe }}
+                                </a>
+                            </li>
+                            <!-- END basic link -->
+                        {% elif nav_config|get_type == 'dict' %}
+                            <!-- START dropdown link -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle aw-nav-main-a1" href="#" id="navbarDropdown{{ nav_key }}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  {{ nav_key }}
+                                </a>
+                                <ul class="dropdown-menu aw-nav-dd1" aria-labelledby="navbarDropdown{{ nav_key }}">
+                                    {% for dd_key, dd_config in nav_config.items %}
+                                        {% if dd_config|get_type == 'dict' %}
+                                            <!-- START nested dropdown link -->
+                                            <li class="dropdown-submenu">
+                                                <a class="dropdown-toggle dropdown-item aw-nav-main-a2" onClick="display_submenu('{{ nav_key }}{{ dd_key }}')" href="#" id="navbarDropdown{{ nav_key }}{{ dd_key }}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    {{ dd_key }}
+                                                </a>
+                                                <ul class="dropdown-menu aw-nav-dd2" aria-labelledby="navbarDropdown{{ nav_key }}{{ dd_key }}">
+                                                    {% for key, value in dd_config.items %}
+                                                    <li>
+                                                        <a class="dropdown-item aw-nav-main-a3" href="{{ value }}">
+                                                            {{ key | safe }}
+                                                        </a>
+                                                    </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </li>
+                                            <!-- END nested dropdown link -->
+                                        {% else %}
+                                            <li>
+                                                <a class="dropdown-item aw-nav-main-a2" href="{{ dd_config }}">
+                                                    {{ dd_key | safe }}
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            <!-- END dropdown link -->
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            <!-- END left navbar -->
+        {% endif %}
+            <!-- START right navbar -->
+            <ul class="navbar-nav ml-auto aw-nav-right">
+                <li class="nav-item aw-nav-right-li">
+                    <a type="button" class="nav-link" id="aw-switch-colorScheme">
+                        <i class="fas fa-adjust fa-2x aw-nav-right-icon" title="Switch Dark/Light Mode"></i>
+                    </a>
+                </li>
+                {% set_var 'right'|get_nav as nav_right %}
+                {% for nav_item in nav_right.values %}
+                    {% if not nav_item.login or user.is_authenticated %}
+                        {% if 'method' in nav_item %}
+                            <li class="nav-item aw-nav-right-li">
+                                <form action="{{ nav_item.url }}" method="{{ nav_item.method }}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="nav-link">{{ nav_item.element | safe }}</button>
+                                </form>
+                            </li>
+                        {% else %}
+                            <li class="nav-item aw-nav-right-li">
+                                <a class="nav-link" href="{{ nav_item.url }}">{{ nav_item.element | safe }}</a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <!-- END right navbar -->
+        </div>
+    </nav>
+</div>
+<script src="{% static 'js/aw_nav.js' %}"></script>

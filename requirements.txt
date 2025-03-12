@@ -1,0 +1,32 @@
+# webui
+gunicorn
+Django==5.0.*
+pytz
+pyyaml
+django-auto-logout
+pycryptodome
+
+## auth
+grafana-django-saml2-auth
+
+## api
+djangorestframework==3.*
+djangorestframework-api-key==2.*
+drf-spectacular
+
+## styles
+fontawesomefree
+
+# scheduling
+crontab
+
+# ansible
+ansible-core
+# ansible-runner
+ansibleguy-runner==2.4.0.post5
+
+# config
+PyYAML
+
+# email
+premailer

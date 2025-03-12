@@ -1,0 +1,4 @@
+js/popper.min.js 2.11.8 https://cdnjs.com/libraries/popper.js/2.11.8
+css/bootstrap.min.css 5.3.3 https://cdnjs.com/libraries/bootstrap/5.3.3
+js/bootstrap.min.js 5.3.3 https://cdnjs.com/libraries/bootstrap/5.3.3
+js/jquery.min.js 3.7.1 https://cdnjs.com/libraries/jquery/3.7.1

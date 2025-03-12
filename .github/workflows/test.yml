@@ -1,0 +1,146 @@
+---
+
+name: Test
+
+on:
+  push:
+    branches: [latest]
+    paths:
+      - '**.py'
+      - '.github/workflows/test.yml'
+      - 'requirements_test.txt'
+  pull_request:
+    branches: [latest]
+    paths:
+      - '**.py'
+      - '**.yml'
+      - '.github/workflows/test.yml'
+      - 'requirements_test.txt'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements_test.txt >/dev/null
+          pip install -r requirements_build.txt >/dev/null
+          pip install -r requirements.txt >/dev/null
+
+      - name: Testing DB migrations for errors (1/3)
+        run: |
+          export AW_DB="/tmp/$(date +%s).e1.aw.db"
+          rm -rf src/ansibleguy-webui/aw/migrations/*
+          python3 manage.py makemigrations
+        working-directory: src/ansibleguy-webui/
+
+      - name: Testing DB migrations for warnings (1/3)
+        run: |
+          export AW_DB="/tmp/$(date +%s).w1.aw.db"
+          rm -rf src/ansibleguy-webui/aw/migrations/*
+          m1=$(python3 manage.py makemigrations 2>&1)
+          if echo "$m1" | grep -q 'WARNING'; then exit 1;fi
+        working-directory: src/ansibleguy-webui/
+
+      - name: Testing DB migrations for errors (2/3)
+        run: |
+          export AW_DB="/tmp/$(date +%s).e2.aw.db"
+          rm -rf src/ansibleguy-webui/aw/migrations/*
+          python3 manage.py makemigrations aw
+        working-directory: src/ansibleguy-webui/
+
+      - name: Testing DB migrations for warnings (2/3)
+        run: |
+          export AW_DB="/tmp/$(date +%s).w2.aw.db"
+          rm -rf src/ansibleguy-webui/aw/migrations/*
+          m2=$(python3 manage.py migrate aw 2>&1)
+          if echo "$m2" | grep -q 'WARNING'; then exit 1;fi
+        working-directory: src/ansibleguy-webui/
+
+      - name: Testing DB migrations for errors (3/3)
+        run: |
+          export AW_DB="/tmp/$(date +%s).e3.aw.db"
+          rm -rf src/ansibleguy-webui/aw/migrations/*
+          python3 manage.py migrate
+        working-directory: src/ansibleguy-webui/
+
+      - name: Testing DB migrations for warnings (3/3)
+        run: |
+          export AW_DB="/tmp/$(date +%s).w3.aw.db"
+          rm -rf src/ansibleguy-webui/aw/migrations/*
+          m3=$(python3 manage.py migrate 2>&1)
+          if echo "$m3" | grep -q 'WARNING'; then exit 1;fi
+        working-directory: src/ansibleguy-webui/
+
+      - name: Testing to start Ansible-WebUI
+        run: |
+          set +e
+          export AW_DB="/tmp/$(date +%s).aw.db"
+          rm -rf src/ansibleguy-webui/aw/migrations/*
+          timeout 10 python3 src/ansibleguy-webui
+          ec="$?"
+          if [[ "$ec" != "124" ]]
+          then
+            exit 1
+          fi
+
+      - name: Running Unit Tests
+        run: |
+          pytest --version
+          python3 -m pytest
+
+      - name: Running Integration Tests
+        run: |
+          export AW_ENV='dev'
+          export AW_DB="/tmp/$(date +%s).aw.db"
+          export AW_ADMIN='tester'
+          export AW_ADMIN_PWD='someSecret!Pwd'
+          rm -rf src/ansibleguy-webui/aw/migrations/*
+          python3 src/ansibleguy-webui/ >/dev/null 2>/dev/null &
+          sleep 5
+
+          echo 'WEB-UI INTEGRATION TESTS'
+          python3 test/integration/webui/main.py
+          sleep 1
+
+          echo 'API INTEGRATION TESTS'
+          echo 'Create API key'
+          api_key="$(python3 src/ansibleguy-webui/cli.py -a api-key.create -p "$AW_ADMIN" | grep 'Key=' | cut -d '=' -f2)"
+          export AW_API_KEY="$api_key"
+          sleep 1
+          python3 test/integration/api/main.py
+          sleep 1
+
+          pkill -f 'ansibleguy-webui'
+
+      - name: Running Integration Tests - AUTH SAML
+        run: |
+          sleep 5
+          export AW_ENV='dev'
+          export AW_DB="/tmp/$(date +%s).aw.db"
+          export AW_ADMIN='tester'
+          export AW_ADMIN_PWD='someSecret!Pwd'
+          export AW_CONFIG="$(pwd)/test/integration/auth/saml.yml"
+          rm -rf src/ansibleguy-webui/aw/migrations/*
+          python3 src/ansibleguy-webui/ >/dev/null 2>/dev/null &
+          sleep 5
+
+          echo 'WEB-UI AUTH-SAML INTEGRATION TESTS'
+          python3 test/integration/auth/saml.py
+          sleep 1
+
+          pkill -f 'ansibleguy-webui'

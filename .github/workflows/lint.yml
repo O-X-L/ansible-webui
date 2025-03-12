@@ -1,0 +1,54 @@
+---
+
+name: Lint
+
+on:
+  push:
+    branches: [latest]
+    paths:
+      - '**.py'
+      - '**.yml'
+      - '.github/workflows/lint.yml'
+      - 'requirements_lint.txt'
+  pull_request:
+    branches: [latest]
+    paths:
+      - '**.py'
+      - '**.yml'
+      - '.github/workflows/lint.yml'
+      - 'requirements_lint.txt'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements_lint.txt >/dev/null
+          pip install -r requirements.txt >/dev/null
+
+      - name: Running PyLint
+        run: |
+          export DJANGO_SETTINGS_MODULE='aw.settings'
+          export AW_INIT=1
+          pylint --version
+          pylint --rcfile .pylintrc --recursive=y --load-plugins pylint_django --django-settings-module=aw.settings .
+
+      - name: Running YamlLint
+        run: |
+          yamllint --version
+          yamllint .

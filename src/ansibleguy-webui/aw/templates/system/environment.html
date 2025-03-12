@@ -1,0 +1,161 @@
+{% extends "../body.html" %}
+{% load static %}
+{% load util %}
+{% block content %}
+<script src="{% static 'js/settings/environment.js' %}"></script>
+<div class="aw-data">
+    <h2>System version</h2>
+    <div class="table-responsive">
+        <table class="table table-striped aw-text-responsive">
+            <tr>
+                <th>Component</th>
+                <th>Version</th>
+            </tr>
+            <tr>
+                <td>Python</td>
+                <td>{{ env_python }}</td>
+            </tr>
+            <tr>
+                <td>AnsibleGuy WebUI</td>
+                <td>{% get_version %}</td>
+            </tr>
+            <tr>
+                <td>AW Database Schema</td>
+                <td>{{ env_db_schema }}</td>
+            </tr>
+            <tr>
+                <td>Django</td>
+                <td>{{ env_django }}</td>
+            </tr>
+            <tr>
+                <td>Django Rest-Framework</td>
+                <td>{{ env_django_api }}</td>
+            </tr>
+            <tr>
+                <td>Gunicorn</td>
+                <td>{{ env_gunicorn }}</td>
+            </tr>
+{% if env_ansible is not none %}
+            <tr>
+                <td>Ansible</td>
+                <td>{{ env_ansible }}</td>
+            </tr>
+{% endif %}
+{% if env_ansible_core is not none %}
+            <tr>
+                <td>Ansible Core</td>
+                <td>{{ env_ansible_core }}</td>
+            </tr>
+{% endif %}
+{% if env_ansible_runner is not none %}
+            <tr>
+                <td>Ansible Runner</td>
+                <td>{{ env_ansible_runner }}</td>
+            </tr>
+{% endif %}
+            <tr>
+                <td>Ansible Playbook</td>
+                <td>{{ env_ansible_playbook }}</td>
+            </tr>
+{% if env_jinja is not none %}
+            <tr>
+                <td>Jinja</td>
+                <td>{{ env_jinja }}</td>
+            </tr>
+{% endif %}
+{% if env_aws|exists %}
+            <tr>
+                <td>AWS Tools</td>
+                <td>{% for tool, version in env_aws.items %}{{ tool }}: {{ version }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+            </tr>
+{% endif %}
+{% if env_ara|exists %}
+            <tr>
+                <td>ARA Client</td>
+                <td>{{ env_ara }}</td>
+            </tr>
+{% endif %}
+            <tr>
+                <td>Git</td>
+                <td>{{ env_git }}</td>
+            </tr>
+            <tr>
+                <td>Running User</td>
+                <td>{{ env_user }}</td>
+            </tr>
+            <tr>
+                <td>Linux</td>
+                <td>{{ env_linux }}</td>
+            </tr>
+        </table>
+        {{ env_system|json_script:"aw-json-system" }}
+        <button class="btn btn-info aw-btn-action aw-btn-refresh" title="Copy Versions" onclick="jsonToClipboard('aw-json-system')">
+            {% include "../button/icon/copy.html" %}
+        </button>
+    </div>
+    <hr>
+    <h2>Ansible Config</h2>
+    <div class="table-responsive">
+        <table class="table table-striped aw-text-responsive">
+            <tr>
+                <th>Setting</th>
+                <th>Value</th>
+                <th>Comment</th>
+            </tr>
+{% for setting, attrs in env_ansible_config.items %}
+            <tr>
+                <td><a href="{{ attrs.url }}">{{ setting }}</a></td>
+                <td>{{ attrs.value }}</td>
+                <td>{{ attrs.comment }}</td>
+            </tr>
+{% endfor %}
+        </table>
+        {{ env_ansible_config|json_script:"aw-json-ansible-config" }}
+        <button class="btn btn-info aw-btn-action aw-btn-refresh" title="Copy Versions" onclick="jsonToClipboard('aw-json-ansible-config')">
+            {% include "../button/icon/copy.html" %}
+        </button>
+    </div>
+    <hr>
+    <h2>Ansible Collections</h2>
+    <div class="table-responsive">
+        <table class="table table-striped aw-text-responsive">
+            <tr>
+                <th>Collection</th>
+                <th>Version</th>
+                <th>Path</th>
+            </tr>
+{% for name, attrs in env_ansible_collections.items %}
+            <tr>
+                <td><a href="{{ attrs.url }}/">{{ name }}</a></td>
+                <td>{{ attrs.version }}</td>
+                <td>{{ attrs.path }}</td>
+            </tr>
+{% endfor %}
+        </table>
+        {{ env_ansible_collections|json_script:"aw-json-ansible-collections" }}
+        <button class="btn btn-info aw-btn-action aw-btn-refresh" title="Copy Versions" onclick="jsonToClipboard('aw-json-ansible-collections')">
+            {% include "../button/icon/copy.html" %}
+        </button>
+    </div>
+    <hr>
+    <h2>Python Modules</h2>
+    <div class="table-responsive">
+        <table class="table table-striped aw-text-responsive">
+            <tr>
+                <th>Module</th>
+                <th>Version</th>
+            </tr>
+{% for module in env_python_modules.values %}
+            <tr>
+                <td><a href="https://pypi.org/project/{{ module|get_value:'name' }}/">{{ module|get_value:'name' }}</a></td>
+                <td>{{ module|get_value:'version' }}</td>
+            </tr>
+{% endfor %}
+        </table>
+        {{ env_python_modules|json_script:"aw-json-python-modules" }}
+        <button class="btn btn-info aw-btn-action aw-btn-refresh" title="Copy Versions" onclick="jsonToClipboard('aw-json-python-modules')">
+            {% include "../button/icon/copy.html" %}
+        </button>
+    </div>
+</div>
+{% endblock %}

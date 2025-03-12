@@ -1,0 +1,25 @@
+{% load util %}
+Job: {{ execution.job.name }}
+Status: {{ execution.status_name }}
+
+Executed by: {{ execution.user_name }}
+Start time: {{ execution.time_created_str }}
+{% if execution.result is not none %}Finish time: {{ execution.result.time_fin_str }}
+Duration: {{ execution.result.time_duration_str }}
+{% if execution.result.error is not none %}
+Short error message: '{{ execution.result.error.short }}'
+Long error message: '{{ execution.result.error.med }}'{% endif %}
+{% if error_msgs|get_value:'text'|exists %}
+Execution errors:
+{% for msg in error_msgs|get_value:'text' %}{{ msg }}
+{% endfor %}{% endif %}
+{% endif %}
+{% for log_attr in execution.log_file_fields %}{% set_var execution|get_value:log_attr as log_file %}{% set_var log_attr|concat:'_url' as log_url %}{% if log_file|file_exists %}
+{{ log_attr|whitespace_char:'_'|capitalize }}: {{ web_addr }}{{ execution|get_value:log_url }}{% endif %}{% endfor %}
+{% if stats|exists %}
+
+Statistics:
+{% for host, host_stats in stats.items %}
+Host: {{ host }}
+Stats: {% for k, v in host_stats.items %}{{ k }}: {{ v }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endfor %}
+{% endif %}

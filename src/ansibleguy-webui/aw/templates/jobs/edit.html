@@ -1,0 +1,79 @@
+{% extends "../body.html" %}
+{% load static %}
+{% load util %}
+{% block content %}
+<script src="{% static 'js/jobs/edit.js' %}"></script>
+<a href="/ui/jobs/manage">
+    <button class="btn btn-info aw-btn-action" title="Return">
+        {% include "../button/icon/return.html" %}
+    </button>
+</a>
+
+<form id="aw-job-form" method="{{ form_method }}" action="/api/{{ form_api }}">
+    {% csrf_token %}
+    {{ form }}
+</form>
+
+<div id="aw-job-form-prompt-tmpl" hidden="hidden">
+    <div class="form-label col-sm-2 col-form-label"><b>Prompt ${ID}</b></div>
+    <div class="mb-3 row" >
+        <label for="id_prompt_${ID}_name" class="form-label col-sm-2 col-form-label form-label-sub">Display Name</label>
+        <div class="col-sm-10">
+            <input class="form-control" id="id_prompt_${ID}_name" name="prompt_${ID}_name" value="${NAME}" required>
+        </div>
+    </div>
+    <div class="mb-3 row" >
+        <label for="id_prompt_${ID}_varName" class="form-label col-sm-2 col-form-label form-label-sub">Variable Name</label>
+        <div class="col-sm-10">
+            <input class="form-control" id="id_prompt_${ID}_varName" name="prompt_${ID}_varName" value="${VAR_NAME}" required>
+        </div>
+    </div>
+    <div class="mb-3 row" >
+        <label for="id_prompt_${ID}_kind" class="form-label col-sm-2 col-form-label form-label-sub">Input Kind</label>
+        <div class="col-sm-10">
+            <select class="form-control" id="id_prompt_${ID}_kind" name="prompt_${ID}_kind">
+                <option value="text" ${kind_text}>Text</option>
+                <option value="dropdown" ${kind_dd}>Choices</option>
+            </select>
+        </div>
+    </div>
+    <div class="mb-3 row" >
+        <label for="id_prompt_${ID}_required" class="form-label col-sm-2 col-form-label form-label-sub">Requirement</label>
+        <div class="col-sm-10">
+            <select class="form-control" id="id_prompt_${ID}_required" name="prompt_${ID}_required">
+                <option value="1" ${req_req}>Required</option>
+                <option value="0" ${req_opt}>Optional</option>
+            </select>
+        </div>
+    </div>
+    <div class="mb-3 row" >
+        <label for="id_prompt_${ID}_choices" class="form-label col-sm-2 col-form-label form-label-sub">Choices</label>
+        <div class="col-sm-10">
+            <input class="form-control" id="id_prompt_${ID}_choices" name="prompt_${ID}_choices" value="${CHOICES}">
+        </div>
+        <div class="help-block">
+            <b>Info:</b> Comma-separated list of choices.
+        </div>
+    </div>
+    <div class="mb-3 row" >
+        <label for="id_prompt_${ID}_regex" class="form-label col-sm-2 col-form-label form-label-sub">Regex Validation</label>
+        <div class="col-sm-10">
+            <input class="form-control" id="id_prompt_${ID}_regex" name="prompt_${ID}_regex" value="${REGEX}" pattern="^(?!.*\x22.*)(^.*$)$">
+        </div>
+        <div class="help-block">
+            <b>Info:</b>
+            You can use <a href="https://regex101.com/">Regex101.com</a> to test your input-validation.
+            Make sure to select the 'ECMAScript (Javascript)' flavor.
+        </div>
+    </div>
+    <button type="button" class="aw-job-form-prompt-del btn btn-danger" title="Remove" name="${ID}">Remove Prompt ${ID}</button>
+    <br><br>
+</div>
+
+<a href="/ui/jobs/manage">
+    <button class="btn btn-info aw-btn-action" title="Return">
+        {% include "../button/icon/return.html" %}
+    </button>
+</a>
+
+{% endblock %}
