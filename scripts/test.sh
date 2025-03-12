@@ -14,7 +14,7 @@ function failure() {
   echo ''
   echo '### FAILED ###'
   echo ''
-  pkill -f oxl-ansible-webui
+  pkill -f oxl_ansible_webui
   exit 1
 }
 
@@ -24,7 +24,7 @@ echo ''
 
 if pgrep -f 'oxl-ansible-webui'
 then
-  echo 'An instance of Ansible-WebUI is already running! Stop it first (pkill -f oxl-ansible-webui)'
+  echo 'An instance of Ansible-WebUI is already running! Stop it first (pkill -f oxl_ansible_webui)'
   exit 1
 fi
 
@@ -39,7 +39,7 @@ export AW_ADMIN='tester'
 export AW_ADMIN_PWD='someSecret!Pwd'
 python3 src/oxl_ansible_webui/ >/dev/null 2>/dev/null &
 echo ''
-sleep 5
+sleep 10
 
 set +e
 if ! python3 test/integration/webui/main.py
@@ -64,7 +64,7 @@ then
 fi
 
 sleep 1
-pkill -f 'oxl-ansible-webui'
+pkill -f oxl_ansible_webui
 
 echo ''
 echo 'INTEGRATION TESTS SAML'
@@ -89,7 +89,7 @@ fi
 
 sleep 1
 export AW_CONFIG=''
-pkill -f 'oxl-ansible-webui'
+pkill -f oxl_ansible_webui
 
 echo ''
 echo 'TESTING TO CLI TOOLS'
