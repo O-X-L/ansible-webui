@@ -17,7 +17,7 @@ def __get_module_version() -> str:
         return env_version
 
     try:
-        return version('ansibleguy-webui')
+        return version('oxl-ansible-webui')
 
     except PackageNotFoundError:
         # NOTE: not able to use aw.utils.debug.log_warn because of circular dependency

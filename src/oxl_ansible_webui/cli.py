@@ -13,7 +13,7 @@ from pathlib import Path
 
 
 def _api_key(username: str):
-    # python3 -m ansibleguy-webui.cli api-key.create
+    # oxl-ansible-webui-cli api-key.create
     from aw.base import USERS
     from aw.model.api import AwAPIKey
     from aw.utils.util import datetime_w_tz
@@ -27,7 +27,7 @@ def _api_key(username: str):
 
 
 def _print_version():
-    # python3 -m ansibleguy-webui.cli --version
+    # oxl-ansible-webui-cli --version
     from aw.utils.version import get_version, get_system_versions
 
     print(f'Version: {get_version()}\n{json_dumps(get_system_versions(), indent=4)}')

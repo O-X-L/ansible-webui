@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-if __name__ == '__main__':
+
+def run():
     # pylint: disable=E0401
     from sys import argv as sys_argv
     from sys import exit as sys_exit
@@ -28,5 +29,9 @@ if __name__ == '__main__':
             environ[ENV_KEY_CONFIG] = sys_argv[2]
 
     from aw.config.main import VERSION
-    print(f'AnsibleGuy-WebUI Version {VERSION}')
+    print(f'Ansible-WebUI Version {VERSION}')
     main()
+
+
+if __name__ == '__main__':
+    run()

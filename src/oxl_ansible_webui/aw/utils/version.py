@@ -33,7 +33,7 @@ def get_version() -> str:
 
 
 def parsed_ansible_version(python_modules) -> dict:
-    versions = {'ansible': None, 'jinja': None, 'libyaml': None, 'ansible_runner': None}
+    versions = {'ansible': None, 'ansible_core': None, 'jinja': None, 'libyaml': None, 'ansible_runner': None}
     try:
         ansible_version = process_cache('ansible --version')['stdout'].split('\n')
         versions['ansible_core'] = ansible_version[0].strip()
@@ -47,7 +47,7 @@ def parsed_ansible_version(python_modules) -> dict:
         if 'ansible' in python_modules:
             versions['ansible'] = python_modules['ansible']['version']
 
-    except IndexError:
+    except (IndexError, AttributeError):
         pass
 
     return versions
