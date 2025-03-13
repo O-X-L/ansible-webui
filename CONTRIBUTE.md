@@ -47,13 +47,13 @@ export AW_VERSION="$(cat VERSION)"
 python3 src/oxl_ansible_webui/
 ```
 
-----
-
 #### Frontend
 
 You need to have Node.js installed.
 
 Quick install: `bash ./scripts/frontend/nodejs_install.sh`
+
+----
 
 ### Using Docker
 
@@ -62,6 +62,10 @@ docker image pull oxlorg/ansible-webui:dev
 cd ${PATH_TO_SRC}  # repository root directory
 docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awtest:/data --volume $(pwd):/aw ansible0guy/webui:dev
 ```
+
+#### Frontend
+
+todo..
 
 ----
 
@@ -92,7 +96,7 @@ To build the frontend bundles - you can either run:
 * `bash ./scripts/frontend/run_updater.sh` for automatic update whenever code changes
 * `bash ./scripts/frontend/build.sh` to build it once (set `FORCE_UPDATE=1` env-var if no changes were made)
 
-The bundles are generated into `src/oxl_ansible_webui/aw/static_dev`.
+The bundles are generated into `src/oxl_ansible_webui/aw/static_dev` - django will use this statics-directory in dev-mode.
 
 DO NOT copy & commit bundles to/in `src/oxl_ansible_webui/aw/static` - they are only generated/updated on release.
 
