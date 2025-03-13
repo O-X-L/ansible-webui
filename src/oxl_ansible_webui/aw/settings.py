@@ -104,7 +104,8 @@ DATABASES = {
         'NAME': DB_FILE,
         'OPTIONS': {
             'timeout': 3,  # kill long-running write-requests fast; do not block whole application
-            'transaction_mode': 'IMMEDIATE',  # see: https://github.com/django/django/commit/a0204ac183ad6bca71707676d994d5888cf966aa
+            'transaction_mode': 'IMMEDIATE',
+            # see: https://github.com/django/django/commit/a0204ac183ad6bca71707676d994d5888cf966aa
         },
         'ATOMIC_REQUESTS': False,  # default
     }
