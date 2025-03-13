@@ -4,6 +4,8 @@ set -e
 
 cd "$(dirname "$0")/.."
 
+export PYTHONPATH=''
+
 echo ''
 echo 'UNIT TESTS'
 echo ''
@@ -30,6 +32,7 @@ fi
 
 
 echo 'Starting Ansible-WebUI..'
+trap "pkill -f oxl_ansible_webui; exit" INT
 export AW_ENV='dev'
 # shellcheck disable=SC2155
 export AW_DB="/tmp/$(date +%s).aw.db"

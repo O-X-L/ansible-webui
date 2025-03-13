@@ -46,6 +46,10 @@ def catchall(request) -> HttpResponse:
     return redirect(LOGIN_PATH)  # will be done by endpoint_wrapper
 
 
+def not_found(request) -> HttpResponse:
+    del request
+    return HttpResponse(content=b'Not found', status=404)
+
 @login_required
 @ui_endpoint_wrapper
 def logout(request) -> HttpResponse:

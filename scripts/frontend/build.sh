@@ -7,18 +7,17 @@ FORCE_UPDATE="${FORCE_UPDATE:-0}"
 cd "$(dirname "$0")/"
 
 REPO_BASE="$(pwd)/../.."
-SRC_DIR="${REPO_BASE}/frontend/"
+SRC_DIR="${REPO_BASE}/frontend"
 DST_DIR="${REPO_BASE}/src/oxl_ansible_webui/aw/static_dev/dist"
-mkdir -p "$DST_DIR"
+UPDATE_NOW="${SRC_DIR}/src/.update_now"
 
-echo "$FORCE_UPDATE"
 if [[ "$FORCE_UPDATE" == '1' ]]
 then
-  touch "${REPO_BASE}/frontend/src/.update_now"
+  touch "$UPDATE_NOW"
 fi
 
 function check_src_changes() {
-  recent_changes="$(find "${SRC_DIR}/src/" -type f -mmin -0.5 | wc -l)"
+  recent_changes="$(find "${SRC_DIR}/src/" -type f -mmin -0.3 | wc -l)"
   if [[ "$recent_changes" == '0' ]]
   then
     exit 0
@@ -27,6 +26,7 @@ function check_src_changes() {
 
 check_src_changes
 
+mkdir -p "$DST_DIR"
 bash build_tailwind.sh "$SRC_DIR" "$DST_DIR" &
 
 cd "$SRC_DIR"
@@ -54,3 +54,4 @@ do
   done
 done
 echo "--- $(date +%H:%M:%S) FRONTEND UPDATED ---"
+rm -f "$UPDATE_NOW"

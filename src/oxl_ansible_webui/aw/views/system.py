@@ -111,7 +111,7 @@ def system_environment(request) -> HttpResponse:
     env_system = get_system_versions(python_modules=python_modules, ansible_version=ansible_version)
 
     return render(
-        request, status=200, template_name='system/environment.html',
+        request, status=200, template_name='system_environment.html',
         context={
             **env_system,
             'env_user': getuser(),

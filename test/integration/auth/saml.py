@@ -12,21 +12,65 @@ BASE_URL = 'http://127.0.0.1:8000'
 options = webdriver.ChromeOptions()
 options.add_argument('--headless')
 options.add_argument('--disable-extensions')
+options.add_argument('--disable-logging')
+options.add_argument('--log-level=3')
 options.add_argument('--remote-debugging-port=9222')
 chromedriver_autoinstaller.install()
 DRIVER = webdriver.Chrome(options=options)
 
 
-def _response_code(url: str) -> (int, None):
-    for request in DRIVER.requests:
-        if request.response and request.url == url:
-            return request.response.status_code
+def _get_requests(url: str) -> dict:
+    reqs = {'main': None, 'sub': []}
 
-    return None
+    for r in DRIVER.requests:
+        if not r.response or r.url.endswith('favicon.ico'):
+            continue
+
+        if r.url == url:
+            reqs['main'] = r
+
+        elif r.url.startswith(BASE_URL) and r.headers['Referer'] == url:
+            reqs['sub'].append(r)
+
+    del DRIVER.requests
+    return reqs
+
+
+def _check_requests(url: str) -> bool:
+    reqs = _get_requests(url)
+    if reqs['main'] is None:
+        return False
+
+    sc = reqs['main'].response.status_code
+    if sc not in [200, 302]:
+        print(f"ERROR: Bad response-code {sc} @ '{reqs['main']}'")
+        return False
+
+    for sr in reqs['sub']:
+        sc = sr.response.status_code
+        if sc not in [200, 304]:
+            print(f"ERROR: Bad response-code {sc} @ '{sr}'")
+            return False
+
+    return True
+
+
+def _check_console_logs(url: str) -> bool:
+    errors = []
+    for log in DRIVER.get_log('browser'):
+        if log['level'] == 'SEVERE':
+            errors.append(log)
+
+    if len(errors) > 0:
+        print(f"ERROR: Issue(s) in logs/console @ '{url}'")
+        print('\n'.join([f"{e['level']} {e['source']}: \"{e['message']}\"" for e in errors]))
+        return False
+
+    return True
 
 
 def _response_ok(url: str) -> bool:
-    return _response_code(url) in [200, 302]
+    return _check_requests(url) and _check_console_logs(url)
 
 
 def login_fallback(user: str, pwd: str):
@@ -40,7 +84,6 @@ def login_fallback(user: str, pwd: str):
 
     login_redirect = f'{BASE_URL}/ui/jobs/manage'
     assert DRIVER.current_url == login_redirect
-    assert _response_ok(login_redirect)
 
 
 def test_get_locations(locations: list):

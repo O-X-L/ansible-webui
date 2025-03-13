@@ -6,10 +6,11 @@ from django.contrib.auth.views import LoginView, PasswordChangeView
 
 from web_serve_static import urlpatterns_static
 from aw.api import urlpatterns_api
-from aw.views.main import urlpatterns_ui, catchall, logout
+from aw.views.main import urlpatterns_ui, catchall, logout, not_found
 from aw.config.environment import check_aw_env_var_true, auth_mode_saml
 from aw.utils.deployment import deployment_dev
 from aw.views.forms.auth import saml_sp_initiated_login, saml_sp_initiated_login_init
+from aw.settings import STATIC_URL
 
 urlpatterns = []
 
@@ -24,8 +25,8 @@ if auth_mode_saml():
         path('a/saml/init/', saml_sp_initiated_login_init),
         path('a/saml/', include('django_saml2_auth.urls')),
         # user views
-        path('a/login/', saml_sp_initiated_login, name='login_sso'),
         path('a/login/fallback/', LoginView.as_view(), name='login'),
+        path('a/login/', saml_sp_initiated_login, name='login_sso'),
     ]
 
 else:
@@ -43,5 +44,6 @@ urlpatterns += [
 urlpatterns += urlpatterns_ui
 urlpatterns += [
     # fallback
+    re_path(r'^' + STATIC_URL[1:], not_found),
     re_path(r'^', catchall),
 ]

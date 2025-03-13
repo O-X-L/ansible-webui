@@ -4,6 +4,6 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-#git pull || true
-#last_tag="$(git describe --tags --abbrev=0)"
-#echo "${last_tag}.dev" > "$(dirname "$0")/../VERSION"
+git pull 2>/dev/null || true
+last_tag="$(git describe --tags --abbrev=0)"
+echo "${last_tag}.dev" > "$(dirname "$0")/../VERSION"

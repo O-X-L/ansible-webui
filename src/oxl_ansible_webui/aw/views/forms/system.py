@@ -70,7 +70,7 @@ def system_config(request) -> HttpResponse:
         context={'form': config_form, 'existing': existing},
     )
     return render(
-        request, status=200, template_name='system/config.html',
+        request, status=200, template_name='system_config.html',
         context={
             'form': config_form_html, 'form_api': form_api, 'form_method': form_method,
             'env_vars': AW_ENV_VARS, 'env_labels': FORM_LABEL['system']['config'],

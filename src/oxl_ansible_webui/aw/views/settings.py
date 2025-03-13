@@ -10,19 +10,19 @@ from aw.views.forms.settings import setting_permission_edit, setting_alert_plugi
 @login_required
 @ui_endpoint_wrapper
 def setting_api_key(request) -> HttpResponse:
-    return render(request, status=200, template_name='settings/api_key.html', context={'show_update_time': True})
+    return render(request, status=200, template_name='settings_api_key.html', context={'show_update_time': True})
 
 
 @login_required
 @ui_endpoint_wrapper
 def setting_permission(request) -> HttpResponse:
-    return render(request, status=200, template_name='settings/permission.html', context={'show_update_time': True})
+    return render(request, status=200, template_name='settings_permission.html', context={'show_update_time': True})
 
 
 @login_required
 @ui_endpoint_wrapper
 def setting_alert(request) -> HttpResponse:
-    return render(request, status=200, template_name='settings/alert.html', context={'show_update_time': True})
+    return render(request, status=200, template_name='settings_alert.html', context={'show_update_time': True})
 
 
 urlpatterns_settings = [

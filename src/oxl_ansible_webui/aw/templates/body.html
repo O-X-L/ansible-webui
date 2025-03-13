@@ -1,37 +1,23 @@
 <!DOCTYPE html>
-{% load util %}
-{% load static %}
 <html lang="en">
     <head>
-        {% include "./head.html" %}
-        <!-- START custom header additions -->
-            {% block extrahead %}
-            {% endblock %}
-        <!-- END custom header additions -->
+        <title>Ansible WebUI</title>
+        <link href="/static/css/global.css" rel="stylesheet" type="text/css" crossorigin="anonymous" referrerpolicy="no-referrer">
+        <link href="/static/dist/tailwind.min.css" rel="stylesheet" type="text/css" crossorigin="anonymous" referrerpolicy="no-referrer">
     </head>
     <body>
-        {% include "./nav.html" %}
-        {% include "./error/js_disabled.html" %}
-        <main class="aw-main">
-            <div id="aw-api-error" class="aw-error-msg aw-mark-warn"></div>
-            <div id="aw-ui-error" class="aw-error-msg aw-mark-warn">{{ request.GET|get_value:"error"|ignore_none }}</div>
-            <div id="aw-api-result" class="aw-success-msg aw-mark-ok"></div>
+        <noscript>
+            <div class="noscript-error">
+                You need to enable Javascript to use this app!
+            </div>
+        </noscript>
+        <div id="nav" class="dark:bg-gray-600"></div>
+        <div id="main" class="dark:bg-gray-600 w-full h-full">
             {% block content %}
             {% endblock %}
-            {% if show_update_time %}
-                <div id="aw-last-update"></div>
-            {% endif %}
-            <iframe hidden="hidden" id="aw-api-error-full" src="about:blank" width="100%" height="100%" marginheight="0" marginwidth="0" frameborder="0" scrolling="auto"></iframe>
-        </main>
-        <br>
-        <div class="aw-footer-wrapper">
-            <footer class="aw-footer">
-                <div class="aw-footer-text">
-                    <div>
-                        © {% now 'Y' %} OXL | Version {% get_version %}{% if user.is_authenticated %} | User: {{ request.user }}{% endif %}
-                    </div>
-                </div>
-            </footer>
         </div>
+        <div id="footer-bg" class="dark:bg-gray-600"></div>
+        <div id="footer" class="dark:bg-gray-600"></div>
+        <script type="module" src="/static/dist/index.js"></script>
     </body>
 </html>

@@ -49,7 +49,7 @@ def manage(request) -> HttpResponse:
                 ).order_by('-created')
 
     return render(
-        request, status=200, template_name='jobs/manage.html',
+        request, status=200, template_name='dashboard.html',
         context={
             'jobs': jobs_viewable, 'executions': executions, 'next_executions': next_executions,
             'show_update_time': True, 'execution_results_hosts': execution_results_hosts,
@@ -61,19 +61,19 @@ def manage(request) -> HttpResponse:
 @login_required
 @ui_endpoint_wrapper_kwargs
 def job_logs(request) -> HttpResponse:
-    return render(request, status=200, template_name='jobs/logs.html', context={'show_update_time': True})
+    return render(request, status=200, template_name='job_logs.html', context={'show_update_time': True})
 
 
 @login_required
 @ui_endpoint_wrapper_kwargs
 def job_credentials(request) -> HttpResponse:
-    return render(request, status=200, template_name='jobs/credentials.html', context={'show_update_time': True})
+    return render(request, status=200, template_name='job_credentials.html', context={'show_update_time': True})
 
 
 @login_required
 @ui_endpoint_wrapper_kwargs
 def job_repository(request) -> HttpResponse:
-    return render(request, status=200, template_name='jobs/repository.html', context={'show_update_time': True})
+    return render(request, status=200, template_name='job_repository.html', context={'show_update_time': True})
 
 
 urlpatterns_jobs = [
