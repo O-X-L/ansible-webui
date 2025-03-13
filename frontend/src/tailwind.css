@@ -1,0 +1,9 @@
+@source "./";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@plugin 'flowbite/plugin';
+
+@custom-variant dark (&:where(.dark, .dark *));

@@ -1,7 +1,8 @@
 # Basic WebUI for using Ansible
 
 [![Lint](https://github.com/O-X-L/ansible-webui/actions/workflows/lint.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/lint.yml)
-[![Test](https://github.com/O-X-L/ansible-webui/actions/workflows/test.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/test.yml)
+[![Test Frontend](https://github.com/O-X-L/ansible-webui/actions/workflows/test_frontend.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/test_frontend.yml)
+[![Test Backend](https://github.com/O-X-L/ansible-webui/actions/workflows/test_backend.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/test_backend.yml)
 
 **DISCLAIMER**: This is an **unofficial community project**! Do not confuse it with the vanilla [Ansible](https://ansible.com/) product!
 

@@ -29,25 +29,6 @@ Read into the [Troubleshooting Guide](https://webui.ansibleguy.net/usage/trouble
 
 ----
 
-### Views
-
-* Django Templates are used to provide the HTML (`templates/**.html`)
-* JS is used to populate the HTML (_aw-api-data-table_) with data (`static/js/**.js`)
-  * JS pulls the data from the backend APIs (`api_endpoints/*.py`)
-  * There are template elements that are copied by JS: (_to keep HTML logic in actual Django template_)
-    * the HTML row template (_aw-api-data-tmpl-row_)
-    * the HTML action-buttons template (_aw-api-data-tmpl-actions_)
-* Elements with classes `aw-responsive-med` or `aw-responsive-lg` are hidden on smaller screens (_tablet/mobile view_)
-* To add sorting capabilities to table columns - simply add the buttons to its headers: `{% include "../button/icon/sort.html" %}` (*they have JS hooks*)
-
-### Forms
-
-* Forms post their data to the API using JS (`class="aw-api-click" aw-api-endpoint="permission" aw-api-item="${ID}" aw-api-method="delete"`)
-* Forms are build on the backend (`views/forms/*.py`)
-  * Custom handling can be found in `templatetags/form_util.py`
-
-----
-
 ## Install
 
 ### Directly
@@ -65,6 +46,14 @@ export AW_VERSION="$(cat VERSION)"
 # run
 python3 src/oxl_ansible_webui/
 ```
+
+----
+
+#### Frontend
+
+You need to have Node.js installed.
+
+Quick install: `bash ./scripts/frontend/nodejs_install.sh`
 
 ### Using Docker
 
@@ -94,6 +83,18 @@ Admin user for testing:
 
 * User: `ansible`
 * Pwd: `automateMe`
+
+### Frontend
+
+To build the frontend bundles - you can either run:
+
+* `bash ./scripts/run_dev.sh` for the full app
+* `bash ./scripts/frontend/run_updater.sh` for automatic update whenever code changes
+* `bash ./scripts/frontend/build.sh` to build it once (set `FORCE_UPDATE=1` env-var if no changes were made)
+
+The bundles are generated into `src/oxl_ansible_webui/aw/static_dev`.
+
+DO NOT copy & commit bundles to/in `src/oxl_ansible_webui/aw/static` - they are only generated/updated on release.
 
 ----
 

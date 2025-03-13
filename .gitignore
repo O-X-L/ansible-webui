@@ -1,11 +1,24 @@
+# dev
 .idea/
-dist/
 venv/
-oxl_ansible_webui.egg-info/
+.venv/
 __pychache__.py
 **/aw*.db
 **/aw*.db.*bak*
 **/aw*.db-shm
 **/aw*.db-wal
 VERSION
+
+# build
+dist/*.whl
+dist/*.tar.gz
+oxl_ansible_webui.egg-info/
 docs/build/
+
+# svelte
+frontend/package-lock.json
+frontend/vite.config.ts.time*
+frontend/node_modules/
+frontend/dist/
+frontend/src/.update_now
+src/oxl_ansible_webui/aw/static_dev/

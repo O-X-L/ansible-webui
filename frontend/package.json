@@ -1,0 +1,29 @@
+{
+    "name": "frontend",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "check": "svelte-check --tsconfig ./tsconfig.json"
+    },
+    "devDependencies": {
+        "@sveltejs/vite-plugin-svelte": "^5.0.3",
+        "@tsconfig/svelte": "^5.0.2",
+        "autoprefixer": "^10.4.20",
+        "flowbite": "^3.1.2",
+        "flowbite-svelte": "^0.47.4",
+        "flowbite-svelte-icons": "^2.0.2",
+        "postcss": "^8.5.3",
+        "postcss-import": "^16.1.0",
+        "svelte": "^5.20.1",
+        "svelte-check": "^3.6.4",
+        "tailwindcss": "^3.4.17",
+        "tslib": "^2.6.2",
+        "typescript": "^5.2.2",
+        "uuid4": "^2.0.3",
+        "vite": "^6.1.0"
+    }
+}
