@@ -78,7 +78,7 @@ See also: [Contributing](https://github.com/O-X-L/ansible-webui/blob/latest/CONT
 - [ ] Refactor WebUI => SvelteJS & TailwindCSS
 - [ ] Data-update over Websockets
 - [ ] Migrate permissions to Django-builtin ones
-- [ ] Django 5.1
+- [x] Django 5.1
 
 ### Full
 
