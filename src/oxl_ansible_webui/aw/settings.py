@@ -100,13 +100,11 @@ else:
 
 DATABASES = {
     'default': {
-        'ENGINE': 'aw.db_sqlite_patched',
-        # 'ENGINE': 'django.db.backends.sqlite3',  # todo: remove once feature is available natively in django 5.1
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': DB_FILE,
         'OPTIONS': {
             'timeout': 3,  # kill long-running write-requests fast; do not block whole application
-            # 'transaction_mode': 'IMMEDIATE',  # waiting for django 5.1 :(
-            # 'database is locked'; https://code.djangoproject.com/ticket/29280
+            'transaction_mode': 'IMMEDIATE',  # see: https://github.com/django/django/commit/a0204ac183ad6bca71707676d994d5888cf966aa
         },
         'ATOMIC_REQUESTS': False,  # default
     }
