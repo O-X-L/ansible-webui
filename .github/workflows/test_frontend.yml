@@ -48,7 +48,9 @@ jobs:
           node-version: '23.x'
 
       - name: Install backend dependencies
-        run: pip install -r requirements.txt >/dev/null
+        run: |
+          pip install -r requirements.txt >/dev/null
+          pip install -r requirements_test_frontend.txt >/dev/null
 
       - name: Install frontend dependencies
         run: npm install

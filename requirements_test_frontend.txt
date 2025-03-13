@@ -1,4 +1,3 @@
-pytest
 selenium
 blinker<1.8.0
 selenium-wire

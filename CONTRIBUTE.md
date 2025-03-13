@@ -110,7 +110,8 @@ Run tests and lint:
 ```bash
 python3 -m pip install -r ${REPO}/requirements.txt
 python3 -m pip install -r ${REPO}/requirements_lint.txt
-python3 -m pip install -r ${REPO}/requirements_test.txt
+python3 -m pip install -r ${REPO}/requirements_test_backend.txt
+python3 -m pip install -r ${REPO}/requirements_test_frontend.txt
 
 bash ${REPO}/scripts/lint.sh
 bash ${REPO}/scripts/test.sh
