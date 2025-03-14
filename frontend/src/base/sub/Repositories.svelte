@@ -9,8 +9,8 @@
     import { share } from '../State.js';
     import { tq } from '../../util/translate.ts';
 
-    let addGitModal = false;
-    let addLocalModal = false;
+    let addGitModal = $state(false);
+    let addLocalModal = $state(false);
 
     function t(code: string) {
       return tq($share, code);

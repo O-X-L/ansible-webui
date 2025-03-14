@@ -43,3 +43,21 @@ class BaseModel(BareModel):
 
     class Meta:
         abstract = True
+
+
+def get_model_field_default(m, field: str):
+    try:
+        field = m._meta.get_field(field)
+        return field.default if field.default is not models.fields.NOT_PROVIDED else None
+
+    except models.FieldDoesNotExist:
+        return None
+
+
+def get_model_field_choices(m, field: str):
+    try:
+        field = m._meta.get_field(field)
+        return field.choices if field.choices else None
+
+    except models.FieldDoesNotExist:
+        return None

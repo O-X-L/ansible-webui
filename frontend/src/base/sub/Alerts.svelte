@@ -9,10 +9,10 @@
     import { share } from '../State.js';
     import { tq } from '../../util/translate.ts';
 
-    let addUserModal = false;
-    let addGroupModal = false;
-    let addGlobalModal = false;
-    let addPluginModal = false;
+    let addUserModal = $state(false);
+    let addGroupModal = $state(false);
+    let addGlobalModal = $state(false);
+    let addPluginModal = $state(false);
 
     function t(code: string) {
       return tq($share, code);
