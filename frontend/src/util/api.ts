@@ -15,7 +15,7 @@ function getCookie(name: string) {
 }
 
 const CSRF_TOKEN = getCookie('csrftoken');
-const API_HEADERS = {'X-CSRFToken': CSRF_TOKEN};
+const API_HEADERS = {'X-CSRFToken': CSRF_TOKEN, 'Content-Type': 'application/json'};
 
 export async function apiGet(location: string, callback: CallableFunction) {
     const res = await fetch(`/api/${location}`, {method: 'GET', headers: API_HEADERS});
@@ -32,7 +32,12 @@ export async function apiGetMulti(locations: string[], callback: CallableFunctio
 }
 
 export async function apiEdit(method: string, location: string, payload: any, callback: CallableFunction) {
-    const res = await fetch(`/api/${location}`, {
+    let url = location;
+    if (!url.includes('/')) {
+        url = `/api/${location}`
+    }
+
+    const res = await fetch(url, {
         method: method,
         headers: API_HEADERS,
         body: JSON.stringify(payload)
@@ -42,4 +47,24 @@ export async function apiEdit(method: string, location: string, payload: any, ca
 
 export function getCSRFFormToken() {
     return `<input type="hidden" name="csrfmiddlewaretoken" value="${CSRF_TOKEN}">`;
+}
+
+export function formJSON(f: HTMLFormElement) {
+    let raw = new FormData(f);
+    let parsed = {};
+    raw.forEach((value, key) => {
+        parsed[key] = value;
+    });
+    return JSON.stringify(parsed);
+}
+
+export async function apiForm(e: SubmitEvent, callback: CallableFunction) {
+    e.preventDefault();
+
+    let payload = formJSON(e.target);
+    let action = e.target.action;
+    var method = e.target.method;
+
+    apiEdit(method, action, payload, callback);
+    return false;
 }

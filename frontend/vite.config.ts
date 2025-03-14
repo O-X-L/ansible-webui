@@ -22,7 +22,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: "./src/main.ts",
-        dashboard: "./src/dashboard.ts",
+        home: "./src/home.ts",
         login: "./src/login.ts",
       },
     },

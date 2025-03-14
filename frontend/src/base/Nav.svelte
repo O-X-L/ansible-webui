@@ -2,35 +2,59 @@
     import { onMount } from 'svelte';
 
     import {
-      Navbar, NavBrand, NavLi, NavUl, NavHamburger,
-      Dropdown, DropdownItem, DropdownDivider, 
-      Button, Tooltip, DarkMode, Spinner,
+      Navbar, NavBrand, NavHamburger, Dropdown, Button, Tooltip,
+      DarkMode, Spinner, Radio,
+      // NavLi, NavUl, DropdownItem, DropdownDivider, 
     } from 'flowbite-svelte';
     import {
-      ChevronDownOutline, UserSettingsSolid, LockSolid, BookSolid, BugSolid, GithubSolid,
+      ChevronDownOutline, LockSolid, BookSolid, BugSolid, GithubSolid, GlobeSolid,
+      // AdjustmentsHorizontalSolid,
     } from 'flowbite-svelte-icons';
 
-    import { share } from './State.svelte.ts';
+    import { share } from './State.js';
+    import { tq } from '../util/translate.ts';
     import { setDarkLightMode } from './DarkLightMode.ts';
     import { apiGet, getCSRFFormToken } from '../util/api.ts';
     import { navFooterClass, classBtnBase } from './Style.ts';
 
     let loaded: boolean = $state(false);
+    let language: string = $state('en');
 
-    const navItemClass = 'font-bold lg:text-lg max-lg:text-base py-2 px-4 hover:bg-primary-200/20 dark:hover:bg-primary-100/10 hover:text-primary-600 dark:hover:text-primary-500';
-    const navItemSubClass = 'font-bold py-2 px-4 lg:text-base max-lg:text-sm hover:bg-gray-100 dark:hover:bg-gray-600 block';
+    $effect(() => {
+      if (!loaded) {
+        return;
+      }
+      localStorage.language = language;
+    })
+
+    // const navItemClass = 'font-bold lg:text-lg max-lg:text-base py-2 px-4 hover:bg-primary-200/20 dark:hover:bg-primary-100/10 hover:text-primary-600 dark:hover:text-primary-500';
+    // const navItemSubClass = 'font-bold py-2 px-4 lg:text-base max-lg:text-sm hover:bg-gray-100 dark:hover:bg-gray-600 block';
     const navContainerClass = 'mx-auto flex flex-wrap justify-between items-center container overflow-hidden';
-    const navDropdownClass = 'w-44 z-20 border-b border-r border-l rounded-b';
-    const navDropdownDividerClass = 'my-1 h-px bg-primary-300 dark:bg-gray-600';
+    // const navDropdownClass = 'w-44 z-20 border-b border-r border-l rounded-b';
+    // const navDropdownDividerClass = 'my-1 h-px bg-primary-300 dark:bg-gray-600';
 
     function setBackendStates(j: any) {
       $share.backend = j;
       loaded = true;
     }
 
+    function setTranslations(j: any) {
+      $share.lang = j;
+    }
+
+    function t(code: string) {
+      return tq($share, code);
+    }
+
     onMount(() => {
       setDarkLightMode(document);
+      if (localStorage.language) {
+        language = localStorage.language;
+      } else {
+        localStorage.language = language;
+      }
       apiGet('frontend/info', setBackendStates);
+      apiGet('frontend/lang', setTranslations);
     });
 </script>
   
@@ -44,6 +68,7 @@
       {/if}
     </NavBrand>
   {/key}
+  <!--
   {#if $share.backend.authenticated}
     <NavUl class="order-1" activeClass={navItemClass} nonActiveClass={navItemClass}>
       <NavLi href="/">Dashboard</NavLi>
@@ -56,24 +81,38 @@
       </Dropdown>
     </NavUl>
   {/if}
+  -->
   <div class="flex md:order-2">
-    <DarkMode size="sm" btnClass="{classBtnBase} px-4 py-2"></DarkMode>
-    <Tooltip placement="bottom">Dark/Light Mode Switch</Tooltip>
+    <Button size="xs" class="ml-2"><GlobeSolid/></Button>
+    <Dropdown class="w-48 p-3 space-y-1">
+      <li class="rounded-sm p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+        <Radio bind:group={language} value={'en'}>English</Radio>
+      </li>
+      <li class="rounded-sm p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+        <Radio bind:group={language} value={'de'}>Deutsch</Radio>
+      </li>
+    </Dropdown>
+    <Tooltip placement="bottom">{t('nav.lang')}</Tooltip>
+
+    <DarkMode size="sm" btnClass="{classBtnBase} px-4 py-2 ml-2"></DarkMode>
+    <Tooltip placement="bottom">{t('nav.darkLight')}</Tooltip>
+    <!--
     {#if $share.backend.authenticated}
-      <Button size="xs" class="ml-2"><UserSettingsSolid /></Button>
+      <Button size="xs" class="ml-2"><AdjustmentsHorizontalSolid /></Button>
       <Tooltip placement="bottom">Settings</Tooltip>
     {/if}
+    -->
 
     <Button size="xs" class="ml-2 max-sm:hidden" href="https://webui.ansibleguy.net"><BookSolid /></Button>
-    <Tooltip placement="bottom">Documentation</Tooltip>
+    <Tooltip placement="bottom">{t('nav.docs')}</Tooltip>
     <Button size="xs" class="ml-2 max-sm:hidden" href="https://github.com/O-X-L/ansible-webui"><GithubSolid /></Button>
-    <Tooltip placement="top">Open Source Repository</Tooltip>
+    <Tooltip placement="bottom">{t('nav.repo')}</Tooltip>
     <Button size="xs" class="ml-2 max-sm:hidden" href="https://github.com/O-X-L/ansible-webui/issues"><BugSolid /></Button>
-    <Tooltip placement="top">Report Bugs</Tooltip>
+    <Tooltip placement="bottom">{t('nav.bugs')}</Tooltip>
     {#if $share.backend.authenticated}
       <form method="post" action="/o/">
         <Button size="xs" class="ml-2 h-full" type="submit"><LockSolid /></Button>
-        <Tooltip placement="bottom">Log out</Tooltip>
+        <Tooltip placement="bottom">{t('nav.logout')}</Tooltip>
         {@html getCSRFFormToken()}
       </form>
     {/if}

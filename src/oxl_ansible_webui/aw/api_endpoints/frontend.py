@@ -5,8 +5,9 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.permissions import AllowAny
 
 from aw.settings import AUTH_MODE
-from aw.api_endpoints.base import BaseResponse, get_api_user, HDR_NOCACHE
+from aw.api_endpoints.base import BaseResponse, get_api_user, HDR_NOCACHE, HDR_CACHE_1W
 from aw.templatetags.util import get_logo, get_version
+from aw.config.language import TRANSLATIONS
 
 
 class BackendInfoResponse(BaseResponse):
@@ -47,3 +48,25 @@ class APIBackendInfo(GenericAPIView):
             states['authenticated'] = user.is_authenticated
 
         return Response(data=states, status=200, headers=HDR_NOCACHE)
+
+
+class BackendTranslationResponse(BaseResponse):
+    en = serializers.DictField()
+    de = serializers.DictField()
+
+
+class APIBackendTranslations(GenericAPIView):
+    http_method_names = ['get']
+    serializer_class = BackendTranslationResponse
+    permission_classes = [AllowAny]
+
+    @staticmethod
+    @extend_schema(
+        request=None,
+        responses={200: BackendTranslationResponse},
+        summary='Return text-translations in needed for frontend rendering',
+        operation_id='backend_infos',
+    )
+    def get(request):
+        del request
+        return Response(data=TRANSLATIONS, status=200, headers=HDR_CACHE_1W)

@@ -3,12 +3,17 @@
 
     import { Input, Label, Button, Spinner, Toggle } from 'flowbite-svelte';
 
-    import { share } from './State.svelte.ts';
+    import { share } from './State.js';
+    import { tq } from '../util/translate.ts';
     import { getCSRFFormToken } from '../util/api.ts';
 
     let loaded = $state(false);
     let loginTarget = $derived($share.backend.sso ? '/a/saml/init/' : '/a/login/')
     let rememberUsername = $state(false);
+
+    function t(code: string) {
+      return tq($share, code);
+    }
 
     function saveUsername() {
         if (!rememberUsername) {
@@ -62,26 +67,26 @@
             <form method="post" action="{loginTarget}">
                 {@html getCSRFFormToken()}
 
-                <Label for="id_username">Username</Label>
+                <Label for="id_username">{t('login.user')}</Label>
                 <Input type="text" id="id_username" name="username" oninput={saveUsername}/>
 
                 {#if !($share.backend.sso) || window.location.includes('fallback')}
-                    <Label for="id_password" class="mt-2">Password</Label>
+                    <Label for="id_password" class="mt-2">{t('login.pwd')}</Label>
                     <Input type="password" name="password" id="id_password"/>
                 {/if}
 
-                <Toggle bind:checked={rememberUsername} class="mt-2">Save Username</Toggle>
+                <Toggle bind:checked={rememberUsername} class="mt-2">{t('login.saveUser')}</Toggle>
 
                 <div class="flex justify-center w-full">
                     <div>
-                        <Button type="submit" class="mt-5">Login</Button>
+                        <Button type="submit" class="mt-5">{t('login.btn')}</Button>
                     </div>
                     {#if $share.backend.sso}
                         <div>
                             {#if window.location.includes('fallback')}
-                                <Button href="/a/login/" class="mt-2">SSO</Button>
+                                <Button href="/a/login/" class="mt-2">{t('login.sso')}</Button>
                             {:else}
-                                <Button href="/a/login/fallback/" class="mt-2">Local User</Button>
+                                <Button href="/a/login/fallback/" class="mt-2">{t('login.localUser')}</Button>
                             {/if}
                         </div>
                     {/if}

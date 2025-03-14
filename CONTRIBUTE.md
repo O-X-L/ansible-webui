@@ -104,6 +104,12 @@ New components added to `vite.config.ts` have to also be added to `scripts/front
 
 This is also necessary if a sub-component is used in multiple others. You will see a 404 error if the js-files are missing from the script. (*as they are not copied to django's static-dir*)
 
+### Translations
+
+Translations are added in `src/oxl_ansible_webui/aw/config/language.py`.
+
+New languages also have to be added to the frontend in `frontend/src/base/Nav.svelte`.
+
 ----
 
 ## Testing

@@ -20,6 +20,7 @@ class HasAwAPIKey(BaseHasAPIKey):
 
 API_PERMISSION = [IsAuthenticated | HasAwAPIKey]
 HDR_NOCACHE = {'Cache-Control': 'no-cache, max-age=0'}
+HDR_CACHE_1W = {'Cache-Control': 'max-age=604800'}
 
 
 # see: rest_framework_api_key.permissions.BaseHasAPIKey:get_from_header

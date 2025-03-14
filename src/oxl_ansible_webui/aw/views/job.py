@@ -49,7 +49,7 @@ def manage(request) -> HttpResponse:
                 ).order_by('-created')
 
     return render(
-        request, status=200, template_name='dashboard.html',
+        request, status=200, template_name='home.html',
         context={
             'jobs': jobs_viewable, 'executions': executions, 'next_executions': next_executions,
             'show_update_time': True, 'execution_results_hosts': execution_results_hosts,

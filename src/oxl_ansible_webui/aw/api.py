@@ -11,7 +11,7 @@ from aw.api_endpoints.system import APISystemConfig
 from aw.api_endpoints.repository import APIRepository, APIRepositoryItem, APIRepositoryLogFile
 from aw.api_endpoints.alert import APIAlertPlugin, APIAlertPluginItem, APIAlertUser, APIAlertUserItem, \
     APIAlertGlobal, APIAlertGlobalItem, APIAlertGroup, APIAlertGroupItem
-from aw.api_endpoints.frontend import APIBackendInfo
+from aw.api_endpoints.frontend import APIBackendInfo, APIBackendTranslations
 # from aw.api_endpoints.base import not_implemented
 
 urlpatterns_api = [
@@ -44,4 +44,5 @@ urlpatterns_api = [
     path('api/_schema/', SpectacularAPIView.as_view(), name='_schema'),
     path('api/_docs', SpectacularSwaggerView.as_view(url_name='_schema'), name='swagger-ui'),
     path('api/frontend/info', APIBackendInfo.as_view()),
+    path('api/frontend/lang', APIBackendTranslations.as_view()),
 ]

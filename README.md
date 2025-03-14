@@ -64,6 +64,8 @@ Feel free to contribute to this project using [pull-requests](https://github.com
 
 Testers are also very welcome! Please [give feedback](https://github.com/O-X-L/ansible-webui/discussions)
 
+You can also provide translations for your language.
+
 See also: [Contributing](https://github.com/O-X-L/ansible-webui/blob/latest/CONTRIBUTE.md)
 
 <img src="https://contrib.rocks/image?repo=O-X-L/ansible-webui&max=5" />
@@ -151,7 +153,7 @@ See also: [Contributing](https://github.com/O-X-L/ansible-webui/blob/latest/CONT
 
   - [x] Mobile Support
 
-  - [ ] Multi-Language Support
+  - [x] Multi-Language Support
 
 - [ ] API
 

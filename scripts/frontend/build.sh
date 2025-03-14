@@ -33,8 +33,10 @@ cd "$SRC_DIR"
 npm run build >/dev/null
 
 APPS=(
-  'Footer' 'Wrapper' 'DarkLightMode' 'Toggle' 'main' 'Spinner' 'Heading' 'Style'
-  'main' 'dashboard' 'login' 'api'
+  'Footer' 'Wrapper' 'DarkLightMode' 'Toggle' 'Spinner' 'Heading' 'ChevronDownOutline' 'Popper'
+  'Dropdown'
+  'State' 'Style'
+  'main' 'home' 'login' 'api' 'translate'
 )
 
 for app in "${APPS[@]}"
