@@ -56,7 +56,7 @@ Start
 
 .. code-block:: bash
 
-    docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 ansible0guy/webui:latest
+    docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 oxlorg/ansible-webui:latest
 
 
 **Details**:

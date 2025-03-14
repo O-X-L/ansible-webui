@@ -30,7 +30,7 @@ There are images for running Ansible-WebUI as unprivileged user :code:`aw` with 
 
 * Latest: :code:`oxlorg/ansible-webui-unprivileged:latest`
 
-* Unstable: :code:`ansible0guy/webui-unprivileged:unstable`
+* Unstable: :code:`oxlorg/ansible-webui-unprivileged:unstable`
 
 ----
 

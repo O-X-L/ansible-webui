@@ -31,7 +31,7 @@ oxl-ansible-webui
 Images: [ansible-webui](https://hub.docker.com/r/oxlorg/ansible-webui), [ansible-webui-unprivileged](https://hub.docker.com/r/oxlorg/ansible-webui-unprivileged), [ansible-webui-aws](https://hub.docker.com/r/oxlorg/ansible-webui-aws)
 
 ```bash
-docker image pull ansible0guy/webui:latest
+docker image pull oxlorg/ansible-webui:latest
 docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 oxlorg/ansible-webui:latest
 
 # or with persistent data (volumes: /data = storage for logs & DB, /play = ansible playbook base-directory)

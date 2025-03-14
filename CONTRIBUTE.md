@@ -60,7 +60,7 @@ Quick install: `bash ./scripts/frontend/nodejs_install.sh`
 ```bash
 docker image pull oxlorg/ansible-webui:dev
 cd ${PATH_TO_SRC}  # repository root directory
-docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awtest:/data --volume $(pwd):/aw ansible0guy/webui:dev
+docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awtest:/data --volume $(pwd):/aw oxlorg/ansible-webui:dev
 ```
 
 #### Frontend

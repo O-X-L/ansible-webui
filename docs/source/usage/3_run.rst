@@ -57,7 +57,7 @@ Run Dockerized
     docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 oxlorg/ansible-webui:latest
 
     # or with persistent data (volumes: /data = storage for logs & DB, /play = ansible playbook base-directory)
-    docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play ansible0guy/webui:latest
+    docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play oxlorg/ansible-webui:latest
 
     # find initial password
     docker logs ansible-webui

@@ -41,6 +41,6 @@ Install Unstable Version
 .. code-block:: bash
 
     docker image pull oxlorg/ansible-webui:unstable
-    docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awdata:/data ansible0guy/webui:unstable
+    docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awdata:/data oxlorg/ansible-webui:unstable
     # to safe db-migrations use:
     # --volume /var/local/ansible-webui/migrations/:/usr/local/lib/python3.11/site-packages/oxl_ansible_webui/aw/migrations
