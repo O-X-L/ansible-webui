@@ -3,6 +3,7 @@
 venv/
 .venv/
 __pychache__.py
+__pychache__
 **/aw*.db
 **/aw*.db.*bak*
 **/aw*.db-shm

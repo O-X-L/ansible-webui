@@ -269,11 +269,12 @@ TIME_ZONE = config.timezone_str
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-if deployment_dev():
-    STATICFILES_DIRS = [BASE_DIR / 'aw' / 'static_dev']
+STATICFILES_DIRS = [BASE_DIR / 'aw' / 'static']
+if deployment_prod():
+    STATICFILES_DIRS.append(BASE_DIR / 'aw' / 'static_prod')
 
 else:
-    STATICFILES_DIRS = [BASE_DIR / 'aw' / 'static']
+    STATICFILES_DIRS.append(BASE_DIR / 'aw' / 'static_dev')
 
 LOGIN_REDIRECT_URL = '/ui/jobs/manage'  # todo: change to '/ui' once dashboard is implemented
 LOGOUT_REDIRECT_URL = LOGIN_PATH

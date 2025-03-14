@@ -34,7 +34,7 @@ npm run build >/dev/null
 
 APPS=(
   'Footer' 'Wrapper' 'DarkLightMode' 'Toggle' 'main' 'Spinner' 'Heading' 'Style'
-  'index'
+  'main' 'dashboard' 'login' 'api'
 )
 
 for app in "${APPS[@]}"

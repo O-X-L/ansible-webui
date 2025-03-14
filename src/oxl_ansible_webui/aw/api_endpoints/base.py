@@ -19,19 +19,22 @@ class HasAwAPIKey(BaseHasAPIKey):
 
 
 API_PERMISSION = [IsAuthenticated | HasAwAPIKey]
+HDR_NOCACHE = {'Cache-Control': 'no-cache, max-age=0'}
 
 
 # see: rest_framework_api_key.permissions.BaseHasAPIKey:get_from_header
 def get_api_user(request) -> USERS:
     if isinstance(request.user, AnonymousUser):
+        api_key = request.META.get(getattr(settings, 'API_KEY_CUSTOM_HEADER'))
+        if api_key is None:
+            return None
+
         try:
-            return AwAPIKey.objects.get_from_key(
-                request.META.get(getattr(settings, 'API_KEY_CUSTOM_HEADER'))
-            ).user
+            return AwAPIKey.objects.get_from_key(api_key).user
 
         except ObjectDoesNotExist:
             # invalid api key
-            pass
+            return None
 
     return request.user
 

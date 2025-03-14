@@ -1,0 +1,15 @@
+html, body {
+    padding: 0px;
+    margin: 0px;
+}
+
+html, body, #main {
+    height: 100%;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.aw-nav-icon {
+    width: 40px;
+    height: 40px;
+}

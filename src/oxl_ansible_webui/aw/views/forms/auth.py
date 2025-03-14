@@ -13,7 +13,7 @@ def saml_sp_initiated_login(request) -> HttpResponse:
     if request.user.is_authenticated:
         return redirect(LOGIN_REDIRECT_URL)
 
-    return render(request, status=200, template_name='registration/saml.html')
+    return render(request, status=200, template_name='registration/login.html')
 
 
 @ui_endpoint_wrapper_auth

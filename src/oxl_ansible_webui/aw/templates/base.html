@@ -5,19 +5,19 @@
         <link href="/static/css/global.css" rel="stylesheet" type="text/css" crossorigin="anonymous" referrerpolicy="no-referrer">
         <link href="/static/dist/tailwind.min.css" rel="stylesheet" type="text/css" crossorigin="anonymous" referrerpolicy="no-referrer">
     </head>
-    <body>
+    <body class="bg-white dark:bg-gray-600">
         <noscript>
             <div class="noscript-error">
                 You need to enable Javascript to use this app!
             </div>
         </noscript>
-        <div id="nav" class="dark:bg-gray-600"></div>
-        <div id="main" class="dark:bg-gray-600 w-full h-full">
+        <div id="nav"></div>
+        <div id="main" class="w-full h-full">
             {% block content %}
             {% endblock %}
         </div>
-        <div id="footer-bg" class="dark:bg-gray-600"></div>
-        <div id="footer" class="dark:bg-gray-600"></div>
-        <script type="module" src="/static/dist/index.js"></script>
+        <div id="footer-bg"></div>
+        <div id="footer"></div>
+        <script type="module" src="/static/dist/main.js"></script>
     </body>
 </html>

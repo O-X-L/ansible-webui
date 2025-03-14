@@ -21,7 +21,9 @@ export default defineConfig({
     outDir: resolve("./dist/"),
     rollupOptions: {
       input: {
-        index: "./src/index.ts",
+        main: "./src/main.ts",
+        dashboard: "./src/dashboard.ts",
+        login: "./src/login.ts",
       },
     },
   },
