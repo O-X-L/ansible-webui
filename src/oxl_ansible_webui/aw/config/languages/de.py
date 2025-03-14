@@ -1,0 +1,33 @@
+# pylint: disable=C0301
+
+DE = {
+    'btn.add': 'Neu',
+    'btn.save': 'Speichern',
+    'btn.discard': 'Verwerfen',
+    'nav.lang': 'Sprache',
+    'nav.darkLight': 'Dunkel/Hell Modus umschalten',
+    'nav.docs': 'Dokumentation',
+    # 'nav.repo': 'Open Source Repository',
+    'nav.bugs': 'Fehler Melden',
+    'nav.logout': 'Abmelden',
+    'footer.user': 'Nutzer',
+    'footer.version': 'Version',
+    'login.user': 'Benutzer',
+    'login.pwd': 'Passwort',
+    'login.saveUser': 'Benutzernamen merken',
+    'login.btn': 'Anmelden',
+    'login.sso': 'SSO',
+    'login.localUser': 'Lokales Konto',
+    # 'home.dashboard': 'Dashboard',
+    # 'home.jobs': 'Jobs',
+    # 'home.repos': 'Repositories',
+    'home.alerts': 'Alarme',
+    'home.alerts.user': 'Nutzer',
+    'home.alerts.group': 'Gruppe',
+    # 'home.alerts.global': 'Global',
+    # 'home.alerts.plugin': 'Plugin',
+    'home.jobs.new': 'Neuer Job',
+    'home.repos.git': 'Git',
+    'home.repos.local': 'Lokal',
+
+}

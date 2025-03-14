@@ -56,6 +56,7 @@ ignore=CVS
 # format. Because '\\' represents the directory delimiter on Windows systems,
 # it can't be used as an escape character.
 ignore-paths=venv/*,
+             .venv/*,
              src/oxl_ansible_webui/aw/migrations/*
 
 # Files or directories matching the regular expression patterns are skipped.

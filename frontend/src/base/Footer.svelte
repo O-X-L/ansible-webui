@@ -6,14 +6,14 @@
 
     import { share } from './State.js';
     import { tq } from '../util/translate.ts';
-    import { classLinkHover, navFooterClass } from './Style.ts';
+    import { classLinkHover, classNavFooter } from './Style.ts';
 
     function t(code: string) {
       return tq($share, code);
     }
 </script>
   
-<Footer class="fixed bottom-0 start-0 w-full flex flex-wrap items-center justify-between pt-2 pb-1 pl-5 pr-5 border-t {navFooterClass}">
+<Footer class="fixed bottom-0 start-0 w-full flex flex-wrap items-center justify-between pt-2 pb-1 pl-5 pr-5 border-t {classNavFooter}">
   <FooterCopyright by="OXL" aClass={classLinkHover} copyrightMessage="" />
   <FooterLinkGroup class="sm:hidden">
     <Button size="xs" class="ml-2" href="https://webui.ansibleguy.net"><BookSolid /></Button>

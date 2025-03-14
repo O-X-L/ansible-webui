@@ -7,15 +7,15 @@
       // NavLi, NavUl, DropdownItem, DropdownDivider, 
     } from 'flowbite-svelte';
     import {
-      ChevronDownOutline, LockSolid, BookSolid, BugSolid, GithubSolid, GlobeSolid,
-      // AdjustmentsHorizontalSolid,
+      LockSolid, BookSolid, BugSolid, GithubSolid, GlobeSolid,
+      // ChevronDownOutline, AdjustmentsHorizontalSolid,
     } from 'flowbite-svelte-icons';
 
     import { share } from './State.js';
     import { tq } from '../util/translate.ts';
     import { setDarkLightMode } from './DarkLightMode.ts';
     import { apiGet, getCSRFFormToken } from '../util/api.ts';
-    import { navFooterClass, classBtnBase } from './Style.ts';
+    import { classNavFooter, classBtnBase } from './Style.ts';
 
     let loaded: boolean = $state(false);
     let language: string = $state('en');
@@ -24,7 +24,10 @@
       if (!loaded) {
         return;
       }
-      localStorage.language = language;
+      if (localStorage.language != language) {
+        localStorage.language = language;
+        location.reload();
+      }
     })
 
     // const navItemClass = 'font-bold lg:text-lg max-lg:text-base py-2 px-4 hover:bg-primary-200/20 dark:hover:bg-primary-100/10 hover:text-primary-600 dark:hover:text-primary-500';
@@ -58,7 +61,7 @@
     });
 </script>
   
-<Navbar class="border-b rounded-b-lg {navFooterClass}" {navContainerClass}>
+<Navbar class="border-b rounded-b-lg {classNavFooter}" {navContainerClass}>
   {#key $share.backend.logo}
     <NavBrand href="/">
       {#if $share.backend.length == 0}
@@ -116,6 +119,8 @@
         {@html getCSRFFormToken()}
       </form>
     {/if}
+    <!--
     <NavHamburger />
+    -->
   </div>
 </Navbar>

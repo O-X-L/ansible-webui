@@ -34,7 +34,7 @@ npm run build >/dev/null
 
 APPS=(
   'Footer' 'Wrapper' 'DarkLightMode' 'Toggle' 'Spinner' 'Heading' 'ChevronDownOutline' 'Popper'
-  'Dropdown'
+  'Dropdown' 'Radio' 'Input'
   'State' 'Style'
   'main' 'home' 'login' 'api' 'translate'
 )
