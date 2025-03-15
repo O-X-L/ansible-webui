@@ -4,8 +4,8 @@
     import { Input, Label, Button, Spinner, Toggle } from 'flowbite-svelte';
 
     import { share } from './State.js';
-    import { tq } from '../util/translate.ts';
-    import { getCSRFFormToken } from '../util/api.ts';
+    import { tq } from '../util/translate.js';
+    import { getCSRFFormToken } from '../util/api.js';
 
     let loaded = $state(false);
     let loginTarget = $derived($share.backend.sso ? '/a/saml/init/' : '/a/login/')

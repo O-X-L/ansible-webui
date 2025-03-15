@@ -1,0 +1,1 @@
+https://cdn.jsdelivr.net/gh/hjnilsson/country-flags@latest/svg/<CODE>.svg

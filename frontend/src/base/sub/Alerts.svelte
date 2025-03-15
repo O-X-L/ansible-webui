@@ -7,7 +7,7 @@
     } from 'flowbite-svelte-icons'
 
     import { share } from '../State.js';
-    import { tq } from '../../util/translate.ts';
+    import { tq } from '../../util/translate.js';
 
     let addUserModal = $state(false);
     let addGroupModal = $state(false);

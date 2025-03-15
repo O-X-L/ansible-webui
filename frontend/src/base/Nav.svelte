@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
 
     import {
-      Navbar, NavBrand, Dropdown, Button, Tooltip, DarkMode, Spinner, Radio,
+      Navbar, NavBrand, Dropdown, Button, Tooltip, DarkMode, Spinner, Radio, Alert,
       // NavLi, NavUl, DropdownItem, DropdownDivider, NavHamburger
     } from 'flowbite-svelte';
     import {
@@ -11,13 +11,15 @@
     } from 'flowbite-svelte-icons';
 
     import { share } from './State.js';
-    import { tq } from '../util/translate.ts';
-    import { setDarkLightMode } from './DarkLightMode.ts';
-    import { apiGet, getCSRFFormToken } from '../util/api.ts';
-    import { classNavFooter, classBtnBase } from './Style.ts';
+    import { type formAlerts } from './Types.js';
+    import { tq, flagIcon } from '../util/translate.js';
+    import { setDarkLightMode } from './DarkLightMode.js';
+    import { apiGet, getCSRFFormToken } from '../util/api.js';
+    import { classNavFooter, classBtnBase } from './Style.js';
 
     let loaded: boolean = $state(false);
     let language: string = $state('en');
+    let alerts: formAlerts[] = $state([]);
 
     $effect(() => {
       if (!loaded) {
@@ -44,6 +46,27 @@
       $share.lang = j;
     }
 
+    function showBackendFormErrors() {
+      let errors = document.querySelectorAll('.aw-form-alert');
+      if (errors) {
+        for (let e of errors) {
+          if (e.field) {
+            alerts.push({
+              color: 'red',
+              title: `Input into field ${e.field} was invalid`,
+              msg: e.innerText,
+            })
+          } else {
+            alerts.push({
+              color: 'red',
+              title: 'Input was invalid',
+              msg: e.innerText,
+            })
+          }
+        }
+      }
+    }
+
     function t(code: string) {
       return tq($share, code);
     }
@@ -57,6 +80,7 @@
       }
       apiGet('frontend/info', setBackendStates);
       apiGet('frontend/lang', setTranslations);
+      showBackendFormErrors();
     });
 </script>
   
@@ -88,10 +112,10 @@
     <Button size="xs" class="ml-2"><GlobeSolid/></Button>
     <Dropdown class="w-48 p-3 space-y-1">
       <li class="rounded-sm p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-        <Radio bind:group={language} value={'en'}>English</Radio>
+        <Radio bind:group={language} value={'en'}>{@html flagIcon('gb')} English</Radio>
       </li>
       <li class="rounded-sm p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-        <Radio bind:group={language} value={'de'}>Deutsch</Radio>
+        <Radio bind:group={language} value={'de'}>{@html flagIcon('de')} Deutsch</Radio>
       </li>
     </Dropdown>
     <Tooltip placement="bottom">{t('nav.lang')}</Tooltip>
@@ -123,3 +147,14 @@
     -->
   </div>
 </Navbar>
+
+{#if alerts.length}
+  <div class="my-5">
+    {#each alerts as alert}
+      <Alert color={alert.color||"red"} class="mx-20">
+        <div class="font-bold">{alert.title}</div>
+        <div>{alert.msg}</div>
+      </Alert>
+    {/each}
+  </div>
+{/if}

@@ -5,8 +5,8 @@
     import { GithubSolid, BugSolid, BookSolid } from 'flowbite-svelte-icons';
 
     import { share } from './State.js';
-    import { tq } from '../util/translate.ts';
-    import { classLinkHover, classNavFooter } from './Style.ts';
+    import { tq } from '../util/translate.js';
+    import { classLinkHover, classNavFooter } from './Style.js';
 
     function t(code: string) {
       return tq($share, code);

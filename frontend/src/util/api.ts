@@ -46,6 +46,10 @@ export async function apiEdit(method: string, location: string, payload: any, ca
 }
 
 export function getCSRFFormToken() {
+    if (!CSRF_TOKEN) {
+        console.log('WARNING: No CSRF Token available')
+        return `<!-- no CSRF token (cookie) available -->`
+    }
     return `<input type="hidden" name="csrfmiddlewaretoken" value="${CSRF_TOKEN}">`;
 }
 

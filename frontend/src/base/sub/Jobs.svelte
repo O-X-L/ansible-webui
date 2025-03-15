@@ -8,11 +8,11 @@
     // import { } from 'flowbite-svelte-icons'
 
     import { share } from '../State.js';
-    import { tq } from '../../util/translate.ts';
+    import { tq } from '../../util/translate.js';
     import {
         classModalBackdrop, classModalLabel, classModalHelp, classModalBtns, classModalForm,
     } from '../Style.js';
-    import { apiGet, apiForm, getCSRFFormToken } from '../../util/api.ts';
+    import { apiGet, apiForm, getCSRFFormToken } from '../../util/api.js';
 
     let addModal = $state(false);
     let formInfos = $state({});

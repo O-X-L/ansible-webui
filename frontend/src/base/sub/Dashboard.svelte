@@ -4,7 +4,7 @@
     } from 'flowbite-svelte';
 
     import { share } from '../State.js';
-    import { tq } from '../../util/translate.ts';
+    import { tq } from '../../util/translate.js';
 
     function t(code: string) {
       return tq($share, code);

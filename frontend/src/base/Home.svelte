@@ -3,7 +3,7 @@
     import { CodeBranchSolid, CogSolid, BellActiveSolid, GridSolid } from 'flowbite-svelte-icons'
 
     import { share } from './State.js';
-    import { tq } from '../util/translate.ts';
+    import { tq } from '../util/translate.js';
 
     import Jobs from './sub/Jobs.svelte';
     import Alerts from './sub/Alerts.svelte';

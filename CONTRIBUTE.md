@@ -108,7 +108,7 @@ This is also necessary if a sub-component is used in multiple others. You will s
 
 Translations are added in `src/oxl_ansible_webui/aw/config/language.py`.
 
-New languages also have to be added to the frontend in `frontend/src/base/Nav.svelte`.
+New languages also have to be added to the frontend in `frontend/src/base/Nav.svelte` and the country's flag needs to be added to `src/oxl_ansible_webui/aw/static/img/`.
 
 ----
 

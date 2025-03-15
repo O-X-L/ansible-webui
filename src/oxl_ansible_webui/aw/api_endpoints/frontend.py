@@ -1,7 +1,7 @@
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema
 from rest_framework.permissions import AllowAny
+from drf_spectacular.utils import extend_schema
 
 from aw.settings import AUTH_MODE
 from aw.api_endpoints.base import get_api_user, HDR_NOCACHE, HDR_CACHE_1W, GenericResponse, API_PERMISSION
