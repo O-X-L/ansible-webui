@@ -9,8 +9,9 @@
 
     import { share } from './State.js';
     import { tq } from '../util/translate.js';
-    import { classNavFooter } from './Style.js';
+    import { classNavFooter, classLinkHover } from './Style.js';
 
+    const classFooterText = 'text-sm text-gray-500 dark:text-gray-400';
     let hideAttributions = $state(true);
 
     let linksAttributionFrontend = [
@@ -46,10 +47,11 @@
 </script>
   
 <Footer class="fixed bottom-0 start-0 w-full flex flex-wrap items-center justify-between pt-2 pb-1 pl-5 pr-5 border-t {classNavFooter}">
-  <FooterCopyright by="OXL" copyrightMessage="" />
+  <FooterCopyright by="OXL" href="https://github.com/O-X-L" copyrightMessage="" classA={classFooterText} />
   <FooterLinkGroup>
-    <div>
-      <button class="text-sm text-gray-500 dark:text-gray-400" onclick={() => (hideAttributions = false)}>
+    <div class={classFooterText}>
+      <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" class={classFooterText}>License: GPLv3</a> |
+      <button class={classLinkHover} onclick={() => (hideAttributions = false)}>
         {t('footer.oss')}
       </button>
     </div>
@@ -62,7 +64,7 @@
     <Button size="xs" class="ml-2" href="https://github.com/O-X-L/ansible-webui/issues"><BugSolid /></Button>
     <Tooltip placement="top">{t('nav.bugs')}</Tooltip>
   </FooterLinkGroup>
-  <FooterLinkGroup class="text-sm text-gray-500 dark:text-gray-400">
+  <FooterLinkGroup class={classFooterText}>
     <div>
       {#if $share.backend.length == 0}
         <Spinner size="xs" />
@@ -78,8 +80,7 @@
 
 <Drawer backdrop={false} placement="left" transitionType="fly" id="drawer-attributions"
     transitionParams={transitionParamsLeft} bind:hidden={hideAttributions}
-    class="bg-gray-800/85 dark:bg-gray-800/85" width="w-100"
->
+    class="bg-gray-800/85 dark:bg-gray-800/85" width="w-100">
     <div class="flex items-end">
         <CloseButton color="red" onclick={() => (hideAttributions = true)} class="mb-4" />
     </div>
