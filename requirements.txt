@@ -2,8 +2,6 @@
 gunicorn
 Django==5.1.*
 pytz
-pyyaml
-django-auto-logout
 pycryptodome
 
 ## auth
@@ -13,9 +11,6 @@ grafana-django-saml2-auth
 djangorestframework==3.*
 djangorestframework-api-key==2.*
 drf-spectacular
-
-## styles
-fontawesomefree
 
 # scheduling
 crontab

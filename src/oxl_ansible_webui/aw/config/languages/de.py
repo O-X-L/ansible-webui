@@ -12,6 +12,7 @@ DE = {
     'nav.logout': 'Abmelden',
     'footer.user': 'Nutzer',
     'footer.version': 'Version',
+    'footer.oss': 'Open Source Nutzung',
     'login.user': 'Benutzer',
     'login.pwd': 'Passwort',
     'login.saveUser': 'Benutzernamen merken',

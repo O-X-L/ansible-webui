@@ -15,6 +15,7 @@ EN = {
     'nav.logout': 'Log out',
     'footer.user': 'User',
     'footer.version': 'Version',
+    'footer.oss': 'Open Source Usage',
     # auth
     'login.user': 'Username',
     'login.pwd': 'Password',

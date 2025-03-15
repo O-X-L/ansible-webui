@@ -16,7 +16,7 @@ Keep it simple.
 
 ### Local - PIP
 
-Requires Python >=3.11
+Requires Python >=3.10
 
 ```bash
 # install
