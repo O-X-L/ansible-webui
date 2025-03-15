@@ -78,7 +78,10 @@ class APISystemConfig(APIView):
         responses={
             200: OpenApiResponse(response=GenericResponse, description='System config updated'),
             400: OpenApiResponse(response=GenericErrorResponse, description='Invalid system config provided'),
-            403: OpenApiResponse(response=GenericErrorResponse, description='Not privileged to update the system config'),
+            403: OpenApiResponse(
+                response=GenericErrorResponse,
+                description='Not privileged to update the system config',
+            ),
         },
         summary='Modify system config.',
         operation_id='system_config_edit',
