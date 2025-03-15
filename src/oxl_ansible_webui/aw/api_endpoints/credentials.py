@@ -9,7 +9,7 @@ from aw.model.job import Job, JobExecution
 from aw.model.job_credential import BaseJobCredentials, JobUserCredentials, JobGlobalCredentials
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, api_docs_delete, \
-    api_docs_put, api_docs_post, validate_no_xss
+    api_docs_put, api_docs_post, validate_no_xss, GenericErrorResponse
 from aw.utils.permission import has_credentials_permission, has_manager_privileges
 from aw.config.hardcoded import SECRET_HIDDEN
 from aw.utils.util import is_null
@@ -183,7 +183,7 @@ class APIJobCredentials(APIView):
         are_global = are_global_credentials(request)
 
         if are_global and not has_manager_privileges(user=user, kind='credentials'):
-            return Response(data={'msg': 'Not privileged to create global credentials'}, status=403)
+            return Response(data={'error': 'Not privileged to create global credentials'}, status=403)
 
         if are_global:
             self.serializer_class = JobGlobalCredentialsWriteRequest
@@ -195,7 +195,7 @@ class APIJobCredentials(APIView):
 
         if not serializer.is_valid():
             return Response(
-                data={'msg': f"Provided {_log_global_user(are_global)} data is not valid: '{serializer.errors}'"},
+                data={'error': f"Provided {_log_global_user(are_global)} data is not valid: '{serializer.errors}'"},
                 status=400,
             )
 
@@ -209,7 +209,7 @@ class APIJobCredentials(APIView):
                     value = _validate_and_fix_ssh_key(value)
                     if value is None:
                         return Response(
-                            data={'msg': f"Provided {_log_global_user(are_global)} ssh-key is not valid'"},
+                            data={'error': f"Provided {_log_global_user(are_global)} ssh-key is not valid'"},
                             status=400,
                         )
 
@@ -220,7 +220,7 @@ class APIJobCredentials(APIView):
 
         except IntegrityError as err:
             return Response(
-                data={'msg': f"Provided {_log_global_user(are_global)} data is not valid: '{err}'"},
+                data={'error': f"Provided {_log_global_user(are_global)} data is not valid: '{err}'"},
                 status=400,
             )
 
@@ -243,8 +243,8 @@ class APIJobCredentialsItem(APIView):
         request=None,
         responses={
             200: OpenApiResponse(JobUserCredentialsReadResponse, description='Return information about credentials'),
-            403: OpenApiResponse(GenericResponse, description='Not privileged to view the credentials'),
-            404: OpenApiResponse(GenericResponse, description='Credentials not exist'),
+            403: OpenApiResponse(GenericErrorResponse, description='Not privileged to view the credentials'),
+            404: OpenApiResponse(GenericErrorResponse, description='Credentials not exist'),
         },
         summary='Return information about a set of credentials.',
         operation_id='credentials_view',
@@ -268,9 +268,9 @@ class APIJobCredentialsItem(APIView):
         if credentials is None:
             base_msg = f"{_log_global_user(are_global)} with ID {credentials_id} do not exist"
             if not are_global:
-                return Response(data={'msg': f"{base_msg} or belong to another user"}, status=404)
+                return Response(data={'error': f"{base_msg} or belong to another user"}, status=404)
 
-            return Response(data={'msg': base_msg}, status=404)
+            return Response(data={'error': base_msg}, status=404)
 
         if are_global and not has_credentials_permission(
             user=user,
@@ -278,7 +278,7 @@ class APIJobCredentialsItem(APIView):
             permission_needed=CHOICE_PERMISSION_READ,
         ):
             return Response(
-                data={'msg': f"{_log_global_user(are_global)} '{credentials.name}' are not viewable"},
+                data={'error': f"{_log_global_user(are_global)} '{credentials.name}' are not viewable"},
                 status=403,
             )
 
@@ -309,9 +309,9 @@ class APIJobCredentialsItem(APIView):
         if credentials is None:
             base_msg = f"{_log_global_user(are_global)} with ID {credentials_id} do not exist"
             if not are_global:
-                return Response(data={'msg': f"{base_msg} or belong to another user"}, status=404)
+                return Response(data={'error': f"{base_msg} or belong to another user"}, status=404)
 
-            return Response(data={'msg': base_msg}, status=404)
+            return Response(data={'error': base_msg}, status=404)
 
         if are_global and not has_credentials_permission(
             user=user,
@@ -319,14 +319,14 @@ class APIJobCredentialsItem(APIView):
             permission_needed=CHOICE_PERMISSION_DELETE,
         ):
             return Response(
-                data={'msg': f"Not privileged to delete the {_log_global_user(are_global, lower=True)} "
-                             f"'{credentials.name}'"},
+                data={'error': f"Not privileged to delete the {_log_global_user(are_global, lower=True)} "
+                               f"'{credentials.name}'"},
                 status=403)
 
         if credentials_in_use(credentials):
             return Response(
-                data={'msg': f"{_log_global_user(are_global)} '{credentials.name}' cannot be deleted "
-                             "as they are still in use"},
+                data={'error': f"{_log_global_user(are_global)} '{credentials.name}' cannot be deleted "
+                               "as they are still in use"},
                 status=400,
             )
 
@@ -358,9 +358,9 @@ class APIJobCredentialsItem(APIView):
         if credentials is None:
             base_msg = f"{_log_global_user(are_global)} with ID {credentials_id} do not exist"
             if not are_global:
-                return Response(data={'msg': f"{base_msg} or belong to another user"}, status=404)
+                return Response(data={'error': f"{base_msg} or belong to another user"}, status=404)
 
-            return Response(data={'msg': base_msg}, status=404)
+            return Response(data={'error': base_msg}, status=404)
 
         if are_global and not has_credentials_permission(
             user=user,
@@ -368,16 +368,16 @@ class APIJobCredentialsItem(APIView):
             permission_needed=CHOICE_PERMISSION_WRITE,
         ):
             return Response(
-                data={'msg': f"Not privileged to modify the {_log_global_user(are_global, lower=True)} "
-                             f"'{credentials.name}'"},
+                data={'error': f"Not privileged to modify the {_log_global_user(are_global, lower=True)} "
+                               f"'{credentials.name}'"},
                 status=403,
             )
 
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
             return Response(
-                data={'msg': f"Provided {_log_global_user(are_global, lower=True)} data is not valid: "
-                             f"'{serializer.errors}'"},
+                data={'error': f"Provided {_log_global_user(are_global, lower=True)} data is not valid: "
+                               f"'{serializer.errors}'"},
                 status=400,
             )
 
@@ -392,7 +392,7 @@ class APIJobCredentialsItem(APIView):
                         value = _validate_and_fix_ssh_key(value)
                         if value is None:
                             return Response(
-                                data={'msg': f"Provided {_log_global_user(are_global)} ssh-key is not valid'"},
+                                data={'error': f"Provided {_log_global_user(are_global)} ssh-key is not valid'"},
                                 status=400,
                             )
 
@@ -408,7 +408,7 @@ class APIJobCredentialsItem(APIView):
 
         except IntegrityError as err:
             return Response(
-                data={'msg': f"Provided {_log_global_user(are_global, lower=True)} data is not valid: '{err}'"},
+                data={'error': f"Provided {_log_global_user(are_global, lower=True)} data is not valid: '{err}'"},
                 status=400,
             )
 

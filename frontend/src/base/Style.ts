@@ -1,5 +1,5 @@
-export const classLinkHover = 'hover:text-primary-600 dark:hover:text-primary-500';
-export const classLink = `text-blue-600 dark:text-blue-300 ${classLinkHover}`;
+// export const classLinkHover = 'hover:text-primary-600 dark:hover:text-primary-500';
+// export const classLink = `text-blue-600 dark:text-blue-300 ${classLinkHover}`;
 export const classNavFooter = 'bg-primary-100/30 border-primary-700 dark:bg-gray-800 dark:border-primary-500';
 export const classBtnBase = 'text-center focus-within:ring-4 focus-within:outline-none inline-flex items-center justify-center text-sm text-white bg-primary-700 hover:bg-primary-800 dark:bg-primary-600 dark:hover:bg-primary-700 focus-within:ring-primary-300 dark:focus-within:ring-primary-800 rounded-lg';
 export const classModalBackdrop = 'fixed inset-0 z-40 bg-gray-900/60';
@@ -7,4 +7,5 @@ export const classModalLabel = 'block text-base font-bold mb-1 mt-5';
 export const classModalHelp = 'text-sm mt-2';
 export const classModalBtns = 'mt-10';
 export const classModalForm = 'ml-2 mr-2';
+export const classModalInputDiv = 'flex flex-wrap gap-5';
 const bg = 'w-full h-full';

@@ -10,7 +10,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParamet
 
 from aw.model.repository import Repository
 from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user, LogDownloadResponse, api_docs_put, \
-    api_docs_delete, api_docs_post, validate_no_xss
+    api_docs_delete, api_docs_post, validate_no_xss, GenericErrorResponse
 from aw.utils.permission import has_manager_privileges, has_repository_permission, get_viewable_repositories
 from aw.model.job import Job
 from aw.utils.util import unset_or_null, is_set
@@ -118,22 +118,22 @@ class APIRepository(GenericAPIView):
     def post(self, request):
         privileged = has_manager_privileges(user=get_api_user(request), kind='repository')
         if not privileged:
-            return Response(data={'msg': 'Not privileged to manage repositories'}, status=403)
+            return Response(data={'error': 'Not privileged to manage repositories'}, status=403)
 
         serializer = RepositoryWriteRequest(data=request.data)
 
         if not serializer.is_valid():
-            return Response(data={'msg': f"Provided repository data is not valid: '{serializer.errors}'"}, status=400)
+            return Response(data={'error': f"Provided repository data is not valid: '{serializer.errors}'"}, status=400)
 
         rtype_valid, rtype_error = validate_repository_types(serializer.validated_data)
         if not rtype_valid:
-            return Response(data={'msg': f"Provided repository data is not valid: '{rtype_error}'"}, status=400)
+            return Response(data={'error': f"Provided repository data is not valid: '{rtype_error}'"}, status=400)
 
         try:
             serializer.save()
 
         except IntegrityError as err:
-            return Response(data={'msg': f"Provided repository data is not valid: '{err}'"}, status=400)
+            return Response(data={'error': f"Provided repository data is not valid: '{err}'"}, status=400)
 
         return Response({'msg': f"Repository '{serializer.validated_data['name']}' created successfully"})
 
@@ -148,7 +148,7 @@ class APIRepositoryItem(GenericAPIView):
         request=None,
         responses={
             200: RepositoryReadResponse,
-            404: OpenApiResponse(response=GenericResponse, description='Repository does not exist'),
+            404: OpenApiResponse(response=GenericErrorResponse, description='Repository does not exist'),
         },
         summary='Return information of a repository.',
         operation_id='repository_get'
@@ -164,14 +164,14 @@ class APIRepositoryItem(GenericAPIView):
                     permission_needed=CHOICE_PERMISSION_READ
             ):
                 return Response(
-                    data={'msg': f"Not privileged to view the repository '{repository.name}'"},
+                    data={'error': f"Not privileged to view the repository '{repository.name}'"},
                     status=403,
                 )
 
             return Response(data=build_repository(repository), status=200)
 
         except ObjectDoesNotExist:
-            return Response(data={'msg': f"Repository with ID {repo_id} does not exist"}, status=404)
+            return Response(data={'error': f"Repository with ID {repo_id} does not exist"}, status=404)
 
     @extend_schema(
         request=RepositoryWriteRequest,
@@ -184,11 +184,11 @@ class APIRepositoryItem(GenericAPIView):
 
         serializer = RepositoryWriteRequest(data=request.data)
         if not serializer.is_valid():
-            return Response(data={'msg': f"Provided repository data is not valid: '{serializer.errors}'"}, status=400)
+            return Response(data={'error': f"Provided repository data is not valid: '{serializer.errors}'"}, status=400)
 
         rtype_valid, rtype_error = validate_repository_types(serializer.validated_data)
         if not rtype_valid:
-            return Response(data={'msg': f"Provided repository data is not valid: '{rtype_error}'"}, status=400)
+            return Response(data={'error': f"Provided repository data is not valid: '{rtype_error}'"}, status=400)
 
         try:
             repository = Repository.objects.get(id=repo_id)
@@ -197,7 +197,7 @@ class APIRepositoryItem(GenericAPIView):
             repository = None
 
         if repository is None:
-            return Response(data={'msg': f"Repository with ID {repo_id} does not exist"}, status=404)
+            return Response(data={'error': f"Repository with ID {repo_id} does not exist"}, status=404)
 
         if not has_repository_permission(
                 user=user,
@@ -205,7 +205,7 @@ class APIRepositoryItem(GenericAPIView):
                 permission_needed=CHOICE_PERMISSION_WRITE
         ):
             return Response(
-                data={'msg': f"Not privileged to modify the repository '{repository.name}'"},
+                data={'error': f"Not privileged to modify the repository '{repository.name}'"},
                 status=403,
             )
 
@@ -214,7 +214,7 @@ class APIRepositoryItem(GenericAPIView):
             return Response(data={'msg': f"Repository '{repository.name}' updated"}, status=200)
 
         except IntegrityError as err:
-            return Response(data={'msg': f"Provided repository data is not valid: '{err}'"}, status=400)
+            return Response(data={'error': f"Provided repository data is not valid: '{err}'"}, status=400)
 
     @extend_schema(
         request=None,
@@ -234,13 +234,13 @@ class APIRepositoryItem(GenericAPIView):
                         permission_needed=CHOICE_PERMISSION_DELETE
                 ):
                     return Response(
-                        data={'msg': f"Not privileged to delete the repository '{repository.name}'"},
+                        data={'error': f"Not privileged to delete the repository '{repository.name}'"},
                         status=403,
                     )
 
                 if repository_in_use(repository):
                     return Response(
-                        data={'msg': f"Repository '{repository.name}' cannot be deleted as it is still in use"},
+                        data={'error': f"Repository '{repository.name}' cannot be deleted as it is still in use"},
                         status=400,
                     )
 
@@ -250,14 +250,14 @@ class APIRepositoryItem(GenericAPIView):
         except ObjectDoesNotExist:
             pass
 
-        return Response(data={'msg': f"Repository with ID {repo_id} does not exist"}, status=404)
+        return Response(data={'error': f"Repository with ID {repo_id} does not exist"}, status=404)
 
     @extend_schema(
         request=None,
         responses={
             200: OpenApiResponse(response=GenericResponse, description='Repository update initiated'),
-            403: OpenApiResponse(response=GenericResponse, description='Not privileged to update the repository'),
-            404: OpenApiResponse(response=GenericResponse, description='Repository does not exist'),
+            403: OpenApiResponse(response=GenericErrorResponse, description='Not privileged to update the repository'),
+            404: OpenApiResponse(response=GenericErrorResponse, description='Repository does not exist'),
         },
         summary='Download/Update a repository.',
         operation_id='repository_update'
@@ -274,7 +274,7 @@ class APIRepositoryItem(GenericAPIView):
                         permission_needed=CHOICE_PERMISSION_EXECUTE,
                 ):
                     return Response(
-                        data={'msg': f"Not privileged to update the repository '{repository.name}'"},
+                        data={'error': f"Not privileged to update the repository '{repository.name}'"},
                         status=403,
                     )
 
@@ -289,7 +289,7 @@ class APIRepositoryItem(GenericAPIView):
         except ObjectDoesNotExist:
             pass
 
-        return Response(data={'msg': f"Repository with ID {repo_id} does not exist"}, status=404)
+        return Response(data={'error': f"Repository with ID {repo_id} does not exist"}, status=404)
 
 
 class APIRepositoryLogFile(GenericAPIView):
@@ -302,8 +302,8 @@ class APIRepositoryLogFile(GenericAPIView):
         request=None,
         responses={
             200: OpenApiResponse(GenericResponse, description='Download repository log-file'),
-            403: OpenApiResponse(GenericResponse, description='Not privileged to view the repository logs'),
-            404: OpenApiResponse(GenericResponse, description='Repository or log-file dos not exist'),
+            403: OpenApiResponse(GenericErrorResponse, description='Not privileged to view the repository logs'),
+            404: OpenApiResponse(GenericErrorResponse, description='Repository or log-file dos not exist'),
         },
         summary='Download log-file of the last repository update.',
         operation_id='repository_logfile',
@@ -326,7 +326,7 @@ class APIRepositoryLogFile(GenericAPIView):
                         permission_needed=CHOICE_PERMISSION_READ,
                 ):
                     return Response(
-                        data={'msg': f"Not privileged to view logs of the repository '{repository.name}'"},
+                        data={'error': f"Not privileged to view logs of the repository '{repository.name}'"},
                         status=403,
                     )
 
@@ -336,7 +336,7 @@ class APIRepositoryLogFile(GenericAPIView):
                     logfile = getattr(repository, f'log_{logfile_type}')
 
                 if logfile is None:
-                    return Response(data={'msg': f"No logs found for repository '{repository.name}'"}, status=404)
+                    return Response(data={'error': f"No logs found for repository '{repository.name}'"}, status=404)
 
                 return get_log_file_content(logfile)
 
@@ -344,6 +344,6 @@ class APIRepositoryLogFile(GenericAPIView):
             pass
 
         return Response(
-            data={'msg': f"Repository with ID '{repo_id}' or log-file does not exist"},
+            data={'error': f"Repository with ID '{repo_id}' or log-file does not exist"},
             status=404,
         )

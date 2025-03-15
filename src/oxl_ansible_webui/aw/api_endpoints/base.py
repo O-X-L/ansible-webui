@@ -19,7 +19,6 @@ class HasAwAPIKey(BaseHasAPIKey):
 
 
 API_PERMISSION = [IsAuthenticated | HasAwAPIKey]
-HDR_NOCACHE = {'Cache-Control': 'no-cache, max-age=0'}
 HDR_CACHE_1W = {'Cache-Control': 'max-age=604800'}
 
 
@@ -52,6 +51,10 @@ class GenericResponse(BaseResponse):
     msg = serializers.CharField()
 
 
+class GenericErrorResponse(BaseResponse):
+    error = serializers.CharField()
+
+
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = GROUPS
@@ -69,26 +72,26 @@ class LogDownloadResponse(BaseResponse):
 def api_docs_put(item: str) -> dict:
     return {
         200: OpenApiResponse(response=GenericResponse, description=f'{item} updated'),
-        400: OpenApiResponse(response=GenericResponse, description=f'Invalid {item} data provided'),
-        403: OpenApiResponse(response=GenericResponse, description=f'Not privileged to edit the {item}'),
-        404: OpenApiResponse(response=GenericResponse, description=f'{item} does not exist'),
+        400: OpenApiResponse(response=GenericErrorResponse, description=f'Invalid {item} data provided'),
+        403: OpenApiResponse(response=GenericErrorResponse, description=f'Not privileged to edit the {item}'),
+        404: OpenApiResponse(response=GenericErrorResponse, description=f'{item} does not exist'),
     }
 
 
 def api_docs_delete(item: str) -> dict:
     return {
         200: OpenApiResponse(response=GenericResponse, description=f'{item} deleted'),
-        400: OpenApiResponse(response=GenericResponse, description=f'Invalid {item} data provided'),
-        403: OpenApiResponse(response=GenericResponse, description=f'Not privileged to delete the {item}'),
-        404: OpenApiResponse(response=GenericResponse, description=f'{item} does not exist'),
+        400: OpenApiResponse(response=GenericErrorResponse, description=f'Invalid {item} data provided'),
+        403: OpenApiResponse(response=GenericErrorResponse, description=f'Not privileged to delete the {item}'),
+        404: OpenApiResponse(response=GenericErrorResponse, description=f'{item} does not exist'),
     }
 
 
 def api_docs_post(item: str) -> dict:
     return {
         200: OpenApiResponse(response=GenericResponse, description=f'{item} created'),
-        400: OpenApiResponse(response=GenericResponse, description=f'Invalid {item} data provided'),
-        403: OpenApiResponse(response=GenericResponse, description=f'Not privileged to create {item}'),
+        400: OpenApiResponse(response=GenericErrorResponse, description=f'Invalid {item} data provided'),
+        403: OpenApiResponse(response=GenericErrorResponse, description=f'Not privileged to create {item}'),
     }
 
 

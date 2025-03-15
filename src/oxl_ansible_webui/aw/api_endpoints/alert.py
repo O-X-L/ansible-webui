@@ -7,7 +7,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from aw.model.job import Job
 from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user, api_docs_put, api_docs_delete, \
-    api_docs_post, validate_no_xss
+    api_docs_post, validate_no_xss, GenericErrorResponse
 from aw.utils.permission import has_manager_privileges
 from aw.model.alert import BaseAlert, AlertPlugin, AlertGlobal, AlertGroup, AlertUser
 
@@ -56,7 +56,7 @@ class APIAlertPlugin(GenericAPIView):
         privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
         if not privileged:
             return Response(
-                data={'msg': 'Not privileged to manage Alert-Plugin'},
+                data={'error': 'Not privileged to manage Alert-Plugin'},
                 status=403,
             )
 
@@ -64,7 +64,7 @@ class APIAlertPlugin(GenericAPIView):
 
         if not serializer.is_valid():
             return Response(
-                data={'msg': f"Provided Alert-Plugin data is not valid: '{serializer.errors}'"},
+                data={'error': f"Provided Alert-Plugin data is not valid: '{serializer.errors}'"},
                 status=400,
             )
 
@@ -73,7 +73,7 @@ class APIAlertPlugin(GenericAPIView):
 
         except IntegrityError as err:
             return Response(
-                data={'msg': f"Provided Alert-Plugin data is not valid: '{err}'"},
+                data={'error': f"Provided Alert-Plugin data is not valid: '{err}'"},
                 status=400,
             )
 
@@ -90,7 +90,7 @@ class APIAlertPluginItem(GenericAPIView):
         request=None,
         responses={
             200: AlertPluginReadWrite,
-            404: OpenApiResponse(response=GenericResponse, description='Alert-Plugin does not exist'),
+            404: OpenApiResponse(response=GenericErrorResponse, description='Alert-Plugin does not exist'),
         },
         summary='Return information of an Alert-Plugin.',
         operation_id='alert_plugin_get'
@@ -105,7 +105,7 @@ class APIAlertPluginItem(GenericAPIView):
         except ObjectDoesNotExist:
             pass
 
-        return Response(data={'msg': f"Alert-Plugin with ID {plugin_id} does not exist"}, status=404)
+        return Response(data={'error': f"Alert-Plugin with ID {plugin_id} does not exist"}, status=404)
 
     @extend_schema(
         request=AlertPluginReadWrite,
@@ -117,7 +117,7 @@ class APIAlertPluginItem(GenericAPIView):
         privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
         if not privileged:
             return Response(
-                data={'msg': 'Not privileged to manage Alert-Plugins'},
+                data={'error': 'Not privileged to manage Alert-Plugins'},
                 status=403,
             )
 
@@ -125,7 +125,7 @@ class APIAlertPluginItem(GenericAPIView):
 
         if not serializer.is_valid():
             return Response(
-                data={'msg': f"Provided Alert-Plugin data is not valid: '{serializer.errors}'"},
+                data={'error': f"Provided Alert-Plugin data is not valid: '{serializer.errors}'"},
                 status=400,
             )
 
@@ -137,7 +137,7 @@ class APIAlertPluginItem(GenericAPIView):
 
         if plugin is None:
             return Response(
-                data={'msg': f"Alert-Plugin with ID {plugin_id} does not exist"},
+                data={'error': f"Alert-Plugin with ID {plugin_id} does not exist"},
                 status=404,
             )
 
@@ -146,7 +146,7 @@ class APIAlertPluginItem(GenericAPIView):
             return Response(data={'msg': f"Alert-Plugin '{plugin.name}' updated"}, status=200)
 
         except IntegrityError as err:
-            return Response(data={'msg': f"Provided Alert-Plugin data is not valid: '{err}'"}, status=400)
+            return Response(data={'error': f"Provided Alert-Plugin data is not valid: '{err}'"}, status=400)
 
     @extend_schema(
         request=None,
@@ -158,7 +158,7 @@ class APIAlertPluginItem(GenericAPIView):
         privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
         if not privileged:
             return Response(
-                data={'msg': 'Not privileged to manage Alert-Plugins'},
+                data={'error': 'Not privileged to manage Alert-Plugins'},
                 status=403,
             )
 
@@ -171,7 +171,7 @@ class APIAlertPluginItem(GenericAPIView):
         except ObjectDoesNotExist:
             pass
 
-        return Response(data={'msg': f"Alert-Plugin with ID {plugin_id} does not exist"}, status=404)
+        return Response(data={'error': f"Alert-Plugin with ID {plugin_id} does not exist"}, status=404)
 
 
 class BaseAlertWriteRequest(serializers.ModelSerializer):
@@ -235,7 +235,7 @@ class APIAlertUser(GenericAPIView):
 
         if not serializer.is_valid():
             return Response(
-                data={'msg': f"Provided Alert data is not valid: '{serializer.errors}'"},
+                data={'error': f"Provided Alert data is not valid: '{serializer.errors}'"},
                 status=400,
             )
 
@@ -245,7 +245,7 @@ class APIAlertUser(GenericAPIView):
 
         except IntegrityError as err:
             return Response(
-                data={'msg': f"Provided Alert data is not valid: '{err}'"},
+                data={'error': f"Provided Alert data is not valid: '{err}'"},
                 status=400,
             )
 
@@ -262,7 +262,7 @@ class APIAlertUserItem(GenericAPIView):
         request=None,
         responses={
             200: AlertUserReadResponse,
-            404: OpenApiResponse(response=GenericResponse, description='Alert does not exist'),
+            404: OpenApiResponse(response=GenericErrorResponse, description='Alert does not exist'),
         },
         summary='Return information of an Alert.',
         operation_id='alert_user_get'
@@ -279,7 +279,7 @@ class APIAlertUserItem(GenericAPIView):
             pass
 
         return Response(
-            data={'msg': f"Alert with ID {alert_id} does not exist or is belongs to another user"},
+            data={'error': f"Alert with ID {alert_id} does not exist or is belongs to another user"},
             status=404,
         )
 
@@ -295,7 +295,7 @@ class APIAlertUserItem(GenericAPIView):
 
         if not serializer.is_valid():
             return Response(
-                data={'msg': f"Provided Alert data is not valid: '{serializer.errors}'"},
+                data={'error': f"Provided Alert data is not valid: '{serializer.errors}'"},
                 status=400,
             )
 
@@ -307,7 +307,7 @@ class APIAlertUserItem(GenericAPIView):
 
         if alert is None:
             return Response(
-                data={'msg': f"Alert with ID {alert_id} does not exist or is belongs to another user"},
+                data={'error': f"Alert with ID {alert_id} does not exist or is belongs to another user"},
                 status=404,
             )
 
@@ -319,7 +319,7 @@ class APIAlertUserItem(GenericAPIView):
             return Response(data={'msg': f"Alert '{alert.name}' updated"}, status=200)
 
         except IntegrityError as err:
-            return Response(data={'msg': f"Provided Alert data is not valid: '{err}'"}, status=400)
+            return Response(data={'error': f"Provided Alert data is not valid: '{err}'"}, status=400)
 
     @extend_schema(
         request=None,
@@ -340,7 +340,7 @@ class APIAlertUserItem(GenericAPIView):
             pass
 
         return Response(
-            data={'msg': f"Alert with ID {alert_id} does not exist or is belongs to another user"},
+            data={'error': f"Alert with ID {alert_id} does not exist or is belongs to another user"},
             status=404,
         )
 
@@ -393,7 +393,7 @@ class APIAlertGlobal(GenericAPIView):
         privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
         if not privileged:
             return Response(
-                data={'msg': 'Not privileged to manage Alert'},
+                data={'error': 'Not privileged to manage Alert'},
                 status=403,
             )
 
@@ -401,7 +401,7 @@ class APIAlertGlobal(GenericAPIView):
 
         if not serializer.is_valid():
             return Response(
-                data={'msg': f"Provided Alert data is not valid: '{serializer.errors}'"},
+                data={'error': f"Provided Alert data is not valid: '{serializer.errors}'"},
                 status=400,
             )
 
@@ -410,7 +410,7 @@ class APIAlertGlobal(GenericAPIView):
 
         except IntegrityError as err:
             return Response(
-                data={'msg': f"Provided Alert data is not valid: '{err}'"},
+                data={'error': f"Provided Alert data is not valid: '{err}'"},
                 status=400,
             )
 
@@ -427,7 +427,7 @@ class APIAlertGlobalItem(GenericAPIView):
         request=None,
         responses={
             200: AlertGlobalReadResponse,
-            404: OpenApiResponse(response=GenericResponse, description='Alert does not exist'),
+            404: OpenApiResponse(response=GenericErrorResponse, description='Alert does not exist'),
         },
         summary='Return information of an Alert.',
         operation_id='alert_global_get'
@@ -442,7 +442,7 @@ class APIAlertGlobalItem(GenericAPIView):
         except ObjectDoesNotExist:
             pass
 
-        return Response(data={'msg': f"Alert with ID {alert_id} does not exist"}, status=404)
+        return Response(data={'error': f"Alert with ID {alert_id} does not exist"}, status=404)
 
     @extend_schema(
         request=AlertGlobalWriteRequest,
@@ -454,7 +454,7 @@ class APIAlertGlobalItem(GenericAPIView):
         privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
         if not privileged:
             return Response(
-                data={'msg': 'Not privileged to manage Alerts'},
+                data={'error': 'Not privileged to manage Alerts'},
                 status=403,
             )
 
@@ -462,7 +462,7 @@ class APIAlertGlobalItem(GenericAPIView):
 
         if not serializer.is_valid():
             return Response(
-                data={'msg': f"Provided Alert data is not valid: '{serializer.errors}'"},
+                data={'error': f"Provided Alert data is not valid: '{serializer.errors}'"},
                 status=400,
             )
 
@@ -474,7 +474,7 @@ class APIAlertGlobalItem(GenericAPIView):
 
         if alert is None:
             return Response(
-                data={'msg': f"Alert with ID {alert_id} does not exist"},
+                data={'error': f"Alert with ID {alert_id} does not exist"},
                 status=404,
             )
 
@@ -484,7 +484,7 @@ class APIAlertGlobalItem(GenericAPIView):
             return Response(data={'msg': f"Alert '{alert.name}' updated"}, status=200)
 
         except IntegrityError as err:
-            return Response(data={'msg': f"Provided Alert data is not valid: '{err}'"}, status=400)
+            return Response(data={'error': f"Provided Alert data is not valid: '{err}'"}, status=400)
 
     @extend_schema(
         request=None,
@@ -496,7 +496,7 @@ class APIAlertGlobalItem(GenericAPIView):
         privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
         if not privileged:
             return Response(
-                data={'msg': 'Not privileged to manage Alerts'},
+                data={'error': 'Not privileged to manage Alerts'},
                 status=403,
             )
 
@@ -504,12 +504,12 @@ class APIAlertGlobalItem(GenericAPIView):
             alert = AlertGlobal.objects.get(id=alert_id)
             if alert is not None:
                 alert.delete()
-                return Response(data={'msg': f"Alert '{alert.name}' deleted"}, status=200)
+                return Response(data={'error': f"Alert '{alert.name}' deleted"}, status=200)
 
         except ObjectDoesNotExist:
             pass
 
-        return Response(data={'msg': f"Alert with ID {alert_id} does not exist"}, status=404)
+        return Response(data={'error': f"Alert with ID {alert_id} does not exist"}, status=404)
 
 
 class AlertGroupReadResponse(serializers.ModelSerializer):
@@ -563,7 +563,7 @@ class APIAlertGroup(GenericAPIView):
         privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
         if not privileged:
             return Response(
-                data={'msg': 'Not privileged to manage Alerts'},
+                data={'error': 'Not privileged to manage Alerts'},
                 status=403,
             )
 
@@ -571,7 +571,7 @@ class APIAlertGroup(GenericAPIView):
 
         if not serializer.is_valid():
             return Response(
-                data={'msg': f"Provided Alert data is not valid: '{serializer.errors}'"},
+                data={'error': f"Provided Alert data is not valid: '{serializer.errors}'"},
                 status=400,
             )
 
@@ -580,7 +580,7 @@ class APIAlertGroup(GenericAPIView):
 
         except IntegrityError as err:
             return Response(
-                data={'msg': f"Provided Alert data is not valid: '{err}'"},
+                data={'error': f"Provided Alert data is not valid: '{err}'"},
                 status=400,
             )
 
@@ -597,7 +597,7 @@ class APIAlertGroupItem(GenericAPIView):
         request=None,
         responses={
             200: AlertGroupReadResponse,
-            404: OpenApiResponse(response=GenericResponse, description='Alert does not exist'),
+            404: OpenApiResponse(response=GenericErrorResponse, description='Alert does not exist'),
         },
         summary='Return information of an Alert.',
         operation_id='alert_group_get'
@@ -614,7 +614,7 @@ class APIAlertGroupItem(GenericAPIView):
             pass
 
         return Response(
-            data={'msg': f"Alert with ID {alert_id} does not exist"},
+            data={'error': f"Alert with ID {alert_id} does not exist"},
             status=404,
         )
 
@@ -628,7 +628,7 @@ class APIAlertGroupItem(GenericAPIView):
         privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
         if not privileged:
             return Response(
-                data={'msg': 'Not privileged to manage Alerts'},
+                data={'error': 'Not privileged to manage Alerts'},
                 status=403,
             )
 
@@ -636,7 +636,7 @@ class APIAlertGroupItem(GenericAPIView):
 
         if not serializer.is_valid():
             return Response(
-                data={'msg': f"Provided Alert data is not valid: '{serializer.errors}'"},
+                data={'error': f"Provided Alert data is not valid: '{serializer.errors}'"},
                 status=400,
             )
 
@@ -648,7 +648,7 @@ class APIAlertGroupItem(GenericAPIView):
 
         if alert is None:
             return Response(
-                data={'msg': f"Alert with ID {alert_id} does not exist"},
+                data={'error': f"Alert with ID {alert_id} does not exist"},
                 status=404,
             )
 
@@ -658,7 +658,7 @@ class APIAlertGroupItem(GenericAPIView):
             return Response(data={'msg': f"Alert '{alert.name}' updated"}, status=200)
 
         except IntegrityError as err:
-            return Response(data={'msg': f"Provided Alert data is not valid: '{err}'"}, status=400)
+            return Response(data={'error': f"Provided Alert data is not valid: '{err}'"}, status=400)
 
     @extend_schema(
         request=None,
@@ -670,7 +670,7 @@ class APIAlertGroupItem(GenericAPIView):
         privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
         if not privileged:
             return Response(
-                data={'msg': 'Not privileged to manage Alerts'},
+                data={'error': 'Not privileged to manage Alerts'},
                 status=403,
             )
 
@@ -684,6 +684,6 @@ class APIAlertGroupItem(GenericAPIView):
             pass
 
         return Response(
-            data={'msg': f"Alert with ID {alert_id} does not exist"},
+            data={'error': f"Alert with ID {alert_id} does not exist"},
             status=404,
         )

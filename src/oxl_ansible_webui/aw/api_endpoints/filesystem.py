@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
 
 from aw.config.main import config
-from aw.api_endpoints.base import API_PERMISSION, BaseResponse, GenericResponse
+from aw.api_endpoints.base import API_PERMISSION, BaseResponse, GenericErrorResponse
 from aw.model.repository import Repository
 from aw.execute.repository import get_path_repo_wo_isolate
 from aw.utils.util import is_set
@@ -17,7 +17,7 @@ from aw.utils.util import is_set
 
 class FileSystemReadResponse(BaseResponse):
     files = serializers.ListSerializer(child=serializers.CharField())
-    directories = serializers.ListSerializer(child=serializers.CharField())
+    dirs = serializers.ListSerializer(child=serializers.CharField())
 
 
 class FileSystemExistsResponse(BaseResponse):
@@ -40,9 +40,9 @@ class APIFsBrowse(APIView):
         request=None,
         responses={
             200: FileSystemReadResponse,
-            400: OpenApiResponse(GenericResponse, description='Invalid browse-selector provided'),
-            403: OpenApiResponse(GenericResponse, description='Traversal not allowed'),
-            404: OpenApiResponse(GenericResponse, description='Base directory does not exist'),
+            400: OpenApiResponse(GenericErrorResponse, description='Invalid browse-selector provided'),
+            403: OpenApiResponse(GenericErrorResponse, description='Traversal not allowed'),
+            404: OpenApiResponse(GenericErrorResponse, description='Base directory does not exist'),
         },
         summary='Return list of existing files and directories.',
         description="This endpoint is mainly used for form auto-completion when selecting job-files",
@@ -56,7 +56,7 @@ class APIFsBrowse(APIView):
     def get(cls, request, repository: int = None):
         # pylint: disable=R0912
         browse_root = Path(config['path_play'])
-        items = {'files': [], 'directories': []}
+        items = {'files': [], 'dirs': []}
 
         if repository not in [None, 0, '0']:
             try:
@@ -72,7 +72,7 @@ class APIFsBrowse(APIView):
                         # do not validate as the repo does not exist..
                         all_valid = ['.*']
                         items['files'] = all_valid
-                        items['directories'] = all_valid
+                        items['dirs'] = all_valid
                         return Response(items)
 
                     browse_root = get_path_repo_wo_isolate(repository)
@@ -80,10 +80,10 @@ class APIFsBrowse(APIView):
                         browse_root = browse_root / repository.git_playbook_base
 
             except ObjectDoesNotExist:
-                return Response(data={'msg': 'Provided repository does not exist'}, status=404)
+                return Response(data={'error': 'Provided repository does not exist'}, status=404)
 
         if not browse_root.is_dir():
-            return Response(data={'msg': f"Base directory '{browse_root}' does not exist"}, status=404)
+            return Response(data={'error': f"Base directory '{browse_root}' does not exist"}, status=404)
 
         if 'base' not in request.GET:
             base = '/'
@@ -91,12 +91,12 @@ class APIFsBrowse(APIView):
             base = str(request.GET['base'])
 
         if base.find('..') != -1 or base.startswith('/'):
-            return Response(data={'msg': 'Traversal not allowed'}, status=403)
+            return Response(data={'error': 'Traversal not allowed'}, status=403)
 
         browse_root = browse_root / base
 
         if not browse_root.is_dir():
-            return Response(data={'msg': f"Base directory '{browse_root}' does not exist"}, status=404)
+            return Response(data={'error': f"Base directory '{browse_root}' does not exist"}, status=404)
 
         raw_items = cls._listdir(browse_root)
 
@@ -106,7 +106,7 @@ class APIFsBrowse(APIView):
                 if item_path.is_file():
                     items['files'].append(item)
                 elif item_path.is_dir():
-                    items['directories'].append(item)
+                    items['dirs'].append(item)
 
             except OSError:
                 continue
@@ -124,8 +124,8 @@ class APIFsExists(APIView):
         request=None,
         responses={
             200: FileSystemExistsResponse,
-            400: OpenApiResponse(GenericResponse, description='No file or directory not provided'),
-            403: OpenApiResponse(GenericResponse, description='Access to file or directory is forbidden'),
+            400: OpenApiResponse(GenericErrorResponse, description='No file or directory not provided'),
+            403: OpenApiResponse(GenericErrorResponse, description='Access to file or directory is forbidden'),
         },
         summary='Return if the provided file or directory exists.',
         description="This endpoint is mainly used for form validation when configuring path and files",
@@ -138,7 +138,7 @@ class APIFsExists(APIView):
     )
     def get(cls, request):
         if 'item' not in request.GET:
-            return Response(data={'msg': "Required parameter 'item' was not provided"}, status=400)
+            return Response(data={'error': "Required parameter 'item' was not provided"}, status=400)
 
         try:
             fs_item = Path(request.GET['item'])
@@ -152,4 +152,4 @@ class APIFsExists(APIView):
                 return Response({'exists': False, 'fstype': 'unknown'})
 
         except PermissionError:
-            return Response(data={'msg': 'Access to file or directory is forbidden'}, status=403)
+            return Response(data={'error': 'Access to file or directory is forbidden'}, status=403)

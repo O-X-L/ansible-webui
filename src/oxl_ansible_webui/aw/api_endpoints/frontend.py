@@ -4,11 +4,28 @@ from rest_framework.permissions import AllowAny
 from drf_spectacular.utils import extend_schema
 
 from aw.settings import AUTH_MODE
-from aw.api_endpoints.base import get_api_user, HDR_NOCACHE, HDR_CACHE_1W, GenericResponse, API_PERMISSION
+from aw.api_endpoints.base import get_api_user, HDR_CACHE_1W, GenericResponse, API_PERMISSION
 from aw.templatetags.util import get_logo, get_version
 from aw.config.language import TRANSLATIONS
 from aw.model.job import Job
 from aw.model.base import get_model_field_default, get_model_field_choices
+from aw.views.base import choices_global_credentials, choices_repositories
+
+
+FK_CHOICES = {
+    Job: {
+        'repository': choices_repositories,
+        'credentials_default': choices_global_credentials,
+    }
+}
+
+
+def _django_to_svelte_choices(c: (list[tuple], tuple[tuple])) -> list[dict]:
+    cv = []
+    for v in c:
+        cv.append({'value': v[0], 'name': v[1]})
+
+    return cv
 
 
 def _build_model_defaults_choices(m) -> dict:
@@ -19,15 +36,16 @@ def _build_model_defaults_choices(m) -> dict:
 
     for f in m.form_fields:
         d['defaults'][f] = get_model_field_default(m, f)
+        if m in FK_CHOICES and f in FK_CHOICES[m]:
+            d['choices'][f] = _django_to_svelte_choices(FK_CHOICES[m][f]())
+            continue
+
         c = get_model_field_choices(m, f)
         if c is None:
             d['choices'][f] = None
 
         else:
-            cv = []
-            for v in c:
-                cv.append({'value': v[0], 'name': v[1]})
-
+            cv = _django_to_svelte_choices(c)
             if len(cv) == 2 and isinstance(cv[0]['value'], bool):
                 # no need for boolean choices
                 d['choices'][f] = None
@@ -70,7 +88,7 @@ class APIBackendInfo(GenericAPIView):
             states['user'] = user.username
             states['authenticated'] = user.is_authenticated
 
-        return Response(data=states, status=200, headers=HDR_NOCACHE)
+        return Response(data=states, status=200)
 
 
 class APIBackendTranslations(GenericAPIView):
@@ -104,8 +122,4 @@ class APIFormInfosJob(GenericAPIView):
     )
     def get(request):
         del request
-        return Response(
-            data=_build_model_defaults_choices(Job),
-            status=200,
-            headers=HDR_CACHE_1W,
-        )
+        return Response(data=_build_model_defaults_choices(Job), status=200)

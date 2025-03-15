@@ -7,3 +7,10 @@
 @plugin 'flowbite/plugin';
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+
+@layer base {
+  a {
+    @apply text-blue-600 dark:text-blue-300 hover:text-primary-600 dark:hover:text-primary-500;
+  }
+}

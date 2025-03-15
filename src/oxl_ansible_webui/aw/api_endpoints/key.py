@@ -9,7 +9,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 from aw.utils.util import datetime_w_tz
 from aw.config.hardcoded import KEY_TIME_FORMAT
 from aw.model.api import AwAPIKey
-from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse
+from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, GenericErrorResponse
 
 
 class KeyReadResponse(BaseResponse):
@@ -62,7 +62,7 @@ class APIKeyItem(APIView):
         request=None,
         responses={
             200: OpenApiResponse(response=GenericResponse, description='API key deleted'),
-            404: OpenApiResponse(response=GenericResponse, description='API key does not exist'),
+            404: OpenApiResponse(response=GenericErrorResponse, description='API key does not exist'),
         },
         summary='Delete one of the existing API keys of the current user.',
     )
@@ -77,4 +77,4 @@ class APIKeyItem(APIView):
         except ObjectDoesNotExist:
             pass
 
-        return Response(data={'msg': 'API key not found'}, status=404)
+        return Response(data={'error': 'API key not found'}, status=404)

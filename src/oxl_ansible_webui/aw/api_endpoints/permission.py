@@ -256,7 +256,7 @@ class APIPermission(GenericAPIView):
         privileged = has_manager_privileges(user=get_api_user(request), kind='permission')
         if not privileged:
             return Response(
-                data={'msg': 'Not privileged to manage permissions'},
+                data={'error': 'Not privileged to manage permissions'},
                 status=403,
             )
 
@@ -264,7 +264,7 @@ class APIPermission(GenericAPIView):
 
         if not serializer.is_valid():
             return Response(
-                data={'msg': f"Provided permission data is not valid: '{serializer.errors}'"},
+                data={'error': f"Provided permission data is not valid: '{serializer.errors}'"},
                 status=400,
             )
 
@@ -273,7 +273,7 @@ class APIPermission(GenericAPIView):
 
         except IntegrityError as err:
             return Response(
-                data={'msg': f"Provided permission data is not valid: '{err}'"},
+                data={'error': f"Provided permission data is not valid: '{err}'"},
                 status=400,
             )
 
@@ -306,7 +306,7 @@ class APIPermissionItem(GenericAPIView):
         privileged = has_manager_privileges(user=get_api_user(request), kind='permission')
         if not privileged:
             return Response(
-                data={'msg': 'Not privileged to manage permissions'},
+                data={'error': 'Not privileged to manage permissions'},
                 status=403,
             )
 
@@ -314,7 +314,7 @@ class APIPermissionItem(GenericAPIView):
 
         if not serializer.is_valid():
             return Response(
-                data={'msg': f"Provided permission data is not valid: '{serializer.errors}'"},
+                data={'error': f"Provided permission data is not valid: '{serializer.errors}'"},
                 status=400,
             )
 
@@ -326,7 +326,7 @@ class APIPermissionItem(GenericAPIView):
 
         if permission is None:
             return Response(
-                data={'msg': f"Permission with ID {perm_id} does not exist"},
+                data={'error': f"Permission with ID {perm_id} does not exist"},
                 status=404,
             )
 
@@ -335,7 +335,7 @@ class APIPermissionItem(GenericAPIView):
             return Response(data={'msg': f"Permission '{permission.name}' updated"}, status=200)
 
         except IntegrityError as err:
-            return Response(data={'msg': f"Provided permission data is not valid: '{err}'"}, status=400)
+            return Response(data={'error': f"Provided permission data is not valid: '{err}'"}, status=400)
 
     @extend_schema(
         request=None,
@@ -347,7 +347,7 @@ class APIPermissionItem(GenericAPIView):
         privileged = has_manager_privileges(user=get_api_user(request), kind='permission')
         if not privileged:
             return Response(
-                data={'msg': 'Not privileged to manage permissions'},
+                data={'error': 'Not privileged to manage permissions'},
                 status=403,
             )
 
@@ -356,7 +356,7 @@ class APIPermissionItem(GenericAPIView):
             if permission is not None:
                 if permission_in_use(permission):
                     return Response(
-                        data={'msg': f"Permission '{permission.name}' cannot be deleted as it is still in use"},
+                        data={'error': f"Permission '{permission.name}' cannot be deleted as it is still in use"},
                         status=400,
                     )
 
@@ -366,4 +366,4 @@ class APIPermissionItem(GenericAPIView):
         except ObjectDoesNotExist:
             pass
 
-        return Response(data={'msg': f"Permission with ID {perm_id} does not exist"}, status=404)
+        return Response(data={'error': f"Permission with ID {perm_id} does not exist"}, status=404)

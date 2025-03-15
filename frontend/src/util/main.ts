@@ -18,3 +18,11 @@ export function hashString(str: string, seed: number = 0) {
 export function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
+export function rsplit(s: string, w: string) {
+  let b = s.split(w);
+  if (b.length == 1) {
+    return [b[0], null];
+  }
+  return [b.slice(0, -1).join(w), b.slice(-1)[0]];
+}

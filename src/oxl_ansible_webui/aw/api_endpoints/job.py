@@ -11,7 +11,7 @@ from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_EXECUT
     CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
 from aw.model.job_credential import JobGlobalCredentials
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, \
-    LogDownloadResponse, api_docs_put, api_docs_delete, api_docs_post, validate_no_xss
+    LogDownloadResponse, api_docs_put, api_docs_delete, api_docs_post, validate_no_xss, GenericErrorResponse
 from aw.api_endpoints.job_util import get_viewable_jobs_serialized, JobReadResponse, get_job_executions_serialized, \
     JobExecutionReadResponse, get_viewable_jobs, get_job_execution_serialized, get_log_file_content
 from aw.utils.permission import has_job_permission, has_credentials_permission, has_manager_privileges
@@ -152,19 +152,19 @@ class APIJob(APIView):
     def post(self, request):
         user = get_api_user(request)
         if not has_manager_privileges(user=user, kind='job'):
-            return Response(data={'msg': 'Not privileged to create jobs'}, status=403)
+            return Response(data={'error': 'Not privileged to create jobs'}, status=403)
 
         serializer = JobWriteRequest(data=request.data)
 
         if not serializer.is_valid():
             return Response(
-                data={'msg': f"Provided job data is not valid: '{serializer.errors}'"},
+                data={'error': f"Provided job data is not valid: '{serializer.errors}'"},
                 status=400,
             )
 
         if not _has_credentials_permission(user=user, data=serializer.validated_data):
             return Response(
-                data={'msg': "Not privileged to use provided credentials"},
+                data={'error': "Not privileged to use provided credentials"},
                 status=403,
             )
 
@@ -173,7 +173,7 @@ class APIJob(APIView):
 
         except IntegrityError as err:
             return Response(
-                data={'msg': f"Provided job data is not valid: '{err}'"},
+                data={'error': f"Provided job data is not valid: '{err}'"},
                 status=400,
             )
 
@@ -182,15 +182,15 @@ class APIJob(APIView):
 
 class APIJobItem(APIView):
     http_method_names = ['get', 'delete', 'put', 'post']
-    serializer_class = GenericResponse
+    serializer_class = GenericErrorResponse
     permission_classes = API_PERMISSION
 
     @extend_schema(
         request=None,
         responses={
             200: OpenApiResponse(JobReadResponse, description='Return job information'),
-            400: OpenApiResponse(GenericResponse, description='Bad parameters provided'),
-            403: OpenApiResponse(GenericResponse, description='Not privileged to view the job'),
+            400: OpenApiResponse(GenericErrorResponse, description='Bad parameters provided'),
+            403: OpenApiResponse(GenericErrorResponse, description='Not privileged to view the job'),
             404: OpenApiResponse(JobReadResponse, description='Job does not exist'),
         },
         summary='Return information about a job.',
@@ -212,10 +212,10 @@ class APIJobItem(APIView):
         user = get_api_user(request)
         job = _find_job(job_id)
         if job is None:
-            return Response(data={'msg': f"Job with ID {job_id} does not exist"}, status=404)
+            return Response(data={'error': f"Job with ID {job_id} does not exist"}, status=404)
 
         if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_READ):
-            return Response(data={'msg': f"Job '{job.name}' is not viewable"}, status=403)
+            return Response(data={'error': f"Job '{job.name}' is not viewable"}, status=403)
 
         data = JobReadResponse(instance=job).data
 
@@ -238,7 +238,7 @@ class APIJobItem(APIView):
 
             if job is not None:
                 if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_DELETE):
-                    return Response(data={'msg': f"Not privileged to delete the job '{job.name}'"}, status=403)
+                    return Response(data={'error': f"Not privileged to delete the job '{job.name}'"}, status=403)
 
                 job.delete()
                 return Response(data={'msg': f"Job '{job.name}' deleted"}, status=200)
@@ -246,7 +246,7 @@ class APIJobItem(APIView):
         except ObjectDoesNotExist:
             pass
 
-        return Response(data={'msg': f"Job with ID {job_id} does not exist"}, status=404)
+        return Response(data={'error': f"Job with ID {job_id} does not exist"}, status=404)
 
     @extend_schema(
         request=JobWriteRequest,
@@ -261,18 +261,18 @@ class APIJobItem(APIView):
 
             if job is not None:
                 if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_WRITE):
-                    return Response(data={'msg': f"Not privileged to modify the job '{job.name}'"}, status=403)
+                    return Response(data={'error': f"Not privileged to modify the job '{job.name}'"}, status=403)
 
                 serializer = JobWriteRequest(data=request.data)
                 if not serializer.is_valid():
                     return Response(
-                        data={'msg': f"Provided job data is not valid: '{serializer.errors}'"},
+                        data={'error': f"Provided job data is not valid: '{serializer.errors}'"},
                         status=400,
                     )
 
                 if not _has_credentials_permission(user=user, data=serializer.validated_data):
                     return Response(
-                        data={'msg': "Not privileged to use provided credentials"},
+                        data={'error': "Not privileged to use provided credentials"},
                         status=403,
                     )
 
@@ -281,7 +281,7 @@ class APIJobItem(APIView):
 
                 except IntegrityError as err:
                     return Response(
-                        data={'msg': f"Provided job data is not valid: '{err}'"},
+                        data={'error': f"Provided job data is not valid: '{err}'"},
                         status=400,
                     )
 
@@ -290,7 +290,7 @@ class APIJobItem(APIView):
         except ObjectDoesNotExist:
             pass
 
-        return Response(data={'msg': f"Job with ID {job_id} does not exist"}, status=404)
+        return Response(data={'error': f"Job with ID {job_id} does not exist"}, status=404)
 
     @extend_schema(
         request=None,
@@ -310,13 +310,13 @@ class APIJobItem(APIView):
 
             if job is not None:
                 if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_EXECUTE):
-                    return Response(data={'msg': f"Not privileged to execute the job '{job.name}'"}, status=403)
+                    return Response(data={'error': f"Not privileged to execute the job '{job.name}'"}, status=403)
 
                 if len(request.data) > 0:
                     serializer = JobExecutionRequest(data=request.data)
                     if not serializer.is_valid():
                         return Response(
-                            data={'msg': f"Provided job-execution data is not valid: '{serializer.errors}'"},
+                            data={'error': f"Provided job-execution data is not valid: '{serializer.errors}'"},
                             status=400,
                         )
 
@@ -334,12 +334,12 @@ class APIJobItem(APIView):
         except ObjectDoesNotExist:
             pass
 
-        return Response(data={'msg': f"Job with ID '{job_id}' does not exist"}, status=404)
+        return Response(data={'error': f"Job with ID '{job_id}' does not exist"}, status=404)
 
 
 class APIJobExecutionItem(APIView):
     http_method_names = ['delete']
-    serializer_class = GenericResponse
+    serializer_class = GenericErrorResponse
     permission_classes = API_PERMISSION
 
     @extend_schema(
@@ -360,13 +360,13 @@ class APIJobExecutionItem(APIView):
 
             if job is not None and execution is not None:
                 if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_EXECUTE):
-                    return Response(data={'msg': f"Not privileged to stop the job '{job.name}'"}, status=403)
+                    return Response(data={'error': f"Not privileged to stop the job '{job.name}'"}, status=403)
 
                 if not is_execution_status(execution, 'Running'):
                     JobExecution.objects.filter(
                         status__in=JOB_EXEC_STATI_ACTIVE, job=job,
                     ).update(status=JOB_EXEC_STATUS_FAILED)
-                    return Response(data={'msg': f"Job execution '{job.name}' is not running"}, status=400)
+                    return Response(data={'error': f"Job execution '{job.name}' is not running"}, status=400)
 
                 update_status(execution, 'Stopping')
                 return Response(data={'msg': f"Job execution '{job.name}' stopping"}, status=200)
@@ -374,7 +374,7 @@ class APIJobExecutionItem(APIView):
         except ObjectDoesNotExist:
             pass
 
-        return Response(data={'msg': f"Job with ID '{job_id}' or execution does not exist"}, status=404)
+        return Response(data={'error': f"Job with ID '{job_id}' or execution does not exist"}, status=404)
 
 
 class JobExecutionLogReadResponse(BaseResponse):
@@ -417,10 +417,10 @@ class APIJobExecutionLogs(APIView):
 
             if job is not None and execution is not None:
                 if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_READ):
-                    return Response(data={'msg': f"Not privileged to view logs of the job '{job.name}'"}, status=403)
+                    return Response(data={'error': f"Not privileged to view logs of the job '{job.name}'"}, status=403)
 
                 if execution.log_stdout is None:
-                    return Response(data={'msg': f"No logs found for job '{job.name}'"}, status=404)
+                    return Response(data={'error': f"No logs found for job '{job.name}'"}, status=404)
 
                 with open(execution.log_stdout, 'r', encoding='utf-8') as logfile:
                     lines = logfile.readlines()
@@ -436,7 +436,7 @@ class APIJobExecutionLogs(APIView):
             pass
 
         return Response(
-            data={'msg': f"Job with ID '{job_id}', execution with ID '{exec_id}' or log-file does not exist"},
+            data={'error': f"Job with ID '{job_id}', execution with ID '{exec_id}' or log-file does not exist"},
             status=404,
         )
 
@@ -451,8 +451,8 @@ class APIJobExecutionLogFile(APIView):
         request=None,
         responses={
             200: OpenApiResponse(GenericResponse, description='Download job log-file'),
-            403: OpenApiResponse(GenericResponse, description='Not privileged to view the job logs'),
-            404: OpenApiResponse(GenericResponse, description='Job, execution or log-file do not exist'),
+            403: OpenApiResponse(GenericErrorResponse, description='Not privileged to view the job logs'),
+            404: OpenApiResponse(GenericErrorResponse, description='Job, execution or log-file do not exist'),
         },
         summary='Download log-file of a job execution.',
         operation_id='job_exec_logfile',
@@ -471,7 +471,7 @@ class APIJobExecutionLogFile(APIView):
 
             if job is not None and execution is not None:
                 if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_READ):
-                    return Response(data={'msg': f"Not privileged to view logs of the job '{job.name}'"}, status=403)
+                    return Response(data={'error': f"Not privileged to view logs of the job '{job.name}'"}, status=403)
 
                 logfile = execution.log_stdout
                 if 'type' in request.GET:
@@ -479,7 +479,7 @@ class APIJobExecutionLogFile(APIView):
                     logfile = getattr(execution, f'log_{logfile_type}')
 
                 if logfile is None:
-                    return Response(data={'msg': f"No logs found for job '{job.name}'"}, status=404)
+                    return Response(data={'error': f"No logs found for job '{job.name}'"}, status=404)
 
                 return get_log_file_content(logfile)
 
@@ -487,7 +487,7 @@ class APIJobExecutionLogFile(APIView):
             pass
 
         return Response(
-            data={'msg': f"Job with ID '{job_id}', execution with ID '{exec_id}' or log-file does not exist"},
+            data={'error': f"Job with ID '{job_id}', execution with ID '{exec_id}' or log-file does not exist"},
             status=404,
         )
 

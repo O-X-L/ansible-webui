@@ -131,10 +131,6 @@ FORM_HELP = {
             'credentials_category': 'The credential category can be used for dynamic matching of '
                                     'user credentials at execution time',
             'enabled': 'En- or disable the schedule. Can be ignored if no schedule was set',
-            'execution_prompts_required': 'Required job attributes and/or variables to prompt at custom execution. '
-                                          'Comma-separated list of key-value pairs.<br>'
-                                          "Variables can be supplied like so: 'var={VAR-NAME}#{DISPLAY-NAME}'<br>"
-                                          "Example: 'limit,check,var=add_user#User to add' ",
         },
         'credentials': {
             'vault_file': 'Path to the file containing your vault-password',

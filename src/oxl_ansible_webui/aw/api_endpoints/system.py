@@ -6,7 +6,7 @@ from django.db.utils import IntegrityError
 
 from aw.config.main import config
 from aw.model.system import SystemConfig, get_config_from_db
-from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse
+from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, GenericErrorResponse
 from aw.utils.util_no_config import is_set, is_null
 from aw.utils.debug import log
 from aw.utils.permission import has_manager_privileges
@@ -77,8 +77,8 @@ class APISystemConfig(APIView):
         request=SystemConfigWriteRequest,
         responses={
             200: OpenApiResponse(response=GenericResponse, description='System config updated'),
-            400: OpenApiResponse(response=GenericResponse, description='Invalid system config provided'),
-            403: OpenApiResponse(response=GenericResponse, description='Not privileged to update the system config'),
+            400: OpenApiResponse(response=GenericErrorResponse, description='Invalid system config provided'),
+            403: OpenApiResponse(response=GenericErrorResponse, description='Not privileged to update the system config'),
         },
         summary='Modify system config.',
         operation_id='system_config_edit',
@@ -87,7 +87,7 @@ class APISystemConfig(APIView):
         privileged = has_manager_privileges(user=get_api_user(request), kind='system')
         if not privileged:
             return Response(
-                data={'msg': 'Not privileged to manage system config'},
+                data={'error': 'Not privileged to manage system config'},
                 status=403,
             )
 
@@ -95,7 +95,7 @@ class APISystemConfig(APIView):
 
         if not serializer.is_valid():
             return Response(
-                data={'msg': f"Provided system config is not valid: '{serializer.errors}'"},
+                data={'error': f"Provided system config is not valid: '{serializer.errors}'"},
                 status=400,
             )
 
@@ -118,4 +118,4 @@ class APISystemConfig(APIView):
             return Response(data={'msg': "System config updated"}, status=200)
 
         except IntegrityError as err:
-            return Response(data={'msg': f"Provided system config is not valid: '{err}'"}, status=400)
+            return Response(data={'error': f"Provided system config is not valid: '{err}'"}, status=400)
