@@ -8,7 +8,7 @@ from aw.config.hardcoded import LOGIN_PATH
 from aw.settings import LOGIN_REDIRECT_URL
 from aw.utils.http import ui_endpoint_wrapper
 from aw.views.settings import urlpatterns_settings
-from aw.views.job import urlpatterns_jobs
+# from aw.views.job import urlpatterns_jobs
 from aw.views.system import urlpatterns_system
 
 
@@ -56,14 +56,20 @@ def logout(request) -> HttpResponse:
     return logout_then_login(request)
 
 
+@login_required
+@ui_endpoint_wrapper
+def home(request) -> HttpResponse:
+    return render(request, status=200, template_name='home.html')
+
+
 urlpatterns_ui = [
+    path('ui', home),
     path('ui/system/admin/', admin),
     path('ui/system/api_docs', api_docs),
 ]
-urlpatterns_ui += urlpatterns_jobs
+# urlpatterns_ui += urlpatterns_jobs
 urlpatterns_ui += urlpatterns_settings
 urlpatterns_ui += urlpatterns_system
 urlpatterns_ui += [
-    path('ui/', not_implemented),
     re_path(r'^ui/*', not_implemented),
 ]

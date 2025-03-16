@@ -1,31 +1,63 @@
 <script lang="ts">
     import { onMount } from 'svelte';
 
-    import { FolderSolid, FileSolid } from 'flowbite-svelte-icons';
+    import { FolderSolid, FileSolid, CloseCircleSolid } from 'flowbite-svelte-icons';
     import {
-        Heading, Button, Modal, Input, Label, Helper, Toggle, Select, Spinner,
+        Heading, Button, Modal, Input, Label, Helper, Toggle, Select, Spinner, Alert,
         AccordionItem, Accordion,
     } from 'flowbite-svelte';
 
     import { share } from '../State.js';
+    import { apiGet } from '../../util/api.js';
     import { rsplit } from '../../util/main.js';
     import { tq } from '../../util/translate.js';
+    import {
+        inputBaseColor, toggleBaseColor, valideInputBase, inputRequiredBaseColor, submitFormBase,
+        type formMethod,
+    } from '../../util/form.js';
     import {
         classModalBackdrop, classModalLabel, classModalHelp, classModalBtns, classModalForm,
         classModalInputDiv,
     } from '../Style.js';
-    import { apiGet, apiForm, getCSRFFormToken } from '../../util/api.js';
 
     // todo: reset to default if 'add' form gets closed
     let { open = $bindable(false), action = 'add', jobId = null, clone = false } = $props();
 
+    const formErrorAlert = 'form-job-alert';
     const urlExisting = `/api/job/${jobId}`;
     let formInfos = $state({});
     let loaded = $state(false);
     let existing = $state({});
-    let method = $derived(getMethod(action));
-    let defaults = $derived(action == 'add' ? formInfos.defaults : existing );
+    let method: formMethod = $derived(getMethod(action));
     let url = $derived(['add', 'clone'].includes(action) ? '/api/job' : urlExisting);
+    let formError = $state('');
+
+    let form = $state({
+        name: {value: '', color: inputRequiredBaseColor, required: true},
+        comment: {value: '', color: inputBaseColor},
+        repository: {value: 0, color: inputBaseColor},
+        playbook_file: {value: '', color: inputRequiredBaseColor, browse: 'pb', required: true},
+        inventory_file: {value: '', color: inputRequiredBaseColor, browse: 'inv'},  // NOTE: not required bc of dynamic inventories..
+        limit: {value: '', color: inputBaseColor},
+        tags: {value: '', color: inputBaseColor},
+        tags_skip: {value: '', color: inputBaseColor},
+        mode_diff: {value: false, color: toggleBaseColor},
+        mode_check: {value: false, color: toggleBaseColor},
+        verbosity: {value: 0, color: inputBaseColor},
+        credentials_needed: {value: true, color: toggleBaseColor},
+        credentials_default: {value: '', color: inputBaseColor},
+        credentials_category: {value: '', color: inputBaseColor},
+        schedule: {
+            value: '', color: inputBaseColor,
+            blank: true,
+            regex: /^()|(@(annually|yearly|monthly|weekly|daily|hourly))|(@every (\d+(s|m|h))+)|((((\d+,)+\d+|(\d+(\/|-|#)\d+)|\d+L?|\*(\/\d+)?|L(-\d+)?|\?|[A-Z]{3}(-[A-Z]{3})?) ?){5,7})$/
+        },
+        enabled: {value: true, color: toggleBaseColor},
+        environment_vars: {value: '', color: inputBaseColor},
+        cmd_args: {value: '', color: inputBaseColor},
+        execution_prompts_required: {value: '', color: inputBaseColor},
+        execution_prompts_optional: {value: '', color: inputBaseColor},
+    });
 
     function getMethod(a: string) {
         if (a == 'delete') {
@@ -41,22 +73,37 @@
       return tq($share, code);
     }
 
-    function handleSubmitResponse(j: any) {
-        console.log("RES", j);
-        // if not error
-        open = false;
+    function valideInput(e: Event) {
+        valideInputBase(e, form);
     }
 
-    function handleSubmit(e: SubmitEvent) {
-        console.log(e);
-        apiForm(e, handleSubmitResponse);
+    function handleSubmitResponse(s: number, j: any) {
+        console.log("RES", j);
+        if (s == 200 && j.error === undefined) {
+            open = false;
+        } else {
+            formError = `${j.error} (${s})`;
+            let a = document.getElementById(formErrorAlert);
+            if (a) {
+                a.scrollIntoView({behavior: "smooth", block: "end", inline: "end"});
+            }
+        }
+    }
+
+    function submitForm() {
+        // todo: write response errors to UI
+        submitFormBase(form, method, url, handleSubmitResponse);
     }
 
     function setFormInfos(j: any) {
         formInfos = j;
         if (action == 'add') {
+            for (let [k, v] of Object.entries(formInfos.defaults)) {
+                if (form[k]) {
+                    form[k].value = v;
+                }
+            }
             loaded = true;
-            repository = defaults.repository;
         }
     }
 
@@ -65,8 +112,11 @@
         if (clone) {
             existing.name = `${existing.name} - Copy`;
         }
-        repository = existing.repository;
-        playbook = existing.playbook;
+        for (let [k, v] of Object.entries(existing)) {
+            if (form[k]) {
+                form[k].value = v;
+            }
+        }
         loaded = true;
     }
 
@@ -86,16 +136,8 @@
     const classFsBrowse = 'bg-gray-100 dark:bg-gray-600 text-gray-800 p-2 dark:text-gray-50 text-sm ml-5 mt-1 mb-3 max-h-80 overflow-y-scroll rounded-b';
     const classFsBrowseItem = 'block hover:bg-primary-200 dark:hover:bg-primary-600 w-full text-left py-1 round';
     const fsBrowseNone = {dirs: [], files: []};
-    const fsBrowseActivePb = 'pb';
-    const fsBrowseActiveInv = 'inv';
-    const inputBaseColor = 'base';
-    let repository = $state(0);
-    let playbook = $state('');
-    let inventory = $state('');
     let fsBrowseActive: string = $state('');
     let fsBrowseChoices: browseResponse = $state(fsBrowseNone);
-    let colorPlaybook = $state(inputBaseColor);
-    let colorInventory = $state(inputBaseColor);
 
     function fsBrowseClick(f: string) {
         if (fsBrowseActive == f) {
@@ -118,23 +160,12 @@
 
     function fsBrowse(f: string) {
         let b = '';
-        if (f == fsBrowseActivePb) {
-            b = fsBrowseBase(playbook);
-            if (b == playbook && !(playbook.slice(-1)[0] == '/') && playbook != '') {
-                playbook += '/';
-            }
-
-        } else if (f == fsBrowseActiveInv) {
-            b = fsBrowseBase(inventory);
-            if (b == inventory && !(inventory.slice(-1)[0] == '/') && inventory != '') {
-                inventory += '/';
-            }
-
-        } else {
-            return;
+        b = fsBrowseBase(form[f].value);
+        if (b == form[f].value && !(form[f].value.slice(-1)[0] == '/') && form[f].value != '') {
+            form[f].value += '/';
         }
 
-        apiGet(`fs/browse/${repository||0}?base=${b}`, (j: any) => {fsBrowseUpdate(j, f)});
+        apiGet(`fs/browse/${form.repository.value||0}?base=${b}`, (j: any) => {fsBrowseUpdate(j, f)});
     }
 
     function fsBrowseClear() {
@@ -143,6 +174,7 @@
     }
 
     function fsBrowseValidate(full: string) {
+        console.log("TEST1", full);
         let p = rsplit(full, '/');
         if ((p[0] && fsBrowseChoices.files.includes(p[0])) || (p[1] && fsBrowseChoices.files.includes(p[1]))) {
             fsBrowseClear();
@@ -162,29 +194,16 @@
         fsBrowseChoices.files = j.files.sort()
         fsBrowseChoices.dirs = j.dirs.sort()
 
-        if (f == fsBrowseActivePb) {
-            colorPlaybook = fsBrowseValidate(playbook);
-        } else if (f == fsBrowseActiveInv) {
-            colorInventory = fsBrowseValidate(inventory);
-        }
+        form[f].color = fsBrowseValidate(form[f].value);
     }
 
     function fsBrowseSelect(f: string, c: string) {
-        if (f == fsBrowseActivePb) {
-            let p = rsplit(playbook, '/');
-            if (p[1] == null && !fsBrowseChoices.dirs.includes(p[0])) {
-                playbook = c;
-            } else {
-                playbook = `${p[0]}/${c}`;
-            }
-
-        } else if (f == fsBrowseActiveInv) {
-            let p = rsplit(inventory, '/');
-            if (p[1] == null && !fsBrowseChoices.dirs.includes(p[0])) {
-                inventory = c;
-            } else {
-                inventory = `${p[0]}/${c}`;
-            }
+        console.log("TEST2", form[f].value);
+        let p = rsplit(form[f].value, '/');
+        if (p[1] == null && !fsBrowseChoices.dirs.includes(p[0])) {
+            form[f].value = c;
+        } else {
+            form[f].value = `${p[0]}/${c}`;
         }
 
         fsBrowse(f);
@@ -196,40 +215,50 @@
     {#if !loaded}
         <Spinner/>
     {:else}
-    <form onsubmit={handleSubmit} action={url} method={method} class={classModalForm}>
-        <Accordion>
+        <div id={formErrorAlert} class="h-0"></div>
+        {#if formError}
+            <Alert border color="red">
+                <CloseCircleSolid slot="icon" class="w-5 h-5" /> {formError}
+            </Alert>
+        {/if}
+        <Accordion class={classModalForm}>
             <AccordionItem>
                 <span slot="header">Main</span>
                 <div class={classModalInputDiv}>
                     <div>
                         <Label for="job_name" class={classModalLabel}>{t('jobs.form.name')}</Label>
-                        <Input id="job_name" name="name" value={defaults.name} />
+                        <Input id="job_name" name="name" bind:value={form.name.value} bind:color={form.name.color}
+                        on:input={valideInput} on:blur={valideInput} required={form.name.required} />
                     </div>
                     <div>
                         <Label for="job_cmt" class={classModalLabel}>{t('jobs.form.comment')}</Label>
-                        <Input id="job_cmt" name="comment" value={defaults.comment} />
+                        <Input id="job_cmt" name="comment" bind:value={form.comment.value} bind:color={form.comment.color}
+                        on:input={valideInput} />
                     </div>
                     <div>
                         <Label for="job_repo" class={classModalLabel}>{t('jobs.form.repository')}</Label>
-                        <Select id="job_repo" name="repository" items={formInfos.choices.repository} bind:value={repository} />
+                        <Select id="job_repo" name="repository" items={formInfos.choices.repository}
+                        bind:value={form.repository.value} bind:color={form.repository.color} on:input={valideInput} />
                         <Helper class={classModalHelp}>{t('jobs.form.help.repository')}</Helper>
                     </div>
                     <div>
                         <Label for="job_pb" class={classModalLabel}>{t('jobs.form.playbook_file')}</Label>
-                        <Input id="job_pb" name="playbook_file" bind:value={playbook} bind:color={colorPlaybook}
-                        on:input={() => {fsBrowse(fsBrowseActivePb)}}
-                        on:click={() => {fsBrowseClick(fsBrowseActivePb)}} />
-                        {#if fsBrowseActive == fsBrowseActivePb}
+                        <Input id="job_pb" name="playbook_file"
+                        bind:value={form.playbook_file.value} bind:color={form.playbook_file.color}
+                        on:input={valideInput} on:blur={valideInput} required={form.playbook_file.required}
+                        on:input={() => {fsBrowse('playbook_file')}}
+                        on:click={() => {fsBrowseClick('playbook_file')}} />
+                        {#if fsBrowseActive == 'playbook_file'}
                             <div class={classFsBrowse}>
                                 {#each fsBrowseChoices.files as c}
                                     <button type="button" class={classFsBrowseItem}
-                                    onclick={(e) => {fsBrowseSelect(fsBrowseActivePb, c)}}>
+                                    onclick={(e) => {fsBrowseSelect('playbook_file', c)}}>
                                         <FileSolid class="inline-block" /> {c}
                                     </button>
                                 {/each}
                                 {#each fsBrowseChoices.dirs as c}
                                     <button type="button" class={classFsBrowseItem}
-                                    onclick={(e) => {fsBrowseSelect(fsBrowseActivePb, c)}}>
+                                    onclick={(e) => {fsBrowseSelect('playbook_file', c)}}>
                                         <FolderSolid class="inline-block" /> {c}
                                     </button>
                                 {/each}
@@ -242,20 +271,21 @@
                     </div>
                     <div>
                         <Label for="job_inv" class={classModalLabel}>{t('jobs.form.inventory_file')}</Label>
-                        <Input id="job_inv" name="inventory_file" bind:value={inventory} bind:color={colorInventory}
-                        on:input={() => {fsBrowse(fsBrowseActiveInv)}}
-                        on:click={() => {fsBrowseClick(fsBrowseActiveInv)}} />
-                        {#if fsBrowseActive == fsBrowseActiveInv}
+                        <Input id="job_inv" name="inventory_file" on:input={valideInput}
+                        bind:value={form.inventory_file.value} bind:color={form.inventory_file.color}
+                        on:input={() => {fsBrowse('inventory_file')}}
+                        on:click={() => {fsBrowseClick('inventory_file')}} />
+                        {#if fsBrowseActive == 'inventory_file'}
                             <div class={classFsBrowse}>
                                 {#each fsBrowseChoices.files as c}
                                     <button type="button" class={classFsBrowseItem}
-                                    onclick={(e) => {fsBrowseSelect(fsBrowseActiveInv, c)}}>
+                                    onclick={(e) => {fsBrowseSelect('inventory_file', c)}}>
                                         <FileSolid class="inline-block" /> {c}
                                     </button>
                                 {/each}
                                 {#each fsBrowseChoices.dirs as c}
                                     <button type="button" class={classFsBrowseItem}
-                                    onclick={(e) => {fsBrowseSelect(fsBrowseActiveInv, c)}}>
+                                    onclick={(e) => {fsBrowseSelect('inventory_file', c)}}>
                                         <FolderSolid class="inline-block" /> {c}
                                     </button>
                                 {/each}
@@ -273,29 +303,33 @@
                 <div class={classModalInputDiv}>
                     <div>
                         <Label for="job_limit" class={classModalLabel}>{t('jobs.form.limit')}</Label>
-                        <Input id="job_limit" name="limit" value={defaults.limit} />
+                        <Input id="job_limit" name="limit" on:input={valideInput}
+                        bind:value={form.limit.value} bind:color={form.limit.color} />
                         <Helper class={classModalHelp}>{@html t('jobs.form.help.limit')}</Helper>
                     </div>
                     <div>
                         <Label for="job_tags" class={classModalLabel}>{t('jobs.form.tags')}</Label>
-                        <Input id="job_tags" name="tags" value={defaults.tags} />
+                        <Input id="job_tags" name="tags" on:input={valideInput}
+                        bind:value={form.tags.value} bind:color={form.tags.color} />
                         <Helper class={classModalHelp}>{@html t('jobs.form.help.tags')}</Helper>
                     </div>
                     <div>
                         <Label for="job_tags_skip" class={classModalLabel}>{t('jobs.form.tags_skip')}</Label>
-                        <Input id="job_tags_skip" name="tags_skip" value={defaults.tags_skip} />
+                        <Input id="job_tags_skip" name="tags_skip" on:input={valideInput}
+                        bind:value={form.tags_skip.value} bind:color={form.tags_skip.color} />
                     </div>
                     <div>
                         <Label for="job_diff" class={classModalLabel}>{t('jobs.form.mode_diff')}</Label>
-                        <Toggle id="job_diff" name="mode_diff" value={defaults.mode_diff} />
+                        <Toggle id="job_diff" name="mode_diff" bind:checked={form.mode_diff.value} bind:color={form.mode_diff.color} />
 
                         <Label for="job_chk" class={classModalLabel}>{t('jobs.form.mode_check')}</Label>
-                        <Toggle id="job_chk" name="mode_check" value={defaults.mode_check} />
+                        <Toggle id="job_chk" name="mode_check" bind:checked={form.mode_check.value} bind:color={form.mode_check.color} />
                         <Helper class={classModalHelp}>{@html t('jobs.form.help.mode_check')}</Helper>
                     </div>
                     <div>
                         <Label for="job_verb" class={classModalLabel}>{t('jobs.form.verbosity')}</Label>
-                        <Select id="job_verb" name="verbosity" items={formInfos.choices.verbosity} value={defaults.verbosity} />
+                        <Select id="job_verb" name="verbosity" items={formInfos.choices.verbosity}
+                        bind:value={form.verbosity.value} bind:color={form.verbosity.color} />
                     </div>
                 </div>
             </AccordionItem>
@@ -304,17 +338,20 @@
                 <div class={classModalInputDiv}>
                     <div>
                         <Label for="job_creds" class={classModalLabel}>{t('jobs.form.credentials_needed')}</Label>
-                        <Toggle id="job_creds" name="credentials_needed" value={defaults.credentials_needed} />
+                        <Toggle id="job_creds" name="credentials_needed"
+                        bind:checked={form.credentials_needed.value} bind:color={form.credentials_needed.color} />
                         <Helper class={classModalHelp}>{t('jobs.form.help.credentials_needed')}</Helper>
                     </div>
                     <div>
                         <Label for="job_creds_dflt" class={classModalLabel}>{t('jobs.form.credentials_default')}</Label>
-                        <Select id="job_creds_dflt" name="credentials_default" items={formInfos.choices.credentials_default} value={defaults.credentials_default} />
+                        <Select id="job_creds_dflt" name="credentials_default" items={formInfos.choices.credentials_default}
+                        bind:value={form.credentials_default.value} bind:color={form.credentials_default.color} />
                         <Helper class={classModalHelp}>{t('jobs.form.help.credentials_default')}</Helper>
                     </div>
                     <div>
                         <Label for="job_creds_cat" class={classModalLabel}>{t('jobs.form.credentials_category')}</Label>
-                        <Input id="job_creds_cat" name="credentials_category" value={defaults.credentials_category} />
+                        <Input id="job_creds_cat" name="credentials_category" on:input={valideInput}
+                        bind:value={form.credentials_category.value} bind:color={form.credentials_category.color} />
                         <Helper class={classModalHelp}>{t('jobs.form.help.credentials_category')}</Helper>
                     </div>
                 </div>
@@ -324,12 +361,14 @@
                 <div class={classModalInputDiv}>
                     <div>
                         <Label for="job_cron" class={classModalLabel}>{t('jobs.form.schedule')}</Label>
-                        <Input id="job_cron" name="schedule" value={defaults.schedule} />
+                        <Input id="job_cron" name="schedule" on:input={valideInput}
+                        bind:value={form.schedule.value} bind:color={form.schedule.color} />
                         <Helper class={classModalHelp}>{@html t('jobs.form.help.schedule')}</Helper>
                     </div>
                     <div>
                         <Label for="job_cron_en" class={classModalLabel}>{t('jobs.form.enabled')}</Label>
-                        <Toggle id="job_cron_en" name="enabled" value={defaults.enabled} />
+                        <Toggle id="job_cron_en" name="enabled" on:input={valideInput}
+                        bind:checked={form.enabled.value} bind:color={form.enabled.color} />
                         <Helper class={classModalHelp}>{t('jobs.form.help.enabled')}</Helper>
                     </div>
                 </div>
@@ -339,12 +378,14 @@
                 <div class={classModalInputDiv}>
                     <div>
                         <Label for="job_env" class={classModalLabel}>{t('jobs.form.environment_vars')}</Label>
-                        <Input id="job_env" name="environment_vars" value={defaults.environment_vars} />
+                        <Input id="job_env" name="environment_vars" on:input={valideInput}
+                        bind:value={form.environment_vars.value} bind:color={form.environment_vars.color} />
                         <Helper class={classModalHelp}>{t('jobs.form.help.environment_vars')}</Helper>
                     </div>
                     <div>
                         <Label for="job_args" class={classModalLabel}>{t('jobs.form.cmd_args')}</Label>
-                        <Input id="job_args" name="cmd_args" value={defaults.cmd_args} />
+                        <Input id="job_args" name="cmd_args" on:input={valideInput} 
+                        bind:value={form.cmd_args.value} bind:color={form.cmd_args.color} />
                         <Helper class={classModalHelp}>{t('jobs.form.help.cmd_args')}</Helper>
                     </div>
                 </div>
@@ -363,11 +404,9 @@
             </AccordionItem>
         </Accordion>
 
-        {@html getCSRFFormToken()}
         <div class={classModalBtns}>
-            <Button type="submit">{t('btn.save')}</Button>
+            <Button type="button" on:click={submitForm}>{t('btn.save')}</Button>
             <Button on:click={() => (open = false)} class="inline-block">{t('btn.discard')}</Button>
         </div>
-    </form>
     {/if}
 </Modal>

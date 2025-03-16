@@ -14,7 +14,7 @@
     import { type formAlerts } from './Types.js';
     import { tq, flagIcon } from '../util/translate.js';
     import { setDarkLightMode } from './DarkLightMode.js';
-    import { apiGet, getCSRFFormToken } from '../util/api.js';
+    import { apiGet, getCSRFFormTokenHTML } from '../util/api.js';
     import { classNavFooter, classBtnBase } from './Style.js';
 
     let loaded: boolean = $state(false);
@@ -139,7 +139,7 @@
       <form method="post" action="/o/">
         <Button size="xs" class="ml-2 h-full" type="submit"><LockSolid /></Button>
         <Tooltip placement="bottom">{t('nav.logout')}</Tooltip>
-        {@html getCSRFFormToken()}
+        {@html getCSRFFormTokenHTML()}
       </form>
     {/if}
     <!--

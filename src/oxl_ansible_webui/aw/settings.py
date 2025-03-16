@@ -275,7 +275,7 @@ if deployment_prod():
 else:
     STATICFILES_DIRS.append(BASE_DIR / 'aw' / 'static_dev')
 
-LOGIN_REDIRECT_URL = '/ui/jobs/manage'  # todo: change to '/ui' once dashboard is implemented
+LOGIN_REDIRECT_URL = '/ui'
 LOGOUT_REDIRECT_URL = LOGIN_PATH
 handler403 = 'aw.utils.handlers.handler403'
 handler500 = 'aw.utils.handlers.handler500'

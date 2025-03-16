@@ -5,7 +5,7 @@
 
     import { share } from './State.js';
     import { tq } from '../util/translate.js';
-    import { getCSRFFormToken } from '../util/api.js';
+    import { getCSRFFormTokenHTML } from '../util/api.js';
 
     let loaded = $state(false);
     let loginTarget = $derived($share.backend.sso ? '/a/saml/init/' : '/a/login/')
@@ -65,7 +65,7 @@
             <Spinner />
         {:else}
             <form method="post" action="{loginTarget}">
-                {@html getCSRFFormToken()}
+                {@html getCSRFFormTokenHTML()}
 
                 <Label for="id_username">{t('login.user')}</Label>
                 <Input type="text" id="id_username" name="username" oninput={saveUsername}/>

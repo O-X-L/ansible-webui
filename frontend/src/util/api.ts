@@ -45,12 +45,16 @@ export async function apiEdit(method: string, location: string, payload: any, ca
     callback(res.status, await res.json());
 }
 
-export function getCSRFFormToken() {
+export function getCSRFFormTokenHTML() {
     if (!CSRF_TOKEN) {
         console.log('WARNING: No CSRF Token available')
         return `<!-- no CSRF token (cookie) available -->`
     }
     return `<input type="hidden" name="csrfmiddlewaretoken" value="${CSRF_TOKEN}">`;
+}
+
+export function getCSRFFormTokenJSON() {
+    return {csrfmiddlewaretoken: CSRF_TOKEN};
 }
 
 export function formJSON(f: HTMLFormElement) {

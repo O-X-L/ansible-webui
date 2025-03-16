@@ -85,7 +85,7 @@ EN = {
     'jobs.form.help.credentials_needed': 'If the job requires credentials to be specified '
                                          '(either as default or at execution-time; '
                                          'fallback are the user-credentials of the executing user)',
-    'jobs.form.help.credentials_default': 'Specify job-level default credentials to use',
+    'jobs.form.help.credentials_default': 'Specify job-level default credentials to use (required for scheduled execution)',
     'jobs.form.help.credentials_category': 'The credential category can be used for dynamic matching of '
                                            'user credentials at execution time',
     'jobs.form.help.enabled': 'En- or disable the schedule. Can be ignored if no schedule was set',

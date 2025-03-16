@@ -8,3 +8,6 @@ export interface formAlerts {
   title: string,
   msg: string,
 }
+
+export type inputColor = 'base' | 'green' | 'red';
+export type toggleColor = 'green' | 'red' | undefined;

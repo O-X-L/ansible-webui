@@ -20,6 +20,9 @@ export function capitalize(s: string) {
 }
 
 export function rsplit(s: string, w: string) {
+  if (s === null) {
+    return [null, null];
+  }
   let b = s.split(w);
   if (b.length == 1) {
     return [b[0], null];
