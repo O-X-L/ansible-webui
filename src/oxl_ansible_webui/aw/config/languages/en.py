@@ -2,11 +2,19 @@ from aw.config.main import config
 
 # pylint: disable=C0301
 
+# todo: api-endpoint responses (add lang-code to api responses)
+
 EN = {
     # base
     'btn.add': 'Add',
     'btn.save': 'Save',
     'btn.discard': 'Discard',
+    'btn.edit': 'Edit',
+    'btn.clone': 'Clone',
+    'btn.execute': 'Execute',
+    'btn.delete': 'Delete',
+    'btn.stop': 'Stop',
+    'btn.logs': 'Logs',
     'nav.lang': 'Language',
     'nav.darkLight': 'Dark/Light Mode Switch',
     'nav.docs': 'Documentation',
@@ -37,6 +45,7 @@ EN = {
 
     # jobs
     'jobs.new': 'New Job',
+    'jobs.edit': 'Edit Job',
     ## form fields
     'jobs.form.name': 'Name',
     'jobs.form.repository': 'Repository',

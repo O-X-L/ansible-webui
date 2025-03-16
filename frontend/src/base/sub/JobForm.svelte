@@ -12,7 +12,7 @@
     import { rsplit } from '../../util/main.js';
     import { tq } from '../../util/translate.js';
     import {
-        inputBaseColor, toggleBaseColor, valideInputBase, inputRequiredBaseColor, submitFormBase,
+        inputBaseColor, toggleBaseColor, valideInputBase, submitFormBase,
         type formMethod,
     } from '../../util/form.js';
     import {
@@ -21,23 +21,25 @@
     } from '../Style.js';
 
     // todo: reset to default if 'add' form gets closed
-    let { open = $bindable(false), action = 'add', jobId = null, clone = false } = $props();
+    let { open = $bindable(false), action = 'add', jobId = null } = $props();
 
     const formErrorAlert = 'form-job-alert';
-    const urlExisting = `/api/job/${jobId}`;
+    const urlExisting = `job/${jobId}`;
     let formInfos = $state({});
     let loaded = $state(false);
     let existing = $state({});
     let method: formMethod = $derived(getMethod(action));
-    let url = $derived(['add', 'clone'].includes(action) ? '/api/job' : urlExisting);
+    let actionNew = $derived(['add', 'clone'].includes(action));
+    let url = $derived(actionNew ? 'job' : urlExisting);
+    let title = $derived(actionNew ? t('jobs.new') : t('jobs.edit'));
     let formError = $state('');
 
     let form = $state({
-        name: {value: '', color: inputRequiredBaseColor, required: true},
+        name: {value: '', color: inputBaseColor, required: true},
         comment: {value: '', color: inputBaseColor},
-        repository: {value: 0, color: inputBaseColor},
-        playbook_file: {value: '', color: inputRequiredBaseColor, browse: 'pb', required: true},
-        inventory_file: {value: '', color: inputRequiredBaseColor, browse: 'inv'},  // NOTE: not required bc of dynamic inventories..
+        repository: {value: null, color: inputBaseColor},
+        playbook_file: {value: '', color: inputBaseColor, required: true},
+        inventory_file: {value: '', color: inputBaseColor},  // NOTE: not required bc of dynamic inventories..
         limit: {value: '', color: inputBaseColor},
         tags: {value: '', color: inputBaseColor},
         tags_skip: {value: '', color: inputBaseColor},
@@ -109,7 +111,7 @@
 
     function loadExisting(j: any) {
         existing = j;
-        if (clone) {
+        if (action == 'clone') {
             existing.name = `${existing.name} - Copy`;
         }
         for (let [k, v] of Object.entries(existing)) {
@@ -211,7 +213,7 @@
 </script>
 
 <Modal bind:open={open} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
-    <Heading tag="h2">{t('jobs.new')}</Heading>
+    <Heading tag="h2">{title}</Heading>
     {#if !loaded}
         <Spinner/>
     {:else}

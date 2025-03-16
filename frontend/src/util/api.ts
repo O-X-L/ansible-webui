@@ -33,7 +33,7 @@ export async function apiGetMulti(locations: string[], callback: CallableFunctio
 
 export async function apiEdit(method: string, location: string, payload: any, callback: CallableFunction) {
     let url = location;
-    if (!url.includes('/')) {
+    if (!url.includes('/api')) {
         url = `/api/${location}`
     }
 
