@@ -160,26 +160,3 @@ def get_form_field_input(bf: BoundField, existing: dict) -> str:
             f'{field_value} {get_form_required(bf)}'
             f'{get_form_field_attributes(bf)} {get_form_field_validators(bf)}>'
             f'{search_choices}')
-
-
-PROMPT_FLAG_DEFAULTS = {
-    'tags': True,
-    'mode_check': True,
-    'mode_diff': False,
-    'limit': True,
-    'skip_tags': False,
-    'env_vars': False,
-    'cmd_args': False,
-    'verbosity': False,
-    'credentials': False,
-    'limit_req': False,
-    'enforce': False,
-}
-
-
-@register.filter
-def check_job_prompt_flag(existing: dict, flag: str) -> bool:
-    if 'execution_prompts' not in existing or not isinstance(existing['execution_prompts'], str):
-        return PROMPT_FLAG_DEFAULTS[flag]
-
-    return flag in existing['execution_prompts'].split(Job.execution_prompt_separator)

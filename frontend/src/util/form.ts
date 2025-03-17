@@ -1,9 +1,8 @@
 import { apiEdit, getCSRFFormTokenJSON } from './api.js';
-import { type inputColor, type toggleColor } from '../base/Types.js';
+import { type inputColor } from '../base/Types.js';
 
 export const inputBaseColor: inputColor = 'base';
 export const inputRequiredBaseColor: inputColor = 'red';
-export const toggleBaseColor: toggleColor = undefined;
 
 export const REGEX_SMALL_INT = /^[\d]{1,3}$/
 export const REGEX_INT = /^[\d]{1,10}$/
@@ -30,9 +29,14 @@ export function validateFormField(field: formField) {
     return true;
 }
 
-export function valideInputBase(e: Event, form: any) {
+export function valideInputBase(e: Event, i: any|formField) {
     let k = e.target.name;
-    let v: formField = form[k];
+    let v: formField;
+    if (!i[k]) {
+        v = i;
+    } else {
+        v = i[k];
+    }
     if ((v.required === undefined || !v.required || (v.required && v.value)) &&
     ((v.blank !== undefined && v.blank && v.value == '') || validateFormField(v))) {
         v.color = inputBaseColor;

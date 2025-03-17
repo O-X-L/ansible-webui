@@ -10,4 +10,3 @@ export interface formAlerts {
 }
 
 export type inputColor = 'base' | 'green' | 'red';
-export type toggleColor = 'green' | 'red' | undefined;

@@ -14,6 +14,16 @@ def choices_global_credentials() -> list[tuple]:
     return [(credentials.id, credentials.name) for credentials in JobGlobalCredentials.objects.all()]
 
 
+# def choices_credentials(user: USERS) -> dict:
+#     return {
+#         'global': [
+#             (c.id, c.name) for c in JobGlobalCredentials.objects.all()
+#             if has_credentials_permission(user, c, CHOICE_PERMISSION_READ)
+#         ],
+#         'user': [(c.id, c.name) for c in JobUserCredentials.objects.filter(user=user)],
+#     }
+
+
 def choices_repositories() -> list[tuple]:
     # todo: only show credentials the user is privileged to view => get_viewable_credentials(user)
     return [(repo.id, repo.name) for repo in Repository.objects.all()]

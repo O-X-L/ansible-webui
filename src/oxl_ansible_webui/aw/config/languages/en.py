@@ -24,6 +24,12 @@ EN = {
     'footer.user': 'User',
     'footer.version': 'Version',
     'footer.oss': 'Open Source Usage',
+
+    # common phrases
+    'common.name': 'Name',
+    'common.choices': 'Choices',
+    'common.required': 'Required',
+
     # auth
     'login.user': 'Username',
     'login.pwd': 'Password',
@@ -64,9 +70,17 @@ EN = {
     'jobs.form.credentials_needed': 'Needs Credentials',
     'jobs.form.credentials_default': 'Default Job Credentials',
     'jobs.form.credentials_category': 'Credentials Category',
-    'jobs.form.execution_prompts_required': 'Execution Prompts - Required',
-    'jobs.form.execution_prompts_optional': 'Execution Prompts - Optional',
+    'jobs.form.execution_prompts': 'Execution Prompts',
+    'jobs.form.execution_prompts_enforce': 'Enforce Prompts',
     'jobs.form.verbosity': 'Verbosity',
+    'jobs.form.credentials': 'Credentials',
+    'jobs.form.prompt_limit_req': 'Require Limit',
+    'jobs.form.prompt_fields': 'Fields to prompt',
+    'jobs.form.prompt_vars': 'Variables to prompt',
+    'jobs.form.prompt_varname': 'Variable Name',
+    'jobs.form.prompt_kind': 'Kind',
+    'jobs.form.prompt_regex': 'Validation Regex',
+    'jobs.form.prompt_choice_text': 'Text',
     ## form help
     'jobs.form.help.playbook_file': 'Playbook to execute',
     'jobs.form.help.inventory_file': 'One or multiple inventory files/directories to include for the execution. '
@@ -102,5 +116,11 @@ EN = {
                                                  'Comma-separated list of key-value pairs.<br>'
                                                  "Variables can be supplied like so: 'var={VAR-NAME}#{DISPLAY-NAME}'<br>"
                                                  "Example: 'limit,check,var=add_user#User to add' ",
+    'jobs.form.help.prompt_choices': 'Comma-separated list of choices.',
+    'jobs.form.help.prompt_regex': 'You can use <a href="https://regex101.com/">Regex101.com</a> to test your input-validation. '
+                                   'Make sure to select the "ECMAScript (Javascript)" flavor.',
 
+    # credentials
+    'creds.user': 'Personal',
+    'creds.global': 'Shared',
 }

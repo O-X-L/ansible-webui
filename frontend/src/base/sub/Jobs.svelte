@@ -8,15 +8,18 @@
     import {
         Spinner, Button, Popover, Radio, Alert, Tooltip, Modal, Heading,
         Table, TableHead, TableHeadCell, TableBody, TableBodyCell, TableBodyRow,
+        Input, Toggle, Label, Select,
     } from 'flowbite-svelte';
 
     import { share } from '../State.js';
     import JobForm from './forms/Job.svelte';
+    import { classModalLabel } from '../Style.js';
     import { tq } from '../../util/translate.js';
     import { apiEdit, apiGet } from '../../util/api.js';
+    import { type executionPromptsType } from './Config.js';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
-        classPopoverColumn2Text, classPopoverColumn2Div,
+        classPopoverColumn2Text, classPopoverColumn2Div, classCenterChildDiv,
     } from '../Style.js';
 
     interface executionInfos {
@@ -70,6 +73,7 @@
         credentials_needed: boolean,
         credentials_category: string|null,
         execution_prompts: string|null,
+        execution_prompts_json: string|null,
         next_run: string|null,
         executions: executionInfos[],
     }
@@ -82,6 +86,43 @@
     let jobList: jobInfos[] = $state([]);
     let jobActions = $state({});
     let apiError = $state('');
+
+    interface executionPromptsFieldValues {
+        tags: string,
+        tags_skip: string,
+        mode_check: boolean,
+        mode_diff: boolean,
+        limit: string,
+        environment_vars: string,
+        cmd_args: string,
+        credentials: number|null,
+    }
+    interface executionPromptsFullType {
+        config: executionPromptsType,
+        field_values: executionPromptsFieldValues,
+        var_values: any,
+    }
+    interface credentialType {
+        id: number,
+        name: string,
+    }
+    interface credentialsType {
+        shared: credentialType[],
+        user: credentialType[],
+    }
+
+    const executionPromptsDefault: executionPromptsFullType = {
+        config: {enforce: false, fields: [], vars: []},
+        field_values: {
+            tags: '', tags_skip: '', mode_check: false, mode_diff: false, limit: '',
+            environment_vars: '', cmd_args: '', credentials: null,
+        },
+        var_values: {},
+    }
+
+    let executionPrompts: executionPromptsFullType = $state(JSON.parse(JSON.stringify(executionPromptsDefault)));
+    let usableCredentials: credentialsType = $state({shared: [], user: []});
+    let usableCredentialChoices = $derived(buildCredentialChoices(usableCredentials));
 
     function t(code: string) {
       return tq($share, code);
@@ -129,19 +170,44 @@
         if (!jobId) {
             return;
         }
+        // todo: add execution prompt values
         apiEdit('post', `job/${jobId}`, undefined, showAPIErrors);
+    }
+
+    function updateExecutionPrompts(encodedPrompts: string|null) {
+        executionPrompts = JSON.parse(JSON.stringify(executionPromptsDefault));
+        if (!encodedPrompts) {
+            return;
+        }
+        executionPrompts.config = JSON.parse(encodedPrompts);
+    }
+
+    function loadCredentialInfos(j: any) {
+        usableCredentials = j;
+    }
+
+    function buildCredentialChoices(cr: credentialsType) {
+        let choices = [];
+        for (let c of cr.user) {
+            choices.push({value: c.id, name: `${t('creds.user')} ${c.name}`});
+        }
+        for (let c of cr.shared) {
+            choices.push({value: c.id, name: `${t('creds.global')} ${c.name}`});
+        }
+        return choices;
     }
 
     // todo: refresh data on changes
 
     onMount(() => {
         apiGet('job?executions=true&execution_count=1', loadJobList);
+        apiGet('credentials', loadCredentialInfos);
     })
 </script>
 
 <div id={apiErrorAlert} class="h-0"></div>
 {#if apiError}
-    <Alert border color="red">
+    <Alert border color="red" class="text-wrap">
         <CloseCircleSolid slot="icon" class="w-5 h-5" /> {apiError}
     </Alert>
 {/if}
@@ -178,7 +244,9 @@
                 </TableBodyCell>
                 <TableBodyCell>
                     <div>
-                        <Button size="xs" on:click={() => {jobActions[job.id].exec = true}} disabled={isJobActive(job)}>
+                        <Button size="xs" on:click={() => {
+                            jobActions[job.id].exec = true; updateExecutionPrompts(job.execution_prompts_json);
+                            }} disabled={isJobActive(job)}>
                             <PlaySolid/>
                         </Button>
                         <Tooltip>{t('btn.execute')}</Tooltip>
@@ -369,12 +437,54 @@
             <Modal bind:open={jobActions[job.id].exec} size="sm" autoclose={true} placement="top-center" backdropClass={classModalBackdrop}>
                 <Heading tag="h2">Execute Job</Heading>
 
-                Execution Prompts HERE
+                {#if executionPrompts.config.fields.includes('limit')}
+                    <Label for="job_prompt_{job.id}_limit" class={classModalLabel}>{t('jobs.form.limit')}</Label>
+                    <Input id="job_prompt_{job.id}_limit" bind:value={executionPrompts.field_values.limit} />
+                {/if}
+                {#if executionPrompts.config.fields.includes('mode_check')}
+                    <Label for="job_prompt_{job.id}_mode_check" class={classModalLabel}>{t('jobs.form.mode_check')}</Label>
+                    <div class={classCenterChildDiv}>
+                        <Toggle id="job_prompt_{job.id}_mode_check" bind:checked={executionPrompts.field_values.mode_check} />
+                    </div>
+                {/if}
+                {#if executionPrompts.config.fields.includes('mode_diff')}
+                    <Label for="job_prompt_{job.id}_mode_diff" class={classModalLabel}>{t('jobs.form.mode_diff')}</Label>
+                    <div class={classCenterChildDiv}>
+                        <Toggle id="job_prompt_{job.id}_mode_diff" bind:checked={executionPrompts.field_values.mode_diff} />
+                    </div>
+                {/if}
+                {#if executionPrompts.config.fields.includes('tags')}
+                    <Label for="job_prompt_{job.id}_tags" class={classModalLabel}>{t('jobs.form.tags')}</Label>
+                    <Input id="job_prompt_{job.id}_tags" bind:value={executionPrompts.field_values.tags} />
+                {/if}
+                {#if executionPrompts.config.fields.includes('tags_skip')}
+                    <Label for="job_prompt_{job.id}_tags_skip" class={classModalLabel}>{t('jobs.form.tags_skip')}</Label>
+                    <Input id="job_prompt_{job.id}_tags_skip" bind:value={executionPrompts.field_values.tags_skip} />
+                {/if}
+                {#if executionPrompts.config.fields.includes('environment_vars')}
+                    <Label for="job_prompt_{job.id}_env_vars" class={classModalLabel}>{t('jobs.form.environment_vars')}</Label>
+                    <Input id="job_prompt_{job.id}_env_vars" bind:value={executionPrompts.field_values.environment_vars} />
+                {/if}
+                {#if executionPrompts.config.fields.includes('cmd_args')}
+                    <Label for="job_prompt_{job.id}_cmd_args" class={classModalLabel}>{t('jobs.form.cmd_args')}</Label>
+                    <Input id="job_prompt_{job.id}_cmd_args" bind:value={executionPrompts.field_values.cmd_args} />
+                {/if}
+                {#if executionPrompts.config.fields.includes('credentials')}
+                    <Label for="job_prompt_{job.id}_creds" class={classModalLabel}>{t('jobs.form.credentials')}</Label>
+                    <Select id="job_prompt_{job.id}_creds" items={usableCredentialChoices}
+                        bind:value={executionPrompts.field_values.credentials} />
+                {/if}
 
                 <div class={classModalBtns}>
-                    <!-- todo: pass execution-prompt inputs to startJob -->
-                    <Button type="button" on:click={() => {startJob(job.id)}}>{t('btn.execute')}</Button>
-                    <Button on:click={() => (jobActions[job.id].exec = false)} class="inline-block">{t('btn.discard')}</Button>
+                    <!--
+                    todo: pass execution-prompt inputs to startJob 
+                    todo: validate execution_prompts_enforce
+                    -->
+                    <Button type="button" on:click={() => {startJob(job.id)}}><PlaySolid/></Button>
+                    <Tooltip>{t('btn.execute')}</Tooltip>
+
+                    <Button on:click={() => (jobActions[job.id].exec = false)} class="inline-block ml-2"><CloseCircleSolid/></Button>
+                    <Tooltip>{t('btn.discard')}</Tooltip>
                 </div>
             </Modal>
             

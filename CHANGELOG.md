@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 1
+
+### 1.0.0
+
+* Completely refactored frontend (SvelteJS & TailwindCSS)
+
+**BREAKING CHANGES**:
+
+* Existing **Execution Prompts** are NOT compatible! You will have to manually re-configure them.
+* Existing **Permissions** are NOT compatible! You will have to manually re-configure them.
+
 ## Version 0
 
 ### 0.0.25

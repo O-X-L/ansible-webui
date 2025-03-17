@@ -29,3 +29,19 @@ export function rsplit(s: string, w: string) {
   }
   return [b.slice(0, -1).join(w), b.slice(-1)[0]];
 }
+
+export function is_set(data: any) {
+  if (typeof(data) != 'undefined' && data != null && data != "") {
+      return true;
+  }
+  return false;
+}
+
+export function escapeQuotes(data: string) {
+  if (!is_set(data)) {
+      return data;
+  }
+  data = data.replaceAll('"', '\x22');
+  data = data.replaceAll('&', '&amp;');
+  return data;
+}
