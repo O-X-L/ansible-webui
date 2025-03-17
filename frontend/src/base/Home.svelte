@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Tabs, TabItem } from 'flowbite-svelte';
-    import { CodeBranchSolid, CogSolid, BellActiveSolid, GridSolid } from 'flowbite-svelte-icons'
+    import { CodeBranchSolid, CogSolid, BellActiveSolid, GridSolid, UsersSolid } from 'flowbite-svelte-icons'
 
     import { share } from './State.js';
     import { tq } from '../util/translate.js';
@@ -9,6 +9,7 @@
     import Alerts from './sub/Alerts.svelte';
     import Dashboard from './sub/Dashboard.svelte';
     import Repositories from './sub/Repositories.svelte';
+    import Credentials from './sub/Credentials.svelte';
 
     function t(code: string) {
       return tq($share, code);
@@ -40,6 +41,14 @@
         {t('home.repos')}
       </div>
       <Repositories/>
+    </TabItem>
+
+    <TabItem>
+      <div slot="title" class="flex items-center gap-2">
+        <UsersSolid size="md" />
+        {t('home.creds')}
+      </div>
+      <Credentials/>
     </TabItem>
 
     <TabItem>

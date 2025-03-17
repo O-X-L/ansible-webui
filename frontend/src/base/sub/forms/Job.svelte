@@ -13,7 +13,7 @@
     import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
     import { rsplit } from '../../../util/main.js';
-    import { type executionPromptsType, type executionPromptVarType } from '../Config.js';
+    import { type executionPromptsType, type executionPromptVarType, API_STATUS_CODES_OK } from '../Config.js';
     import {
         inputBaseColor, valideInputBase, submitFormBase,
         type formMethod,

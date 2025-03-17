@@ -13,6 +13,6 @@ export const classModalInput = 'grow shrink text-wrap';
 export const classPopover = 'w-96 text-sm font-light text-gray-500 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400';
 export const classPopoverTitle = 'font-semibold text-gray-900 dark:text-white';
 export const classPopoverColumn1 = 'font-bold mr-5';
-export const classPopoverColumn2Text = 'text-center';
+export const classPopoverColumn2Text = 'text-center text-wrap';
 export const classPopoverColumn2Div = classCenterChildDiv;
 const bg = 'w-full h-full';

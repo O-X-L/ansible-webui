@@ -18,7 +18,7 @@
     import { tq } from '../../util/translate.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import { choicesFromArray } from '../../util/form.js';
-    import { type executionPromptsType } from './Config.js';
+    import { type executionPromptsType, API_STATUS_CODES_OK } from './Config.js';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
         classPopoverColumn2Text, classPopoverColumn2Div, classCenterChildDiv,
@@ -89,6 +89,8 @@
     let jobActions = $state({});
     let apiError = $state('');
     let apiSuccess = $state('');
+    let loaded = $state(false);
+    let apiDataHash = $state('');
 
     interface executionPromptsFieldValues {
         tags: string,
@@ -131,11 +133,18 @@
       return tq($share, code);
     }
 
-    function loadJobList(j: any) {
-        for (let job of j) {
-            jobActions[job.id] = {edit: false, clone: false, exec: false, logs: false};
+    function loadJobList(j: any, h: string) {
+        if (!loaded) {
+            for (let job of j) {
+                jobActions[job.id] = {edit: false, clone: false, exec: false, logs: false};
+            }
+            loaded = true;
+        }
+        if (!j || h == apiDataHash) {
+            return;
         }
         jobList = j;
+        apiDataHash = h;
     }
 
     function isJobActive(job: jobInfos) {
@@ -146,7 +155,7 @@
     }
 
     function showAPIErrors(s: number, j: any) {
-        if (s != 200 || j.error !== undefined) {
+        if (!API_STATUS_CODES_OK.includes(s) || j.error !== undefined) {
             apiError = `${j.error} (${s})`;  // todo: pull language-code from api-error and show user the translation
             let a = document.getElementById(apiErrorAlert);
             if (a) {
@@ -226,10 +235,21 @@
         return choices;
     }
 
-    // todo: refresh data on changes
+    function buildUpdateJobList() {
+        if (typeof(document.hidden) !== undefined && document['hidden']) {
+            // tab in background
+            return;
+        }
+        apiGet(`job?executions=true&execution_count=1&hash=${apiDataHash}`, loadJobList);
+    }
+
+    // todo: refresh data over websockets
+    setInterval(() => {
+        buildUpdateJobList();
+    }, $share.updateInterval)
 
     onMount(() => {
-        apiGet('job?executions=true&execution_count=1', loadJobList);
+        buildUpdateJobList();
         apiGet('credentials', loadCredentialInfos);
     })
 </script>
@@ -408,7 +428,7 @@
                             </tr>
                             <tr>
                                 <td class={classPopoverColumn1}>
-                                    {t('jobs.form.schedule')}:
+                                    {t('jobs.form.cron')}:
                                 </td>
                                 <td class={classPopoverColumn2Text}>
                                     {job.schedule ? job.schedule : '-'}

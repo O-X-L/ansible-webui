@@ -16,10 +16,11 @@ function getCookie(name: string) {
 
 const CSRF_TOKEN = getCookie('csrftoken');
 const API_HEADERS = {'X-CSRFToken': CSRF_TOKEN, 'Content-Type': 'application/json'};
+const API_RES_HEADER_HASH = 'X-Hash';
 
 export async function apiGet(location: string, callback: CallableFunction) {
     const res = await fetch(`/api/${location}`, {method: 'GET', headers: API_HEADERS});
-    callback(await res.json());
+    callback(await res.json(), res.headers.get(API_RES_HEADER_HASH));
 }
 
 export async function apiGetMulti(locations: string[], callback: CallableFunction) {

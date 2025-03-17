@@ -1,6 +1,6 @@
 <script lang="ts">
     import {
-        Heading, Spinner, Button, Dropdown, DropdownItem, Accordion, AccordionItem,
+        Spinner, Button, Dropdown, DropdownItem, Accordion, AccordionItem,
     } from 'flowbite-svelte';
     import {
         ChevronDownOutline, UserSolid, MessagesSolid, UsersGroupSolid,

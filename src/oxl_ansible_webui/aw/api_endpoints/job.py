@@ -20,6 +20,7 @@ from aw.execute.util import update_status, is_execution_status
 from aw.utils.util import is_set, ansible_log_html, ansible_log_text
 from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED
 from aw.base import USERS
+from aw.api_endpoints.base import client_server_data_changed
 
 
 class JobWriteRequest(serializers.ModelSerializer):
@@ -130,6 +131,11 @@ class APIJob(APIView):
                 description='Maximum count of job-executions to return',
                 required=False,
             ),
+            OpenApiParameter(
+                name='hash', type=int, default=0,
+                description='Hash to compare client-side & server-side information',
+                required=False,
+            ),
         ],
     )
     def get(request):
@@ -144,7 +150,11 @@ class APIJob(APIView):
         else:
             data = get_viewable_jobs_serialized(get_api_user(request))
 
-        return Response(data=data, status=200)
+        changed, md5 = client_server_data_changed(request, data=data)
+        if not changed:
+            return Response(data=None, status=304, headers={'X-Hash': md5})
+
+        return Response(data=data, status=200, headers={'X-Hash': md5})
 
     @extend_schema(
         request=JobWriteRequest,

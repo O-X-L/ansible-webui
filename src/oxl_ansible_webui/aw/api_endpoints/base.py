@@ -1,3 +1,6 @@
+from hashlib import md5
+from json import dumps as json_dumps
+
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ObjectDoesNotExist
@@ -111,3 +114,12 @@ def validate_no_xss(value: str, field: str, shell_cmd: bool = False, single_quot
 
         if value != escape_html(value):
             raise ValidationError(f"Found illegal characters in field '{field}'")
+
+
+def client_server_data_changed(request, data) -> (bool, str):
+    if 'hash' in request.GET and str(request.GET['hash']) != '0':
+        h = md5(json_dumps(data).encode('utf-8')).hexdigest()
+        print("API HASH:", h, request.GET['hash'])
+        return h != request.GET['hash'], h
+
+    return True, '-'
