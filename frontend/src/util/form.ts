@@ -65,3 +65,10 @@ export function submitFormBase(form: any, method: formMethod, url: string, callb
     }
 }
 
+export function choicesFromArray(a: string[]) {
+    let c = [];
+    for (let i of a) {
+        c.push({'value': i, 'name': i})
+    }
+    return c
+}

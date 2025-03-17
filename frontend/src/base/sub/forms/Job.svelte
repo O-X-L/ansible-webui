@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { fade } from 'svelte/transition';
+
     import {
         FolderSolid, FileSolid, CloseCircleSolid, TrashBinSolid, FloppyDiskSolid, CirclePlusSolid,
     } from 'flowbite-svelte-icons';
@@ -341,9 +343,11 @@
     {:else}
         <div id={formErrorAlert} class="h-0"></div>
         {#if formError}
-            <Alert border color="red" class="text-wrap">
-                <CloseCircleSolid slot="icon" class="w-5 h-5" /> {formError}
-            </Alert>
+            <div transition:fade>
+                <Alert border color="red" class="text-wrap">
+                    <CloseCircleSolid slot="icon" class="w-5 h-5" /> {formError}
+                </Alert>
+            </div>
         {/if}
         <Accordion class={classModalForm}>
             <AccordionItem>
@@ -553,7 +557,8 @@
                         <div>
                             <Label for="job_exec_prompt_limit_req" class={classModalLabel}>{t('jobs.form.prompt_limit_req')}</Label>
                             <div class={classCenterChildDiv}>
-                                <Toggle id="job_exec_prompt_limit_req" bind:checked={executionPromptsSimple.limit_req} />
+                                <Toggle id="job_exec_prompt_limit_req" bind:checked={executionPromptsSimple.limit_req}
+                                disabled={!executionPromptsSimple.limit} />
                             </div>
                         </div>
                         <div>
@@ -587,7 +592,7 @@
                             <hr class="mt-10 mb-2">
                             <div class={classModalInputDiv}>
                                 <div class={classModalInput}>
-                                    <Label for="job_prompt_{p.id}_name" class={classModalLabel}>{t('common.name')}</Label>
+                                    <Label for="job_prompt_{p.id}_name" class={classModalLabel}>{t('jobs.form.prompt_name')}</Label>
                                     <Input id="job_prompt_{p.id}_name" on:input={(e) => {valideInputInstance(e, p)}} 
                                     bind:value={p.name.value} bind:color={p.name.color} />
                                 </div>
@@ -606,11 +611,13 @@
                                         <Toggle id="job_prompt_{p.id}_req" bind:checked={p.required.value} />
                                     </div>
                                 </div>
-                                <div class={classModalInput}>
-                                    <Label for="job_prompt_{p.id}_choices" class={classModalLabel}>{t('common.choices')}</Label>
-                                    <Input id="job_prompt_{p.id}_choices" bind:value={p.choices.value} />
-                                    <Helper class={classModalHelp}>{t('jobs.form.help.prompt_choices')}</Helper>
-                                </div>
+                                {#if p.kind.value == 'dropdown'}
+                                    <div class={classModalInput}>
+                                        <Label for="job_prompt_{p.id}_choices" class={classModalLabel}>{t('common.choices')}</Label>
+                                        <Input id="job_prompt_{p.id}_choices" bind:value={p.choices.value} />
+                                        <Helper class={classModalHelp}>{t('jobs.form.help.prompt_choices')}</Helper>
+                                    </div>
+                                {/if}
                                 <div class={classModalInput}>
                                     <Label for="job_prompt_{p.id}_regex" class={classModalLabel}>{t('jobs.form.prompt_regex')}</Label>
                                     <Input id="job_prompt_{p.id}_regex" on:input={(e) => {valideInputInstance(e, p)}} 

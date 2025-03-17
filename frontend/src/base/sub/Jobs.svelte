@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { fade } from 'svelte/transition';
 
     import {
         InfoCircleSolid, PlaySolid, StopSolid, TrashBinSolid, EditSolid, FileCloneSolid, BookOpenSolid,
@@ -16,6 +17,7 @@
     import { classModalLabel } from '../Style.js';
     import { tq } from '../../util/translate.js';
     import { apiEdit, apiGet } from '../../util/api.js';
+    import { choicesFromArray } from '../../util/form.js';
     import { type executionPromptsType } from './Config.js';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
@@ -86,6 +88,7 @@
     let jobList: jobInfos[] = $state([]);
     let jobActions = $state({});
     let apiError = $state('');
+    let apiSuccess = $state('');
 
     interface executionPromptsFieldValues {
         tags: string,
@@ -149,6 +152,9 @@
             if (a) {
                 a.scrollIntoView({behavior: "smooth", block: "end", inline: "end"});
             }
+        } else {
+            apiSuccess = t('common.success');
+            setTimeout(() => {apiSuccess = ''}, 6000);
         }
     }
 
@@ -170,8 +176,31 @@
         if (!jobId) {
             return;
         }
-        // todo: add execution prompt values
-        apiEdit('post', `job/${jobId}`, undefined, showAPIErrors);
+        let promptData = {};
+
+        for (let f of executionPrompts.config.fields) {
+            promptData[f] = executionPrompts.field_values[f];
+        }
+
+        if (executionPrompts.config.vars.length) {
+            let c: string[] = [];
+
+            for (let [k, v] of Object.entries(executionPrompts.var_values)) {
+                if (v && v.trim()) {
+                    c.push(`-e "${k}=${v}"`)
+                }
+            }
+
+            if (c.length) {
+                if (!executionPrompts.config.fields.includes('cmd_args')) {
+                    promptData['cmd_args'] = '';
+                }
+                promptData['cmd_args'] += ` ${c.join(' ')}`
+            }
+        }
+
+        apiEdit('post', `job/${jobId}`, promptData, showAPIErrors);
+        jobActions[jobId].exec = false;
     }
 
     function updateExecutionPrompts(encodedPrompts: string|null) {
@@ -207,9 +236,18 @@
 
 <div id={apiErrorAlert} class="h-0"></div>
 {#if apiError}
-    <Alert border color="red" class="text-wrap">
-        <CloseCircleSolid slot="icon" class="w-5 h-5" /> {apiError}
-    </Alert>
+    <div transition:fade>
+        <Alert border color="red" class="text-wrap">
+            <CloseCircleSolid slot="icon" class="w-5 h-5" /> {apiError}
+        </Alert>
+    </div>
+{/if}
+{#if apiSuccess}
+    <div transition:fade>
+        <Alert border color="green" class="text-wrap">
+            <InfoCircleSolid slot="icon" class="w-5 h-5" /> {apiSuccess}
+        </Alert>
+    </div>
 {/if}
 <div>
   <Table striped={true}>
@@ -230,7 +268,7 @@
                     {job.name}
                     <button id="job-name-{job.id}" class="ml-1">
                         <InfoCircleSolid size="sm"/>
-                        <span class="sr-only">Show Job Information</span>
+                        <span class="sr-only">{t('jobs.info')}</span>
                     </button>
                 </TableBodyCell>
                 <TableBodyCell class="max-lg:hidden">{job.inventory_file ? job.inventory_file : '-'}</TableBodyCell>
@@ -239,7 +277,7 @@
                     {job.next_run ? job.next_run : '-'}
                     <button id="job-schedule-{job.id}" class="ml-1">
                         <InfoCircleSolid size="sm"/>
-                        <span class="sr-only">Show Execution Information</span>
+                        <span class="sr-only">{t('jobs.info.execution')}</span>
                     </button>
                 </TableBodyCell>
                 <TableBodyCell>
@@ -284,7 +322,7 @@
         <div id="job-infos-{job.id}">
             <Popover triggeredBy="#job-name-{job.id}" class={classPopover} placement="bottom-start">
                 <div class="p-3 space-y-2">
-                    <h3 class={classPopoverTitle}>Job Information</h3>
+                    <h3 class={classPopoverTitle}>{t('jobs.info')}</h3>
                 </div>
                 <table>
                     <tbody>
@@ -355,12 +393,12 @@
             </Popover>
             <Popover triggeredBy="#job-schedule-{job.id}" class={classPopover} placement="bottom-start">
                 <div class="p-3 space-y-2">
-                    <h3 class={classPopoverTitle}>Execution Information</h3>
+                    <h3 class={classPopoverTitle}>{t('jobs.info.execution')}</h3>
                     <table>
                         <tbody>
                             <tr>
                                 <td class={classPopoverColumn1}>
-                                    Schedule Enabled:
+                                    {t('jobs.form.enabled')}:
                                 </td>
                                 <td class={classPopoverColumn2Div}>
                                     <button class="cursor-default">
@@ -370,7 +408,7 @@
                             </tr>
                             <tr>
                                 <td class={classPopoverColumn1}>
-                                    Schedule Cron:
+                                    {t('jobs.form.schedule')}:
                                 </td>
                                 <td class={classPopoverColumn2Text}>
                                     {job.schedule ? job.schedule : '-'}
@@ -378,7 +416,7 @@
                             </tr>
                             <tr>
                                 <td class={classPopoverColumn1}>
-                                    Next Run:
+                                    {t('jobs.info.next_run')}:
                                 </td>
                                 <td class={classPopoverColumn2Text}>
                                     {job.next_run ? job.next_run : '-'}
@@ -387,7 +425,7 @@
                             {#if job.executions.length}
                                 <tr>
                                     <td class={classPopoverColumn1}>
-                                        Last Run:
+                                        {t('jobs.info.last_run')}:
                                     </td>
                                     <td class={classPopoverColumn2Text}>
                                         {job.executions[0].time_start}
@@ -395,7 +433,7 @@
                                 </tr>
                                 <tr>
                                     <td class={classPopoverColumn1}>
-                                        Status:
+                                        {t('common.status')}:
                                     </td>
                                     <td class={classPopoverColumn2Text}>
                                         {job.executions[0].status_name}
@@ -403,7 +441,7 @@
                                 </tr>
                                 <tr>
                                     <td class={classPopoverColumn1}>
-                                        Duration:
+                                        {t('jobs.info.duration')}:
                                     </td>
                                     <td class={classPopoverColumn2Text}>
                                         {job.executions[0].time_duration}
@@ -411,7 +449,7 @@
                                 </tr>
                                 <tr>
                                     <td class={classPopoverColumn1}>
-                                        Failed:
+                                        {t('jobs.info.failed')}:
                                     </td>
                                     <td class={classPopoverColumn2Div}>
                                         <button class="cursor-default">
@@ -422,7 +460,7 @@
                                 {#if job.executions[0].failed}
                                     <tr>
                                         <td class={classPopoverColumn1}>
-                                            Error:
+                                            {t('common.error')}:
                                         </td>
                                         <td class={classPopoverColumn2Div}>
                                             <Alert color="red" border>{job.executions[0].error_s}</Alert>
@@ -435,24 +473,26 @@
                 </div>
             </Popover>
             <Modal bind:open={jobActions[job.id].exec} size="sm" autoclose={true} placement="top-center" backdropClass={classModalBackdrop}>
-                <Heading tag="h2">Execute Job</Heading>
+                <Heading tag="h2">{t('jobs.execute')}</Heading>
 
                 {#if executionPrompts.config.fields.includes('limit')}
                     <Label for="job_prompt_{job.id}_limit" class={classModalLabel}>{t('jobs.form.limit')}</Label>
                     <Input id="job_prompt_{job.id}_limit" bind:value={executionPrompts.field_values.limit} />
                 {/if}
-                {#if executionPrompts.config.fields.includes('mode_check')}
-                    <Label for="job_prompt_{job.id}_mode_check" class={classModalLabel}>{t('jobs.form.mode_check')}</Label>
-                    <div class={classCenterChildDiv}>
-                        <Toggle id="job_prompt_{job.id}_mode_check" bind:checked={executionPrompts.field_values.mode_check} />
-                    </div>
-                {/if}
-                {#if executionPrompts.config.fields.includes('mode_diff')}
-                    <Label for="job_prompt_{job.id}_mode_diff" class={classModalLabel}>{t('jobs.form.mode_diff')}</Label>
-                    <div class={classCenterChildDiv}>
-                        <Toggle id="job_prompt_{job.id}_mode_diff" bind:checked={executionPrompts.field_values.mode_diff} />
-                    </div>
-                {/if}
+                <div>
+                    {#if executionPrompts.config.fields.includes('mode_check')}
+                        <Label for="job_prompt_{job.id}_mode_check" class={classModalLabel}>{t('jobs.form.mode_check')}</Label>
+                        <div class={classCenterChildDiv}>
+                            <Toggle id="job_prompt_{job.id}_mode_check" bind:checked={executionPrompts.field_values.mode_check} />
+                        </div>
+                    {/if}
+                    {#if executionPrompts.config.fields.includes('mode_diff')}
+                        <Label for="job_prompt_{job.id}_mode_diff" class={classModalLabel}>{t('jobs.form.mode_diff')}</Label>
+                        <div class={classCenterChildDiv}>
+                            <Toggle id="job_prompt_{job.id}_mode_diff" bind:checked={executionPrompts.field_values.mode_diff} />
+                        </div>
+                    {/if}
+                </div>
                 {#if executionPrompts.config.fields.includes('tags')}
                     <Label for="job_prompt_{job.id}_tags" class={classModalLabel}>{t('jobs.form.tags')}</Label>
                     <Input id="job_prompt_{job.id}_tags" bind:value={executionPrompts.field_values.tags} />
@@ -474,6 +514,17 @@
                     <Select id="job_prompt_{job.id}_creds" items={usableCredentialChoices}
                         bind:value={executionPrompts.field_values.credentials} />
                 {/if}
+                {#each executionPrompts.config.vars as v, i (v.name)}
+                    {#if v.kind == 'text'}
+                        <Label for="job_prompt_{job.id}_var_{i}" class={classModalLabel}>{v.name}</Label>
+                        <Input id="job_prompt_{job.id}_var_{i}" bind:value={executionPrompts.var_values[v.varName]} />
+                        <!-- todo: regex validation -->
+                    {:else}
+                        <Label for="job_prompt_{job.id}_var_{i}" class={classModalLabel}>{v.name}</Label>
+                        <Select id="job_prompt_{job.id}_var_{i}" items={choicesFromArray(v.choices)}
+                            bind:value={executionPrompts.var_values[v.varName]} />
+                    {/if}                    
+                {/each}
 
                 <div class={classModalBtns}>
                     <!--
