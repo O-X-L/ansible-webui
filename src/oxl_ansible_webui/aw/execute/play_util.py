@@ -99,7 +99,7 @@ def _environmental_variables(job: Job, execution: JobExecution) -> dict:
             **decode_job_env_vars(env_vars_csv=config['global_environment_vars'], src='Global')
         }
 
-    if is_set(job.environment_vars.strip()):
+    if is_set(job.environment_vars) and is_set(job.environment_vars.strip()):
         env_vars = {
             **env_vars,
             **decode_job_env_vars(env_vars_csv=job.environment_vars, src='Job')

@@ -15,6 +15,7 @@
     }
 </script>
 
+<!-- todo: add #<title> to url when tabs open/close so the user can reload the page and directly get to the last open tab -->
 <div class="pl-5 pr-5 h-full">
   <Tabs tabStyle="underline" contentClass="p-4 rounded-lg mt-4 mb-10 h-full">
     <TabItem open divClass="h-full">

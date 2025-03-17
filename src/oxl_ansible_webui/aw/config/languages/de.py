@@ -23,7 +23,7 @@ DE = {
     # 'home.jobs': 'Jobs',
     # 'home.repos': 'Repositories',
     'home.alerts': 'Alarme',
-    'home.alerts.user': 'Nutzer',
+    'home.alerts.user': 'Persönliche',
     'home.alerts.group': 'Gruppe',
     # 'home.alerts.global': 'Global',
     # 'home.alerts.plugin': 'Plugin',

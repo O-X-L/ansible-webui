@@ -36,7 +36,7 @@ EN = {
     'home.jobs': 'Jobs',
     'home.repos': 'Repositories',
     'home.alerts': 'Alerts',
-    'alerts.user': 'User',
+    'alerts.user': 'Personal',
     'alerts.group': 'Group',
     'alerts.global': 'Global',
     'alerts.plugin': 'Plugin',

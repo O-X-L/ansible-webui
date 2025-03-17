@@ -1,6 +1,6 @@
 <script lang="ts">
     import {
-        Heading, Spinner, Button, Dropdown, DropdownItem,
+        Spinner, Button, Dropdown, DropdownItem, Accordion, AccordionItem,
     } from 'flowbite-svelte';
     import {
         ChevronDownOutline, CodeBranchSolid, FolderOpenSolid,
@@ -18,11 +18,7 @@
 </script>
 
 <div class="flex justify-between">
-    <div>
-        <Heading tag="h1" customSize="text-3xl font-extrabold">
-            {t('home.repos')}
-        </Heading>
-    </div>
+    <div></div>
     <div>
         <Button>{t('btn.add')}<ChevronDownOutline class="w-6 h-6 ms-2 text-white dark:text-white" /></Button>
         <Dropdown>
@@ -35,3 +31,12 @@
 <div class="text-center mt-20">
     <Spinner/>
 </div>
+
+<Accordion>
+    <AccordionItem>
+        <span slot="header">{t('repos.git')}</span>
+    </AccordionItem>
+    <AccordionItem>
+        <span slot="header">{t('repos.local')}</span>
+    </AccordionItem>
+</Accordion>

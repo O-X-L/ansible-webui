@@ -1,6 +1,6 @@
 <script lang="ts">
     import {
-        Heading, Spinner, Button, Dropdown, DropdownItem,
+        Heading, Spinner, Button, Dropdown, DropdownItem, Accordion, AccordionItem,
     } from 'flowbite-svelte';
     import {
         ChevronDownOutline, UserSolid, MessagesSolid, UsersGroupSolid,
@@ -43,3 +43,18 @@
 <div class="text-center mt-20">
     <Spinner/>
 </div>
+
+<Accordion>
+    <AccordionItem>
+        <span slot="header">{t('alerts.user')}</span>
+    </AccordionItem>
+    <AccordionItem>
+        <span slot="header">{t('alerts.group')}</span>
+    </AccordionItem>
+    <AccordionItem>
+        <span slot="header">{t('alerts.global')}</span>
+    </AccordionItem>
+    <AccordionItem>
+        <span slot="header">{t('alerts.plugin')}</span>
+    </AccordionItem>
+</Accordion>

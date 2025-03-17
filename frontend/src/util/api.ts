@@ -76,3 +76,16 @@ export async function apiForm(e: SubmitEvent, callback: CallableFunction) {
     apiEdit(method, action, payload, callback);
     return false;
 }
+
+// todo: fix that we are unable to pass a state (v).. maybe move it to a dedicated component?
+export function showAPIErrors(status: number, json: any, v: string, scroll: boolean = false, element: string = '') {
+    if (status != 200 || json.error !== undefined) {
+        v = `${json.error} (${status})`;  // todo: pull language-code from api-error and show user the translation
+        if (scroll) {
+            let a = document.getElementById(element);
+            if (a) {
+                a.scrollIntoView({behavior: "smooth", block: "end", inline: "end"});
+            }    
+        }
+    }
+}

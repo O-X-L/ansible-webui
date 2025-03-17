@@ -7,24 +7,25 @@
         AccordionItem, Accordion,
     } from 'flowbite-svelte';
 
-    import { share } from '../State.js';
-    import { apiGet } from '../../util/api.js';
-    import { rsplit } from '../../util/main.js';
-    import { tq } from '../../util/translate.js';
+    import { share } from '../../State.js';
+    import { apiGet } from '../../../util/api.js';
+    import { rsplit } from '../../../util/main.js';
+    import { tq } from '../../../util/translate.js';
     import {
         inputBaseColor, toggleBaseColor, valideInputBase, submitFormBase,
         type formMethod,
-    } from '../../util/form.js';
+    } from '../../../util/form.js';
     import {
         classModalBackdrop, classModalLabel, classModalHelp, classModalBtns, classModalForm,
         classModalInputDiv,
-    } from '../Style.js';
+    } from '../../Style.js';
 
     // todo: reset to default if 'add' form gets closed
     let { open = $bindable(false), action = 'add', jobId = null } = $props();
 
     const formErrorAlert = 'form-job-alert';
     const urlExisting = `job/${jobId}`;
+
     let formInfos = $state({});
     let loaded = $state(false);
     let existing = $state({});
@@ -122,7 +123,10 @@
         loaded = true;
     }
 
-    onMount(() => {
+    $effect(() => {
+        if (!open || loaded) {
+            return;
+        }
         apiGet('frontend/form/job', setFormInfos);
 
         if (action != 'add' && jobId) {
