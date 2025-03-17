@@ -1,11 +1,8 @@
 from django.shortcuts import render
 from django.shortcuts import HttpResponse
-# from django.urls import path
 from django.contrib.auth.decorators import login_required
 
 from aw.utils.http import ui_endpoint_wrapper_kwargs
-# from aw.views.forms.job import job_edit, job_clone, job_credentials_edit, job_repository_static_edit, \
-#     job_repository_git_edit
 
 LIMIT_JOB_RESULTS = 10
 LIMIT_JOB_LOG_RESULTS = 50

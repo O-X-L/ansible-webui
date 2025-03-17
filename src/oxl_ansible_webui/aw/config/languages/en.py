@@ -32,6 +32,7 @@ EN = {
     'common.status': 'Status',
     'common.error': 'Error',
     'common.success': 'Action succeeded',
+    'common.actions': 'Actions',
 
     # auth
     'login.user': 'Username',
@@ -57,6 +58,7 @@ EN = {
     'jobs.new': 'New Job',
     'jobs.edit': 'Edit Job',
     'jobs.execute': 'Execute Job',
+    'jobs.job': 'Job',
     'jobs.info': 'Job Information',
     'jobs.info.execution': 'Execution Information',
     'jobs.info.next_run': 'Next Run',

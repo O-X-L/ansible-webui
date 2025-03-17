@@ -72,3 +72,13 @@ export function choicesFromArray(a: string[]) {
     }
     return c
 }
+
+export function getMethod(a: string) {
+    if (a == 'delete') {
+        return 'delete';
+    }
+    if (a == 'edit') {
+        return 'put';
+    }
+    return 'post';
+}

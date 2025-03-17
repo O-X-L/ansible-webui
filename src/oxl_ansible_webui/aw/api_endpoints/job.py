@@ -11,7 +11,8 @@ from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_EXECUT
     CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
 from aw.model.job_credential import JobGlobalCredentials
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, \
-    LogDownloadResponse, api_docs_put, api_docs_delete, api_docs_post, validate_no_xss, GenericErrorResponse
+    LogDownloadResponse, api_docs_put, api_docs_delete, api_docs_post, validate_no_xss, GenericErrorResponse, \
+    client_server_data_changed, HDR_HASH
 from aw.api_endpoints.job_util import get_viewable_jobs_serialized, JobReadResponse, get_job_executions_serialized, \
     JobExecutionReadResponse, get_viewable_jobs, get_job_execution_serialized, get_log_file_content
 from aw.utils.permission import has_job_permission, has_credentials_permission, has_manager_privileges
@@ -20,7 +21,6 @@ from aw.execute.util import update_status, is_execution_status
 from aw.utils.util import is_set, ansible_log_html, ansible_log_text
 from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED
 from aw.base import USERS
-from aw.api_endpoints.base import client_server_data_changed
 
 
 class JobWriteRequest(serializers.ModelSerializer):
@@ -132,7 +132,7 @@ class APIJob(APIView):
                 required=False,
             ),
             OpenApiParameter(
-                name='hash', type=int, default=0,
+                name='hash', type=str, default='',
                 description='Hash to compare client-side & server-side information',
                 required=False,
             ),
@@ -152,9 +152,9 @@ class APIJob(APIView):
 
         changed, md5 = client_server_data_changed(request, data=data)
         if not changed:
-            return Response(data=None, status=304, headers={'X-Hash': md5})
+            return Response(data=None, status=304, headers={HDR_HASH: md5})
 
-        return Response(data=data, status=200, headers={'X-Hash': md5})
+        return Response(data=data, status=200, headers={HDR_HASH: md5})
 
     @extend_schema(
         request=JobWriteRequest,

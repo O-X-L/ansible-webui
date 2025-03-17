@@ -20,7 +20,15 @@ const API_RES_HEADER_HASH = 'X-Hash';
 
 export async function apiGet(location: string, callback: CallableFunction) {
     const res = await fetch(`/api/${location}`, {method: 'GET', headers: API_HEADERS});
-    callback(await res.json(), res.headers.get(API_RES_HEADER_HASH));
+    if (res.status == 304) {
+        callback(null, res.headers.get(API_RES_HEADER_HASH));
+    }
+    try {
+        let data = await res.json();
+        callback(data, res.headers.get(API_RES_HEADER_HASH));
+    } catch {
+        callback(null, res.headers.get(API_RES_HEADER_HASH));
+    }
 }
 
 export async function apiGetMulti(locations: string[], callback: CallableFunction) {

@@ -23,6 +23,7 @@ class HasAwAPIKey(BaseHasAPIKey):
 
 API_PERMISSION = [IsAuthenticated | HasAwAPIKey]
 HDR_CACHE_1W = {'Cache-Control': 'max-age=604800'}
+HDR_HASH = 'X-Hash'
 
 
 # see: rest_framework_api_key.permissions.BaseHasAPIKey:get_from_header
@@ -119,7 +120,6 @@ def validate_no_xss(value: str, field: str, shell_cmd: bool = False, single_quot
 def client_server_data_changed(request, data) -> (bool, str):
     if 'hash' in request.GET and str(request.GET['hash']) != '0':
         h = md5(json_dumps(data).encode('utf-8')).hexdigest()
-        print("API HASH:", h, request.GET['hash'])
         return h != request.GET['hash'], h
 
     return True, '-'

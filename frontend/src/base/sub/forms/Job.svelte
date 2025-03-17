@@ -13,22 +13,22 @@
     import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
     import { rsplit } from '../../../util/main.js';
-    import { type executionPromptsType, type executionPromptVarType, API_STATUS_CODES_OK } from '../Config.js';
+    import { type executionPromptsType, type executionPromptVarType } from '../Config.js';
     import {
-        inputBaseColor, valideInputBase, submitFormBase,
+        inputBaseColor, valideInputBase, submitFormBase, getMethod,
         type formMethod,
     } from '../../../util/form.js';
     import {
         classModalBackdrop, classModalLabel, classModalHelp, classModalBtns, classModalForm,
-        classModalInputDiv, classCenterChildDiv, classModalInput,
+        classModalInputDiv, classCenterChildDiv, classModalInput, classSpinnerDiv,
     } from '../../Style.js';
     import type { inputColor } from '../../Types.js';
 
     // todo: reset to default if 'add' form gets closed
-    let { open = $bindable(false), action = 'add', jobId = null } = $props();
+    let { open = $bindable(false), action = 'add', existingID = null } = $props();
 
     const formErrorAlert = 'form-job-alert';
-    const urlExisting = `job/${jobId}`;
+    const urlExisting = `job/${existingID}`;
 
     let formInfos = $state({});
     let loaded = $state(false);
@@ -66,16 +66,6 @@
         execution_prompts_json: {value: '', color: inputBaseColor},
     });
 
-    function getMethod(a: string) {
-        if (a == 'delete') {
-            return 'delete';
-        }
-        if (a == 'edit') {
-            return 'put';
-        }
-        return 'post';
-    }
-
     function t(code: string) {
       return tq($share, code);
     }
@@ -101,7 +91,6 @@
     }
 
     function submitForm() {
-        // todo: write response errors to UI
         execPromptsEncode();
         submitFormBase(form, method, url, handleSubmitResponse);
     }
@@ -138,7 +127,7 @@
         }
         apiGet('frontend/form/job', setFormInfos);
 
-        if (action != 'add' && jobId) {
+        if (action != 'add' && existingID) {
             apiGet(urlExisting, loadExisting);
         }
     })
@@ -339,7 +328,7 @@
 <Modal bind:open={open} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
     <Heading tag="h2">{title}</Heading>
     {#if !loaded}
-        <Spinner/>
+        <div class={classSpinnerDiv}><Spinner/></div>
     {:else}
         <div id={formErrorAlert} class="h-0"></div>
         {#if formError}
@@ -360,13 +349,12 @@
                     </div>
                     <div class={classModalInput}>
                         <Label for="job_cmt" class={classModalLabel}>{t('jobs.form.comment')}</Label>
-                        <Input id="job_cmt" bind:value={form.comment.value} bind:color={form.comment.color}
-                        on:input={valideInput} />
+                        <Input id="job_cmt" bind:value={form.comment.value} bind:color={form.comment.color} />
                     </div>
                     <div class={classModalInput}>
                         <Label for="job_repo" class={classModalLabel}>{t('jobs.form.repository')}</Label>
                         <Select id="job_repo" items={formInfos.choices.repository}
-                        bind:value={form.repository.value} bind:color={form.repository.color} on:input={valideInput} />
+                        bind:value={form.repository.value} bind:color={form.repository.color} />
                         <Helper class={classModalHelp}>{t('jobs.form.help.repository')}</Helper>
                     </div>
                     <div class={classModalInput}>
@@ -398,7 +386,7 @@
                     </div>
                     <div class={classModalInput}>
                         <Label for="job_inv" class={classModalLabel}>{t('jobs.form.inventory_file')}</Label>
-                        <Input id="job_inv" on:input={valideInput}
+                        <Input id="job_inv"
                         bind:value={form.inventory_file.value} bind:color={form.inventory_file.color}
                         on:input={() => {fsBrowse('inventory_file')}}
                         on:click={() => {fsBrowseClick('inventory_file')}} />
@@ -430,19 +418,19 @@
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
                         <Label for="job_limit" class={classModalLabel}>{t('jobs.form.limit')}</Label>
-                        <Input id="job_limit" on:input={valideInput}
+                        <Input id="job_limit"
                         bind:value={form.limit.value} bind:color={form.limit.color} />
                         <Helper class={classModalHelp}>{@html t('jobs.form.help.limit')}</Helper>
                     </div>
                     <div class={classModalInput}>
                         <Label for="job_tags" class={classModalLabel}>{t('jobs.form.tags')}</Label>
-                        <Input id="job_tags" on:input={valideInput}
+                        <Input id="job_tags"
                         bind:value={form.tags.value} bind:color={form.tags.color} />
                         <Helper class={classModalHelp}>{@html t('jobs.form.help.tags')}</Helper>
                     </div>
                     <div class={classModalInput}>
                         <Label for="job_tags_skip" class={classModalLabel}>{t('jobs.form.tags_skip')}</Label>
-                        <Input id="job_tags_skip" on:input={valideInput}
+                        <Input id="job_tags_skip"
                         bind:value={form.tags_skip.value} bind:color={form.tags_skip.color} />
                     </div>
                     <div class={classModalInput}>
@@ -476,7 +464,7 @@
                     </div>
                     <div class={classModalInput}>
                         <Label for="job_creds_cat" class={classModalLabel}>{t('jobs.form.credentials_category')}</Label>
-                        <Input id="job_creds_cat" on:input={valideInput}
+                        <Input id="job_creds_cat"
                         bind:value={form.credentials_category.value} bind:color={form.credentials_category.color} />
                         <Helper class={classModalHelp}>{t('jobs.form.help.credentials_category')}</Helper>
                     </div>
@@ -487,13 +475,13 @@
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
                         <Label for="job_cron" class={classModalLabel}>{t('jobs.form.schedule')}</Label>
-                        <Input id="job_cron" on:input={valideInput} 
+                        <Input id="job_cron" on:input={valideInput}
                         bind:value={form.schedule.value} bind:color={form.schedule.color} />
                         <Helper class={classModalHelp}>{@html t('jobs.form.help.schedule')}</Helper>
                     </div>
                     <div class={classModalInput}>
                         <Label for="job_cron_en" class={classModalLabel}>{t('jobs.form.enabled')}</Label>
-                        <Toggle id="job_cron_en" on:input={valideInput} bind:checked={form.enabled.value} />
+                        <Toggle id="job_cron_en" bind:checked={form.enabled.value} />
                         <Helper class={classModalHelp}>{t('jobs.form.help.enabled')}</Helper>
                     </div>
                 </div>
@@ -503,14 +491,12 @@
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
                         <Label for="job_env" class={classModalLabel}>{t('jobs.form.environment_vars')}</Label>
-                        <Input id="job_env" on:input={valideInput}
-                        bind:value={form.environment_vars.value} bind:color={form.environment_vars.color} />
+                        <Input id="job_env" bind:value={form.environment_vars.value} bind:color={form.environment_vars.color} />
                         <Helper class={classModalHelp}>{t('jobs.form.help.environment_vars')}</Helper>
                     </div>
                     <div class={classModalInput}>
                         <Label for="job_args" class={classModalLabel}>{t('jobs.form.cmd_args')}</Label>
-                        <Input id="job_args" on:input={valideInput} 
-                        bind:value={form.cmd_args.value} bind:color={form.cmd_args.color} />
+                        <Input id="job_args" bind:value={form.cmd_args.value} bind:color={form.cmd_args.color} />
                         <Helper class={classModalHelp}>{t('jobs.form.help.cmd_args')}</Helper>
                     </div>
                 </div>

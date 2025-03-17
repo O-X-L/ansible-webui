@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import FieldDoesNotExist
 
 CHOICES_BOOL = (
     (True, 'Yes'),
@@ -50,7 +51,7 @@ def get_model_field_default(m, field: str):
         field = m._meta.get_field(field)
         return field.default if field.default is not models.fields.NOT_PROVIDED else None
 
-    except models.FieldDoesNotExist:
+    except FieldDoesNotExist:
         return None
 
 
@@ -59,5 +60,5 @@ def get_model_field_choices(m, field: str):
         field = m._meta.get_field(field)
         return field.choices if field.choices else None
 
-    except models.FieldDoesNotExist:
+    except FieldDoesNotExist:
         return None

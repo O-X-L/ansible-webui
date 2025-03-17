@@ -7,7 +7,7 @@ from aw.settings import AUTH_MODE
 from aw.api_endpoints.base import get_api_user, HDR_CACHE_1W, GenericResponse, API_PERMISSION
 from aw.templatetags.util import get_logo, get_version
 from aw.config.language import TRANSLATIONS
-from aw.model.job import Job
+from aw.model.job import Job, JobUserCredentials
 from aw.model.base import get_model_field_default, get_model_field_choices
 from aw.views.base import choices_global_credentials, choices_repositories
 
@@ -117,9 +117,26 @@ class APIFormInfosJob(GenericAPIView):
     @extend_schema(
         request=None,
         responses={200: GenericResponse},
-        summary='Return job-form-choices needed for frontend rendering',
+        summary='Return job-form-choices & -defaults needed for frontend rendering',
         operation_id='form_choices_job',
     )
     def get(request):
         del request
         return Response(data=_build_model_defaults_choices(Job), status=200)
+
+
+class APIFormInfosCredentials(GenericAPIView):
+    http_method_names = ['get']
+    serializer_class = GenericResponse
+    permission_classes = API_PERMISSION
+
+    @staticmethod
+    @extend_schema(
+        request=None,
+        responses={200: GenericResponse},
+        summary='Return credential-form-choices & -defaults needed for frontend rendering',
+        operation_id='form_choices_credentials',
+    )
+    def get(request):
+        del request
+        return Response(data=_build_model_defaults_choices(JobUserCredentials), status=200, headers=HDR_CACHE_1W)

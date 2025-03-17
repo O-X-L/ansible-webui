@@ -15,4 +15,5 @@ export const classPopoverTitle = 'font-semibold text-gray-900 dark:text-white';
 export const classPopoverColumn1 = 'font-bold mr-5';
 export const classPopoverColumn2Text = 'text-center text-wrap';
 export const classPopoverColumn2Div = classCenterChildDiv;
+export const classSpinnerDiv = 'text-center my-20';
 const bg = 'w-full h-full';

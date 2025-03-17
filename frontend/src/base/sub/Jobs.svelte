@@ -21,7 +21,7 @@
     import { type executionPromptsType, API_STATUS_CODES_OK } from './Config.js';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
-        classPopoverColumn2Text, classPopoverColumn2Div, classCenterChildDiv,
+        classPopoverColumn2Text, classPopoverColumn2Div, classCenterChildDiv, classSpinnerDiv,
     } from '../Style.js';
 
     interface executionInfos {
@@ -85,8 +85,8 @@
 
     let addModal = $state(false);
     let addModalId = $state(Date.now());
-    let jobList: jobInfos[] = $state([]);
-    let jobActions = $state({});
+    let entryList: jobInfos[] = $state([]);
+    let entryActions = $state({});
     let apiError = $state('');
     let apiSuccess = $state('');
     let loaded = $state(false);
@@ -136,14 +136,14 @@
     function loadJobList(j: any, h: string) {
         if (!loaded) {
             for (let job of j) {
-                jobActions[job.id] = {edit: false, clone: false, exec: false, logs: false};
+                entryActions[job.id] = {edit: false, clone: false, exec: false, logs: false};
             }
             loaded = true;
         }
         if (!j || h == apiDataHash) {
             return;
         }
-        jobList = j;
+        entryList = j;
         apiDataHash = h;
     }
 
@@ -209,7 +209,7 @@
         }
 
         apiEdit('post', `job/${jobId}`, promptData, showAPIErrors);
-        jobActions[jobId].exec = false;
+        entryActions[jobId].exec = false;
     }
 
     function updateExecutionPrompts(encodedPrompts: string|null) {
@@ -272,17 +272,14 @@
 <div>
   <Table striped={true}>
     <TableHead theadClass="text-base font-bold uppercase">
-        <TableHeadCell>Job</TableHeadCell>
+        <TableHeadCell>{t('jobs.job')}</TableHeadCell>
         <TableHeadCell class="max-lg:hidden">{t('jobs.form.inventory_file')}</TableHeadCell>
         <TableHeadCell class="max-lg:hidden">{t('jobs.form.playbook_file')}</TableHeadCell>
         <TableHeadCell class="max-sm:hidden">{t('jobs.form.schedule')}</TableHeadCell>
-        <TableHeadCell>Actions</TableHeadCell>
+        <TableHeadCell>{t('common.actions')}</TableHeadCell>
     </TableHead>
     <TableBody tableBodyClass="divide-y">
-        {#if !jobList.length}
-            <div class="text-center mt-20"><Spinner/></div>
-        {/if}
-        {#each jobList as job (job.id)}
+        {#each entryList as job (job.id)}
             <TableBodyRow>
                 <TableBodyCell>
                     {job.name}
@@ -303,7 +300,7 @@
                 <TableBodyCell>
                     <div>
                         <Button size="xs" on:click={() => {
-                            jobActions[job.id].exec = true; updateExecutionPrompts(job.execution_prompts_json);
+                            entryActions[job.id].exec = true; updateExecutionPrompts(job.execution_prompts_json);
                             }} disabled={isJobActive(job)}>
                             <PlaySolid/>
                         </Button>
@@ -315,16 +312,16 @@
                         </Button>
                         <Tooltip>{t('btn.stop')}</Tooltip>
 
-                        <Button size="xs" on:click={() => {jobActions[job.id].logs = true}}><BookOpenSolid/></Button>
+                        <Button size="xs" on:click={() => {entryActions[job.id].logs = true}}><BookOpenSolid/></Button>
                         <Tooltip>{t('btn.logs')}</Tooltip>
                     </div>
                     <div class="mt-2">
-                        <JobForm bind:open={jobActions[job.id].edit} action='edit' jobId={job.id} />
-                        <Button size="xs" on:click={() => {jobActions[job.id].edit = true}}><EditSolid/></Button>
+                        <JobForm bind:open={entryActions[job.id].edit} action='edit' existingID={job.id} />
+                        <Button size="xs" on:click={() => {entryActions[job.id].edit = true}}><EditSolid/></Button>
                         <Tooltip>{t('btn.edit')}</Tooltip>
     
-                        <JobForm bind:open={jobActions[job.id].clone} action='clone' jobId={job.id} />
-                        <Button size="xs" on:click={() => {jobActions[job.id].clone = true}}><FileCloneSolid/></Button>
+                        <JobForm bind:open={entryActions[job.id].clone} action='clone' existingID={job.id} />
+                        <Button size="xs" on:click={() => {entryActions[job.id].clone = true}}><FileCloneSolid/></Button>
                         <Tooltip>{t('btn.clone')}</Tooltip>
     
                         <Button size="xs" on:click={() => {deleteJob(job.id)}}><TrashBinSolid/></Button>
@@ -335,10 +332,13 @@
         {/each}
     </TableBody>
   </Table>
+  {#if !entryList.length}
+    <div class={classSpinnerDiv}><Spinner/></div>
+  {/if}
 </div>
 
 <div>
-    {#each jobList as job (job.id)}
+    {#each entryList as job (job.id)}
         <div id="job-infos-{job.id}">
             <Popover triggeredBy="#job-name-{job.id}" class={classPopover} placement="bottom-start">
                 <div class="p-3 space-y-2">
@@ -492,7 +492,7 @@
                     </table>
                 </div>
             </Popover>
-            <Modal bind:open={jobActions[job.id].exec} size="sm" autoclose={true} placement="top-center" backdropClass={classModalBackdrop}>
+            <Modal bind:open={entryActions[job.id].exec} size="sm" autoclose={true} placement="top-center" backdropClass={classModalBackdrop}>
                 <Heading tag="h2">{t('jobs.execute')}</Heading>
 
                 {#if executionPrompts.config.fields.includes('limit')}
@@ -554,7 +554,7 @@
                     <Button type="button" on:click={() => {startJob(job.id)}}><PlaySolid/></Button>
                     <Tooltip>{t('btn.execute')}</Tooltip>
 
-                    <Button on:click={() => (jobActions[job.id].exec = false)} class="inline-block ml-2"><CloseCircleSolid/></Button>
+                    <Button on:click={() => (entryActions[job.id].exec = false)} class="inline-block ml-2"><CloseCircleSolid/></Button>
                     <Tooltip>{t('btn.discard')}</Tooltip>
                 </div>
             </Modal>
