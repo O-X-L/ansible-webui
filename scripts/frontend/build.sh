@@ -32,19 +32,14 @@ bash build_tailwind.sh "$SRC_DIR" "$DST_DIR" &
 cd "$SRC_DIR"
 npm run build >/dev/null
 
-APPS=(
-  'Footer' 'Wrapper' 'DarkLightMode' 'Toggle' 'Spinner' 'Heading' 'ChevronDownOutline' 'Popper'
-  'Dropdown' 'Radio' 'Input'
-  'State' 'Style'
-  'main' 'home' 'login' 'api' 'translate'
-)
+APPS=$(ls "${SRC_DIR}/dist/"*.js | rev | cut -d '/' -f 1 | rev | cut -d '-' -f1)
 
-for app in "${APPS[@]}"
+for app in $APPS
 do
   cp "${SRC_DIR}/dist/${app}"-*css "${DST_DIR}/${app}.css" 2>/dev/null || true
   cp "${SRC_DIR}/dist/${app}"-*js "${DST_DIR}/${app}.js" 2>/dev/null || true
 
-  for ref in "${APPS[@]}"
+  for ref in $APPS
   do
     if [[ "$app" != "$ref" ]]
     then

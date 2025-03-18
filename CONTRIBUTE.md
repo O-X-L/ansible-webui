@@ -100,8 +100,6 @@ The bundles are generated into `src/oxl_ansible_webui/aw/static_dev` - django wi
 
 DO NOT copy & commit bundles to/in `src/oxl_ansible_webui/aw/static` - they are only generated/updated on release.
 
-New components added to `vite.config.ts` have to also be added to `scripts/frontend/build.sh`.
-
 This is also necessary if a sub-component is used in multiple others. You will see a 404 error if the js-files are missing from the script. (*as they are not copied to django's static-dir*)
 
 ### Translations

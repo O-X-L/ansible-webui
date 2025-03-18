@@ -18,10 +18,12 @@
     import { tq } from '../../util/translate.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import { choicesFromArray } from '../../util/form.js';
+    import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import { type executionPromptsType, API_STATUS_CODES_OK } from './Config.js';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
         classPopoverColumn2Text, classPopoverColumn2Div, classCenterChildDiv, classSpinnerDiv,
+        classListContent, classListHeader,
     } from '../Style.js';
 
     interface executionInfos {
@@ -80,16 +82,15 @@
         executions: executionInfos[],
     }
 
-    const apiErrorAlert = 'api-job-alert';
     const JOB_EXEC_STATI_ACTIVE = [0, 1, 2, 7];
 
+    let apiResponseHandler: APIResponseHandler = $state();
     let addModal = $state(false);
     let addModalId = $state(Date.now());
     let entryList: jobInfos[] = $state([]);
     let entryActions = $state({});
-    let apiError = $state('');
-    let apiSuccess = $state('');
-    let loaded = $state(false);
+    let apiErrorMsg = $state('');
+    let apiSuccessMsg = $state('');
     let apiDataHash = $state('');
 
     interface executionPromptsFieldValues {
@@ -134,11 +135,10 @@
     }
 
     function loadJobList(j: any, h: string) {
-        if (!loaded) {
-            for (let job of j) {
+        for (let job of j) {
+            if (!entryActions[job.id]) {
                 entryActions[job.id] = {edit: false, clone: false, exec: false, logs: false};
             }
-            loaded = true;
         }
         if (!j || h == apiDataHash) {
             return;
@@ -154,31 +154,20 @@
         return JOB_EXEC_STATI_ACTIVE.includes(job.executions[0].status);
     }
 
-    function showAPIErrors(s: number, j: any) {
-        if (!API_STATUS_CODES_OK.includes(s) || j.error !== undefined) {
-            apiError = `${j.error} (${s})`;  // todo: pull language-code from api-error and show user the translation
-            let a = document.getElementById(apiErrorAlert);
-            if (a) {
-                a.scrollIntoView({behavior: "smooth", block: "end", inline: "end"});
-            }
-        } else {
-            apiSuccess = t('common.success');
-            setTimeout(() => {apiSuccess = ''}, 6000);
-        }
-    }
-
     function stopJob(jobId: number, executionId: number) {
         if (!jobId || !executionId) {
             return;
         }
-        apiEdit('delete', `job/${jobId}/${executionId}`, null, showAPIErrors);
+        apiSuccessMsg = 'jobs.action.stop';
+        apiEdit('delete', `job/${jobId}/${executionId}`, null, apiResponseHandler.handleRes);
     }
 
     function deleteJob(jobId: number) {
         if (!jobId) {
             return;
         }
-        apiEdit('delete', `job/${jobId}`, null, showAPIErrors);
+        apiSuccessMsg = 'jobs.action.delete';
+        apiEdit('delete', `job/${jobId}`, null, apiResponseHandler.handleRes);
     }
 
     function startJob(jobId: number) {
@@ -208,7 +197,8 @@
             }
         }
 
-        apiEdit('post', `job/${jobId}`, promptData, showAPIErrors);
+        apiSuccessMsg = 'jobs.action.start';
+        apiEdit('post', `job/${jobId}`, promptData, apiResponseHandler.handleRes);
         entryActions[jobId].exec = false;
     }
 
@@ -227,10 +217,10 @@
     function buildCredentialChoices(cr: credentialsType) {
         let choices = [];
         for (let c of cr.user) {
-            choices.push({value: c.id, name: `${t('creds.user')} ${c.name}`});
+            choices.push({value: c.id, name: `${t('creds.user')} - ${c.name}`});
         }
         for (let c of cr.shared) {
-            choices.push({value: c.id, name: `${t('creds.global')} ${c.name}`});
+            choices.push({value: c.id, name: `${t('creds.shared')} - ${c.name}`});
         }
         return choices;
     }
@@ -254,24 +244,11 @@
     })
 </script>
 
-<div id={apiErrorAlert} class="h-0"></div>
-{#if apiError}
-    <div transition:fade>
-        <Alert border color="red" class="text-wrap">
-            <CloseCircleSolid slot="icon" class="w-5 h-5" /> {apiError}
-        </Alert>
-    </div>
-{/if}
-{#if apiSuccess}
-    <div transition:fade>
-        <Alert border color="green" class="text-wrap">
-            <InfoCircleSolid slot="icon" class="w-5 h-5" /> {apiSuccess}
-        </Alert>
-    </div>
-{/if}
+<APIResponseHandler bind:this={apiResponseHandler} bind:errorMsg={apiErrorMsg} bind:successMsg={apiSuccessMsg} />
+
 <div>
   <Table striped={true}>
-    <TableHead theadClass="text-base font-bold uppercase">
+    <TableHead theadClass={classListHeader}>
         <TableHeadCell>{t('jobs.job')}</TableHeadCell>
         <TableHeadCell class="max-lg:hidden">{t('jobs.form.inventory_file')}</TableHeadCell>
         <TableHeadCell class="max-lg:hidden">{t('jobs.form.playbook_file')}</TableHeadCell>
@@ -281,23 +258,23 @@
     <TableBody tableBodyClass="divide-y">
         {#each entryList as job (job.id)}
             <TableBodyRow>
-                <TableBodyCell>
+                <TableBodyCell tdClass={classListContent}>
                     {job.name}
                     <button id="job-name-{job.id}" class="ml-1">
                         <InfoCircleSolid size="sm"/>
                         <span class="sr-only">{t('jobs.info')}</span>
                     </button>
                 </TableBodyCell>
-                <TableBodyCell class="max-lg:hidden">{job.inventory_file ? job.inventory_file : '-'}</TableBodyCell>
-                <TableBodyCell class="max-lg:hidden">{job.playbook_file}</TableBodyCell>    
-                <TableBodyCell class="max-sm:hidden">
+                <TableBodyCell class="{classListContent} max-lg:hidden">{job.inventory_file ? job.inventory_file : '-'}</TableBodyCell>
+                <TableBodyCell class="{classListContent} max-lg:hidden">{job.playbook_file}</TableBodyCell>    
+                <TableBodyCell class="{classListContent} max-sm:hidden">
                     {job.next_run ? job.next_run : '-'}
                     <button id="job-schedule-{job.id}" class="ml-1">
                         <InfoCircleSolid size="sm"/>
                         <span class="sr-only">{t('jobs.info.execution')}</span>
                     </button>
                 </TableBodyCell>
-                <TableBodyCell>
+                <TableBodyCell tdClass={classListContent}>
                     <div>
                         <Button size="xs" on:click={() => {
                             entryActions[job.id].exec = true; updateExecutionPrompts(job.execution_prompts_json);
@@ -571,5 +548,5 @@
 </div>
 
 {#key addModalId}
-    <JobForm bind:open={addModal} action='add' ></JobForm>
+    <JobForm bind:open={addModal} action='add' />
 {/key}

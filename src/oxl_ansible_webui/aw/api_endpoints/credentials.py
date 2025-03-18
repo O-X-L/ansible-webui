@@ -9,7 +9,7 @@ from aw.model.job import Job, JobExecution
 from aw.model.job_credential import BaseJobCredentials, JobUserCredentials, JobGlobalCredentials
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, api_docs_delete, \
-    api_docs_put, api_docs_post, validate_no_xss, GenericErrorResponse, client_server_data_changed, HDR_HASH
+    api_docs_put, api_docs_post, validate_no_xss, GenericErrorResponse, response_data_if_changed
 from aw.utils.permission import has_credentials_permission, has_manager_privileges
 from aw.config.hardcoded import SECRET_HIDDEN
 from aw.utils.util import is_null
@@ -34,7 +34,6 @@ class JobUserCredentialsReadResponse(JobGlobalCredentialsReadResponse):
 
 
 class JobCredentialsList(BaseResponse):
-    # NOTE: 'global' attribute not usable..
     shared = serializers.ListSerializer(child=JobGlobalCredentialsReadResponse())
     user = serializers.ListSerializer(child=JobUserCredentialsReadResponse())
 
@@ -45,10 +44,10 @@ class JobGlobalCredentialsWriteRequest(serializers.ModelSerializer):
         fields = JobGlobalCredentials.api_fields_write
 
     name = serializers.CharField(validators=[])  # uc on update
-    vault_pass = serializers.CharField(max_length=100, required=False, default=None, allow_blank=True)
-    become_pass = serializers.CharField(max_length=100, required=False, default=None, allow_blank=True)
-    connect_pass = serializers.CharField(max_length=100, required=False, default=None, allow_blank=True)
-    ssh_key = serializers.CharField(max_length=5000, required=False, default=None, allow_blank=True)
+    vault_pass = serializers.CharField(max_length=100, required=False, default=None, allow_blank=True, allow_null=True)
+    become_pass = serializers.CharField(max_length=100, required=False, default=None, allow_blank=True, allow_null=True)
+    connect_pass = serializers.CharField(max_length=100, required=False, default=None, allow_blank=True, allow_null=True)
+    ssh_key = serializers.CharField(max_length=5000, required=False, default=None, allow_blank=True, allow_null=True)
 
     def validate(self, attrs: dict):
         for field in JobGlobalCredentials.api_fields_write:
@@ -72,10 +71,7 @@ class JobUserCredentialsWriteRequest(JobGlobalCredentialsWriteRequest):
 
 
 def are_global_credentials(request) -> bool:
-    if 'global' in request.GET and request.GET['global'] != 'true':
-        return False
-
-    return True
+    return 'shared' not in request.GET or request.GET['shared'] == 'true'
 
 
 def _find_credentials(
@@ -138,7 +134,7 @@ class APIJobCredentials(APIView):
     permission_classes = API_PERMISSION
     parameters = [
         OpenApiParameter(
-            name='global', type=bool, default=True,
+            name='shared', type=bool, default=True,
             description='If the credentials are global or user-specific',
             required=False,
         ),
@@ -175,12 +171,7 @@ class APIJobCredentials(APIView):
             credentials_user.append(JobUserCredentialsReadResponse(instance=credentials).data)
 
         data = {'shared': credentials_global, 'user': credentials_user}
-
-        changed, md5 = client_server_data_changed(request, data=data)
-        if not changed:
-            return Response(data=None, status=304, headers={HDR_HASH: md5})
-
-        return Response(data=data, status=200, headers={HDR_HASH: md5})
+        return response_data_if_changed(request, data)
 
     @extend_schema(
         request=JobGlobalCredentialsWriteRequest,
@@ -244,7 +235,7 @@ class APIJobCredentialsItem(APIView):
     permission_classes = API_PERMISSION
     parameters = [
         OpenApiParameter(
-            name='global', type=bool, default=True,
+            name='shared', type=bool, default=True,
             description='If the credentials are global or user-specific',
             required=False,
         ),

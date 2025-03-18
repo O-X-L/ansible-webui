@@ -41,11 +41,11 @@ class PermissionWriteRequest(serializers.ModelSerializer):
         model = JobPermission
         fields = JobPermission.api_fields_write
 
-    jobs = serializers.MultipleChoiceField(allow_blank=True, choices=[])
-    credentials = serializers.MultipleChoiceField(allow_blank=True, choices=[])
-    repositories = serializers.MultipleChoiceField(allow_blank=True, choices=[])
-    users = serializers.MultipleChoiceField(allow_blank=True, choices=[])
-    groups = serializers.MultipleChoiceField(allow_blank=True, choices=[])
+    jobs = serializers.MultipleChoiceField(allow_blank=True, allow_null=True, choices=[])
+    credentials = serializers.MultipleChoiceField(allow_blank=True, allow_null=True, choices=[])
+    repositories = serializers.MultipleChoiceField(allow_blank=True, allow_null=True, choices=[])
+    users = serializers.MultipleChoiceField(allow_blank=True, allow_null=True, choices=[])
+    groups = serializers.MultipleChoiceField(allow_blank=True, allow_null=True, choices=[])
     name = serializers.CharField(validators=[])  # uc on update
 
     def __init__(self, *args, **kwargs):

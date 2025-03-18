@@ -16,4 +16,6 @@ export const classPopoverColumn1 = 'font-bold mr-5';
 export const classPopoverColumn2Text = 'text-center text-wrap';
 export const classPopoverColumn2Div = classCenterChildDiv;
 export const classSpinnerDiv = 'text-center my-20';
+export const classListHeader = 'text-base font-bold uppercase';
+export const classListContent = 'px-6 py-4 whitespace-nowrap font-medium text-wrap';
 const bg = 'w-full h-full';

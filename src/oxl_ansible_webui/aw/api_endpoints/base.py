@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.utils.html import escape as escape_html
 from rest_framework import serializers
+from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_api_key.permissions import BaseHasAPIKey
@@ -119,7 +120,15 @@ def validate_no_xss(value: str, field: str, shell_cmd: bool = False, single_quot
 
 def client_server_data_changed(request, data) -> (bool, str):
     if 'hash' in request.GET and str(request.GET['hash']) != '0':
-        h = md5(json_dumps(data).encode('utf-8')).hexdigest()
+        h = md5(json_dumps(data).encode('utf-8')).hexdigest()[:6]
         return h != request.GET['hash'], h
 
     return True, '-'
+
+
+def response_data_if_changed(request, data) -> Response:
+    changed, h = client_server_data_changed(request, data=data)
+    if not changed:
+        return Response(data=None, status=304, headers={HDR_HASH: h})
+
+    return Response(data=data, status=200, headers={HDR_HASH: h})

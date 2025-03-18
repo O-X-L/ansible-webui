@@ -14,8 +14,8 @@
     import { type formAlerts } from './Types.js';
     import { tq, flagIcon } from '../util/translate.js';
     import { setDarkLightMode } from './DarkLightMode.js';
-    import { apiGet, getCSRFFormTokenHTML } from '../util/api.js';
     import { classNavFooter, classBtnBase } from './Style.js';
+    import { apiGet, getCSRFFormTokenHTML } from '../util/api.js';
 
     let loaded: boolean = $state(false);
     let language: string = $state('en');

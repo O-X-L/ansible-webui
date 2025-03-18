@@ -1,7 +1,16 @@
 import { writable } from 'svelte/store';
 
+interface backendInfos {
+    authenticated: boolean,
+    sso: boolean,
+    user: null|string,
+    user_id: null|number,
+    version: string,
+    logo: string,
+}
+
 interface shareObject {
-    backend: any,
+    backend: backendInfos,
     lang: any,
     updateInterval: number,
 }

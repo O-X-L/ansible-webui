@@ -24,7 +24,6 @@
     } from '../../Style.js';
     import type { inputColor } from '../../Types.js';
 
-    // todo: reset to default if 'add' form gets closed
     let { open = $bindable(false), action = 'add', existingID = null } = $props();
 
     const formErrorAlert = 'form-job-alert';

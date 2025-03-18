@@ -70,7 +70,7 @@ class APIBackendInfo(GenericAPIView):
     )
     def get(request):
         states = {
-            'authenticated': False, 'sso': False, 'user': None,
+            'authenticated': False, 'sso': False, 'user': None, 'user_id': None,
             'version': get_version(),
             'logo': get_logo(),
         }
@@ -86,6 +86,7 @@ class APIBackendInfo(GenericAPIView):
         user = get_api_user(request)
         if user is not None:
             states['user'] = user.username
+            states['user_id'] = user.id
             states['authenticated'] = user.is_authenticated
 
         return Response(data=states, status=200)

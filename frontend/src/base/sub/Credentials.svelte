@@ -1,41 +1,39 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { fade } from 'svelte/transition';
 
     import {
-        InfoCircleSolid, CloseCircleSolid, UserSolid, UsersGroupSolid, ChevronDownOutline, TrashBinSolid,
+        InfoCircleSolid, UserSolid, UsersGroupSolid, ChevronDownOutline, TrashBinSolid,
         EditSolid, FileCloneSolid,
     } from 'flowbite-svelte-icons';
     import {
-        Spinner, Button, Popover, Radio, Alert, Tooltip, Modal, Heading,
+        Spinner, Button, Tooltip, Popover, Radio,
         Table, TableHead, TableHeadCell, TableBody, TableBodyCell, TableBodyRow,
-        Input, Toggle, Label, Select, Dropdown, DropdownItem, Accordion, AccordionItem,
+        Dropdown, DropdownItem, Accordion, AccordionItem,
     } from 'flowbite-svelte';
 
     import { share } from '../State.js';
-    import CredentialsForm from './forms/Credentials.svelte';
-    import { classModalLabel } from '../Style.js';
     import { tq } from '../../util/translate.js';
     import { apiEdit, apiGet } from '../../util/api.js';
-    import { choicesFromArray } from '../../util/form.js';
-    import { type executionPromptsType, API_STATUS_CODES_OK } from './Config.js';
+    import CredentialsForm from './forms/Credentials.svelte';
+    import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
-        classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
-        classPopoverColumn2Text, classPopoverColumn2Div, classCenterChildDiv, classSpinnerDiv,
+        classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
+        classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle,
     } from '../Style.js';
+ 
+    const credentialsKind = ['user', 'shared'];
 
-    const apiErrorAlert = 'api-job-alert';
-    const credentialsKind = ['user', 'global'];
-
+    let apiResponseHandler: APIResponseHandler = $state();
     let addUserModal = $state(false);
-    let addGlobalModal = $state(false);
-    let apiError = $state('');
-    let apiSuccess = $state('');
-    let loaded = $state(false);
+    let addSharedModal = $state(false);
+    let addUserModalId = $state(Date.now());
+    let addSharedModalId = $state(Date.now());
+    let apiErrorMsg = $state('');
+    let apiSuccessMsg = $state('');
     let apiDataHash = $state('');
-    let entryActions = $state({'global': {}, 'user': {}});
+    let entryActions = $state({'shared': {}, 'user': {}});
 
-    interface credentialsGlobalInfos {
+    interface credentialsSharedInfos {
         id: number,
         name: string,
         connect_user: string,
@@ -47,11 +45,11 @@
         connect_pass_is_set: boolean,
         ssh_key_is_set: boolean,
     }
-    interface credentialsUserInfos extends credentialsGlobalInfos {
+    interface credentialsUserInfos extends credentialsSharedInfos {
         category: string,
     }
     interface credentialsFullType {
-        shared: credentialsGlobalInfos[],
+        shared: credentialsSharedInfos[],
         user: credentialsUserInfos[],
     }
 
@@ -65,37 +63,26 @@
         if (!j || h == apiDataHash) {
             return;
         }
-        if (!loaded) {
-            for (let c of j.user) {
-                entryActions['user'][c.id] = {edit: false, clone: false};
+        for (let kind of credentialsKind) {
+            if (!entryActions[kind]) {
+                entryActions[kind] = {};
             }
-            for (let c of j.shared) {
-                entryActions['global'][c.id] = {edit: false, clone: false};
+            for (let c of j[kind]) {
+                if (!entryActions[kind][c.id]) {
+                    entryActions[kind][c.id] = {edit: false, clone: false};
+                }
             }
-            loaded = true;
         }
         entryList = j;
         apiDataHash = h;
     }
 
-    function showAPIErrors(s: number, j: any) {
-        if (!API_STATUS_CODES_OK.includes(s) || j.error !== undefined) {
-            apiError = `${j.error} (${s})`;  // todo: pull language-code from api-error and show user the translation
-            let a = document.getElementById(apiErrorAlert);
-            if (a) {
-                a.scrollIntoView({behavior: "smooth", block: "end", inline: "end"});
-            }
-        } else {
-            apiSuccess = t('common.success');
-            setTimeout(() => {apiSuccess = ''}, 6000);
-        }
-    }
-
-    function deleteCredentials(credentialsID: number, global: boolean) {
+    function deleteCredentials(credentialsID: number, shared: boolean) {
         if (!credentialsID) {
             return;
         }
-        apiEdit('delete', `credentials/${credentialsID}?global=${global}`, null, showAPIErrors);
+        apiSuccessMsg = 'creds.action.delete';
+        apiEdit('delete', `credentials/${credentialsID}?shared=${shared}`, null, apiResponseHandler.handleRes);
     }
 
     function buildUpdateJobList() {
@@ -103,7 +90,7 @@
             // tab in background
             return;
         }
-        apiGet(`credentials&hash=${apiDataHash}`, loadCredentialsList);
+        apiGet(`credentials?hash=${apiDataHash}`, loadCredentialsList);
     }
 
     // todo: refresh data over websockets
@@ -116,129 +103,230 @@
     })
 </script>
 
-<div id={apiErrorAlert} class="h-0"></div>
-{#if apiError}
-    <div transition:fade>
-        <Alert border color="red" class="text-wrap">
-            <CloseCircleSolid slot="icon" class="w-5 h-5" /> {apiError}
-        </Alert>
-    </div>
-{/if}
-{#if apiSuccess}
-    <div transition:fade>
-        <Alert border color="green" class="text-wrap">
-            <InfoCircleSolid slot="icon" class="w-5 h-5" /> {apiSuccess}
-        </Alert>
-    </div>
-{/if}
+<APIResponseHandler bind:this={apiResponseHandler} bind:errorMsg={apiErrorMsg} bind:successMsg={apiSuccessMsg} />
 
-<Accordion>
-    {#each credentialsKind as credsKind (credsKind) }
-    <AccordionItem>
-        <span slot="header">{t(`creds.${credsKind}`)}</span>
-
-        <div>
-            <Table striped={true}>
-              <TableHead theadClass="text-base font-bold uppercase">
-                  <TableHeadCell>{t('common.name')}</TableHeadCell>
-                  <TableHeadCell>Users</TableHeadCell>
-                  <TableHeadCell class="max-lg:hidden">Vault</TableHeadCell>
-                  <TableHeadCell class="max-lg:hidden">Secrets</TableHeadCell>
-                  <TableHeadCell>{t('common.actions')}</TableHeadCell>
-              </TableHead>
-              <TableBody tableBodyClass="divide-y">
-                  {#each entryList.user as creds (creds.id)}
-                      <TableBodyRow>
-                          <TableBodyCell>
-                              {creds.name}
-                              <button id="creds-user-name-{creds.id}" class="ml-1">
-                                  <InfoCircleSolid size="sm"/>
-                                  <span class="sr-only">Credentials Information</span>
-                              </button>
-                          </TableBodyCell>
-                          <TableBodyCell>
-                            {#if creds.connect_user}
-                                <div>
-                                    <b>Connect User</b>: {creds.connect_user}
-                                </div>
-                            {/if}
-                            {#if creds.become_user}
-                                <div>
-                                    <b>Become User</b>: {creds.become_user}
-                                </div>
-                            {/if}
-                        </TableBodyCell>
-                          <TableBodyCell class="max-lg:hidden">
-                            {#if creds.vault_file}
-                                <div>
-                                    <b>Vault File</b>: {creds.vault_file}
-                                </div>
-                            {/if}
-                            {#if creds.vault_id}
-                                <div>
-                                    <b>Vault ID</b>: {creds.vault_id}
-                                </div>
-                            {/if}
-                        </TableBodyCell>
-                          <TableBodyCell class="font-bold max-lg:hidden">
-                            {#if creds.ssh_key_is_set}
-                                <div>
-                                    SSH private key
-                                </div>
-                            {/if}
-                            {#if creds.connect_pass_is_set}
-                                <div>
-                                    Connect password
-                                </div>
-                            {/if}
-                            {#if creds.become_pass_is_set}
-                                <div>
-                                    Become password
-                                </div>
-                            {/if}
-                            {#if creds.vault_pass_is_set}
-                                <div>
-                                    Vault password
-                                </div>
-                            {/if}
-                          </TableBodyCell>
-                          <TableBodyCell>
-                            <CredentialsForm bind:open={entryActions[credsKind][creds.id].edit} action='edit'
-                            existingID={creds.id} global={credsKind == 'global'} />
-                            <Button size="xs" on:click={() => {entryActions[credsKind][creds.id].edit = true}}><EditSolid/></Button>
-                            <Tooltip>{t('btn.edit')}</Tooltip>
+<div>
+    <Accordion>
+        {#each credentialsKind as credsKind (credsKind) }
+            <AccordionItem>
+                <span slot="header">{t(`creds.${credsKind}`)}</span>
         
-                            <CredentialsForm bind:open={entryActions[credsKind][creds.id].clone} action='clone'
-                            existingID={creds.id} global={credsKind == 'global'} />
-                            <Button size="xs" on:click={() => {entryActions[credsKind][creds.id].clone = true}}><FileCloneSolid/></Button>
-                            <Tooltip>{t('btn.clone')}</Tooltip>
-        
-                            <Button size="xs" on:click={() => {deleteCredentials(creds.id, credsKind == 'global')}}><TrashBinSolid/></Button>
-                            <Tooltip>{t('btn.delete')}</Tooltip>
-                          </TableBodyCell>
-                      </TableBodyRow>
-                  {/each}
-              </TableBody>
-            </Table>
-            {#if !entryList.user.length}
-                <div class={classSpinnerDiv}><Spinner/></div>
-            {/if}
-        </div>
-    </AccordionItem>        
-    {/each}
-</Accordion>
+                <div>
+                    <Table striped={true}>
+                    <TableHead theadClass={classListHeader}>
+                        <TableHeadCell>{t('common.name')}</TableHeadCell>
+                        <TableHeadCell>{t('creds.form.accounts')}</TableHeadCell>
+                        <TableHeadCell class="max-lg:hidden">{t('creds.form.vault')}</TableHeadCell>
+                        <TableHeadCell class="max-lg:hidden">{t('creds.form.secrets')}</TableHeadCell>
+                        <TableHeadCell>{t('common.actions')}</TableHeadCell>
+                    </TableHead>
+                    <TableBody tableBodyClass="divide-y">
+                        {#each entryList[credsKind] as creds (credsKind + creds.id)}
+                            <TableBodyRow>
+                                <TableBodyCell tdClass={classListContent}>
+                                    {creds.name}
+                                    <button id="creds-name-{credsKind}-{creds.id}" class="ml-1">
+                                        <InfoCircleSolid size="sm"/>
+                                        <span class="sr-only">{t('creds.info')}</span>
+                                    </button>
+                                </TableBodyCell>
+                                <TableBodyCell tdClass={classListContent}>
+                                    {#if creds.connect_user}
+                                        <div>
+                                            <b>{t('creds.form.connect_user')}</b>: {creds.connect_user}
+                                        </div>
+                                    {/if}
+                                    {#if creds.become_user}
+                                        <div>
+                                            <b>{t('creds.form.become_user')}</b>: {creds.become_user}
+                                        </div>
+                                    {/if}
+                                    {#if !creds.connect_user && !creds.become_user}
+                                        -
+                                    {/if}
+                                </TableBodyCell>
+                                <TableBodyCell class="{classListContent} max-lg:hidden">
+                                    {#if creds.vault_pass_is_set}
+                                        <div>
+                                            <b>{t('creds.form.vault_pwd')}</b>
+                                        </div>
+                                    {/if}
+                                    {#if creds.vault_file}
+                                        <div>
+                                            <b>{t('creds.form.vault_file')}</b>
+                                        </div>
+                                    {/if}
+                                    {#if creds.vault_id}
+                                        <div>
+                                            <b>{t('creds.form.vault_id')}</b>: {creds.vault_id}
+                                        </div>
+                                    {/if}
+                                    {#if !creds.vault_pass_is_set && !creds.vault_file && !creds.vault_id}
+                                        -
+                                    {/if}
+                                </TableBodyCell>
+                                <TableBodyCell class="{classListContent} font-bold max-lg:hidden">
+                                    {#if creds.ssh_key_is_set}
+                                        <div>
+                                            {t('creds.form.ssh_key')}
+                                        </div>
+                                    {/if}
+                                    {#if creds.connect_pass_is_set}
+                                        <div>
+                                            {t('creds.form.connect_pwd')}
+                                        </div>
+                                    {/if}
+                                    {#if creds.become_pass_is_set}
+                                        <div>
+                                            {t('creds.form.become_pwd')}
+                                        </div>
+                                    {/if}
+                                    {#if !creds.ssh_key_is_set && !creds.connect_pass_is_set && !creds.become_pass_is_set}
+                                        -
+                                    {/if}
+                                </TableBodyCell>
+                                <TableBodyCell tdClass={classListContent}>
+                                    <CredentialsForm bind:open={entryActions[credsKind][creds.id].edit} action='edit'
+                                    existingID={creds.id} shared={credsKind == 'shared'} />
+                                    <Button size="xs" on:click={() => {entryActions[credsKind][creds.id].edit = true}}><EditSolid/></Button>
+                                    <Tooltip>{t('btn.edit')}</Tooltip>
+                
+                                    <CredentialsForm bind:open={entryActions[credsKind][creds.id].clone} action='clone'
+                                    existingID={creds.id} shared={credsKind == 'shared'} />
+                                    <Button size="xs" on:click={() => {entryActions[credsKind][creds.id].clone = true}}><FileCloneSolid/></Button>
+                                    <Tooltip>{t('btn.clone')}</Tooltip>
+                
+                                    <Button size="xs" on:click={() => {deleteCredentials(creds.id, credsKind == 'shared')}}><TrashBinSolid/></Button>
+                                    <Tooltip>{t('btn.delete')}</Tooltip>
+                                </TableBodyCell>
+                            </TableBodyRow>
+                        {/each}
+                    </TableBody>
+                    </Table>
+                    {#if !entryList[credsKind].length}
+                        <div class={classSpinnerDiv}><Spinner/></div>
+                    {/if}
+                </div>
+                <div>
+                    {#each entryList[credsKind] as creds (creds.id)}
+                        <div id="creds-infos-{credsKind}-{creds.id}">
+                            <Popover triggeredBy="#creds-name-{credsKind}-{creds.id}" class={classPopover} placement="bottom-start">
+                                <div class="p-3 space-y-2">
+                                    <h3 class={classPopoverTitle}>{t('creds.info')}</h3>
+                                </div>
+                                <table>
+                                    <tbody>
+                                        {#if credsKind == 'user'}
+                                            <tr>
+                                                <td class={classPopoverColumn1}>
+                                                    {t('creds.form.category')}:
+                                                </td>
+                                                <td class={classPopoverColumn2Text}>
+                                                    {creds.category ? creds.category : '-'}
+                                                </td>
+                                            </tr>
+                                        {/if}
+                                        <tr>
+                                            <td class={classPopoverColumn1}>
+                                                {t('creds.form.connect_user')}:
+                                            </td>
+                                            <td class={classPopoverColumn2Text}>
+                                                {creds.connect_user ? creds.connect_user : '-'}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class={classPopoverColumn1}>
+                                                {t('creds.form.connect_pwd')}:
+                                            </td>
+                                            <td class={classPopoverColumn2Div}>
+                                                <button class="cursor-default">
+                                                    <Radio class="inline-block" checked={creds.connect_pass_is_set}></Radio>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class={classPopoverColumn1}>
+                                                {t('creds.form.ssh_key')}:
+                                            </td>
+                                            <td class={classPopoverColumn2Div}>
+                                                <button class="cursor-default">
+                                                    <Radio class="inline-block" checked={creds.ssh_key_is_set}></Radio>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class={classPopoverColumn1}>
+                                                {t('creds.form.become_user')}:
+                                            </td>
+                                            <td class={classPopoverColumn2Text}>
+                                                {creds.become_user ? creds.become_user : '-'}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class={classPopoverColumn1}>
+                                                {t('creds.form.become_pwd')}:
+                                            </td>
+                                            <td class={classPopoverColumn2Div}>
+                                                <button class="cursor-default">
+                                                    <Radio class="inline-block" checked={creds.become_pass_is_set}></Radio>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class={classPopoverColumn1}>
+                                                {t('creds.form.vault_pwd')}:
+                                            </td>
+                                            <td class={classPopoverColumn2Div}>
+                                                <button class="cursor-default">
+                                                    <Radio class="inline-block" checked={creds.vault_pass_is_set}></Radio>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class={classPopoverColumn1}>
+                                                {t('creds.form.vault_file')}:
+                                            </td>
+                                            <td class={classPopoverColumn2Text}>
+                                                {creds.vault_file ? creds.vault_file : '-'}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class={classPopoverColumn1}>
+                                                {t('creds.form.vault_id')}:
+                                            </td>
+                                            <td class={classPopoverColumn2Text}>
+                                                {creds.vault_id ? creds.vault_id : '-'}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </Popover>
+                        </div>
+                    {/each}
+                </div>
+            </AccordionItem>
+        {/each}
+    </Accordion>    
+</div>
 
 <div class="flex justify-between">
     <div></div>
     <div class="mr-5 mt-10">
         <Button>{t('btn.add')}<ChevronDownOutline class="w-6 h-6 ms-2 text-white dark:text-white" /></Button>
         <Dropdown>
-            <DropdownItem on:click={() => (addUserModal = true)}>
-                <UserSolid class="inline-block"/> {t('alerts.user')}
+            <DropdownItem on:click={() => {addUserModalId = Date.now(); addUserModal = true}}>
+                <UserSolid class="inline-block"/> {t('creds.user')}
             </DropdownItem>
-            <DropdownItem on:click={() => (addGlobalModal = true)}>
-                <UsersGroupSolid class="inline-block"/> {t('alerts.global')}
+            <DropdownItem on:click={() => {addSharedModalId = Date.now(); addSharedModal = true}}>
+                <UsersGroupSolid class="inline-block"/> {t('creds.shared')}
             </DropdownItem>
         </Dropdown>
     </div>    
 </div>
+
+{#key addUserModalId}
+    <CredentialsForm bind:open={addUserModal} action='add' shared={false} />
+{/key}
+{#key addSharedModalId}
+    <CredentialsForm bind:open={addSharedModal} action='add' shared={true} />
+{/key}

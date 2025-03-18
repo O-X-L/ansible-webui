@@ -180,7 +180,7 @@ class BaseAlertWriteRequest(serializers.ModelSerializer):
         self.fields['jobs'] = serializers.MultipleChoiceField(choices=[job.id for job in Job.objects.all()])
 
     name = serializers.CharField(validators=[])  # uc on update
-    jobs = serializers.MultipleChoiceField(allow_blank=True, choices=[])
+    jobs = serializers.MultipleChoiceField(allow_blank=True, allow_null=True, choices=[])
 
 
 class AlertUserReadResponse(serializers.ModelSerializer):

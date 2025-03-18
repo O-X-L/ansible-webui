@@ -47,7 +47,7 @@ class SystemConfigWriteRequest(serializers.ModelSerializer):
         model = SystemConfig
         fields = SystemConfig.api_fields_write
 
-    mail_pass = serializers.CharField(max_length=100, required=False, default=None, allow_blank=True)
+    mail_pass = serializers.CharField(max_length=100, required=False, default=None, allow_blank=True, allow_null=True)
 
 
 class APISystemConfig(APIView):

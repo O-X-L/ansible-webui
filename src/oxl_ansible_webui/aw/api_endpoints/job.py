@@ -12,7 +12,7 @@ from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_EXECUT
 from aw.model.job_credential import JobGlobalCredentials
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, \
     LogDownloadResponse, api_docs_put, api_docs_delete, api_docs_post, validate_no_xss, GenericErrorResponse, \
-    client_server_data_changed, HDR_HASH
+    response_data_if_changed
 from aw.api_endpoints.job_util import get_viewable_jobs_serialized, JobReadResponse, get_job_executions_serialized, \
     JobExecutionReadResponse, get_viewable_jobs, get_job_execution_serialized, get_log_file_content
 from aw.utils.permission import has_job_permission, has_credentials_permission, has_manager_privileges
@@ -150,11 +150,7 @@ class APIJob(APIView):
         else:
             data = get_viewable_jobs_serialized(get_api_user(request))
 
-        changed, md5 = client_server_data_changed(request, data=data)
-        if not changed:
-            return Response(data=None, status=304, headers={HDR_HASH: md5})
-
-        return Response(data=data, status=200, headers={HDR_HASH: md5})
+        return response_data_if_changed(request, data)
 
     @extend_schema(
         request=JobWriteRequest,
