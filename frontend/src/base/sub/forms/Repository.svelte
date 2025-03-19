@@ -17,9 +17,9 @@
         classModalBackdrop, classModalLabel, classModalBtns, classModalForm, classModalInputDiv, classModalInput,
     } from '../../Style.js';
 
-    let { open = $bindable(false), action = 'add', existingID = null, shared = false } = $props();
+    let { open = $bindable(false), action = 'add', existingID = null } = $props();
 
-    const urlExisting = `credentials/${existingID}?shared=${shared}`;
+    const urlExisting = `repository/${existingID}`;
 
     let apiResponseHandler: APIResponseHandler = $state();
     let formInfos = $state({});
@@ -27,8 +27,8 @@
     let existing = $state({});
     let method: formMethod = $derived(getMethod(action));
     let actionNew = $derived(['add', 'clone'].includes(action));
-    let url = $derived(actionNew ? `credentials?shared=${shared}` : urlExisting);
-    let title = $derived(actionNew ? t('creds.new') : t('creds.edit'));
+    let url = $derived(actionNew ? 'repository' : urlExisting);
+    let title = $derived(actionNew ? t('repos.new') : t('repos.edit'));
 
     let form = $state({
         name: {value: '', color: inputBaseColor, required: true, regex: /^.{1,100}/},
@@ -93,7 +93,7 @@
         if (!open || loaded) {
             return;
         }
-        apiGet('frontend/form/credentials', setFormInfos);
+        apiGet('frontend/form/repository', setFormInfos);
 
         if (action != 'add' && existingID) {
             apiGet(urlExisting, loadExisting);
@@ -110,67 +110,19 @@
 
         <div class={classModalInputDiv}>
             <div class={classModalInput}>
-                <Label for="creds_name" class={classModalLabel}>{t('common.name')}</Label>
-                <Input id="creds_name" bind:value={form.name.value} bind:color={form.name.color}
+                <Label for="repo_name" class={classModalLabel}>{t('common.name')}</Label>
+                <Input id="repo_name" bind:value={form.name.value} bind:color={form.name.color}
                 on:input={valideInput} on:blur={valideInput} required={form.name.required} />
             </div>
-            {#if !shared}
-                <div class={classModalInput}>
-                    <Label for="creds_cat" class={classModalLabel}>{t('creds.form.category')}</Label>
-                    <Input id="creds_cat" bind:value={form.category.value} bind:color={form.category.color}
-                    on:input={valideInput} on:blur={valideInput} />
-                </div>
-            {/if}
         </div>
 
         <Accordion class={classModalForm}>
             <AccordionItem>
-                <span slot="header">{t('creds.form.accounts')}</span>
+                <span slot="header">{t('repos.form.xxx')}</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
-                        <Label for="creds_conn_user" class={classModalLabel}>{t('creds.form.connect_user')}</Label>
-                        <Input id="creds_conn_user" bind:value={form.connect_user.value} bind:color={form.connect_user.color}
-                        on:input={valideInput} on:blur={valideInput} />
-                    </div>
-                    <div class={classModalInput}>
-                        <Label for="creds_conn_pwd" class={classModalLabel}>{t('creds.form.connect_pwd')}</Label>
-                        <Input id="creds_conn_pwd" bind:value={form.connect_pass.value} bind:color={form.connect_pass.color}
-                        on:input={valideInput} on:blur={valideInput} type="password" />
-                    </div>
-                    <div class={classModalInput}>
-                        <Label for="creds_ssh_key" class={classModalLabel}>{t('creds.form.ssh_key')}</Label>
-                        <Input id="creds_ssh_key" bind:value={form.ssh_key.value} bind:color={form.ssh_key.color}
-                        on:input={valideInput} on:blur={valideInput} type="password" />
-                    </div>
-
-                    <div class={classModalInput}>
-                        <Label for="creds_bec_user" class={classModalLabel}>{t('creds.form.become_user')}</Label>
-                        <Input id="creds_bec_user" bind:value={form.become_user.value} bind:color={form.become_user.color}
-                        on:input={valideInput} on:blur={valideInput} />
-                    </div>
-                    <div class={classModalInput}>
-                        <Label for="creds_bec_pwd" class={classModalLabel}>{t('creds.form.become_pwd')}</Label>
-                        <Input id="creds_bec_pwd" bind:value={form.become_pass.value} bind:color={form.become_pass.color}
-                        on:input={valideInput} on:blur={valideInput} type="password" />
-                    </div>
-                </div>
-            </AccordionItem>
-            <AccordionItem>
-                <span slot="header">{t('creds.form.vault')}</span>
-                <div class={classModalInputDiv}>
-                    <div class={classModalInput}>
-                        <Label for="creds_vault_pass" class={classModalLabel}>{t('creds.form.vault_pwd')}</Label>
-                        <Input id="creds_vault_pass" bind:value={form.vault_pass.value} bind:color={form.vault_pass.color}
-                        on:input={valideInput} on:blur={valideInput} type="password" />
-                    </div>
-                    <div class={classModalInput}>
-                        <Label for="creds_vault_file" class={classModalLabel}>{t('creds.form.vault_file')}</Label>
-                        <Input id="creds_vault_file" bind:value={form.vault_file.value} bind:color={form.vault_file.color}
-                        on:input={valideInput} on:blur={valideInput} />
-                    </div>
-                    <div class={classModalInput}>
-                        <Label for="creds_vault_id" class={classModalLabel}>{t('creds.form.vault_id')}</Label>
-                        <Input id="creds_vault_id" bind:value={form.vault_id.value} bind:color={form.vault_id.color}
+                        <Label for="repos_xxx" class={classModalLabel}>{t('repos.form.xxx')}</Label>
+                        <Input id="repos_xxx" bind:value={form.connect_user.value} bind:color={form.connect_user.color}
                         on:input={valideInput} on:blur={valideInput} />
                     </div>
                 </div>

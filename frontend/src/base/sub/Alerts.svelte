@@ -8,6 +8,7 @@
 
     import { share } from '../State.js';
     import { tq } from '../../util/translate.js';
+    import { classSpinnerDiv } from '../Style.js';
 
     let addUserModal = $state(false);
     let addGroupModal = $state(false);
@@ -40,21 +41,21 @@
     </div>    
 </div>
 
-<div class="text-center mt-20">
-    <Spinner/>
-</div>
-
 <Accordion>
     <AccordionItem>
         <span slot="header">{t('alerts.user')}</span>
+        <div class={classSpinnerDiv}><Spinner/></div>
     </AccordionItem>
     <AccordionItem>
         <span slot="header">{t('alerts.group')}</span>
+        <div class={classSpinnerDiv}><Spinner/></div>
     </AccordionItem>
     <AccordionItem>
         <span slot="header">{t('alerts.global')}</span>
+        <div class={classSpinnerDiv}><Spinner/></div>
     </AccordionItem>
     <AccordionItem>
         <span slot="header">{t('alerts.plugin')}</span>
+        <div class={classSpinnerDiv}><Spinner/></div>
     </AccordionItem>
 </Accordion>

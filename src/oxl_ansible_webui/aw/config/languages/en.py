@@ -51,8 +51,6 @@ EN = {
     'alerts.group': 'Group',
     'alerts.global': 'Global',
     'alerts.plugin': 'Plugin',
-    'repos.git': 'Git',
-    'repos.local': 'Local',
 
     # jobs
     'jobs.new': 'New Job',
@@ -160,4 +158,13 @@ EN = {
     'creds.form.vault_pwd': 'Vault Password',
     'creds.form.vault_file': 'Vault File',
     'creds.form.vault_id': 'Vault ID',
+
+    # repositories
+    'repos.static': 'Static / Local',
+    'repos.git': 'Git',
+    'repos.static.src': 'Path',
+    'repos.git.src': 'Origin',
+    'repos.info': 'Repository Information',
+    'repos.new': 'New Repository',
+    'repos.edit': 'Edit Repository',
 }
