@@ -23,6 +23,8 @@
  
     const repoKindMap = {'static': 1, 'git': 2};
 
+    let { open = $bindable(false) } = $props();
+
     let apiResponseHandler: APIResponseHandler = $state();
     let addGitModal = $state(false);
     let addStaticModal = $state(false);
@@ -30,6 +32,7 @@
     let addStaticModalId = $state(Date.now());
     let apiErrorMsg = $state('');
     let apiSuccessMsg = $state('');
+    let apiSuccess = $state(false);
     let apiDataHash = $state('');
     let entryActions = $state({});
 
@@ -89,7 +92,7 @@
     }
 
     function buildUpdateJobList() {
-        if (typeof(document.hidden) !== undefined && document['hidden']) {
+        if (!open || typeof(document.hidden) !== undefined && document['hidden']) {
             // tab in background
             return;
         }
@@ -106,7 +109,8 @@
     })
 </script>
 
-<APIResponseHandler bind:this={apiResponseHandler} bind:errorMsg={apiErrorMsg} bind:successMsg={apiSuccessMsg} />
+<APIResponseHandler bind:this={apiResponseHandler} bind:errorMsg={apiErrorMsg}
+    bind:successMsg={apiSuccessMsg} bind:showSuccess={apiSuccess} />
 
 <div>
     <Accordion>
@@ -164,12 +168,12 @@
                                     {/if}
                                     <TableBodyCell tdClass={classListContent}>
                                         <RepositoryForm bind:open={entryActions[repo.id].edit} action='edit'
-                                        existingID={repo.id} />
+                                            existingID={repo.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                                         <Button size="xs" on:click={() => {entryActions[repo.id].edit = true}}><EditSolid/></Button>
                                         <Tooltip>{t('btn.edit')}</Tooltip>
                     
                                         <RepositoryForm bind:open={entryActions[repo.id].clone} action='clone'
-                                        existingID={repo.id} />
+                                            existingID={repo.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                                         <Button size="xs" on:click={() => {entryActions[repo.id].clone = true}}><FileCloneSolid/></Button>
                                         <Tooltip>{t('btn.clone')}</Tooltip>
                     
@@ -246,8 +250,8 @@
 </div>
 
 {#key addGitModalId}
-    <RepositoryForm bind:open={addGitModal} action='add' />
+    <RepositoryForm bind:open={addGitModal} action='add' bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 {/key}
 {#key addStaticModalId}
-    <RepositoryForm bind:open={addStaticModal} action='add' />
+    <RepositoryForm bind:open={addStaticModal} action='add' bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 {/key}

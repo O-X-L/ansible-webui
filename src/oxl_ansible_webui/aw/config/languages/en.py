@@ -167,4 +167,7 @@ EN = {
     'repos.info': 'Repository Information',
     'repos.new': 'New Repository',
     'repos.edit': 'Edit Repository',
+    'repos.action.create': 'Repository created',
+    'repos.action.update': 'Repository updated',
+    'repos.action.delete': 'Repository deleted',
 }

@@ -6,6 +6,8 @@
     import { share } from '../State.js';
     import { tq } from '../../util/translate.js';
 
+    let { open = $bindable(false) } = $props();
+
     function t(code: string) {
       return tq($share, code);
     }

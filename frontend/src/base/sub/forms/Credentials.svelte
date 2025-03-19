@@ -17,7 +17,14 @@
         classModalBackdrop, classModalLabel, classModalBtns, classModalForm, classModalInputDiv, classModalInput,
     } from '../../Style.js';
 
-    let { open = $bindable(false), action = 'add', existingID = null, shared = false } = $props();
+    let {
+        open = $bindable(false),
+        successMsg = $bindable(''),
+        success = $bindable(false),
+        action = 'add',
+        existingID = null,
+        shared = false,
+    } = $props();
 
     const urlExisting = `credentials/${existingID}?shared=${shared}`;
 
@@ -54,6 +61,8 @@
 
     function handleSubmitResponse(s: number, j: any) {
         if (s == 200 && j.error === undefined) {
+            successMsg = actionNew ? 'creds.action.create' : 'creds.action.update';
+            success = true;
             open = false;
         } else {
             apiResponseHandler.handleRes(s, j);

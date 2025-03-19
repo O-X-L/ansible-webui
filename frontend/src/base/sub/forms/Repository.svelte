@@ -17,7 +17,13 @@
         classModalBackdrop, classModalLabel, classModalBtns, classModalForm, classModalInputDiv, classModalInput,
     } from '../../Style.js';
 
-    let { open = $bindable(false), action = 'add', existingID = null } = $props();
+    let {
+        open = $bindable(false),
+        successMsg = $bindable(''),
+        success = $bindable(false),
+        action = 'add',
+        existingID = null,
+    } = $props();
 
     const urlExisting = `repository/${existingID}`;
 
@@ -54,6 +60,8 @@
 
     function handleSubmitResponse(s: number, j: any) {
         if (s == 200 && j.error === undefined) {
+            successMsg = actionNew ? 'repos.action.create' : 'repos.action.update';
+            success = true;
             open = false;
         } else {
             apiResponseHandler.handleRes(s, j);

@@ -14,7 +14,8 @@
         successMsg = $bindable(''),
     } = $props();
 
-    const scrollToDiv = `api-response-${Date.now()}`;
+    // const scrollToDiv = `api-response-${Date.now()}`;
+    const classAlert = 'text-wrap mb-5 mt-2 absolute right-5 top-20 z-100 bg-opacity-70';
     const timeoutSuccess = 5000;
     const timeoutError = 15000;
 
@@ -44,6 +45,10 @@
     $effect(() => {
         // if we set a language-code as error/success message - we want to translate it
         // todo: pull language-code from api-error and show user the translation
+        if (!errorMsg && !successMsg) {
+            return;
+        }
+
         errorMsgTranslated = t(errorMsg);
         successMsgTranslated = t(successMsg);
     })
@@ -53,30 +58,27 @@
             return;
         }
 
-        let a = document.getElementById(scrollToDiv);
-        if (a) {
-            a.scrollIntoView({behavior: "smooth", block: "end", inline: "end"});
-            setTimeout(() => {
-                [showError, showSuccess] = [false, false];
-                successMsg = '';
-                errorMsg = '';
-            }, showSuccess ? timeoutSuccess : timeoutError);
-        }
+        setTimeout(() => {
+            if (showError && errorMsgTranslated) {
+                console.log("ERROR:", errorMsgTranslated);
+            }
+            [showError, showSuccess] = [false, false];
+            successMsg = '';
+            errorMsg = '';
+        }, showSuccess ? timeoutSuccess : timeoutError);
     })
 </script>
 
-
-<div id={scrollToDiv} class="h-0"></div>
 {#if showError}
     <div transition:slide>
-        <Alert border color="red" class="text-wrap mb-5 mt-2">
+        <Alert border color="red" class={classAlert} dismissable={true}>
             <CloseCircleSolid slot="icon" class="w-5 h-5" /> {errorMsgTranslated}
         </Alert>
     </div>
 {/if}
 {#if showSuccess}
     <div transition:slide>
-        <Alert border color="green" class="text-wrap mb-5 mt-2">
+        <Alert border color="green" class={classAlert} dismissable={true}>
             <InfoCircleSolid slot="icon" class="w-5 h-5" /> {successMsgTranslated}
         </Alert>
     </div>

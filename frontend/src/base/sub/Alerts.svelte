@@ -10,6 +10,8 @@
     import { tq } from '../../util/translate.js';
     import { classSpinnerDiv } from '../Style.js';
 
+    let { open = $bindable(false) } = $props();
+    
     let addUserModal = $state(false);
     let addGroupModal = $state(false);
     let addGlobalModal = $state(false);

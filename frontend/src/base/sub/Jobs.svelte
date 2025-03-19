@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { fade } from 'svelte/transition';
 
     import {
         InfoCircleSolid, PlaySolid, StopSolid, TrashBinSolid, EditSolid, FileCloneSolid, BookOpenSolid,
@@ -18,8 +17,8 @@
     import { tq } from '../../util/translate.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import { choicesFromArray } from '../../util/form.js';
+    import { type executionPromptsType } from './Config.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
-    import { type executionPromptsType, API_STATUS_CODES_OK } from './Config.js';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
         classPopoverColumn2Text, classPopoverColumn2Div, classCenterChildDiv, classSpinnerDiv,
@@ -84,6 +83,8 @@
 
     const JOB_EXEC_STATI_ACTIVE = [0, 1, 2, 7];
 
+    let { open = $bindable(false) } = $props();
+
     let apiResponseHandler: APIResponseHandler = $state();
     let addModal = $state(false);
     let addModalId = $state(Date.now());
@@ -91,6 +92,7 @@
     let entryActions = $state({});
     let apiErrorMsg = $state('');
     let apiSuccessMsg = $state('');
+    let apiSuccess = $state(false);
     let apiDataHash = $state('');
 
     interface executionPromptsFieldValues {
@@ -135,13 +137,13 @@
     }
 
     function loadJobList(j: any, h: string) {
+        if (!j || h == apiDataHash) {
+            return;
+        }
         for (let job of j) {
             if (!entryActions[job.id]) {
                 entryActions[job.id] = {edit: false, clone: false, exec: false, logs: false};
             }
-        }
-        if (!j || h == apiDataHash) {
-            return;
         }
         entryList = j;
         apiDataHash = h;
@@ -226,7 +228,7 @@
     }
 
     function buildUpdateJobList() {
-        if (typeof(document.hidden) !== undefined && document['hidden']) {
+        if (!open || typeof(document.hidden) !== undefined && document['hidden']) {
             // tab in background
             return;
         }
@@ -244,7 +246,8 @@
     })
 </script>
 
-<APIResponseHandler bind:this={apiResponseHandler} bind:errorMsg={apiErrorMsg} bind:successMsg={apiSuccessMsg} />
+<APIResponseHandler bind:this={apiResponseHandler} bind:errorMsg={apiErrorMsg}
+    bind:successMsg={apiSuccessMsg} bind:showSuccess={apiSuccess} />
 
 <div>
   <Table striped={true}>
@@ -293,11 +296,13 @@
                         <Tooltip>{t('btn.logs')}</Tooltip>
                     </div>
                     <div class="mt-2">
-                        <JobForm bind:open={entryActions[job.id].edit} action='edit' existingID={job.id} />
+                        <JobForm bind:open={entryActions[job.id].edit} action='edit' existingID={job.id}
+                            bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                         <Button size="xs" on:click={() => {entryActions[job.id].edit = true}}><EditSolid/></Button>
                         <Tooltip>{t('btn.edit')}</Tooltip>
     
-                        <JobForm bind:open={entryActions[job.id].clone} action='clone' existingID={job.id} />
+                        <JobForm bind:open={entryActions[job.id].clone} action='clone' existingID={job.id}
+                            bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                         <Button size="xs" on:click={() => {entryActions[job.id].clone = true}}><FileCloneSolid/></Button>
                         <Tooltip>{t('btn.clone')}</Tooltip>
     
@@ -548,5 +553,5 @@
 </div>
 
 {#key addModalId}
-    <JobForm bind:open={addModal} action='add' />
+    <JobForm bind:open={addModal} action='add' bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 {/key}

@@ -23,6 +23,8 @@
  
     const credentialsKind = ['user', 'shared'];
 
+    let { open = $bindable(false) } = $props();
+
     let apiResponseHandler: APIResponseHandler = $state();
     let addUserModal = $state(false);
     let addSharedModal = $state(false);
@@ -30,6 +32,7 @@
     let addSharedModalId = $state(Date.now());
     let apiErrorMsg = $state('');
     let apiSuccessMsg = $state('');
+    let apiSuccess = $state(false);
     let apiDataHash = $state('');
     let entryActions = $state({'shared': {}, 'user': {}});
 
@@ -86,7 +89,7 @@
     }
 
     function buildUpdateJobList() {
-        if (typeof(document.hidden) !== undefined && document['hidden']) {
+        if (!open || typeof(document.hidden) !== undefined && document['hidden']) {
             // tab in background
             return;
         }
@@ -103,7 +106,8 @@
     })
 </script>
 
-<APIResponseHandler bind:this={apiResponseHandler} bind:errorMsg={apiErrorMsg} bind:successMsg={apiSuccessMsg} />
+<APIResponseHandler bind:this={apiResponseHandler} bind:errorMsg={apiErrorMsg}
+    bind:successMsg={apiSuccessMsg} bind:showSuccess={apiSuccess} />
 
 <div>
     <Accordion>
@@ -187,12 +191,14 @@
                                 </TableBodyCell>
                                 <TableBodyCell tdClass={classListContent}>
                                     <CredentialsForm bind:open={entryActions[credsKind][creds.id].edit} action='edit'
-                                    existingID={creds.id} shared={credsKind == 'shared'} />
+                                        existingID={creds.id} shared={credsKind == 'shared'}
+                                        bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                                     <Button size="xs" on:click={() => {entryActions[credsKind][creds.id].edit = true}}><EditSolid/></Button>
                                     <Tooltip>{t('btn.edit')}</Tooltip>
                 
                                     <CredentialsForm bind:open={entryActions[credsKind][creds.id].clone} action='clone'
-                                    existingID={creds.id} shared={credsKind == 'shared'} />
+                                        existingID={creds.id} shared={credsKind == 'shared'}
+                                        bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                                     <Button size="xs" on:click={() => {entryActions[credsKind][creds.id].clone = true}}><FileCloneSolid/></Button>
                                     <Tooltip>{t('btn.clone')}</Tooltip>
                 
@@ -325,8 +331,10 @@
 </div>
 
 {#key addUserModalId}
-    <CredentialsForm bind:open={addUserModal} action='add' shared={false} />
+    <CredentialsForm bind:open={addUserModal} action='add' shared={false}
+        bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 {/key}
 {#key addSharedModalId}
-    <CredentialsForm bind:open={addSharedModal} action='add' shared={true} />
+    <CredentialsForm bind:open={addSharedModal} action='add' shared={true}
+        bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 {/key}

@@ -13,6 +13,7 @@
     import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
     import { rsplit } from '../../../util/main.js';
+    import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
     import { type executionPromptsType, type executionPromptVarType } from '../Config.js';
     import {
         inputBaseColor, valideInputBase, submitFormBase, getMethod,
@@ -24,11 +25,17 @@
     } from '../../Style.js';
     import type { inputColor } from '../../Types.js';
 
-    let { open = $bindable(false), action = 'add', existingID = null } = $props();
+    let {
+        open = $bindable(false),
+        successMsg = $bindable(''),
+        success = $bindable(false),
+        action = 'add',
+        existingID = null,
+    } = $props();
 
-    const formErrorAlert = 'form-job-alert';
     const urlExisting = `job/${existingID}`;
 
+    let apiResponseHandler: APIResponseHandler = $state();
     let formInfos = $state({});
     let loaded = $state(false);
     let existing = $state({});
@@ -36,7 +43,6 @@
     let actionNew = $derived(['add', 'clone'].includes(action));
     let url = $derived(actionNew ? 'job' : urlExisting);
     let title = $derived(actionNew ? t('jobs.new') : t('jobs.edit'));
-    let formError = $state('');
 
     let form = $state({
         name: {value: '', color: inputBaseColor, required: true},
@@ -79,13 +85,11 @@
 
     function handleSubmitResponse(s: number, j: any) {
         if (s == 200 && j.error === undefined) {
+            successMsg = actionNew ? 'jobs.action.create' : 'jobs.action.update';
+            success = true;
             open = false;
         } else {
-            formError = `${j.error} (${s})`;
-            let a = document.getElementById(formErrorAlert);
-            if (a) {
-                a.scrollIntoView({behavior: "smooth", block: "end", inline: "end"});
-            }
+            apiResponseHandler.handleRes(s, j);
         }
     }
 
@@ -329,14 +333,8 @@
     {#if !loaded}
         <div class={classSpinnerDiv}><Spinner/></div>
     {:else}
-        <div id={formErrorAlert} class="h-0"></div>
-        {#if formError}
-            <div transition:fade>
-                <Alert border color="red" class="text-wrap">
-                    <CloseCircleSolid slot="icon" class="w-5 h-5" /> {formError}
-                </Alert>
-            </div>
-        {/if}
+        <APIResponseHandler bind:this={apiResponseHandler} />
+
         <Accordion class={classModalForm}>
             <AccordionItem>
                 <span slot="header">Main</span>
