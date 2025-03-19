@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
+
     import { Tabs, TabItem } from 'flowbite-svelte';
     import { CodeBranchSolid, CogSolid, BellActiveSolid, GridSolid, UsersSolid } from 'flowbite-svelte-icons'
 
@@ -11,20 +13,58 @@
     import Repositories from './sub/Repositories.svelte';
     import Credentials from './sub/Credentials.svelte';
 
+    let loaded = $state(false);
     let openTab = $state({
-      dashboard: true,
+      dashboard: false,
       jobs: false,
       repositories: false,
       credentials: false,
       alerts: false,
     });
 
+    $effect(() => {
+      // save open tab to URL
+      if (!loaded) {
+        return;
+      }
+
+      let fragment = 'dashboard';
+      if (openTab.jobs) {
+        fragment = 'jobs';
+      } else if (openTab.repositories) {
+        fragment = 'repositories';
+      } else if (openTab.credentials) {
+        fragment = 'credentials';
+      } else if (openTab.alerts) {
+        fragment = 'alerts';
+      }
+
+      window.location.hash = fragment;
+    });
+
     function t(code: string) {
       return tq($share, code);
     }
+
+    onMount(() => {
+      // restore open tab from URL
+      let f = window.location.hash;
+      if (f == '#jobs') {
+        openTab.jobs = true;
+      } else if (f == '#repositories') {
+        openTab.repositories = true;
+      } else if (f == '#credentials') {
+        openTab.credentials = true;
+      } else if (f == '#alerts') {
+        openTab.alerts = true;
+      } else {
+        openTab.dashboard = true;
+      }
+      console.log("LOADED", window.location.hash, window.location.hash == '#repositories', openTab);
+      loaded = true;
+    })
 </script>
 
-<!-- todo: add #<title> to url when tabs open/close so the user can reload the page and directly get to the last open tab -->
 <div class="pl-5 pr-5 h-full">
   <Tabs tabStyle="underline" contentClass="p-4 rounded-lg mt-4 mb-10 h-full">
     <TabItem bind:open={openTab.dashboard} divClass="h-full">
