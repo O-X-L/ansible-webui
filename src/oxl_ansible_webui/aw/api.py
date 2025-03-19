@@ -12,7 +12,7 @@ from aw.api_endpoints.repository import APIRepository, APIRepositoryItem, APIRep
 from aw.api_endpoints.alert import APIAlertPlugin, APIAlertPluginItem, APIAlertUser, APIAlertUserItem, \
     APIAlertGlobal, APIAlertGlobalItem, APIAlertGroup, APIAlertGroupItem
 from aw.api_endpoints.frontend import APIBackendInfo, APIBackendTranslations, APIFormInfosJob, \
-    APIFormInfosCredentials
+    APIFormInfosCredentials, APIFormInfosRepositories
 # from aw.api_endpoints.base import not_implemented
 
 urlpatterns_api = [
@@ -48,4 +48,5 @@ urlpatterns_api = [
     path('api/frontend/lang', APIBackendTranslations.as_view()),
     path('api/frontend/form/job', APIFormInfosJob.as_view()),
     path('api/frontend/form/credentials', APIFormInfosCredentials.as_view()),
+    path('api/frontend/form/repository', APIFormInfosRepositories.as_view()),
 ]

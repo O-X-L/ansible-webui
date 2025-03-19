@@ -3,6 +3,7 @@ from pathlib import Path
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
+from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
 from rest_framework import serializers
 from rest_framework.response import Response
@@ -10,7 +11,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParamet
 
 from aw.model.repository import Repository
 from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user, LogDownloadResponse, api_docs_put, \
-    api_docs_delete, api_docs_post, validate_no_xss, GenericErrorResponse
+    api_docs_delete, api_docs_post, validate_no_xss, GenericErrorResponse, response_data_if_changed, API_PARAM_HASH
 from aw.utils.permission import has_manager_privileges, has_repository_permission, get_viewable_repositories
 from aw.model.job import Job
 from aw.utils.util import unset_or_null, is_set
@@ -30,7 +31,7 @@ class RepositoryWriteRequest(serializers.ModelSerializer):
     def validate(self, attrs: dict):
         for field in Repository.api_fields_write:
             if field in attrs:
-                if field in Repository.fields_shell_cmds:
+                if field in Repository.fields_shell_cmds and attrs[field] is not None:
                     attrs[field] = attrs[field].replace('"', "''")
                     validate_no_xss(value=attrs[field], field=field, shell_cmd=True)
 
@@ -88,26 +89,28 @@ def build_repository(repository: Repository) -> dict:
     return data
 
 
-class APIRepository(GenericAPIView):
+class APIRepository(APIView):
     http_method_names = ['get', 'post']
     serializer_class = RepositoryReadResponse
     permission_classes = API_PERMISSION
 
-    @staticmethod
     @extend_schema(
         request=None,
-        responses={200: RepositoryReadResponse},
+        responses={
+            200: OpenApiResponse(RepositoryReadResponse, description='Return list of credentials'),
+        },
         summary='Return list of repositories',
         operation_id='repository_list',
+        parameters=[API_PARAM_HASH],
     )
-    def get(request):
+    def get(self, request):
         user = get_api_user(request)
         repositories = []
 
         for repository in get_viewable_repositories(user=user):
             repositories.append(build_repository(repository))
 
-        return Response(data=repositories, status=200)
+        return response_data_if_changed(request, data=repositories)
 
     @extend_schema(
         request=RepositoryWriteRequest,

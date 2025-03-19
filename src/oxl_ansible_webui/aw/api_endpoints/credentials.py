@@ -9,7 +9,7 @@ from aw.model.job import Job, JobExecution
 from aw.model.job_credential import BaseJobCredentials, JobUserCredentials, JobGlobalCredentials
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, api_docs_delete, \
-    api_docs_put, api_docs_post, validate_no_xss, GenericErrorResponse, response_data_if_changed
+    api_docs_put, api_docs_post, validate_no_xss, GenericErrorResponse, response_data_if_changed, API_PARAM_HASH
 from aw.utils.permission import has_credentials_permission, has_manager_privileges
 from aw.config.hardcoded import SECRET_HIDDEN
 from aw.utils.util import is_null
@@ -138,11 +138,6 @@ class APIJobCredentials(APIView):
             description='If the credentials are global or user-specific',
             required=False,
         ),
-        OpenApiParameter(
-            name='hash', type=str, default='',
-            description='Hash to compare client-side & server-side information',
-            required=False,
-        ),
     ]
 
     @extend_schema(
@@ -152,6 +147,10 @@ class APIJobCredentials(APIView):
         },
         summary='Return list of all credentials the current user is privileged to view.',
         operation_id='credentials_list',
+        parameters=[
+            parameters[0],
+            API_PARAM_HASH,
+        ]
     )
     def get(self, request):
         user = get_api_user(request)
@@ -170,8 +169,7 @@ class APIJobCredentials(APIView):
         for credentials in credentials_user_raw:
             credentials_user.append(JobUserCredentialsReadResponse(instance=credentials).data)
 
-        data = {'shared': credentials_global, 'user': credentials_user}
-        return response_data_if_changed(request, data)
+        return response_data_if_changed(request, data={'shared': credentials_global, 'user': credentials_user})
 
     @extend_schema(
         request=JobGlobalCredentialsWriteRequest,

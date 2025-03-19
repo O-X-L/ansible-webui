@@ -46,16 +46,16 @@ export function valideInputBase(e: Event, i: any|formField) {
     }
 }
 
-export function submitFormBase(form: any, method: formMethod, url: string, callback: CallableFunction) {
+export function submitFormBase(form: any, method: formMethod, url: string, callback: CallableFunction, ignoreFields: string[] = []) {
     let payload = {...getCSRFFormTokenJSON()};
     let valid = true;
 
     for (let [k, v] of Object.entries(form)) {
-        if (!validateFormField(v)) {
+        if (!ignoreFields.includes(k) && !validateFormField(v)) {
             // todo: give error message (?)
+            console.log("ERROR: Field has invalid value", k);
             v.color = 'red';
             valid = false;
-
         }
         payload[k] = v.value;
     }

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
 
     import {
         InfoCircleSolid, PlaySolid, StopSolid, TrashBinSolid, EditSolid, FileCloneSolid, BookOpenSolid,
@@ -17,7 +17,7 @@
     import { tq } from '../../util/translate.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import { choicesFromArray } from '../../util/form.js';
-    import { type executionPromptsType } from './Config.js';
+    import { type executionPromptsType, JOB_EXEC_STATI_ACTIVE } from './Config.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
@@ -81,8 +81,6 @@
         executions: executionInfos[],
     }
 
-    const JOB_EXEC_STATI_ACTIVE = [0, 1, 2, 7];
-
     let { open = $bindable(false) } = $props();
 
     let apiResponseHandler: APIResponseHandler = $state();
@@ -94,6 +92,7 @@
     let apiSuccessMsg = $state('');
     let apiSuccess = $state(false);
     let apiDataHash = $state('');
+    let updateLoop: number = $state(0);
 
     interface executionPromptsFieldValues {
         tags: string,
@@ -137,7 +136,7 @@
     }
 
     function loadJobList(j: any, h: string) {
-        if (!j || h == apiDataHash) {
+        if (j === null || h == apiDataHash) {
             return;
         }
         for (let job of j) {
@@ -235,15 +234,20 @@
         apiGet(`job?executions=true&execution_count=1&hash=${apiDataHash}`, loadJobList);
     }
 
-    // todo: refresh data over websockets
-    setInterval(() => {
-        buildUpdateJobList();
-    }, $share.updateInterval)
-
     onMount(() => {
         buildUpdateJobList();
         apiGet('credentials', loadCredentialInfos);
-    })
+
+        // todo: refresh data over websockets
+        clearInterval(updateLoop);
+        updateLoop = setInterval(() => {
+            buildUpdateJobList();
+        }, $share.updateInterval);
+    });
+
+    onDestroy(()=>{
+    	clearInterval(updateLoop);
+    });
 </script>
 
 <APIResponseHandler bind:this={apiResponseHandler} bind:errorMsg={apiErrorMsg}

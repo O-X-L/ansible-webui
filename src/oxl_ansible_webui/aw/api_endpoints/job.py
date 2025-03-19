@@ -12,7 +12,7 @@ from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_EXECUT
 from aw.model.job_credential import JobGlobalCredentials
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, \
     LogDownloadResponse, api_docs_put, api_docs_delete, api_docs_post, validate_no_xss, GenericErrorResponse, \
-    response_data_if_changed
+    response_data_if_changed, API_PARAM_HASH
 from aw.api_endpoints.job_util import get_viewable_jobs_serialized, JobReadResponse, get_job_executions_serialized, \
     JobExecutionReadResponse, get_viewable_jobs, get_job_execution_serialized, get_log_file_content
 from aw.utils.permission import has_job_permission, has_credentials_permission, has_manager_privileges
@@ -131,11 +131,7 @@ class APIJob(APIView):
                 description='Maximum count of job-executions to return',
                 required=False,
             ),
-            OpenApiParameter(
-                name='hash', type=str, default='',
-                description='Hash to compare client-side & server-side information',
-                required=False,
-            ),
+            API_PARAM_HASH,
         ],
     )
     def get(request):

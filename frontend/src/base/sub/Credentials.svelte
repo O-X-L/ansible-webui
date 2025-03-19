@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
 
     import {
         InfoCircleSolid, UserSolid, UsersGroupSolid, ChevronDownOutline, TrashBinSolid,
@@ -35,6 +35,7 @@
     let apiSuccess = $state(false);
     let apiDataHash = $state('');
     let entryActions = $state({'shared': {}, 'user': {}});
+    let updateLoop: number = $state(0);
 
     interface credentialsSharedInfos {
         id: number,
@@ -63,7 +64,7 @@
     }
 
     function loadCredentialsList(j: any, h: string) {
-        if (!j || h == apiDataHash) {
+        if (j === null || h == apiDataHash) {
             return;
         }
         for (let kind of credentialsKind) {
@@ -88,7 +89,7 @@
         apiEdit('delete', `credentials/${credentialsID}?shared=${shared}`, null, apiResponseHandler.handleRes);
     }
 
-    function buildUpdateJobList() {
+    function buildUpdateCredsList() {
         if (!open || typeof(document.hidden) !== undefined && document['hidden']) {
             // tab in background
             return;
@@ -96,14 +97,19 @@
         apiGet(`credentials?hash=${apiDataHash}`, loadCredentialsList);
     }
 
-    // todo: refresh data over websockets
-    setInterval(() => {
-        buildUpdateJobList();
-    }, $share.updateInterval)
-
     onMount(() => {
-        buildUpdateJobList();
-    })
+        buildUpdateCredsList();
+
+        // todo: refresh data over websockets
+        clearInterval(updateLoop);
+        updateLoop = setInterval(() => {
+            buildUpdateCredsList();
+        }, $share.updateInterval);
+    });
+
+    onDestroy(()=>{
+    	clearInterval(updateLoop);
+    });
 </script>
 
 <APIResponseHandler bind:this={apiResponseHandler} bind:errorMsg={apiErrorMsg}

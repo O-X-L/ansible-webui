@@ -7,7 +7,7 @@ from aw.settings import AUTH_MODE
 from aw.api_endpoints.base import get_api_user, HDR_CACHE_1W, GenericResponse, API_PERMISSION
 from aw.templatetags.util import get_logo, get_version
 from aw.config.language import TRANSLATIONS
-from aw.model.job import Job, JobUserCredentials
+from aw.model.job import Job, JobUserCredentials, Repository
 from aw.model.base import get_model_field_default, get_model_field_choices
 from aw.views.base import choices_global_credentials, choices_repositories
 
@@ -16,7 +16,10 @@ FK_CHOICES = {
     Job: {
         'repository': choices_repositories,
         'credentials_default': choices_global_credentials,
-    }
+    },
+    Repository: {
+        'git_credentials': choices_global_credentials,
+    },
 }
 
 
@@ -141,3 +144,20 @@ class APIFormInfosCredentials(GenericAPIView):
     def get(request):
         del request
         return Response(data=_build_model_defaults_choices(JobUserCredentials), status=200, headers=HDR_CACHE_1W)
+
+
+class APIFormInfosRepositories(GenericAPIView):
+    http_method_names = ['get']
+    serializer_class = GenericResponse
+    permission_classes = API_PERMISSION
+
+    @staticmethod
+    @extend_schema(
+        request=None,
+        responses={200: GenericResponse},
+        summary='Return repository-form-choices & -defaults needed for frontend rendering',
+        operation_id='form_choices_repositories',
+    )
+    def get(request):
+        del request
+        return Response(data=_build_model_defaults_choices(Repository), status=200)

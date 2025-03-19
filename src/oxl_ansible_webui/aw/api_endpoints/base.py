@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_api_key.permissions import BaseHasAPIKey
-from drf_spectacular.utils import OpenApiResponse
+from drf_spectacular.utils import OpenApiResponse, OpenApiParameter
 
 from aw.model.api import AwAPIKey
 from aw.base import USERS, GROUPS
@@ -117,6 +117,12 @@ def validate_no_xss(value: str, field: str, shell_cmd: bool = False, single_quot
         if value != escape_html(value):
             raise ValidationError(f"Found illegal characters in field '{field}'")
 
+
+API_PARAM_HASH = OpenApiParameter(
+    name='hash', type=str, default='',
+    description='Hash to compare client-side & server-side information',
+    required=False,
+)
 
 def client_server_data_changed(request, data) -> (bool, str):
     if 'hash' in request.GET and str(request.GET['hash']) != '0':

@@ -10,3 +10,8 @@ export interface formAlerts {
 }
 
 export type inputColor = 'base' | 'green' | 'red';
+
+export interface formInfoType {
+  defaults: any,
+  choices: any,
+}

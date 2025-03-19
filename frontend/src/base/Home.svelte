@@ -21,7 +21,7 @@
       credentials: false,
       alerts: false,
     });
-
+  
     $effect(() => {
       // save open tab to URL
       if (!loaded) {
@@ -60,7 +60,6 @@
       } else {
         openTab.dashboard = true;
       }
-      console.log("LOADED", window.location.hash, window.location.hash == '#repositories', openTab);
       loaded = true;
     })
 </script>

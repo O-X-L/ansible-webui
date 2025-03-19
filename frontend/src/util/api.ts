@@ -22,13 +22,15 @@ export async function apiGet(location: string, callback: CallableFunction) {
     const res = await fetch(`/api/${location}`, {method: 'GET', headers: API_HEADERS});
     if (res.status == 304) {
         callback(null, res.headers.get(API_RES_HEADER_HASH));
+        return;
     }
+    let data = null;
     try {
-        let data = await res.json();
-        callback(data, res.headers.get(API_RES_HEADER_HASH));
+        data = await res.json();
     } catch {
-        callback(null, res.headers.get(API_RES_HEADER_HASH));
+        data = null;
     }
+    callback(data, res.headers.get(API_RES_HEADER_HASH));
 }
 
 export async function apiGetMulti(locations: string[], callback: CallableFunction) {

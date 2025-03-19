@@ -1,20 +1,22 @@
 <script lang="ts">
     import { CloseCircleSolid, FloppyDiskSolid } from 'flowbite-svelte-icons';
     import {
-        Heading, Button, Modal, Input, Label, Spinner, Tooltip,
+        Heading, Button, Modal, Input, Label, Spinner, Tooltip, Helper,
         AccordionItem, Accordion,
     } from 'flowbite-svelte';
 
     import { share } from '../../State.js';
     import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
+    import { type formInfoType } from '../../Types.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
     import {
         inputBaseColor, valideInputBase, submitFormBase, getMethod,
         type formMethod,
     } from '../../../util/form.js';
     import {
-        classModalBackdrop, classModalLabel, classModalBtns, classModalForm, classModalInputDiv, classModalInput,
+        classModalBackdrop, classModalLabel, classModalBtns, classModalForm, classModalInputDiv,
+        classModalInput, classModalHelp,
     } from '../../Style.js';
 
     let {
@@ -29,7 +31,7 @@
     const urlExisting = `credentials/${existingID}?shared=${shared}`;
 
     let apiResponseHandler: APIResponseHandler = $state();
-    let formInfos = $state({});
+    let formInfos: formInfoType = $state({defaults: {}, choices: {}});
     let loaded = $state(false);
     let existing = $state({});
     let method: formMethod = $derived(getMethod(action));
@@ -121,13 +123,14 @@
             <div class={classModalInput}>
                 <Label for="creds_name" class={classModalLabel}>{t('common.name')}</Label>
                 <Input id="creds_name" bind:value={form.name.value} bind:color={form.name.color}
-                on:input={valideInput} on:blur={valideInput} required={form.name.required} />
+                    on:input={valideInput} on:blur={valideInput} required={form.name.required} />
             </div>
             {#if !shared}
                 <div class={classModalInput}>
                     <Label for="creds_cat" class={classModalLabel}>{t('creds.form.category')}</Label>
                     <Input id="creds_cat" bind:value={form.category.value} bind:color={form.category.color}
-                    on:input={valideInput} on:blur={valideInput} />
+                        on:input={valideInput} on:blur={valideInput} />
+                    <Helper class={classModalHelp}>{t('creds.form.help.category')}</Helper>
                 </div>
             {/if}
         </div>
@@ -139,28 +142,29 @@
                     <div class={classModalInput}>
                         <Label for="creds_conn_user" class={classModalLabel}>{t('creds.form.connect_user')}</Label>
                         <Input id="creds_conn_user" bind:value={form.connect_user.value} bind:color={form.connect_user.color}
-                        on:input={valideInput} on:blur={valideInput} />
+                            on:input={valideInput} on:blur={valideInput} />
                     </div>
                     <div class={classModalInput}>
                         <Label for="creds_conn_pwd" class={classModalLabel}>{t('creds.form.connect_pwd')}</Label>
                         <Input id="creds_conn_pwd" bind:value={form.connect_pass.value} bind:color={form.connect_pass.color}
-                        on:input={valideInput} on:blur={valideInput} type="password" />
+                            on:input={valideInput} on:blur={valideInput} type="password" />
                     </div>
                     <div class={classModalInput}>
                         <Label for="creds_ssh_key" class={classModalLabel}>{t('creds.form.ssh_key')}</Label>
                         <Input id="creds_ssh_key" bind:value={form.ssh_key.value} bind:color={form.ssh_key.color}
-                        on:input={valideInput} on:blur={valideInput} type="password" />
+                            on:input={valideInput} on:blur={valideInput} type="password" />
+                        <Helper class={classModalHelp}>{t('creds.form.help.ssh_key')}</Helper>
                     </div>
 
                     <div class={classModalInput}>
                         <Label for="creds_bec_user" class={classModalLabel}>{t('creds.form.become_user')}</Label>
                         <Input id="creds_bec_user" bind:value={form.become_user.value} bind:color={form.become_user.color}
-                        on:input={valideInput} on:blur={valideInput} />
+                            on:input={valideInput} on:blur={valideInput} />
                     </div>
                     <div class={classModalInput}>
                         <Label for="creds_bec_pwd" class={classModalLabel}>{t('creds.form.become_pwd')}</Label>
                         <Input id="creds_bec_pwd" bind:value={form.become_pass.value} bind:color={form.become_pass.color}
-                        on:input={valideInput} on:blur={valideInput} type="password" />
+                            on:input={valideInput} on:blur={valideInput} type="password" />
                     </div>
                 </div>
             </AccordionItem>
@@ -170,17 +174,19 @@
                     <div class={classModalInput}>
                         <Label for="creds_vault_pass" class={classModalLabel}>{t('creds.form.vault_pwd')}</Label>
                         <Input id="creds_vault_pass" bind:value={form.vault_pass.value} bind:color={form.vault_pass.color}
-                        on:input={valideInput} on:blur={valideInput} type="password" />
+                            on:input={valideInput} on:blur={valideInput} type="password" />
                     </div>
                     <div class={classModalInput}>
                         <Label for="creds_vault_file" class={classModalLabel}>{t('creds.form.vault_file')}</Label>
                         <Input id="creds_vault_file" bind:value={form.vault_file.value} bind:color={form.vault_file.color}
-                        on:input={valideInput} on:blur={valideInput} />
+                            on:input={valideInput} on:blur={valideInput} />
+                        <Helper class={classModalHelp}>{t('creds.form.help.vault_file')}</Helper>
                     </div>
                     <div class={classModalInput}>
                         <Label for="creds_vault_id" class={classModalLabel}>{t('creds.form.vault_id')}</Label>
                         <Input id="creds_vault_id" bind:value={form.vault_id.value} bind:color={form.vault_id.color}
-                        on:input={valideInput} on:blur={valideInput} />
+                            on:input={valideInput} on:blur={valideInput} />
+                        <Helper class={classModalHelp}>{@html t('creds.form.help.vault_id')}</Helper>
                     </div>
                 </div>
             </AccordionItem>

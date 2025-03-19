@@ -30,7 +30,7 @@ export function rsplit(s: string, w: string) {
   return [b.slice(0, -1).join(w), b.slice(-1)[0]];
 }
 
-export function is_set(data: any) {
+export function isSet(data: any) {
   if (typeof(data) != 'undefined' && data != null && data != "") {
       return true;
   }
@@ -38,7 +38,7 @@ export function is_set(data: any) {
 }
 
 export function escapeQuotes(data: string) {
-  if (!is_set(data)) {
+  if (!isSet(data)) {
       return data;
   }
   data = data.replaceAll('"', '\x22');

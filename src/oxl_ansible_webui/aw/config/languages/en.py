@@ -15,6 +15,7 @@ EN = {
     'btn.delete': 'Delete',
     'btn.stop': 'Stop',
     'btn.logs': 'Logs',
+    'btn.download': 'Download',
     'nav.lang': 'Language',
     'nav.darkLight': 'Dark/Light Mode Switch',
     'nav.docs': 'Documentation',
@@ -146,6 +147,7 @@ EN = {
     'creds.action.create': 'Credentials created',
     'creds.action.update': 'Credentials updated',
     'creds.action.delete': 'Credentials deleted',
+    ## form fields
     'creds.form.category': 'Category',
     'creds.form.accounts': 'Accounts',
     'creds.form.secrets': 'Secrets',
@@ -158,6 +160,14 @@ EN = {
     'creds.form.vault_pwd': 'Vault Password',
     'creds.form.vault_file': 'Vault File',
     'creds.form.vault_id': 'Vault ID',
+    ## form help
+    'creds.form.help.vault_file': 'Path to the file containing your vault-password',
+    'creds.form.help.vault_id': 'For details see: '
+                                '<a href="https://docs.ansible.com/ansible/latest/vault_guide/'
+                                'vault_managing_passwords.html">'
+                                'Ansible Docs - Managing Passwords</a>',
+    'creds.form.help.ssh_key': 'Provide an unencrypted SSH private key',
+    'creds.form.help.category': 'The category of user credentials. Used for dynamic matching at execution time',
 
     # repositories
     'repos.static': 'Static / Local',
@@ -170,4 +180,43 @@ EN = {
     'repos.action.create': 'Repository created',
     'repos.action.update': 'Repository updated',
     'repos.action.delete': 'Repository deleted',
+    'repos.action.download': 'Repository download initiated',
+
+    ## form fields
+    'repos.form.static_path': 'Path',
+    'repos.form.git_origin': 'Origin',
+    'repos.form.git_branch': 'Branch',
+    'repos.form.git_credentials': 'Credentials',
+    'repos.form.git_limit_depth': 'Limit Depth',
+    'repos.form.git_lfs': 'LFS',
+    'repos.form.git_playbook_base': 'Playbook Base-Directory',
+    'repos.form.git_isolate': 'Isolate Directory',
+    'repos.form.git_hook_pre': 'Pre-Hook',
+    'repos.form.git_hook_post': 'Post-Hook',
+    'repos.form.git_hook_cleanup': 'Cleanup-Hook',
+    'repos.form.git_override_initialize': 'Override Initialize-Command',
+    'repos.form.git_override_update': 'Override Update-Command',
+    'repos.form.git_hooks': 'Hooks',
+    'repos.form.git_options': 'Options',
+
+    ## form help
+    'repos.form.help.static_path': 'Path to the local static repository/playbook-base-directory',
+    'repos.form.help.git_origin': "Full URL to the remote repository. "
+                                  "Per example: '<a href=\"https://github.com/O-X-L/ansible-webui.git\">"
+                                  "https://github.com/O-X-L/ansible-webui.git'</a>'",
+    'repos.form.help.git_credentials': "Credentials for connecting to the origin. "
+                                       "'Connect User', 'Connect Password' and 'SSH Private Key' are used",
+    'repos.form.help.git_playbook_base': 'Relative path to the Playbook base-directory relative from the repository root',
+    'repos.form.help.git_lfs': 'En- or disable checkout of Git-LFS files',
+    'repos.form.help.git_isolate': 'En- or disable if one clone of the Git-repository should be used for all jobs. '
+                                   'If enabled - the repository will be cloned/fetched on every job execution. '
+                                   'This will have a negative impact on performance',
+    'repos.form.help.git_hook_pre': 'Commands to execute before initializing/updating the repository. '
+                                    'Comma-separated list of shell-commands',
+    'repos.form.help.git_hook_post': 'Commands to execute after initializing/updating the repository. '
+                                     'Comma-separated list of shell-commands',
+    'repos.form.help.git_override_initialize': 'Advanced usage! Completely override the command used to initialize '
+                                               '(clone) the repository',
+    'repos.form.help.git_override_update': 'Advanced usage! Completely override the command used to update '
+                                           '(pull) the repository',
 }
