@@ -45,6 +45,7 @@ EN = {
     # home
     'home.dashboard': 'Dashboard',
     'home.jobs': 'Jobs',
+    'home.logs': 'Logs',
     'home.repos': 'Repositories',
     'home.alerts': 'Alerts',
     'home.creds': 'Credentials',
@@ -219,4 +220,18 @@ EN = {
                                                '(clone) the repository',
     'repos.form.help.git_override_update': 'Advanced usage! Completely override the command used to update '
                                            '(pull) the repository',
+
+    # logs
+    'logs.job_logs': 'Logs of job',
+    'logs.time': 'Time',
+    'logs.time_start': 'Start time',
+    'logs.time_start_short': 'Start',
+    'logs.time_fin_short': 'End',
+    'logs.command': 'Command',
+    'logs.executed_by': 'Executed by',
+    'logs.exec_log_file': 'Execution log file',
+    'logs.exec_error_log_file': 'Execution error-log file',
+    'logs.repo_log_file': 'Repository log file',
+    'logs.repo_error_log_file': 'Repository error-log file',
+    'logs.exec_finished': 'Execution finished!',
 }

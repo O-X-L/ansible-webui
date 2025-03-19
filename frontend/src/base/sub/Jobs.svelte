@@ -13,73 +13,18 @@
 
     import { share } from '../State.js';
     import JobForm from './forms/Job.svelte';
-    import { classModalLabel } from '../Style.js';
     import { tq } from '../../util/translate.js';
+    import { classModalLabel } from '../Style.js';
+    import { redirectTo } from '../../util/main.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import { choicesFromArray } from '../../util/form.js';
-    import { type executionPromptsType, JOB_EXEC_STATI_ACTIVE } from './Config.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
+    import { type executionPromptsType, JOB_EXEC_STATI_ACTIVE, type jobInfos } from './Config.js';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
         classPopoverColumn2Text, classPopoverColumn2Div, classCenterChildDiv, classSpinnerDiv,
         classListContent, classListHeader,
     } from '../Style.js';
-
-    interface executionInfos {
-        id: number,
-        job: number,
-        user: number,
-        user_name: string,
-        result: number,
-        status: number,
-        status_name: string,
-        log_stdout: string|null,
-        log_stdout_url: string|null,
-        log_stderr: string|null,
-        log_stderr_url: string|null,
-        comment: string|null,
-        credential_global: number|null,
-        credential_user: number|null,
-        command: string|null,
-        log_stdout_repo: string|null,
-        log_stderr_repo: string|null,
-        log_stdout_repo_url: string|null,
-        log_stderr_repo_url: string|null,
-        job_name: string,
-        job_comment: string,
-        time_start: string,
-        time_fin: string,
-        failed: boolean,
-        error_s: string|null,
-        error_m: string|null,
-        time_duration: string,
-    }
-
-    interface jobInfos {
-        id: number,
-        name: string,
-        playbook_file: string,
-        inventory_file: string,
-        repository: number|null,
-        schedule: string|null,
-        enabled: boolean,
-        limit: string,
-        verbosity: number,
-        mode_diff: boolean,
-        mode_check: boolean,
-        tags: string,
-        tags_skip: string,
-        comment: string,
-        environment_vars: string,
-        cmd_args: string,
-        credentials_default: number|null,
-        credentials_needed: boolean,
-        credentials_category: string|null,
-        execution_prompts: string|null,
-        execution_prompts_json: string|null,
-        next_run: string|null,
-        executions: executionInfos[],
-    }
 
     let { open = $bindable(false) } = $props();
 
@@ -103,6 +48,7 @@
         environment_vars: string,
         cmd_args: string,
         credentials: number|null,
+        comment: string|null,
     }
     interface executionPromptsFullType {
         config: executionPromptsType,
@@ -122,7 +68,7 @@
         config: {enforce: false, fields: [], vars: []},
         field_values: {
             tags: '', tags_skip: '', mode_check: false, mode_diff: false, limit: '',
-            environment_vars: '', cmd_args: '', credentials: null,
+            environment_vars: '', cmd_args: '', credentials: null, comment: '',
         },
         var_values: {},
     }
@@ -141,7 +87,7 @@
         }
         for (let job of j) {
             if (!entryActions[job.id]) {
-                entryActions[job.id] = {edit: false, clone: false, exec: false, logs: false};
+                entryActions[job.id] = {edit: false, clone: false, exec: false};
             }
         }
         entryList = j;
@@ -201,6 +147,13 @@
         apiSuccessMsg = 'jobs.action.start';
         apiEdit('post', `job/${jobId}`, promptData, apiResponseHandler.handleRes);
         entryActions[jobId].exec = false;
+    }
+
+    function redirectLogs(jobId: number) {
+        if (!jobId) {
+            return;
+        }
+        redirectTo(`/ui?job=${jobId}#logs`, `?job=${jobId}`);
     }
 
     function updateExecutionPrompts(encodedPrompts: string|null) {
@@ -296,7 +249,7 @@
                         </Button>
                         <Tooltip>{t('btn.stop')}</Tooltip>
 
-                        <Button size="xs" on:click={() => {entryActions[job.id].logs = true}}><BookOpenSolid/></Button>
+                        <Button size="xs" on:click={() => (redirectLogs(job.id))}><BookOpenSolid/></Button>
                         <Tooltip>{t('btn.logs')}</Tooltip>
                     </div>
                     <div class="mt-2">
@@ -519,6 +472,10 @@
                     <Label for="job_prompt_{job.id}_creds" class={classModalLabel}>{t('jobs.form.credentials')}</Label>
                     <Select id="job_prompt_{job.id}_creds" items={usableCredentialChoices}
                         bind:value={executionPrompts.field_values.credentials} />
+                {/if}
+                {#if executionPrompts.config.fields.includes('comment')}
+                    <Label for="job_prompt_{job.id}_cmt" class={classModalLabel}>{t('jobs.form.comment')}</Label>
+                    <Input id="job_prompt_{job.id}_cmt" bind:value={executionPrompts.field_values.comment} />
                 {/if}
                 {#each executionPrompts.config.vars as v, i (v.name)}
                     {#if v.kind == 'text'}

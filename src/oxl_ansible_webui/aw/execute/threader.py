@@ -12,7 +12,7 @@ from aw.execute.play import ansible_playbook
 from aw.utils.handlers import AnsibleConfigError, AnsibleRepositoryError
 from aw.utils.util import get_next_cron_execution_sec, get_next_cron_execution_str, is_set
 from aw.execute.util import update_status
-from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED, JOB_EXEC_STATUS_RETRY
+from aw.model.base import JOB_EXEC_STATUS_FAILED, JOB_EXEC_STATUS_RETRY
 
 
 class Workload(Thread):
@@ -49,7 +49,7 @@ class Workload(Thread):
             # 'cannot join current thread'
             pass
 
-        if self.execution is not None and self.execution.status in JOB_EXEC_STATI_ACTIVE:
+        if self.execution is not None and self.execution.is_active:
             update_status(self.execution, status=JOB_EXEC_STATUS_FAILED)
 
         log(f"Stopped thread {self.log_name_debug}", level=4)

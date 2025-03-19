@@ -4,7 +4,6 @@ from django.db.models import Q
 
 from aw.base import USERS
 from aw.utils.util import ansible_log_text, ansible_log_html
-from aw.model.base import JOB_EXEC_STATUS_SUCCESS
 from aw.model.job import Job, JobExecution, JobExecutionResultHost
 from aw.utils.permission import has_job_permission, CHOICE_PERMISSION_READ
 from aw.model.alert import BaseAlert, AlertUser, AlertGroup, AlertGlobal, \
@@ -18,7 +17,7 @@ class Alert:
     def __init__(self, job: Job, execution: JobExecution):
         self.job = job
         self.execution = execution
-        self.failed = execution.status != JOB_EXEC_STATUS_SUCCESS
+        self.failed = execution.has_failed
         self.privileged_users = []
         for user in USERS.objects.all():
             if has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_READ):

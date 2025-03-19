@@ -1,6 +1,4 @@
 <script lang="ts">
-    import { fade } from 'svelte/transition';
-
     import {
         FolderSolid, FileSolid, CloseCircleSolid, TrashBinSolid, FloppyDiskSolid, CirclePlusSolid,
     } from 'flowbite-svelte-icons';
@@ -13,6 +11,7 @@
     import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
     import { rsplit } from '../../../util/main.js';
+    import type { inputColor } from '../../Types.js';
     import { type formInfoType } from '../../Types.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
     import { type executionPromptsType, type executionPromptVarType } from '../Config.js';
@@ -24,7 +23,6 @@
         classModalBackdrop, classModalLabel, classModalHelp, classModalBtns, classModalForm,
         classModalInputDiv, classCenterChildDiv, classModalInput, classSpinnerDiv,
     } from '../../Style.js';
-    import type { inputColor } from '../../Types.js';
 
     let {
         open = $bindable(false),
@@ -246,10 +244,9 @@
 
     let executionPromptsSimple: executionPromptSwitches = $state({
         tags: false, tags_skip: false, mode_check: true, mode_diff: false, limit: true, limit_req: false,
-        environment_vars: false, cmd_args: false, verbosity: true, credentials: true,
+        environment_vars: false, cmd_args: false, verbosity: true, credentials: true, comment: true,
     });
     let executionPrompts: executionPrompt[] = $state([]);
-    let executionPromptsEnforce = $state(false);
     let executionPromptId = 0;
 
     function execPromptsDecode() {
@@ -270,7 +267,7 @@
     }
 
     function execPromptsEncode() {
-        let prompts: executionPromptsType = {enforce: executionPromptsEnforce, fields: [], vars: []};
+        let prompts: executionPromptsType = {fields: [], vars: []};
         for (let [s, v] of Object.entries(executionPromptsSimple)) {
             if (v) {
                 prompts.fields.push(s);
@@ -502,12 +499,14 @@
             <AccordionItem>
                 <span slot="header">{t('jobs.form.execution_prompts')}</span>
                 <div class={classModalInputDiv}>
-                    <div class={classModalInput}>
-                        <Label for="job_exec_prompt_enforce" class={classModalLabel}>{t('jobs.form.execution_prompts_enforce')}</Label>
-                        <Toggle id="job_exec_prompt_enforce" bind:checked={executionPromptsEnforce} />
-                    </div>
                     <div class={classModalInputDiv}>
                         <Heading tag="h3">{t('jobs.form.prompt_fields')}:</Heading>
+                        <div>
+                            <Label for="job_exec_prompt_cmt" class={classModalLabel}>{t('jobs.form.comment')}</Label>
+                            <div class={classCenterChildDiv}>
+                                <Toggle id="job_exec_prompt_cmt" bind:checked={executionPromptsSimple.comment} />
+                            </div>
+                        </div>
                         <div>
                             <Label for="job_exec_prompt_tags" class={classModalLabel}>{t('jobs.form.tags')}</Label>
                             <div class={classCenterChildDiv}>

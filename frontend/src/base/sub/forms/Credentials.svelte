@@ -16,7 +16,7 @@
     } from '../../../util/form.js';
     import {
         classModalBackdrop, classModalLabel, classModalBtns, classModalForm, classModalInputDiv,
-        classModalInput, classModalHelp,
+        classModalInput, classModalHelp, classSpinnerDiv,
     } from '../../Style.js';
 
     let {
@@ -115,7 +115,7 @@
 <Modal bind:open={open} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
     <Heading tag="h2">{title}</Heading>
     {#if !loaded}
-        <Spinner/>
+        <div class={classSpinnerDiv}><Spinner/></div>
     {:else}
         <APIResponseHandler bind:this={apiResponseHandler} />
 

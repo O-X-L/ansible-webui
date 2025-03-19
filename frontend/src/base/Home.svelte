@@ -2,12 +2,15 @@
     import { onMount } from 'svelte';
 
     import { Tabs, TabItem } from 'flowbite-svelte';
-    import { CodeBranchSolid, CogSolid, BellActiveSolid, GridSolid, UsersSolid } from 'flowbite-svelte-icons'
+    import {
+      CodeBranchSolid, CogSolid, BellActiveSolid, GridSolid, UsersSolid, BookOpenSolid,
+    } from 'flowbite-svelte-icons'
 
     import { share } from './State.js';
     import { tq } from '../util/translate.js';
 
     import Jobs from './sub/Jobs.svelte';
+    import Logs from './sub/Logs.svelte';
     import Alerts from './sub/Alerts.svelte';
     import Dashboard from './sub/Dashboard.svelte';
     import Repositories from './sub/Repositories.svelte';
@@ -17,6 +20,7 @@
     let openTab = $state({
       dashboard: false,
       jobs: false,
+      logs: false,
       repositories: false,
       credentials: false,
       alerts: false,
@@ -31,6 +35,8 @@
       let fragment = 'dashboard';
       if (openTab.jobs) {
         fragment = 'jobs';
+      } else if (openTab.logs) {
+        fragment = 'logs';
       } else if (openTab.repositories) {
         fragment = 'repositories';
       } else if (openTab.credentials) {
@@ -49,8 +55,14 @@
     onMount(() => {
       // restore open tab from URL
       let f = window.location.hash;
+      if (f.includes('?')) {
+        f = f.split('?')[0];
+      }
+
       if (f == '#jobs') {
         openTab.jobs = true;
+      } else if (f == '#logs') {
+        openTab.logs = true;
       } else if (f == '#repositories') {
         openTab.repositories = true;
       } else if (f == '#credentials') {
@@ -80,6 +92,14 @@
         {t('home.jobs')}
       </div>
       <Jobs bind:open={openTab.jobs}/>
+    </TabItem>
+
+    <TabItem bind:open={openTab.logs}>
+      <div slot="title" class="flex items-center gap-2">
+        <BookOpenSolid size="md" />
+        {t('home.logs')}
+      </div>
+      <Logs bind:open={openTab.logs}/>
     </TabItem>
 
     <TabItem bind:open={openTab.repositories}>

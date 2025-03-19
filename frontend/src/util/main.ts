@@ -45,3 +45,10 @@ export function escapeQuotes(data: string) {
   data = data.replaceAll('&', '&amp;');
   return data;
 }
+
+export function redirectTo(url: string, reloadIfSearch: string) {
+  window.location.replace(url);
+  if (window.location.search.includes(reloadIfSearch)) {
+      location.reload();
+  }
+}

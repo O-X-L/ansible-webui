@@ -13,3 +13,28 @@ html, body, #main {
     width: 40px;
     height: 40px;
 }
+
+/* Ansible console output colors */
+.aw-log-ok {
+    color: #11D116;
+}
+
+.aw-log-skip {
+    color: #1AB899;
+}
+
+.aw-log-warn {
+    color: #8E44AD;
+}
+
+.aw-log-err {
+    color: #E11616;
+}
+
+.aw-log-change {
+    color: #F07201;
+}
+
+.aw-log-debug {
+    color: #326fa7;
+}

@@ -14,6 +14,7 @@ from aw.base import USERS
 from aw.model.repository import Repository
 from aw.utils.util import get_choice_key_by_value, get_choice_value_by_key, datetime_from_db_str, is_null, \
     datetime_from_db, pretty_timedelta_str
+from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED
 
 
 class JobError(BareModel):
@@ -283,6 +284,14 @@ class JobExecution(BaseJob):
     @property
     def user_name(self) -> str:
         return self.user.username if self.user is not None else 'Scheduled'
+
+    @property
+    def is_active(self) -> bool:
+        return self.status in JOB_EXEC_STATI_ACTIVE
+
+    @property
+    def has_failed(self) -> bool:
+        return self.status == JOB_EXEC_STATUS_FAILED
 
 
 class JobQueue(BareModel):

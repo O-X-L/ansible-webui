@@ -3,7 +3,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from aw.api_endpoints.key import APIKey, APIKeyItem
 from aw.api_endpoints.job import APIJob, APIJobItem, APIJobExecutionItem, APIJobExecutionLogs, \
-    APIJobExecutionLogFile, APIJobExecution
+    APIJobExecutionLogFile, APIJobExecution, APIJobExecutionSingleJob
 from aw.api_endpoints.permission import APIPermission, APIPermissionItem
 from aw.api_endpoints.credentials import APIJobCredentials, APIJobCredentialsItem
 from aw.api_endpoints.filesystem import APIFsBrowse, APIFsExists
@@ -23,6 +23,7 @@ urlpatterns_api = [
     path('api/job/<int:job_id>/<int:exec_id>', APIJobExecutionItem.as_view()),
     path('api/job/<int:job_id>', APIJobItem.as_view()),
     path('api/job_exec', APIJobExecution.as_view()),
+    path('api/job_exec/<int:job_id>', APIJobExecutionSingleJob.as_view()),
     path('api/job', APIJob.as_view()),
     path('api/permission/<int:perm_id>', APIPermissionItem.as_view()),
     path('api/permission', APIPermission.as_view()),

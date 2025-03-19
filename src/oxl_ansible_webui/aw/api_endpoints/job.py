@@ -384,6 +384,8 @@ class APIJobExecutionItem(APIView):
 
 class JobExecutionLogReadResponse(BaseResponse):
     lines = serializers.ListSerializer(child=serializers.CharField())
+    finished = serializers.BooleanField()
+    count = serializers.IntegerField()
 
 
 class APIJobExecutionLogs(APIView):
@@ -420,22 +422,28 @@ class APIJobExecutionLogs(APIView):
         try:
             job, execution = _find_job_and_execution(job_id, exec_id)
 
-            if job is not None and execution is not None:
-                if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_READ):
-                    return Response(data={'error': f"Not privileged to view logs of the job '{job.name}'"}, status=403)
+            if job is None or execution is None:
+                raise ObjectDoesNotExist()
 
-                if execution.log_stdout is None:
-                    return Response(data={'error': f"No logs found for job '{job.name}'"}, status=404)
+            if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_READ):
+                return Response(data={'error': f"Not privileged to view logs of the job '{job.name}'"}, status=403)
 
-                with open(execution.log_stdout, 'r', encoding='utf-8') as logfile:
-                    lines = logfile.readlines()
-                    if log_fmt == 'html':
-                        lines = [ansible_log_html(line) for line in lines]
+            if execution.log_stdout is None:
+                return Response(data={'error': f"No logs found for job '{job.name}'"}, status=404)
 
-                    elif log_fmt == 'text':
-                        lines = [ansible_log_text(line) for line in lines]
+            with open(execution.log_stdout, 'r', encoding='utf-8') as logfile:
+                lines = logfile.readlines()
+                if log_fmt == 'html':
+                    lines = [ansible_log_html(line) for line in lines]
 
-                    return Response(data={'lines': lines[line_start:]}, status=200)
+                elif log_fmt == 'text':
+                    lines = [ansible_log_text(line) for line in lines]
+
+                return Response(data={
+                    'lines': lines[line_start:],
+                    'finished': not execution.is_active,
+                    'count': len(lines),
+                }, status=200)
 
         except (ObjectDoesNotExist, FileNotFoundError):
             pass
@@ -525,6 +533,49 @@ class APIJobExecution(APIView):
 
         serialized = []
         for execution in JobExecution.objects.filter(job__in=jobs).order_by('-updated')[:exec_count]:
+            serialized.append(get_job_execution_serialized(execution))
+
+        return Response(data=serialized, status=200)
+
+
+class APIJobExecutionSingleJob(APIView):
+    http_method_names = ['get']
+    serializer_class = JobExecutionReadResponse
+    permission_classes = API_PERMISSION
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(JobExecutionReadResponse, description='Return job-execution information'),
+            403: OpenApiResponse(GenericErrorResponse, description='Not privileged to view the job executions'),
+            404: OpenApiResponse(GenericErrorResponse, description='Job does not exist'),
+        },
+        summary='Return list of job-executions the current user is privileged to view.',
+        operation_id='job_exec_list_single',
+        parameters=[
+            OpenApiParameter(
+                name='execution_count', type=int, default=JOB_EXECUTION_LIMIT,
+                description='Maximum count of job-executions to return',
+                required=False,
+            ),
+        ],
+    )
+    def get(self, request, job_id: int):
+        user = get_api_user(request)
+        job = _find_job(job_id)
+
+        if job is None:
+            return Response(data={'error': f"Job with ID '{job_id}' does not exist"}, status=404)
+
+        if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_READ):
+            return Response(data={'error': f"Not privileged to view the job '{job.name}'"}, status=403)
+
+        exec_count = _job_execution_count(request)
+        if exec_count is None:
+            exec_count = JOB_EXECUTION_LIMIT
+
+        serialized = []
+        for execution in JobExecution.objects.filter(job=job).order_by('-updated')[:exec_count]:
             serialized.append(get_job_execution_serialized(execution))
 
         return Response(data=serialized, status=200)
