@@ -23,7 +23,7 @@
 
     let apiResponseHandler: APIResponseHandler = $state();
     let jobList: jobInfos[] = $state([]);
-    let executionList: executionInfos[] = $state([]);
+    let executionList = $state({});
     let entryActions = $state({});
     let apiErrorMsg = $state('');
     let apiSuccessMsg = $state('');
@@ -83,10 +83,10 @@
         }
         for (let exec of j) {
             if (!entryActions[openJob][exec.id]) {
-                entryActions[openJob][exec.id] = {logs: false};
+                entryActions[openJob][exec.id] = false;
             }
         }
-        executionList = j;
+        executionList[openJob] = j;
     }
 
     function buildUpdateJobList() {
@@ -111,6 +111,7 @@
             return;
         }
         openJob = openJobID;
+        executionList[openJob] = [];
 
         if (!open || typeof(document.hidden) !== undefined && document['hidden']) {
             // tab in background
@@ -161,6 +162,9 @@
     {#each jobList as job (job.id)}
         <AccordionItem bind:open={entryActions[job.id]['open']}>
             <span slot="header">{job.name}</span>
+            {#if !executionList[job.id] || !executionList[job.id].length}
+                <div class={classSpinnerDiv}><Spinner/></div>
+            {:else}
             <Table striped={true} id="logs-{job.id}">
                 <TableHead theadClass={classListHeader}>
                     <TableHeadCell>{t('logs.time')}</TableHeadCell>
@@ -169,7 +173,7 @@
                     <TableHeadCell>{t('common.actions')}</TableHeadCell>
                 </TableHead>
                 <TableBody tableBodyClass="divide-y">
-                    {#each executionList as exec, execIdx (exec.id)}
+                    {#each executionList[job.id] as exec, execIdx (exec.id)}
                     <TableBodyRow>
                         <TableBodyCell tdClass={classListContent}>
                             <div>{t('logs.time_start_short')}: {exec.time_start}</div>
@@ -200,9 +204,9 @@
                             {/if}
                         </TableBodyCell>
                         <TableBodyCell tdClass={classListContent}>
-                            <LogsView bind:open={entryActions[job.id][exec.id].logs}
-                                jobID={job.id} jobName={job.name} bind:exec={executionList[execIdx]} />
-                            <Button size="xs" on:click={() => {entryActions[job.id][exec.id].logs = true}}><BookOpenSolid/></Button>
+                            <LogsView bind:open={entryActions[job.id][exec.id]}
+                                jobID={job.id} jobName={job.name} bind:exec={executionList[job.id][execIdx]} />
+                            <Button size="xs" on:click={() => {entryActions[job.id][exec.id] = true}}><BookOpenSolid/></Button>
                             <Tooltip>{t('btn.logs')}</Tooltip>
 
                             <Button size="xs" on:click={() => {stopJob(job.id, exec.id)}}
@@ -218,8 +222,6 @@
                     {/each}
                 </TableBody>
             </Table>
-            {#if !executionList.length}
-                <div class={classSpinnerDiv}><Spinner/></div>
             {/if}
         </AccordionItem>
     {/each}
