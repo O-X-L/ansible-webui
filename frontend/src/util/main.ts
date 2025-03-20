@@ -1,5 +1,5 @@
 // source: https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
-export function hashString(str: string, seed: number = 0) {
+export function hashString(str: string, seed: number = 0) : number {
   let h1 = 0xdeadbeef ^ seed,
     h2 = 0x41c6ce57 ^ seed;
   for (let i = 0, ch; i < str.length; i++) {
@@ -15,11 +15,11 @@ export function hashString(str: string, seed: number = 0) {
   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
 
-export function capitalize(s: string) {
+export function capitalize(s: string) : string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export function rsplit(s: string, w: string) {
+export function rsplit(s: string, w: string) : [string|null, string|null] {
   if (s === null) {
     return [null, null];
   }
@@ -30,14 +30,14 @@ export function rsplit(s: string, w: string) {
   return [b.slice(0, -1).join(w), b.slice(-1)[0]];
 }
 
-export function isSet(data: any) {
+export function isSet(data: any) : boolean {
   if (typeof(data) != 'undefined' && data != null && data != "") {
       return true;
   }
   return false;
 }
 
-export function escapeQuotes(data: string) {
+export function escapeQuotes(data: string) : string {
   if (!isSet(data)) {
       return data;
   }

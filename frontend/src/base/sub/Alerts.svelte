@@ -17,7 +17,7 @@
     let addGlobalModal = $state(false);
     let addPluginModal = $state(false);
 
-    function t(code: string) {
+    function t(code: string) : string {
       return tq($share, code);
     }
 </script>

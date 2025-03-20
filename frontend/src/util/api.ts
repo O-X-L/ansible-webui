@@ -1,4 +1,4 @@
-function getCookie(name: string) {
+function getCookie(name: string) : string|null {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
@@ -56,7 +56,7 @@ export async function apiEdit(method: string, location: string, payload: any, ca
     callback(res.status, await res.json());
 }
 
-export function getCSRFFormTokenHTML() {
+export function getCSRFFormTokenHTML() : string {
     if (!CSRF_TOKEN) {
         console.log('WARNING: No CSRF Token available')
         return `<!-- no CSRF token (cookie) available -->`
@@ -64,11 +64,15 @@ export function getCSRFFormTokenHTML() {
     return `<input type="hidden" name="csrfmiddlewaretoken" value="${CSRF_TOKEN}">`;
 }
 
-export function getCSRFFormTokenJSON() {
+interface crsfTokenJSON {
+    csrfmiddlewaretoken: string|null
+}
+
+export function getCSRFFormTokenJSON() : crsfTokenJSON {
     return {csrfmiddlewaretoken: CSRF_TOKEN};
 }
 
-export function formJSON(f: HTMLFormElement) {
+export function formJSON(f: HTMLFormElement) : string {
     let raw = new FormData(f);
     let parsed = {};
     raw.forEach((value, key) => {
@@ -77,7 +81,7 @@ export function formJSON(f: HTMLFormElement) {
     return JSON.stringify(parsed);
 }
 
-export async function apiForm(e: SubmitEvent, callback: CallableFunction) {
+export async function apiForm(e: SubmitEvent, callback: CallableFunction) : boolean {
     e.preventDefault();
 
     let payload = formJSON(e.target);

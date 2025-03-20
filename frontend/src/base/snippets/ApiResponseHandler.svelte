@@ -22,7 +22,7 @@
     let errorMsgTranslated = $state('');
     let successMsgTranslated = $state('');
 
-    function t(code: string) {
+    function t(code: string) : string {
       return tq($share, code);
     }
 

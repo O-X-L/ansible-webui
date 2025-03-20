@@ -75,7 +75,7 @@
         git_timeout: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
     });
 
-    function t(code: string) {
+    function t(code: string) : string {
       return tq($share, code);
     }
 

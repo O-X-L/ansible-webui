@@ -1,15 +1,15 @@
-export interface formChoice {
+export interface formChoiceType {
   name: string,
-  value: string,
+  value: string|number,
 }
 
-export interface formAlerts {
+export interface formAlertType {
   color: string,
   title: string,
   msg: string,
 }
 
-export type inputColor = 'base' | 'green' | 'red';
+export type inputColorType = 'base' | 'green' | 'red';
 
 export interface formInfoType {
   defaults: any,

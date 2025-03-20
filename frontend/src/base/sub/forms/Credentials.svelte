@@ -53,7 +53,7 @@
         user: {value: $share.backend.user_id},
     });
 
-    function t(code: string) {
+    function t(code: string) : string {
       return tq($share, code);
     }
 

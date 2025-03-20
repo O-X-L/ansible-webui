@@ -36,6 +36,7 @@
     let apiDataHash = $state('');
     let entryActions = $state({});
     let updateLoop: number = $state(0);
+    let updatedAt = $state(0);
 
     interface repoType {
         id: number,
@@ -64,10 +65,14 @@
         log_stderr: string|null,
         log_stderr_url: string|null,
     }
+    interface repoLists {
+        static: repoType[]
+        git: repoType[]
+    }
 
-    let entryList: repoType[] = $state([]);
+    let entryLists: repoLists = $state({'static': [], 'git': []});
 
-    function t(code: string) {
+    function t(code: string) : string {
       return tq($share, code);
     }
 
@@ -80,8 +85,19 @@
                 entryActions[r.id] = {edit: false, clone: false};
             }
         }
-        entryList = j;
+        let newStatic = [];
+        let newGit = [];
+        for (let r of j) {
+            if (r.rtype == repoKindMap['static']) {
+                newStatic.push(r);
+            } else {
+                newGit.push(r);
+            }
+        }
+        entryLists['static'] = newStatic;
+        entryLists['git'] = newGit;
         apiDataHash = h;
+        updatedAt = Date.now();
     }
 
     function deleteRepository(repoID: number) {
@@ -100,8 +116,27 @@
         apiEdit('post', `repository/${repoID}`, null, apiResponseHandler.handleRes);
     }
 
-    function isDownloadActive(repo: repoType) {
+    function isDownloadActive(repo: repoType) : boolean {
         return REPO_EXEC_STATI_ACTIVE.includes(repo.status);
+    }
+
+    function searchFilter(item: repoType, searchTerm: string) : boolean {
+        let s = searchTerm.toLowerCase();
+        if (item.rtype_name.toLowerCase() == 'static') {
+            let p = item.static_path ? item.static_path : '';
+            return (
+                item.name.toLowerCase().includes(s) ||
+                p.toLowerCase().includes(s)
+            )
+        }
+        
+        let o = item.git_origin ? item.git_origin : '';
+        let b = item.git_branch ? item.git_branch : '';
+        return (
+            item.name.toLowerCase().includes(s) ||
+            o.toLowerCase().includes(s) ||
+            b.toLowerCase().includes(s)
+        )
     }
 
     function buildUpdateRepoList() {
@@ -135,94 +170,102 @@
         {#each Object.keys(repoKindMap) as repoKind (repoKind) }
             <AccordionItem>
                 <span slot="header">{t(`repos.${repoKind}`)}</span>
-        
                 <div>
-                    <Table striped={true}>
+                  <Table striped={true} bind:items={entryLists[repoKind]} hoverable={true}
+                      placeholder={t('common.search')} filter={(item, searchTerm) => {return searchFilter(item, searchTerm)}}>
                     <TableHead theadClass={classListHeader}>
-                        <TableHeadCell>{t('common.name')}</TableHeadCell>
-                        <TableHeadCell class="max-lg:hidden">{t(`repos.${repoKind}.src`)}</TableHeadCell>
+                        <TableHeadCell sort={(a, b) => a.name.localeCompare(b.name)} defaultSort>
+                            {t('common.name')}
+                        </TableHeadCell>
+                        <TableHeadCell class="max-lg:hidden" sort={(a, b) => a.name.localeCompare(b.name)}>
+                            {t(`repos.${repoKind}.src`)}
+                        </TableHeadCell>
                         {#if repoKind == 'git'}
-                            <TableHeadCell>{t('common.status')}</TableHeadCell>
+                            <TableHeadCell sort={(a, b) => {
+                                let aUpdatedAt = a.time_update ? a.time_update : 'z';
+                                let bUpdatedAt = b.time_update ? b.time_update : 'z';
+                                return aUpdatedAt.name.localeCompare(bUpdatedAt);
+                            }}>
+                                {t('common.status')}
+                            </TableHeadCell>
                         {/if}
                         <TableHeadCell>{t('common.actions')}</TableHeadCell>
                     </TableHead>
+                    {#key updatedAt}
                     <TableBody tableBodyClass="divide-y">
-                        {#each entryList as repo (repo.id)}
-                            {#if repoKindMap[repoKind] == repo.rtype}
-                                <TableBodyRow>
-                                    <TableBodyCell tdClass={classListContent}>
-                                        {repo.name}
-                                        <button id="repo-name-{repo.id}" class="ml-1">
-                                            <InfoCircleSolid size="sm"/>
-                                            <span class="sr-only">{t('repos.info')}</span>
-                                        </button>
-                                    </TableBodyCell>
-                                    <TableBodyCell tdClass="{classListContent} max-lg:hidden">
-                                        {#if repo.rtype == repoKindMap['git']}
-                                            {repo.git_origin}:{repo.git_branch}
-                                        {:else}
-                                            {repo.static_path}
-                                        {/if}
-                                    </TableBodyCell>
-                                    {#if repoKind == 'git'}
-                                        <TableBodyCell class={classListContent}>
-                                            <div>
-                                                <b>Updated:</b> {repo.time_update ? repo.time_update : '-'}
-                                            </div>
-                                            <div>
-                                                <!-- todo: status color green/red/blue -->
-                                                <b>Status:</b> <span>{repo.status_name}</span>
-                                            </div>
-                                            {#if repo.log_stderr_url || repo.log_stderr_url}
-                                                <div>
-                                                    <b>Logs:</b> 
-                                                    {#if repo.log_stderr_url}
-                                                        <a href={repo.log_stdout_url}>Output</a>
-                                                    {/if}
-                                                    {#if repo.log_stderr_url}
-                                                        <a href={repo.log_stderr_url}>Error</a>
-                                                    {/if}
-                                                </div>
-                                            {/if}
-                                        </TableBodyCell>
-                                    {/if}
-                                    <TableBodyCell tdClass={classListContent}>
-                                        {#if repoKind == 'git'}
-                                            <div class="mb-2">
-                                                <Button size="xs" on:click={() => (downloadGitRepo(repo.id))}
-                                                    disabled={isDownloadActive(repo)}>
-                                                    <DownloadSolid/>
-                                                </Button>
-                                                <Tooltip>{t('btn.download')}</Tooltip>
-                                            </div>
-                                        {/if}
+                        <TableBodyRow slot="row" let:item>
+                            <TableBodyCell tdClass={classListContent}>
+                                {item.name}
+                                <button id="repo-name-{item.id}" class="ml-1">
+                                    <InfoCircleSolid size="sm"/>
+                                    <span class="sr-only">{t('repos.info')}</span>
+                                </button>
+                            </TableBodyCell>
+                            <TableBodyCell tdClass="{classListContent} max-lg:hidden">
+                                {#if item.rtype == repoKindMap['git']}
+                                    {item.git_origin}:{item.git_branch}
+                                {:else}
+                                    {item.static_path}
+                                {/if}
+                            </TableBodyCell>
+                            {#if repoKind == 'git'}
+                                <TableBodyCell class={classListContent}>
+                                    <div>
+                                        <b>{t('common.updated_at')}:</b> {item.time_update ? item.time_update : '-'}
+                                    </div>
+                                    <div>
+                                        <!-- todo: status color green/red/blue -->
+                                        <b>{t('common.status')}:</b> <span>{item.status_name}</span>
+                                    </div>
+                                    {#if item.log_stderr_url || item.log_stderr_url}
                                         <div>
-                                            <RepositoryForm bind:open={entryActions[repo.id].edit} action='edit' rtypeName={repoKind}
-                                                existingID={repo.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-                                            <Button size="xs" on:click={() => {entryActions[repo.id].edit = true}}><EditSolid/></Button>
-                                            <Tooltip>{t('btn.edit')}</Tooltip>
-                        
-                                            <RepositoryForm bind:open={entryActions[repo.id].clone} action='clone' rtypeName={repoKind}
-                                                existingID={repo.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-                                            <Button size="xs" on:click={() => {entryActions[repo.id].clone = true}}><FileCloneSolid/></Button>
-                                            <Tooltip>{t('btn.clone')}</Tooltip>
-                        
-                                            <Button size="xs" on:click={() => {deleteRepository(repo.id)}}><TrashBinSolid/></Button>
-                                            <Tooltip>{t('btn.delete')}</Tooltip>
+                                            <b>{t('home.logs')}:</b> 
+                                            {#if item.log_stderr_url}
+                                                <a href={item.log_stdout_url}>{t('logs.repo_log_file')}</a>
+                                            {/if}
+                                            {#if item.log_stderr_url}
+                                                <a href={item.log_stderr_url}>{t('logs.repo_error_log_file')}</a>
+                                            {/if}
                                         </div>
-                                    </TableBodyCell>
-                                </TableBodyRow>
+                                    {/if}
+                                </TableBodyCell>
                             {/if}
-                        {/each}
+                            <TableBodyCell tdClass={classListContent}>
+                                {#if repoKind == 'git'}
+                                    <div class="mb-2">
+                                        <Button size="xs" on:click={() => (downloadGitRepo(item.id))}
+                                            disabled={isDownloadActive(item)}>
+                                            <DownloadSolid/>
+                                        </Button>
+                                        <Tooltip>{t('btn.download')}</Tooltip>
+                                    </div>
+                                {/if}
+                                <div>
+                                    <RepositoryForm bind:open={entryActions[item.id].edit} action='edit' rtypeName={repoKind}
+                                        existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                    <Button size="xs" on:click={() => {entryActions[item.id].edit = true}}><EditSolid/></Button>
+                                    <Tooltip>{t('btn.edit')}</Tooltip>
+                
+                                    <RepositoryForm bind:open={entryActions[item.id].clone} action='clone' rtypeName={repoKind}
+                                        existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                    <Button size="xs" on:click={() => {entryActions[item.id].clone = true}}><FileCloneSolid/></Button>
+                                    <Tooltip>{t('btn.clone')}</Tooltip>
+                
+                                    <Button size="xs" on:click={() => {deleteRepository(item.id)}}><TrashBinSolid/></Button>
+                                    <Tooltip>{t('btn.delete')}</Tooltip>
+                                </div>
+                            </TableBodyCell>
+                        </TableBodyRow>
                     </TableBody>
-                    </Table>
-                    {#if !entryList.length}
-                        <div class={classSpinnerDiv}><Spinner/></div>
-                    {/if}
+                    {/key}
+                  </Table>
+                  {#if !entryLists[repoKind].length}
+                      <div class={classSpinnerDiv}><Spinner/></div>
+                  {/if}
                 </div>
                 <div>
-                    {#each entryList as repo (repo.id)}
-                        {#if repoKindMap[repoKind] == repo.rtype}
+                    {#each entryLists[repoKind] as repo (repo.id)}
+                        {#if repoKind == repo.rtype_name.toLowerCase()}
                         <div id="repo-infos-{repo.id}">
                             <Popover triggeredBy="#repo-name-{repo.id}" class={classPopover} placement="bottom-start">
                                 <div class="p-3 space-y-2">
@@ -230,7 +273,6 @@
                                 </div>
                                 <table>
                                     <tbody>
-                                        <!-- todo: extend -->
                                         {#if repoKind == 'static'}
                                             <tr>
                                                 <td class={classPopoverColumn1}>

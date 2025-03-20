@@ -11,8 +11,7 @@
     import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
     import { rsplit } from '../../../util/main.js';
-    import type { inputColor } from '../../Types.js';
-    import { type formInfoType } from '../../Types.js';
+    import { type formInfoType, type inputColorType } from '../../Types.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
     import { type executionPromptsType, type executionPromptVarType } from '../Config.js';
     import {
@@ -70,7 +69,7 @@
         execution_prompts_json: {value: '', color: inputBaseColor},
     });
 
-    function t(code: string) {
+    function t(code: string) : string {
       return tq($share, code);
     }
 
@@ -152,7 +151,7 @@
         fsBrowse(f);
     }
 
-    function fsBrowseBase(full: string) {
+    function fsBrowseBase(full: string) : string {
         let b = '';
         let p = rsplit(full, '/');
         if (p[1] && fsBrowseChoices.dirs.includes(p[1])) {
@@ -179,7 +178,7 @@
         fsBrowseChoices = fsBrowseNone;
     }
 
-    function fsBrowseValidate(full: string) {
+    function fsBrowseValidate(full: string) : inputColorType {
         let p = rsplit(full, '/');
         if ((p[0] && fsBrowseChoices.files.includes(p[0])) || (p[1] && fsBrowseChoices.files.includes(p[1]))) {
             fsBrowseClear();
@@ -222,12 +221,12 @@
 
     interface executionPrompt {
         id: number,
-        name: {value: string, color: inputColor, required: boolean},
-        varName: {value: string, color: inputColor, required: boolean},
+        name: {value: string, color: inputColorType, required: boolean},
+        varName: {value: string, color: inputColorType, required: boolean},
         kind: {value: 'text'|'dropdown'},
         required: {value: boolean},
         choices: {value: string},  // todo: change to multi-input and array
-        regex: {value: string, color: inputColor, regex: RegExp},
+        regex: {value: string, color: inputColorType, regex: RegExp},
     }
     interface executionPromptSwitches {
         tags: boolean,

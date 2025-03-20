@@ -14,7 +14,7 @@
     import { apiEdit, apiGet } from '../../util/api.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import { classSpinnerDiv, classListContent, classListHeader } from '../Style.js';
-    import { JOB_EXEC_STATI_ACTIVE, type jobInfos, type executionInfos } from './Config.js';
+    import { JOB_EXEC_STATI_ACTIVE, type jobType, type executionType } from './Config.js';
 
     let { open = $bindable(false) } = $props();
 
@@ -22,7 +22,7 @@
     const JOB_PARAM = 'job';
 
     let apiResponseHandler: APIResponseHandler = $state();
-    let jobList: jobInfos[] = $state([]);
+    let jobList: jobType[] = $state([]);
     let executionList = $state({});
     let entryActions = $state({});
     let apiErrorMsg = $state('');
@@ -33,11 +33,11 @@
     let executionCount: number = $state(20);
     let loaded = $state(false);
 
-    function t(code: string) {
+    function t(code: string) : string {
       return tq($share, code);
     }
 
-    function isJobExecutionActive(exec: executionInfos) {
+    function isJobExecutionActive(exec: executionType) : boolean {
         if (!exec) {
             return false;
         }

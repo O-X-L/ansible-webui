@@ -5,7 +5,7 @@
     ln -s ../../../../src/flowbite-custom/MultiInput.svelte MultiInput.svelte
   */
   import type { SizeType, FormSizeType } from '../../node_modules/flowbite-svelte/dist/types';
-  export function clampSize(s: SizeType) {
+  export function clampSize(s: SizeType) : number {
     return s && s === 'xs' ? 'sm' : s === 'xl' ? 'lg' : s;
   }
 </script>

@@ -11,7 +11,7 @@
     } from 'flowbite-svelte-icons';
 
     import { share } from './State.js';
-    import { type formAlerts } from './Types.js';
+    import { type formAlertType } from './Types.js';
     import { tq, flagIcon } from '../util/translate.js';
     import { setDarkLightMode } from './DarkLightMode.js';
     import { classNavFooter, classBtnBase } from './Style.js';
@@ -19,7 +19,7 @@
 
     let loaded: boolean = $state(false);
     let language: string = $state('en');
-    let alerts: formAlerts[] = $state([]);
+    let alerts: formAlertType[] = $state([]);
 
     $effect(() => {
       if (!loaded) {
@@ -67,7 +67,7 @@
       }
     }
 
-    function t(code: string) {
+    function t(code: string) : string {
       return tq($share, code);
     }
 

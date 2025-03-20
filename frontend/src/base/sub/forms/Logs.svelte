@@ -34,7 +34,7 @@
     let finished = $state(false);
     let lineNr = $state(1);
 
-    function t(code: string) {
+    function t(code: string) : string {
         return tq($share, code);
     }
 

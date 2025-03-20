@@ -34,6 +34,8 @@ EN = {
     'common.error': 'Error',
     'common.success': 'Action succeeded',
     'common.actions': 'Actions',
+    'common.search': 'Search',
+    'common.updated_at': 'Updated at',
 
     # auth
     'login.user': 'Username',

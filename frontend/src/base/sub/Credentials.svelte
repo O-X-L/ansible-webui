@@ -36,6 +36,7 @@
     let apiDataHash = $state('');
     let entryActions = $state({'shared': {}, 'user': {}});
     let updateLoop: number = $state(0);
+    let updatedAt = $state(0);
 
     interface credentialsSharedInfos {
         id: number,
@@ -59,7 +60,7 @@
 
     let entryList: credentialsFullType = $state({'shared': [], 'user': []});
 
-    function t(code: string) {
+    function t(code: string) : string {
       return tq($share, code);
     }
 
@@ -79,6 +80,28 @@
         }
         entryList = j;
         apiDataHash = h;
+        updatedAt = Date.now();
+    }
+
+    function searchFilter(item: credentialsSharedInfos|credentialsUserInfos, searchTerm: string) : boolean {
+        let s = searchTerm.toLowerCase();
+        let c = '';
+        if (item.category) {
+            c = item.category;
+        }
+
+        let uc = item.connect_user ? item.connect_user : '';
+        let ub = item.become_user ? item.become_user : '';
+        let vf = item.vault_file ? item.vault_file : '';
+        let vi = item.vault_id ? item.vault_id : '';
+        return (
+            item.name.toLowerCase().includes(s) ||
+            c.toLowerCase().includes(s) ||
+            uc.toLowerCase().includes(s) ||
+            ub.toLowerCase().includes(s) ||
+            vf.toLowerCase().includes(s) ||
+            vi.toLowerCase().includes(s)
+        )
     }
 
     function deleteCredentials(credentialsID: number, shared: boolean) {
@@ -122,102 +145,153 @@
                 <span slot="header">{t(`creds.${credsKind}`)}</span>
         
                 <div>
-                    <Table striped={true}>
+                  <Table striped={true} bind:items={entryList[credsKind]} hoverable={true}
+                    placeholder={t('common.search')} filter={(item, searchTerm) => {return searchFilter(item, searchTerm)}}>
                     <TableHead theadClass={classListHeader}>
-                        <TableHeadCell>{t('common.name')}</TableHeadCell>
-                        <TableHeadCell>{t('creds.form.accounts')}</TableHeadCell>
-                        <TableHeadCell class="max-lg:hidden">{t('creds.form.vault')}</TableHeadCell>
+                        <TableHeadCell sort={(a, b) => a.name.localeCompare(b.name)} defaultSort>
+                            {t('common.name')}
+                        </TableHeadCell>
+                        <TableHeadCell sort={(a, b) => {
+                            let [aU, bU] = ['', ''];
+                            if (a.connect_user) {
+                                aU += a.connect_user;
+                            }
+                            if (b.connect_user) {
+                                bU += b.connect_user;
+                            }
+                            if (a.become_user) {
+                                aU += a.become_user;
+                            }
+                            if (b.become_user) {
+                                bU += b.become_user;
+                            }
+                            if (!aU) {
+                                aU = 'z';
+                            }
+                            if (!bU) {
+                                bU = 'z';
+                            }
+
+                            return aU.localeCompare(bU);
+                        }}>
+                            {t('creds.form.accounts')}
+                        </TableHeadCell>
+                        <TableHeadCell class="max-lg:hidden" sort={(a, b) => {
+                            let [aV, bV] = ['', ''];
+                            if (a.vault_file) {
+                                aV += a.vault_file;
+                            }
+                            if (b.vault_file) {
+                                bV += b.vault_file;
+                            }
+                            if (a.vault_id) {
+                                aU += a.vault_id;
+                            }
+                            if (b.vault_id) {
+                                bU += b.vault_id;
+                            }
+                            if (!aU) {
+                                aU = 'z';
+                            }
+                            if (!bU) {
+                                bU = 'z';
+                            }
+
+                            return aV.localeCompare(bV);
+                        }}>
+                            {t('creds.form.vault')}
+                        </TableHeadCell>
                         <TableHeadCell class="max-lg:hidden">{t('creds.form.secrets')}</TableHeadCell>
                         <TableHeadCell>{t('common.actions')}</TableHeadCell>
                     </TableHead>
+                    {#key updatedAt}
                     <TableBody tableBodyClass="divide-y">
-                        {#each entryList[credsKind] as creds (credsKind + creds.id)}
-                            <TableBodyRow>
-                                <TableBodyCell tdClass={classListContent}>
-                                    {creds.name}
-                                    <button id="creds-name-{credsKind}-{creds.id}" class="ml-1">
-                                        <InfoCircleSolid size="sm"/>
-                                        <span class="sr-only">{t('creds.info')}</span>
-                                    </button>
-                                </TableBodyCell>
-                                <TableBodyCell tdClass={classListContent}>
-                                    {#if creds.connect_user}
-                                        <div>
-                                            <b>{t('creds.form.connect_user')}</b>: {creds.connect_user}
-                                        </div>
-                                    {/if}
-                                    {#if creds.become_user}
-                                        <div>
-                                            <b>{t('creds.form.become_user')}</b>: {creds.become_user}
-                                        </div>
-                                    {/if}
-                                    {#if !creds.connect_user && !creds.become_user}
-                                        -
-                                    {/if}
-                                </TableBodyCell>
-                                <TableBodyCell class="{classListContent} max-lg:hidden">
-                                    {#if creds.vault_pass_is_set}
-                                        <div>
-                                            <b>{t('creds.form.vault_pwd')}</b>
-                                        </div>
-                                    {/if}
-                                    {#if creds.vault_file}
-                                        <div>
-                                            <b>{t('creds.form.vault_file')}</b>
-                                        </div>
-                                    {/if}
-                                    {#if creds.vault_id}
-                                        <div>
-                                            <b>{t('creds.form.vault_id')}</b>: {creds.vault_id}
-                                        </div>
-                                    {/if}
-                                    {#if !creds.vault_pass_is_set && !creds.vault_file && !creds.vault_id}
-                                        -
-                                    {/if}
-                                </TableBodyCell>
-                                <TableBodyCell class="{classListContent} font-bold max-lg:hidden">
-                                    {#if creds.ssh_key_is_set}
-                                        <div>
-                                            {t('creds.form.ssh_key')}
-                                        </div>
-                                    {/if}
-                                    {#if creds.connect_pass_is_set}
-                                        <div>
-                                            {t('creds.form.connect_pwd')}
-                                        </div>
-                                    {/if}
-                                    {#if creds.become_pass_is_set}
-                                        <div>
-                                            {t('creds.form.become_pwd')}
-                                        </div>
-                                    {/if}
-                                    {#if !creds.ssh_key_is_set && !creds.connect_pass_is_set && !creds.become_pass_is_set}
-                                        -
-                                    {/if}
-                                </TableBodyCell>
-                                <TableBodyCell tdClass={classListContent}>
-                                    <CredentialsForm bind:open={entryActions[credsKind][creds.id].edit} action='edit'
-                                        existingID={creds.id} shared={credsKind == 'shared'}
-                                        bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-                                    <Button size="xs" on:click={() => {entryActions[credsKind][creds.id].edit = true}}><EditSolid/></Button>
-                                    <Tooltip>{t('btn.edit')}</Tooltip>
-                
-                                    <CredentialsForm bind:open={entryActions[credsKind][creds.id].clone} action='clone'
-                                        existingID={creds.id} shared={credsKind == 'shared'}
-                                        bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-                                    <Button size="xs" on:click={() => {entryActions[credsKind][creds.id].clone = true}}><FileCloneSolid/></Button>
-                                    <Tooltip>{t('btn.clone')}</Tooltip>
-                
-                                    <Button size="xs" on:click={() => {deleteCredentials(creds.id, credsKind == 'shared')}}><TrashBinSolid/></Button>
-                                    <Tooltip>{t('btn.delete')}</Tooltip>
-                                </TableBodyCell>
-                            </TableBodyRow>
-                        {/each}
+                        <TableBodyRow slot="row" let:item>
+                            <TableBodyCell tdClass={classListContent}>
+                                {item.name}
+                                <button id="creds-name-{credsKind}-{item.id}" class="ml-1">
+                                    <InfoCircleSolid size="sm"/>
+                                    <span class="sr-only">{t('creds.info')}</span>
+                                </button>
+                            </TableBodyCell>
+                            <TableBodyCell tdClass={classListContent}>
+                                {#if item.connect_user}
+                                    <div>
+                                        <b>{t('creds.form.connect_user')}</b>: {item.connect_user}
+                                    </div>
+                                {/if}
+                                {#if item.become_user}
+                                    <div>
+                                        <b>{t('creds.form.become_user')}</b>: {item.become_user}
+                                    </div>
+                                {/if}
+                                {#if !item.connect_user && !item.become_user}
+                                    -
+                                {/if}
+                            </TableBodyCell>
+                            <TableBodyCell class="{classListContent} max-lg:hidden">
+                                {#if item.vault_pass_is_set}
+                                    <div>
+                                        <b>{t('creds.form.vault_pwd')}</b>
+                                    </div>
+                                {/if}
+                                {#if item.vault_file}
+                                    <div>
+                                        <b>{t('creds.form.vault_file')}</b>
+                                    </div>
+                                {/if}
+                                {#if item.vault_id}
+                                    <div>
+                                        <b>{t('creds.form.vault_id')}</b>: {item.vault_id}
+                                    </div>
+                                {/if}
+                                {#if !item.vault_pass_is_set && !item.vault_file && !item.vault_id}
+                                    -
+                                {/if}
+                            </TableBodyCell>
+                            <TableBodyCell class="{classListContent} font-bold max-lg:hidden">
+                                {#if item.ssh_key_is_set}
+                                    <div>
+                                        {t('creds.form.ssh_key')}
+                                    </div>
+                                {/if}
+                                {#if item.connect_pass_is_set}
+                                    <div>
+                                        {t('creds.form.connect_pwd')}
+                                    </div>
+                                {/if}
+                                {#if item.become_pass_is_set}
+                                    <div>
+                                        {t('creds.form.become_pwd')}
+                                    </div>
+                                {/if}
+                                {#if !item.ssh_key_is_set && !item.connect_pass_is_set && !item.become_pass_is_set}
+                                    -
+                                {/if}
+                            </TableBodyCell>
+                            <TableBodyCell tdClass={classListContent}>
+                                <CredentialsForm bind:open={entryActions[credsKind][item.id].edit} action='edit'
+                                    existingID={item.id} shared={credsKind == 'shared'}
+                                    bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                <Button size="xs" on:click={() => {entryActions[credsKind][item.id].edit = true}}><EditSolid/></Button>
+                                <Tooltip>{t('btn.edit')}</Tooltip>
+            
+                                <CredentialsForm bind:open={entryActions[credsKind][item.id].clone} action='clone'
+                                    existingID={item.id} shared={credsKind == 'shared'}
+                                    bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                <Button size="xs" on:click={() => {entryActions[credsKind][item.id].clone = true}}><FileCloneSolid/></Button>
+                                <Tooltip>{t('btn.clone')}</Tooltip>
+            
+                                <Button size="xs" on:click={() => {deleteCredentials(item.id, credsKind == 'shared')}}><TrashBinSolid/></Button>
+                                <Tooltip>{t('btn.delete')}</Tooltip>
+                            </TableBodyCell>
+                        </TableBodyRow>
                     </TableBody>
-                    </Table>
-                    {#if !entryList[credsKind].length}
-                        <div class={classSpinnerDiv}><Spinner/></div>
-                    {/if}
+                    {/key}
+                  </Table>
+                  {#if !entryList[credsKind].length}
+                      <div class={classSpinnerDiv}><Spinner/></div>
+                  {/if}
                 </div>
                 <div>
                     {#each entryList[credsKind] as creds (creds.id)}

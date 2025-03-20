@@ -24,7 +24,7 @@ interface repoKindMapType {
 
 export const repoKindMap: repoKindMapType = {'static': 1, 'git': 2};
 
-export interface executionInfos {
+export interface executionType {
     id: number,
     job: number,
     user: number,
@@ -54,28 +54,28 @@ export interface executionInfos {
     time_duration: string,
 }
 
-export interface jobInfos {
+export interface jobType {
     id: number,
     name: string,
     playbook_file: string,
-    inventory_file: string,
+    inventory_file: string|null,
     repository: number|null,
     schedule: string|null,
     enabled: boolean,
-    limit: string,
+    limit: string|null,
     verbosity: number,
     mode_diff: boolean,
     mode_check: boolean,
-    tags: string,
-    tags_skip: string,
-    comment: string,
-    environment_vars: string,
-    cmd_args: string,
+    tags: string|null,
+    tags_skip: string|null,
+    comment: string|null,
+    environment_vars: string|null,
+    cmd_args: string|null,
     credentials_default: number|null,
     credentials_needed: boolean,
     credentials_category: string|null,
     execution_prompts: string|null,
     execution_prompts_json: string|null,
     next_run: string|null,
-    executions: executionInfos[],
+    executions: executionType[],
 }

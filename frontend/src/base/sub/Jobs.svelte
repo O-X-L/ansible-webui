@@ -15,11 +15,12 @@
     import JobForm from './forms/Job.svelte';
     import { tq } from '../../util/translate.js';
     import { classModalLabel } from '../Style.js';
-    import { redirectTo } from '../../util/main.js';
+    import { type formChoiceType } from '../Types.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import { choicesFromArray } from '../../util/form.js';
+    import { redirectTo, isSet } from '../../util/main.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
-    import { type executionPromptsType, JOB_EXEC_STATI_ACTIVE, type jobInfos } from './Config.js';
+    import { type executionPromptsType, JOB_EXEC_STATI_ACTIVE, type jobType } from './Config.js';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
         classPopoverColumn2Text, classPopoverColumn2Div, classCenterChildDiv, classSpinnerDiv,
@@ -31,13 +32,14 @@
     let apiResponseHandler: APIResponseHandler = $state();
     let addModal = $state(false);
     let addModalId = $state(Date.now());
-    let entryList: jobInfos[] = $state([]);
+    let entryList: jobType[] = $state([]);
     let entryActions = $state({});
     let apiErrorMsg = $state('');
     let apiSuccessMsg = $state('');
     let apiSuccess = $state(false);
     let apiDataHash = $state('');
     let updateLoop: number = $state(0);
+    let updatedAt = $state(0);
 
     interface executionPromptsFieldValues {
         tags: string,
@@ -77,7 +79,7 @@
     let usableCredentials: credentialsType = $state({shared: [], user: []});
     let usableCredentialChoices = $derived(buildCredentialChoices(usableCredentials));
 
-    function t(code: string) {
+    function t(code: string) : string {
       return tq($share, code);
     }
 
@@ -92,9 +94,10 @@
         }
         entryList = j;
         apiDataHash = h;
+        updatedAt = Date.now();
     }
 
-    function isJobActive(job: jobInfos) {
+    function isJobActive(job: jobType) : boolean {
         if (!job.executions.length) {
             return false;
         }
@@ -164,12 +167,24 @@
         executionPrompts.config = JSON.parse(encodedPrompts);
     }
 
+    function searchFilter(item: jobType, searchTerm: string) : boolean {
+        let s = searchTerm.toLowerCase();
+        let c = item.comment ? item.comment : '';
+        let i = item.inventory_file ? item.inventory_file : '';
+        return (
+            item.name.toLowerCase().includes(s) ||
+            c.toLowerCase().includes(s) ||
+            item.playbook_file.toLowerCase().includes(s) ||
+            i.toLowerCase().includes(s)
+        )
+    }
+
     function loadCredentialInfos(j: any) {
         usableCredentials = j;
     }
 
-    function buildCredentialChoices(cr: credentialsType) {
-        let choices = [];
+    function buildCredentialChoices(cr: credentialsType) : formChoiceType[] {
+        let choices: formChoiceType[] = [];
         for (let c of cr.user) {
             choices.push({value: c.id, name: `${t('creds.user')} - ${c.name}`});
         }
@@ -207,69 +222,82 @@
     bind:successMsg={apiSuccessMsg} bind:showSuccess={apiSuccess} />
 
 <div>
-  <Table striped={true}>
+  <Table striped={true} bind:items={entryList} hoverable={true}
+        placeholder={t('common.search')} filter={(item, searchTerm) => {return searchFilter(item, searchTerm)}}>
     <TableHead theadClass={classListHeader}>
-        <TableHeadCell>{t('jobs.job')}</TableHeadCell>
-        <TableHeadCell class="max-lg:hidden">{t('jobs.form.inventory_file')}</TableHeadCell>
-        <TableHeadCell class="max-lg:hidden">{t('jobs.form.playbook_file')}</TableHeadCell>
-        <TableHeadCell class="max-sm:hidden">{t('jobs.form.schedule')}</TableHeadCell>
+        <TableHeadCell sort={(a, b) => a.name.localeCompare(b.name)} defaultSort>
+            {t('jobs.job')}
+        </TableHeadCell>
+        <TableHeadCell class="max-lg:hidden" sort={(a, b) => a.inventory_file.localeCompare(b.inventory_file)}>
+            {t('jobs.form.inventory_file')}
+        </TableHeadCell>
+        <TableHeadCell class="max-lg:hidden" sort={(a, b) => a.playbook_file.localeCompare(b.playbook_file)}>
+            {t('jobs.form.playbook_file')}
+        </TableHeadCell>
+        <TableHeadCell class="max-sm:hidden" sort={(a, b) => {
+            let aNextRun = a.next_run ? a.next_run : 'z';
+            let bNextRun = b.next_run ? b.next_run : 'z';
+            return aNextRun.localeCompare(bNextRun);
+        }}>
+            {t('jobs.form.schedule')}
+        </TableHeadCell>
         <TableHeadCell>{t('common.actions')}</TableHeadCell>
     </TableHead>
+    {#key updatedAt}
     <TableBody tableBodyClass="divide-y">
-        {#each entryList as job (job.id)}
-            <TableBodyRow>
-                <TableBodyCell tdClass={classListContent}>
-                    {job.name}
-                    <button id="job-name-{job.id}" class="ml-1">
-                        <InfoCircleSolid size="sm"/>
-                        <span class="sr-only">{t('jobs.info')}</span>
-                    </button>
-                </TableBodyCell>
-                <TableBodyCell class="{classListContent} max-lg:hidden">{job.inventory_file ? job.inventory_file : '-'}</TableBodyCell>
-                <TableBodyCell class="{classListContent} max-lg:hidden">{job.playbook_file}</TableBodyCell>    
-                <TableBodyCell class="{classListContent} max-sm:hidden">
-                    {job.next_run ? job.next_run : '-'}
-                    <button id="job-schedule-{job.id}" class="ml-1">
-                        <InfoCircleSolid size="sm"/>
-                        <span class="sr-only">{t('jobs.info.execution')}</span>
-                    </button>
-                </TableBodyCell>
-                <TableBodyCell tdClass={classListContent}>
-                    <div>
-                        <Button size="xs" on:click={() => {
-                            entryActions[job.id].exec = true; updateExecutionPrompts(job.execution_prompts_json);
-                            }} disabled={isJobActive(job)}>
-                            <PlaySolid/>
-                        </Button>
-                        <Tooltip>{t('btn.execute')}</Tooltip>
+        <TableBodyRow slot="row" let:item>
+            <TableBodyCell tdClass={classListContent}>
+                {item.name}
+                <button id="job-name-{item.id}" class="ml-1">
+                    <InfoCircleSolid size="sm"/>
+                    <span class="sr-only">{t('jobs.info')}</span>
+                </button>
+            </TableBodyCell>
+            <TableBodyCell class="{classListContent} max-lg:hidden">{item.inventory_file ? item.inventory_file : '-'}</TableBodyCell>
+            <TableBodyCell class="{classListContent} max-lg:hidden">{item.playbook_file}</TableBodyCell>    
+            <TableBodyCell class="{classListContent} max-sm:hidden">
+                {item.next_run ? item.next_run : '-'}
+                <button id="job-schedule-{item.id}" class="ml-1">
+                    <InfoCircleSolid size="sm"/>
+                    <span class="sr-only">{t('jobs.info.execution')}</span>
+                </button>
+            </TableBodyCell>
+            <TableBodyCell tdClass={classListContent}>
+                <div>
+                    <Button size="xs" on:click={() => {
+                        entryActions[item.id].exec = true; updateExecutionPrompts(item.execution_prompts_json);
+                        }} disabled={isJobActive(item)}>
+                        <PlaySolid/>
+                    </Button>
+                    <Tooltip>{t('btn.execute')}</Tooltip>
 
-                        <Button size="xs" on:click={() => {stopJob(job.id, job.executions[0].id)}}
-                            disabled={!isJobActive(job)} >
-                            <StopSolid/>
-                        </Button>
-                        <Tooltip>{t('btn.stop')}</Tooltip>
+                    <Button size="xs" on:click={() => {stopJob(item.id, item.executions[0].id)}}
+                        disabled={!isJobActive(item)} >
+                        <StopSolid/>
+                    </Button>
+                    <Tooltip>{t('btn.stop')}</Tooltip>
 
-                        <Button size="xs" on:click={() => (redirectLogs(job.id))}><BookOpenSolid/></Button>
-                        <Tooltip>{t('btn.logs')}</Tooltip>
-                    </div>
-                    <div class="mt-2">
-                        <JobForm bind:open={entryActions[job.id].edit} action='edit' existingID={job.id}
-                            bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-                        <Button size="xs" on:click={() => {entryActions[job.id].edit = true}}><EditSolid/></Button>
-                        <Tooltip>{t('btn.edit')}</Tooltip>
-    
-                        <JobForm bind:open={entryActions[job.id].clone} action='clone' existingID={job.id}
-                            bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-                        <Button size="xs" on:click={() => {entryActions[job.id].clone = true}}><FileCloneSolid/></Button>
-                        <Tooltip>{t('btn.clone')}</Tooltip>
-    
-                        <Button size="xs" on:click={() => {deleteJob(job.id)}}><TrashBinSolid/></Button>
-                        <Tooltip>{t('btn.delete')}</Tooltip>
-                    </div>
-                </TableBodyCell>
-            </TableBodyRow>
-        {/each}
-    </TableBody>
+                    <Button size="xs" on:click={() => (redirectLogs(item.id))}><BookOpenSolid/></Button>
+                    <Tooltip>{t('btn.logs')}</Tooltip>
+                </div>
+                <div class="mt-2">
+                    <JobForm bind:open={entryActions[item.id].edit} action='edit' existingID={item.id}
+                        bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                    <Button size="xs" on:click={() => {entryActions[item.id].edit = true}}><EditSolid/></Button>
+                    <Tooltip>{t('btn.edit')}</Tooltip>
+
+                    <JobForm bind:open={entryActions[item.id].clone} action='clone' existingID={item.id}
+                        bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                    <Button size="xs" on:click={() => {entryActions[item.id].clone = true}}><FileCloneSolid/></Button>
+                    <Tooltip>{t('btn.clone')}</Tooltip>
+
+                    <Button size="xs" on:click={() => {deleteJob(item.id)}}><TrashBinSolid/></Button>
+                    <Tooltip>{t('btn.delete')}</Tooltip>
+                </div>
+            </TableBodyCell>
+        </TableBodyRow>
+    </TableBody>  
+    {/key}
   </Table>
   {#if !entryList.length}
     <div class={classSpinnerDiv}><Spinner/></div>
@@ -361,7 +389,7 @@
                                 </td>
                                 <td class={classPopoverColumn2Div}>
                                     <button class="cursor-default">
-                                        <Radio checked={job.enabled}></Radio>
+                                        <Radio checked={job.enabled && isSet(job.schedule)}></Radio>
                                     </button>
                                 </td>
                             </tr>

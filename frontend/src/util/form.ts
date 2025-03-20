@@ -1,8 +1,8 @@
 import { apiEdit, getCSRFFormTokenJSON } from './api.js';
-import { type inputColor } from '../base/Types.js';
+import { type inputColorType, type formChoiceType } from '../base/Types.js';
 
-export const inputBaseColor: inputColor = 'base';
-export const inputRequiredBaseColor: inputColor = 'red';
+export const inputBaseColor: inputColorType = 'base';
+export const inputRequiredBaseColor: inputColorType = 'red';
 
 export const REGEX_SMALL_INT = /^[\d]{1,3}$/
 export const REGEX_INT = /^[\d]{1,10}$/
@@ -10,14 +10,14 @@ export const REGEX_INT = /^[\d]{1,10}$/
 export interface formField {
     value: string|number|boolean,
     regex: RegExp|undefined,
-    color: inputColor|toggleColor,
+    color: inputColorType,
     required: boolean|undefined,
     blank: boolean|undefined,
 }
 
 export type formMethod = 'post' | 'put' | 'delete';
 
-export function validateFormField(field: formField) {
+export function validateFormField(field: formField) : boolean {
     if (field.required !== undefined && field.required && !field.value) {
         return false;
     }
@@ -65,15 +65,15 @@ export function submitFormBase(form: any, method: formMethod, url: string, callb
     }
 }
 
-export function choicesFromArray(a: string[]) {
-    let c = [];
+export function choicesFromArray(a: string[]) : formChoiceType[] {
+    let c: formChoiceType[] = [];
     for (let i of a) {
         c.push({'value': i, 'name': i})
     }
     return c
 }
 
-export function getMethod(a: string) {
+export function getMethod(a: string) : 'post'|'put'|'delete' {
     if (a == 'delete') {
         return 'delete';
     }

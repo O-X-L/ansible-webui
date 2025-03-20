@@ -11,7 +11,7 @@
     let loginTarget = $derived($share.backend.sso ? '/a/saml/init/' : '/a/login/')
     let rememberUsername = $state(false);
 
-    function t(code: string) {
+    function t(code: string) : string {
       return tq($share, code);
     }
 

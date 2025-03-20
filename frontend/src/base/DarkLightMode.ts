@@ -1,4 +1,4 @@
-export function getDarkLightMode() {
+export function getDarkLightMode() : 'dark'|'light' {
     let lastColorMode = localStorage.getItem('color-theme');
     if (lastColorMode && (lastColorMode == 'light' || lastColorMode == 'dark')) {
       return lastColorMode;
