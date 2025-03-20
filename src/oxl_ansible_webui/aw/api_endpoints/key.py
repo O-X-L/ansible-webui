@@ -7,19 +7,23 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from aw.utils.util import datetime_w_tz
-from aw.config.hardcoded import KEY_TIME_FORMAT
+from aw.config.hardcoded import KEY_TIME_FORMAT, SHORT_TIME_FORMAT
 from aw.model.api import AwAPIKey
-from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, GenericErrorResponse
+from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, GenericErrorResponse, \
+    response_data_if_changed
 
 
 class KeyReadResponse(BaseResponse):
     token = serializers.CharField()
     id = serializers.CharField()
+    comment = serializers.CharField()
+    created_at = serializers.CharField()
 
 
 class KeyWriteResponse(BaseResponse):
     token = serializers.CharField()
     secret = serializers.CharField()
+    comment = serializers.CharField(max_length=50)
 
 
 class APIKey(APIView):
@@ -36,21 +40,36 @@ class APIKey(APIView):
     def get(request):
         tokens = []
         for key in AwAPIKey.objects.filter(user=get_api_user(request)):
-            tokens.append({'token': key.name, 'id': md5(key.name.encode('utf-8')).hexdigest()})
+            tokens.append({
+                'token': key.name,
+                'id': md5(key.name.encode('utf-8')).hexdigest(),
+                'comment': key.comment,
+            })
 
-        return Response(tokens)
+        return response_data_if_changed(request, data=tokens)
 
     @extend_schema(
         request=None,
-        responses={200: OpenApiResponse(KeyWriteResponse, description='Returns generated API token & key')},
+        responses={
+            200: OpenApiResponse(KeyWriteResponse, description='Returns generated API token & key'),
+            400: OpenApiResponse(KeyWriteResponse, description='Invalid API keypair name provided'),
+        },
         summary='Create a new API key.',
     )
     def post(self, request):
         self.serializer_class = KeyWriteResponse
+
+        comment = None
+        if request.data is not None and 'comment' in request.data:
+            comment = request.data['comment']
+            if len(comment) > 100:
+                return Response(data={'error': 'Provided API-keypair comment is invalid'}, status=400)
+
         user = get_api_user(request)
         token = f'{user}-{datetime_w_tz().strftime(KEY_TIME_FORMAT)}'
-        _, key = AwAPIKey.objects.create_key(name=token, user=user)
-        return Response({'token': token, 'key': key})
+        api_keypair, key = AwAPIKey.objects.create_key(name=token, user=user, comment=comment)
+
+        return Response({'token': token, 'key': key, 'comment': comment})
 
 
 class APIKeyItem(APIView):

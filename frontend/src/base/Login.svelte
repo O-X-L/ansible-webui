@@ -61,7 +61,7 @@
 
 <div class="flex justify-center w-full">
     <div>
-        {#if $share.backend.length == 0}
+        {#if !$share.backend}
             <Spinner />
         {:else}
             <form method="post" action="{loginTarget}">
@@ -70,7 +70,7 @@
                 <Label for="id_username">{t('login.user')}</Label>
                 <Input type="text" id="id_username" name="username" oninput={saveUsername}/>
 
-                {#if !($share.backend.sso) || window.location.includes('fallback')}
+                {#if !$share.backend.sso || window.location.pathname.includes('fallback')}
                     <Label for="id_password" class="mt-2">{t('login.pwd')}</Label>
                     <Input type="password" name="password" id="id_password"/>
                 {/if}
@@ -83,7 +83,7 @@
                     </div>
                     {#if $share.backend.sso}
                         <div>
-                            {#if window.location.includes('fallback')}
+                            {#if window.location.pathname.includes('fallback')}
                                 <Button href="/a/login/" class="mt-2">{t('login.sso')}</Button>
                             {:else}
                                 <Button href="/a/login/fallback/" class="mt-2">{t('login.localUser')}</Button>

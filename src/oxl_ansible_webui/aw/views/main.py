@@ -62,14 +62,16 @@ def home(request) -> HttpResponse:
     return render(request, status=200, template_name='home.html')
 
 
+@login_required
+@ui_endpoint_wrapper
+def system(request) -> HttpResponse:
+    return render(request, status=200, template_name='system.html')
+
+
 urlpatterns_ui = [
     path('ui', home),
-    path('ui/system/admin/', admin),
     path('ui/system/api_docs', api_docs),
-]
-# urlpatterns_ui += urlpatterns_jobs
-urlpatterns_ui += urlpatterns_settings
-urlpatterns_ui += urlpatterns_system
-urlpatterns_ui += [
+    path('ui/system/admin/', admin),
+    path('ui/system', system),
     re_path(r'^ui/*', not_implemented),
 ]

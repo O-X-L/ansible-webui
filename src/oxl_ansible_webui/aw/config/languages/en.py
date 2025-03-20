@@ -15,7 +15,9 @@ EN = {
     'btn.delete': 'Delete',
     'btn.stop': 'Stop',
     'btn.logs': 'Logs',
+    'btn.home': 'Home',
     'btn.download': 'Download',
+    'nav.system': 'System',
     'nav.lang': 'Language',
     'nav.darkLight': 'Dark/Light Mode Switch',
     'nav.docs': 'Documentation',
@@ -36,6 +38,8 @@ EN = {
     'common.actions': 'Actions',
     'common.search': 'Search',
     'common.updated_at': 'Updated at',
+    'common.created_at': 'Created at',
+    'common.click_to_copy': 'Click to Copy',
 
     # auth
     'login.user': 'Username',
@@ -240,4 +244,15 @@ EN = {
     'logs.repo_log_file': 'Repository log file',
     'logs.repo_error_log_file': 'Repository error-log file',
     'logs.exec_finished': 'Execution finished!',
+
+    # system
+    'system.settings': 'Settings',
+    'system.api_keys': 'API Keys',
+
+    # api-keys
+    'api_keys.token': 'Token',
+    'api_keys.key': 'Key',
+    'api_keys.new': 'New API Key-Pair',
+    'api_keys.action.create': 'API Key created',
+    'api_keys.action.delete': 'API Key deleted',
 }

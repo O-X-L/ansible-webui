@@ -9,12 +9,12 @@
     import { share } from './Share.js';
     import { tq } from '../util/translate.js';
 
-    import Jobs from './sub/Jobs.svelte';
-    import Logs from './sub/Logs.svelte';
-    import Alerts from './sub/Alerts.svelte';
-    import Dashboard from './sub/Dashboard.svelte';
-    import Repositories from './sub/Repositories.svelte';
-    import Credentials from './sub/Credentials.svelte';
+    import Jobs from './home/Jobs.svelte';
+    import Logs from './home/Logs.svelte';
+    import Alerts from './home/Alerts.svelte';
+    import Dashboard from './home/Dashboard.svelte';
+    import Repositories from './home/Repositories.svelte';
+    import Credentials from './home/Credentials.svelte';
 
     let loaded = $state(false);
     let openTab = $state({

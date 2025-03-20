@@ -3,11 +3,9 @@
 
     import {
       Navbar, NavBrand, Dropdown, Button, Tooltip, DarkMode, Spinner, Radio, Alert,
-      // NavLi, NavUl, DropdownItem, DropdownDivider, NavHamburger
     } from 'flowbite-svelte';
     import {
-      LockSolid, BookSolid, BugSolid, GithubSolid, GlobeSolid,
-      // ChevronDownOutline, AdjustmentsHorizontalSolid,
+      LockSolid, BookSolid, BugSolid, GithubSolid, GlobeSolid, ServerSolid, HomeSolid,
     } from 'flowbite-svelte-icons';
 
     import { share } from './Share.js';
@@ -15,7 +13,7 @@
     import { tq, flagIcon } from '../util/translate.js';
     import { setDarkLightMode } from './DarkLightMode.js';
     import { apiGet, getCSRFFormTokenHTML } from '../util/api.js';
-    import { classNavFooter, classBtnBase, classNavFooterLink } from './Style.js';
+    import { classNavFooter, classBtnBase, classNavLink } from './Style.js';
 
     let loaded: boolean = $state(false);
     let language: string = $state('en');
@@ -87,7 +85,7 @@
 <Navbar class="border-b rounded-b-lg {classNavFooter}" {navContainerClass}>
   {#key $share.backend.logo}
     <NavBrand href="/">
-      {#if $share.backend.length == 0}
+      {#if !$share.backend}
         <Spinner size="sm" />
       {:else}
         <img loading="lazy" src="{$share.backend.logo}" alt="HOME" class="aw-nav-icon" referrerpolicy="no-referrer">
@@ -108,7 +106,19 @@
     </NavUl>
   {/if}
   -->
-  <div class="flex md:order-2">
+    {#if $share.backend.authenticated}
+      <div class="flex md:order-1 mr-5">
+        <Button size="xs" class="ml-2 {classNavLink}" href="/ui" disabled={window.location.pathname == '/ui'}>
+          <HomeSolid/></Button>
+        <Tooltip placement="bottom">{t('nav.home')}</Tooltip>
+
+        <Button size="xs" class="ml-2 {classNavLink}" href="/ui/system" disabled={window.location.pathname == '/ui/system'}>
+          <ServerSolid/></Button>
+        <Tooltip placement="bottom">{t('nav.system')}</Tooltip>
+      </div>
+    {/if}
+
+    <div class="flex md:order-2">
     <Button size="xs" class="ml-2"><GlobeSolid/></Button>
     <Dropdown class="w-48 p-3 space-y-1">
       <li class="rounded-sm p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
@@ -129,11 +139,11 @@
     {/if}
     -->
 
-    <Button size="xs" class="ml-2 max-sm:hidden {classNavFooterLink}" href="https://webui.ansibleguy.net"><BookSolid /></Button>
+    <Button size="xs" class="ml-2 max-sm:hidden {classNavLink}" href="https://webui.ansibleguy.net"><BookSolid /></Button>
     <Tooltip placement="bottom">{t('nav.docs')}</Tooltip>
-    <Button size="xs" class="ml-2 max-sm:hidden {classNavFooterLink}" href="https://github.com/O-X-L/ansible-webui"><GithubSolid /></Button>
+    <Button size="xs" class="ml-2 max-sm:hidden {classNavLink}" href="https://github.com/O-X-L/ansible-webui"><GithubSolid /></Button>
     <Tooltip placement="bottom">{t('nav.repo')}</Tooltip>
-    <Button size="xs" class="ml-2 max-sm:hidden {classNavFooterLink}" href="https://github.com/O-X-L/ansible-webui/issues"><BugSolid /></Button>
+    <Button size="xs" class="ml-2 max-sm:hidden {classNavLink}" href="https://github.com/O-X-L/ansible-webui/issues"><BugSolid /></Button>
     <Tooltip placement="bottom">{t('nav.bugs')}</Tooltip>
     {#if $share.backend.authenticated}
       <form method="post" action="/o/">

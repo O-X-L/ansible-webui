@@ -4,7 +4,7 @@
     import { share } from '../Share.js';
     import { Alert } from 'flowbite-svelte';
     import { tq } from '../../util/translate.js';
-    import { API_STATUS_CODES_OK } from '../sub/Config.js';
+    import { API_STATUS_CODES_OK } from '../home/Config.js';
     import { CloseCircleSolid, InfoCircleSolid } from 'flowbite-svelte-icons';
 
     let {

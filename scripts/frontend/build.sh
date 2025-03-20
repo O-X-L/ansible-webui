@@ -48,6 +48,7 @@ do
       if [ -f "${DST_DIR}/${app}.js" ]
       then
         sed -i "s|from\"./${ref}-[^\.]*\.js\"|from\"./${ref}.js\"|g" "${DST_DIR}/${app}.js"
+        sed -i "s|import\"./${ref}-[^\.]*\.js\"|import\"./${ref}.js\"|g" "${DST_DIR}/${app}.js"
       fi
     fi
   done

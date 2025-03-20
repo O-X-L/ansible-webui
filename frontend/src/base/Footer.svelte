@@ -2,14 +2,12 @@
     import { sineIn } from 'svelte/easing';
 
     import {
-      Footer, FooterCopyright, FooterLinkGroup, Spinner, Tooltip, Button,
-      Drawer, CloseButton, Listgroup,
+      Footer, FooterCopyright, FooterLinkGroup, Spinner, Drawer, CloseButton, Listgroup,
     } from 'flowbite-svelte';
-    import { GithubSolid, BugSolid, BookSolid } from 'flowbite-svelte-icons';
 
     import { share } from './Share.js';
     import { tq } from '../util/translate.js';
-    import { classNavFooter, classLinkHover, classNavFooterLink } from './Style.js';
+    import { classNavFooter, classLinkHover } from './Style.js';
 
     const classFooterText = 'text-sm text-gray-500 dark:text-gray-400';
     let hideAttributions = $state(true);
@@ -56,17 +54,9 @@
       </button>
     </div>
   </FooterLinkGroup>
-  <FooterLinkGroup class="sm:hidden">
-    <Button size="xs" class="ml-2 {classNavFooterLink}" href="https://webui.ansibleguy.net"><BookSolid /></Button>
-    <Tooltip placement="bottom">{t('nav.docs')}</Tooltip>
-    <Button size="xs" class="ml-2 {classNavFooterLink}" href="https://github.com/O-X-L/ansible-webui"><GithubSolid /></Button>
-    <Tooltip placement="top">{t('nav.repo')}</Tooltip>
-    <Button size="xs" class="ml-2 {classNavFooterLink}" href="https://github.com/O-X-L/ansible-webui/issues"><BugSolid /></Button>
-    <Tooltip placement="top">{t('nav.bugs')}</Tooltip>
-  </FooterLinkGroup>
   <FooterLinkGroup class={classFooterText}>
     <div>
-      {#if $share.backend.length == 0}
+      {#if !$share.backend}
         <Spinner size="xs" />
       {:else}
         {#if $share.backend.authenticated}

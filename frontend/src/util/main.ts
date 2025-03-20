@@ -52,3 +52,8 @@ export function redirectTo(url: string, reloadIfSearch: string) {
       location.reload();
   }
 }
+
+export function clickToCopy(event: MouseEvent) {
+  console.log("TEST", event);
+  navigator.clipboard.writeText(event.target.innerText);
+}
