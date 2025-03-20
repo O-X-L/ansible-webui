@@ -44,10 +44,18 @@ class JobGlobalCredentialsWriteRequest(serializers.ModelSerializer):
         fields = JobGlobalCredentials.api_fields_write
 
     name = serializers.CharField(validators=[])  # uc on update
-    vault_pass = serializers.CharField(max_length=100, required=False, default=None, allow_blank=True, allow_null=True)
-    become_pass = serializers.CharField(max_length=100, required=False, default=None, allow_blank=True, allow_null=True)
-    connect_pass = serializers.CharField(max_length=100, required=False, default=None, allow_blank=True, allow_null=True)
-    ssh_key = serializers.CharField(max_length=5000, required=False, default=None, allow_blank=True, allow_null=True)
+    vault_pass = serializers.CharField(
+        max_length=100, required=False, default=None, allow_blank=True, allow_null=True,
+    )
+    become_pass = serializers.CharField(
+        max_length=100, required=False, default=None, allow_blank=True, allow_null=True,
+    )
+    connect_pass = serializers.CharField(
+        max_length=100, required=False, default=None, allow_blank=True, allow_null=True,
+    )
+    ssh_key = serializers.CharField(
+        max_length=5000, required=False, default=None, allow_blank=True, allow_null=True,
+    )
 
     def validate(self, attrs: dict):
         for field in JobGlobalCredentials.api_fields_write:

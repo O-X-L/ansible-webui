@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from aw.utils.util import datetime_w_tz
-from aw.config.hardcoded import KEY_TIME_FORMAT, SHORT_TIME_FORMAT
+from aw.config.hardcoded import KEY_TIME_FORMAT
 from aw.model.api import AwAPIKey
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, GenericErrorResponse, \
     response_data_if_changed
@@ -67,7 +67,7 @@ class APIKey(APIView):
 
         user = get_api_user(request)
         token = f'{user}-{datetime_w_tz().strftime(KEY_TIME_FORMAT)}'
-        api_keypair, key = AwAPIKey.objects.create_key(name=token, user=user, comment=comment)
+        _, key = AwAPIKey.objects.create_key(name=token, user=user, comment=comment)
 
         return Response({'token': token, 'key': key, 'comment': comment})
 

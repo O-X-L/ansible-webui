@@ -44,7 +44,6 @@ LOGGING = {
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
-X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 INSTALLED_APPS = [
     'aw.apps.AwConfig',
@@ -213,10 +212,12 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Security
-AUTO_LOGOUT = {
-    'SESSION_TIME': config['session_timeout'],
-}
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = config['session_timeout']
 SECRET_KEY = config['secret']
+CSRF_COOKIE_AGE = None  # session-based
+SESSION_COOKIE_HTTPONLY = True
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # Authentication
 AUTH_MODE = CONFIG_DEFAULTS['auth_mode']
