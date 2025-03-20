@@ -1,0 +1,36 @@
+---
+
+name: Test Job-Execution
+
+on:
+  workflow_run:
+    workflows: [test_backend]
+    types:
+      - completed
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install backend dependencies
+        run: |
+          pip install -r requirements.txt >/dev/null
+          pip install -r requirements_test_backend.txt >/dev/null
+
+      # todo: trigger jobs via api and verify expected outcome/status
+      #   https://github.com/O-X-L/ansible-webui/issues/11
