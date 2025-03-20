@@ -145,7 +145,7 @@
                 <span slot="header">{t(`creds.${credsKind}`)}</span>
         
                 <div>
-                  <Table striped={true} bind:items={entryList[credsKind]} hoverable={true}
+                  <Table striped={true} bind:items={entryList[credsKind]} hoverable={true} shadow
                     placeholder={t('common.search')} filter={(item, searchTerm) => {return searchFilter(item, searchTerm)}}>
                     <TableHead theadClass={classListHeader}>
                         <TableHeadCell sort={(a, b) => a.name.localeCompare(b.name)} defaultSort>

@@ -7,12 +7,12 @@ from aw.api_endpoints.job import APIJob, APIJobItem, APIJobExecutionItem, APIJob
 from aw.api_endpoints.permission import APIPermission, APIPermissionItem
 from aw.api_endpoints.credentials import APIJobCredentials, APIJobCredentialsItem
 from aw.api_endpoints.filesystem import APIFsBrowse, APIFsExists
-from aw.api_endpoints.system import APISystemConfig
+from aw.api_endpoints.system import APISystemConfig, APISystemEnvironment
 from aw.api_endpoints.repository import APIRepository, APIRepositoryItem, APIRepositoryLogFile
 from aw.api_endpoints.alert import APIAlertPlugin, APIAlertPluginItem, APIAlertUser, APIAlertUserItem, \
     APIAlertGlobal, APIAlertGlobalItem, APIAlertGroup, APIAlertGroupItem
 from aw.api_endpoints.frontend import APIBackendInfo, APIBackendTranslations, APIFormInfosJob, \
-    APIFormInfosCredentials, APIFormInfosRepositories
+    APIFormInfosCredentials, APIFormInfosRepositories, APIFormInfosConfig
 # from aw.api_endpoints.base import not_implemented
 
 urlpatterns_api = [
@@ -41,6 +41,7 @@ urlpatterns_api = [
     path('api/alert/user/<int:alert_id>', APIAlertUserItem.as_view()),
     path('api/alert/user', APIAlertUser.as_view()),
     path('api/config', APISystemConfig.as_view()),
+    path('api/environment', APISystemEnvironment.as_view()),
     path('api/fs/browse/<str:repository>', APIFsBrowse.as_view()),
     path('api/fs/exists', APIFsExists.as_view()),
     path('api/_schema/', SpectacularAPIView.as_view(), name='_schema'),
@@ -50,4 +51,5 @@ urlpatterns_api = [
     path('api/frontend/form/job', APIFormInfosJob.as_view()),
     path('api/frontend/form/credentials', APIFormInfosCredentials.as_view()),
     path('api/frontend/form/repository', APIFormInfosRepositories.as_view()),
+    path('api/frontend/form/config', APIFormInfosConfig.as_view()),
 ]

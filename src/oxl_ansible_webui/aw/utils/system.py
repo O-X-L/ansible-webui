@@ -2,16 +2,10 @@ from os import environ
 from pathlib import Path
 from getpass import getuser
 
-from django.urls import path
-from django.shortcuts import HttpResponse
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 from ansibleguy_runner.interface import get_ansible_config
 
-from aw.utils.http import ui_endpoint_wrapper
 from aw.utils.subps import process_cache
-from aw.utils.version import get_system_versions, parsed_ansible_version, parsed_python_modules
-from aw.views.forms.system import system_config
+from aw.utils.version import get_system_versions, parsed_ansible_version, parsed_python_modules, get_version
 
 
 def _parsed_ansible_collections() -> dict:
@@ -102,32 +96,21 @@ def _parsed_ansible_playbook() -> str:
     return ap['stdout']
 
 
-@login_required
-@ui_endpoint_wrapper
-def system_environment(request) -> HttpResponse:
+def get_system_environment() -> dict:
     # todo: allow to check for updates (pypi, ansible-galaxy & github api)
     python_modules = parsed_python_modules()
     ansible_version = parsed_ansible_version(python_modules)
     env_system = get_system_versions(python_modules=python_modules, ansible_version=ansible_version)
 
-    return render(
-        request, status=200, template_name='system_environment.html',
-        context={
-            **env_system,
-            'env_user': getuser(),
-            'env_system': env_system,
-            'env_aws': _parsed_aws_versions(),
-            'env_ara': _parsed_ara_version(python_modules),
-            'env_python_modules': python_modules,
-            'env_ansible_config': _parsed_ansible_config(),
-            'env_ansible_playbook': _parsed_ansible_playbook(),
-            # 'env_ansible_roles': get_role_list(),
-            'env_ansible_collections': _parsed_ansible_collections(),
-        },
-    )
-
-
-urlpatterns_system = [
-    path('ui/system/environment', system_environment),
-    path('ui/system/config', system_config),
-]
+    return {
+        **env_system,
+        'aw': get_version(),
+        'user': getuser(),
+        'aws': _parsed_aws_versions(),
+        'ara': _parsed_ara_version(python_modules),
+        'python_modules': python_modules,
+        'ansible_config': _parsed_ansible_config(),
+        'ansible_playbook': _parsed_ansible_playbook(),
+        # 'ansible_roles': get_role_list(),
+        'ansible_collections': _parsed_ansible_collections(),
+    }

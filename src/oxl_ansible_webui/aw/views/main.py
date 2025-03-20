@@ -7,9 +7,6 @@ from django.urls import path, re_path
 from aw.config.hardcoded import LOGIN_PATH
 from aw.settings import LOGIN_REDIRECT_URL
 from aw.utils.http import ui_endpoint_wrapper
-from aw.views.settings import urlpatterns_settings
-# from aw.views.job import urlpatterns_jobs
-from aw.views.system import urlpatterns_system
 
 
 def _local_iframe(_path: str, title: str) -> str:

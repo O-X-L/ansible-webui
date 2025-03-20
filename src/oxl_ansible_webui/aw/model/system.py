@@ -4,9 +4,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from aw.base import USERS
 from aw.model.base import BaseModel, CHOICES_BOOL, DEFAULT_NONE
 from aw.config.defaults import CONFIG_DEFAULTS
-from aw.config.environment import check_aw_env_var_is_set
+from aw.config.environment import check_aw_env_var_is_set, AW_ENV_VARS, AW_ENV_VARS_SECRET
 from aw.config.main import VERSION
-from aw.utils.util import is_null
+from aw.utils.util import is_null, is_set
 from aw.utils.crypto import decrypt, encrypt
 
 MAIL_TRANSPORT_TYPE_PLAIN = 0
@@ -62,9 +62,20 @@ class SystemConfig(BaseModel):
     _enc_mail_pass = models.CharField(max_length=500, **DEFAULT_NONE)
 
     @classmethod
-    def get_set_env_vars(cls) -> list:
+    def get_set_public_env_vars(cls) -> list:
         # grey-out settings in web-ui
-        return [field for field in cls.form_fields if check_aw_env_var_is_set(field)]
+        e = []
+
+        for k in AW_ENV_VARS:
+            if k in AW_ENV_VARS_SECRET:
+                continue
+
+            if not check_aw_env_var_is_set(k):
+                continue
+
+            e.append(k)
+
+        return e
 
     @property
     def mail_pass(self) -> str:
@@ -80,6 +91,10 @@ class SystemConfig(BaseModel):
             return
 
         self._enc_mail_pass = encrypt(value)
+
+    @property
+    def mail_pass_is_set(self) -> bool:
+        return is_set(self._enc_mail_pass)
 
     def __str__(self) -> str:
         return 'Ansible-WebUI System Config'

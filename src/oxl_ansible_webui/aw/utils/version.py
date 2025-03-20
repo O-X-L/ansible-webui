@@ -91,15 +91,15 @@ def get_system_versions(python_modules: dict = None, ansible_version: dict = Non
     db_schema = get_schema_metadata()
 
     return {
-        'env_linux': linux_versions,
-        'env_db_schema': f'{db_schema.schema_version} (updated: {datetime_from_db_str(db_schema.updated)})',
-        'env_git': process_cache('git --version')['stdout'],
-        'env_ansible_core': ansible_version['ansible_core'],
-        'env_ansible_runner': ansible_version['ansible_runner'],
-        'env_django': python_modules['django']['version'],
-        'env_django_api': python_modules['djangorestframework']['version'],
-        'env_gunicorn': python_modules['gunicorn']['version'],
-        'env_jinja': ansible_version['jinja'],
-        'env_libyaml': ansible_version['libyaml'],
-        'env_python': f"{version_info.major}.{version_info.minor}.{version_info.micro}",
+        'linux': linux_versions,
+        'aw_db_schema': f'{db_schema.schema_version} (updated: {datetime_from_db_str(db_schema.updated)})',
+        'git': process_cache('git --version')['stdout'],
+        'ansible_core': ansible_version['ansible_core'],
+        'ansible_runner': ansible_version['ansible_runner'],
+        'django': python_modules['django']['version'],
+        'django_api': python_modules['djangorestframework']['version'],
+        'gunicorn': python_modules['gunicorn']['version'],
+        'jinja': ansible_version['jinja'],
+        'libyaml': ansible_version['libyaml'],
+        'python': f"{version_info.major}.{version_info.minor}.{version_info.micro}",
     }

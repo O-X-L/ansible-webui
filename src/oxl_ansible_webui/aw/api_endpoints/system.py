@@ -6,16 +6,16 @@ from django.db.utils import IntegrityError
 
 from aw.config.main import config
 from aw.model.system import SystemConfig, get_config_from_db
-from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, GenericErrorResponse
+from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, GenericErrorResponse, \
+    HDR_CACHE_1W, response_data_if_changed
 from aw.utils.util_no_config import is_set, is_null
 from aw.utils.debug import log
 from aw.utils.permission import has_manager_privileges
 from aw.config.hardcoded import SECRET_HIDDEN
+from aw.utils.system import get_system_environment
 
 
-class SystemConfigReadResponse(BaseResponse):
-    # todo: fix static fields.. duplicate logic in model
-
+class SystemConfigSettings(BaseResponse):
     # SystemConfig.api_fields_read
     path_run = serializers.CharField()
     path_play = serializers.CharField()
@@ -25,13 +25,6 @@ class SystemConfigReadResponse(BaseResponse):
     session_timeout = serializers.IntegerField()
     path_ansible_config = serializers.CharField()
     path_ssh_known_hosts = serializers.CharField()
-
-    # SystemConfig.api_fields_read_only
-    db = serializers.CharField()
-    db_migrate = serializers.BooleanField()
-    serve_static = serializers.BooleanField()
-    deployment = serializers.CharField()
-    version = serializers.CharField()
     logo_url = serializers.CharField()
     ara_server = serializers.CharField()
     global_environment_vars = serializers.CharField()
@@ -40,6 +33,20 @@ class SystemConfigReadResponse(BaseResponse):
     mail_user = serializers.CharField()
     mail_sender = serializers.CharField()
     mail_ssl_verify = serializers.BooleanField()
+
+    # SystemConfig.api_fields_read_only
+    db = serializers.CharField()
+    db_migrate = serializers.BooleanField()
+    serve_static = serializers.BooleanField()
+    deployment = serializers.CharField()
+    version = serializers.CharField()
+    mail_pass_is_set = serializers.BooleanField()
+
+
+class SystemConfigReadResponse(BaseResponse):
+    settings = SystemConfigSettings()
+    env_vars = serializers.DictField()
+    read_only = serializers.ListSerializer(child=serializers.CharField())
 
 
 class SystemConfigWriteRequest(serializers.ModelSerializer):
@@ -63,15 +70,20 @@ class APISystemConfig(APIView):
         operation_id='system_config_view',
     )
     def get(request):
-        del request
-        merged_config = {'read_only_settings': SystemConfig.api_fields_read_only}
+        data = {
+            'read_only': SystemConfig.api_fields_read_only,
+            'env_vars': {k: config[k] for k in SystemConfig.get_set_public_env_vars()},
+            'settings': {},
+        }
 
-        for field in SystemConfig.api_fields_read + merged_config['read_only_settings']:
-            merged_config[field] = config[field]
+        for field in SystemConfig.api_fields_read + data['read_only']:
+            data['settings'][field] = config[field]
 
-        merged_config['read_only_settings'] += SystemConfig.get_set_env_vars()
+        data['settings']['mail_pass_is_set'] = get_config_from_db().mail_pass_is_set
+        data['read_only'] += data['env_vars'].keys()
+        data['read_only'] = list(set(data['read_only']))
 
-        return Response(merged_config)
+        return response_data_if_changed(request, data=data)
 
     @extend_schema(
         request=SystemConfigWriteRequest,
@@ -122,3 +134,42 @@ class APISystemConfig(APIView):
 
         except IntegrityError as err:
             return Response(data={'error': f"Provided system config is not valid: '{err}'"}, status=400)
+
+
+class SystemEnvironmentReadResponse(BaseResponse):
+    aw = serializers.CharField()
+    aw_db_schema = serializers.CharField()
+    linux = serializers.CharField()
+    git = serializers.CharField()
+    ansible_core = serializers.CharField()
+    ansible_runner = serializers.CharField()
+    django = serializers.CharField()
+    django_api = serializers.CharField()
+    gunicorn = serializers.CharField()
+    jinja = serializers.CharField()
+    libyaml = serializers.CharField()
+    python = serializers.CharField()
+    user = serializers.CharField()
+    aws = serializers.CharField()
+    ara = serializers.CharField()
+    python_modules = serializers.CharField()
+    ansible_config = serializers.CharField()
+    ansible_playbook = serializers.CharField()
+    ansible_collections = serializers.CharField()
+
+
+class APISystemEnvironment(APIView):
+    http_method_names = ['get']
+    serializer_class = SystemEnvironmentReadResponse
+    permission_classes = API_PERMISSION
+
+    @staticmethod
+    @extend_schema(
+        request=None,
+        responses={200: SystemEnvironmentReadResponse},
+        summary='Return system environment.',
+        operation_id='system_env_view',
+    )
+    def get(request):
+        del request
+        return Response(get_system_environment(), headers=HDR_CACHE_1W)

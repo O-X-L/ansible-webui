@@ -258,3 +258,14 @@ def ansible_log_html(line: str) -> str:
         line = line.replace(color_code, color_html)
 
     return line
+
+
+def get_logo() -> str:
+    # pylint: disable=C0415
+    from aw.settings import STATIC_URL
+
+    url = config['logo_url']
+    if not url.startswith('http'):
+        return f"{STATIC_URL}{url}"
+
+    return config['logo_url']

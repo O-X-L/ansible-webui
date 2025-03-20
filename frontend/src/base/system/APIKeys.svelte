@@ -55,12 +55,12 @@
         apiEdit('post', 'key', null, handleSubmitResponse);
     }
 
-    function deleteAPIKey(toke: string) {
-        if (!toke) {
+    function deleteAPIKey(token: string) {
+        if (!token) {
             return;
         }
         apiSuccessMsg = 'api_keys.action.delete';
-        apiEdit('delete', `key/${toke}`, null, apiResponseHandler.handleRes);
+        apiEdit('delete', `key/${token}`, null, apiResponseHandler.handleRes);
     }
 
     function loadApiKeyList(j: any, h: string) {
@@ -104,7 +104,7 @@
 <APIResponseHandler bind:this={apiResponseHandler} bind:successMsg={apiSuccessMsg} />
 
 <div>
-    <Table striped={true} bind:items={entryList} hoverable={true} placeholder={t('common.search')}
+    <Table striped={true} bind:items={entryList} hoverable={true} shadow placeholder={t('common.search')}
         filter={(item, searchTerm) => (item.token.toLowerCase().includes(searchTerm.toLowerCase()))}>
     <TableHead theadClass={classListHeader}>
         <TableHeadCell sort={(a, b) => a.token.localeCompare(b.token)} defaultSort>

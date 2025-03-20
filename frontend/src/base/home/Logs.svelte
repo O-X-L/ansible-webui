@@ -162,7 +162,7 @@
             {#if !executionList[job.id] || !executionList[job.id].length}
                 <div class={classSpinnerDiv}><Spinner/></div>
             {:else}
-            <Table striped={true} id="logs-{job.id}">
+            <Table striped={true} id="logs-{job.id}" shadow>
                 <TableHead theadClass={classListHeader}>
                     <TableHeadCell>{t('logs.time')}</TableHeadCell>
                     <TableHeadCell>{t('common.status')}</TableHeadCell>

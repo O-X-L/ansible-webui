@@ -272,7 +272,7 @@
     bind:successMsg={apiSuccessMsg} bind:showSuccess={apiSuccess} />
 
 <div>
-  <Table striped={true} bind:items={entryList} hoverable={true}
+  <Table striped={true} bind:items={entryList} hoverable={true} shadow
         placeholder={t('common.search')} filter={(item, searchTerm) => {return searchFilter(item, searchTerm)}}>
     <TableHead theadClass={classListHeader}>
         <TableHeadCell sort={(a, b) => a.name.localeCompare(b.name)} defaultSort>

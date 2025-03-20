@@ -171,7 +171,7 @@
             <AccordionItem>
                 <span slot="header">{t(`repos.${repoKind}`)}</span>
                 <div>
-                  <Table striped={true} bind:items={entryLists[repoKind]} hoverable={true}
+                  <Table striped={true} bind:items={entryLists[repoKind]} hoverable={true} shadow
                       placeholder={t('common.search')} filter={(item, searchTerm) => {return searchFilter(item, searchTerm)}}>
                     <TableHead theadClass={classListHeader}>
                         <TableHeadCell sort={(a, b) => a.name.localeCompare(b.name)} defaultSort>

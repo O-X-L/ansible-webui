@@ -255,4 +255,77 @@ EN = {
     'api_keys.new': 'New API Key-Pair',
     'api_keys.action.create': 'API Key created',
     'api_keys.action.delete': 'API Key deleted',
+
+    # config
+    'config.paths': 'Paths',
+    'config.mailing': 'Mailing',
+    'config.execution': 'Execution',
+    'config.internal': 'Internal',
+    'config.action.update': 'Settings updated',
+
+    ## form fields
+    'config.form.path_run': 'Runtime directory',
+    'config.form.path_play': 'Playbook base-directory',
+    'config.form.path_log': 'Directory for execution-logs',
+    'config.form.path_template': 'Directory for templates',
+    'config.form.run_timeout': 'Timeout for playbook execution',
+    'config.form.session_timeout': 'Timeout for WebUI login-sessions',
+    'config.form.path_ansible_config': 'Ansible Config-File',
+    'config.form.path_ssh_known_hosts': 'SSH Known-Hosts File',
+    'config.form.debug': 'Debug Mode',
+    ### env-vars
+    'config.form.timezone': 'Timezone',
+    'config.form.db': 'Database',
+    'config.form.hostnames': 'Hostnames',
+    'config.form.proxy': 'Using Proxy',
+    'config.form.db_migrate': 'Database auto-upgrade',
+    'config.form.serve_static': 'Serving static files',
+    'config.form.deployment': 'Deployment',
+    'config.form.version': 'Ansible-WebUI Version',
+    'config.form.logo_url': 'URL to a Logo to use',
+    'config.form.ara_server': 'ARA Server URL',
+    'config.form.global_environment_vars': 'Global Environmental Variables',
+    'config.form.auth_mode': 'Authentication Mode',
+    'config.form.saml_config': 'SAML Config File',
+    'config.form.address': 'Listen Address',
+    'config.form.port': 'Listen Port',
+    'config.form.ssl_file_crt': 'SSL Certificate',
+    'config.form.ssl_file_key': 'SSL Private-Key',
+    'config.form.mail_server': 'Mail Server',
+    'config.form.mail_transport': 'Mail Transport',
+    'config.form.mail_ssl_verify': 'Mail SSL Verification',
+    'config.form.mail_sender': 'Mail Sender Address',
+    'config.form.mail_user': 'Mail Login Username',
+    'config.form.mail_pass': 'Mail Login Password',
+    ## form help
+    'config.form.help.path_run': 'Base directory for <a href="https://ansible.readthedocs.io/projects/runner/en/latest/intro/">'
+                                 'Ansible-Runner runtime files</a>',
+    'config.form.help.path_play': 'Path to the <a href="https://docs.ansible.com/ansible/2.8/user_guide/'
+                                  'playbooks_best_practices.html#directory-layout">Ansible base/playbook directory</a>',
+    'config.form.help.path_log': 'Define the path where full job-logs are saved',
+    'config.form.help.path_template': 'Define the path where custom templates are placed',
+    'config.form.help.path_ansible_config': 'Path to a <a href="https://docs.ansible.com/ansible/latest/installation_guide'
+                                            '/intro_configuration.html#configuration-file">Ansible config-file</a> to use',
+    'config.form.help.path_ssh_known_hosts': 'Path to a <a href="https://en.wikibooks.org/wiki/OpenSSH/'
+                                             'Client_Configuration_Files#~/.ssh/known_hosts">SSH known_hosts file</a> to use',
+    'config.form.help.debug': 'Enable Debug-mode. Do not enable permanent on production systems! '
+                              'It can possibly open attack vectors. '
+                              'You might need to restart the application to apply this setting',
+    'config.form.help.logo_url': 'Default: <a href="/static/img/logo.svg">img/logo.svg</a>; '
+                                 'Per example: '
+                                 '<a href="https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo'
+                                 '/vscode-ansible.svg">'
+                                 'https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo/vscode-ansible.svg'
+                                 '</a>',
+    'config.form.help.ara_server': 'Provide the URL to your ARA server. Can be used to gather job statistics. See: '
+                                   '<a href="https://webui.ansibleguy.net/usage/integrations.html">'
+                                   'Documentation - Integrations</a>',
+    'config.form.help.global_environment_vars': 'Set environmental variables that will be added to every job execution. '
+                                                'Comma-separated list of key-value pairs. (VAR1=TEST1,VAR2=0)',
+    'config.form.help.mail_server': 'Mail Server to use for Alert Mails. Combination of server and port (default 25)',
+    'config.form.help.mail_ssl_verify': 'En- or disable SSL certificate verification. '
+                                        'If enabled - the certificate SAN has to contain the mail-server FQDN '
+                                        'and must be issued from a trusted CA',
+    'config.form.help.mail_sender': 'Mail Sender Address to use for Alert Mails. Fallback is mail-user',
+    'config.form.help.mail_transport': 'The default port mapping is: 25 = Unencrypted, 465 = SSL, 587 = StartTLS',
 }

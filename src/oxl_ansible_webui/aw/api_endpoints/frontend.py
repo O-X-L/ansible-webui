@@ -1,12 +1,17 @@
+from pytz import all_timezones
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from drf_spectacular.utils import extend_schema
 
+from aw.model.system import SystemConfig
 from aw.settings import AUTH_MODE
-from aw.api_endpoints.base import get_api_user, HDR_CACHE_1W, GenericResponse, API_PERMISSION
-from aw.templatetags.util import get_logo, get_version
+from aw.utils.util import get_logo
+from aw.utils.version import get_version
 from aw.config.language import TRANSLATIONS
+from aw.utils.deployment import deployment_dev
+from aw.config.defaults import CONFIG_DEFAULTS
+from aw.api_endpoints.base import get_api_user, HDR_CACHE_1W, GenericResponse, API_PERMISSION
 from aw.model.job import Job, JobUserCredentials, Repository
 from aw.model.base import get_model_field_default, get_model_field_choices
 from aw.views.base import choices_global_credentials, choices_repositories
@@ -161,3 +166,30 @@ class APIFormInfosRepositories(GenericAPIView):
     def get(request):
         del request
         return Response(data=_build_model_defaults_choices(Repository), status=200)
+
+
+class APIFormInfosConfig(GenericAPIView):
+    http_method_names = ['get']
+    serializer_class = GenericResponse
+    permission_classes = API_PERMISSION
+
+    @staticmethod
+    @extend_schema(
+        request=None,
+        responses={200: GenericResponse},
+        summary='Return system-config form-choices & -defaults needed for frontend rendering',
+        operation_id='form_choices_config',
+    )
+    def get(request):
+        del request
+        data = _build_model_defaults_choices(SystemConfig)
+
+        data['choices']['timezone'] = sorted(all_timezones)
+        data['defaults']['path_run'] = CONFIG_DEFAULTS['path_run']
+        data['defaults']['path_play'] = CONFIG_DEFAULTS['path_play']
+        data['defaults']['path_log'] = CONFIG_DEFAULTS['path_log']
+        data['defaults']['path_ansible_config'] = CONFIG_DEFAULTS['path_ansible_config']
+        data['defaults']['path_ssh_known_hosts'] = CONFIG_DEFAULTS['path_ssh_known_hosts']
+        data['defaults']['debug'] = CONFIG_DEFAULTS['debug'] or deployment_dev()
+
+        return Response(data=data, status=200, headers=HDR_CACHE_1W)
