@@ -31,7 +31,7 @@ export function rsplit(s: string, w: string) : [string|null, string|null] {
 }
 
 export function isSet(data: any) : boolean {
-  if (typeof(data) != 'undefined' && data != null && data != "") {
+  if (typeof(data) != 'undefined' && data != null && data != "" && String(data).trim() != "") {
       return true;
   }
   return false;

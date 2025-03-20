@@ -6,7 +6,7 @@
         ChevronDownOutline, UserSolid, MessagesSolid, UsersGroupSolid,
     } from 'flowbite-svelte-icons'
 
-    import { share } from '../State.js';
+    import { share } from '../Share.js';
     import { tq } from '../../util/translate.js';
     import { classSpinnerDiv } from '../Style.js';
 

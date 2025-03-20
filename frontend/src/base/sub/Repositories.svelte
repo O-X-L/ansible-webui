@@ -11,7 +11,7 @@
         Dropdown, DropdownItem, Accordion, AccordionItem,
     } from 'flowbite-svelte';
 
-    import { share } from '../State.js';
+    import { share } from '../Share.js';
     import { tq } from '../../util/translate.js';
     import { isSet } from '../../util/main.js';
     import { apiEdit, apiGet } from '../../util/api.js';
@@ -20,7 +20,7 @@
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
         classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
-        classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle,
+        classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle, classFooterSpacing,
     } from '../Style.js';
  
     let { open = $bindable(false) } = $props();
@@ -431,3 +431,5 @@
     <RepositoryForm bind:open={addStaticModal} action='add' rtypeName='static'
         bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 {/key}
+
+<div class={classFooterSpacing}></div>

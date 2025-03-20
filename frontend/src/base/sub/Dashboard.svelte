@@ -3,7 +3,7 @@
         Spinner, 
     } from 'flowbite-svelte';
 
-    import { share } from '../State.js';
+    import { share } from '../Share.js';
     import { tq } from '../../util/translate.js';
 
     let { open = $bindable(false) } = $props();

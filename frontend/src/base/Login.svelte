@@ -3,7 +3,7 @@
 
     import { Input, Label, Button, Spinner, Toggle } from 'flowbite-svelte';
 
-    import { share } from './State.js';
+    import { share } from './Share.js';
     import { tq } from '../util/translate.js';
     import { getCSRFFormTokenHTML } from '../util/api.js';
 

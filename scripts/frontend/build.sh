@@ -26,6 +26,8 @@ function check_src_changes() {
 
 check_src_changes
 
+bash link_flowbite_custom.sh "$SRC_DIR"
+
 mkdir -p "$DST_DIR"
 bash build_tailwind.sh "$SRC_DIR" "$DST_DIR" &
 

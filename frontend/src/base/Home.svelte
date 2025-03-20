@@ -6,7 +6,7 @@
       CodeBranchSolid, CogSolid, BellActiveSolid, GridSolid, UsersSolid, BookOpenSolid,
     } from 'flowbite-svelte-icons'
 
-    import { share } from './State.js';
+    import { share } from './Share.js';
     import { tq } from '../util/translate.js';
 
     import Jobs from './sub/Jobs.svelte';

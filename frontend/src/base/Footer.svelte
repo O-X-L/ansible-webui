@@ -7,9 +7,9 @@
     } from 'flowbite-svelte';
     import { GithubSolid, BugSolid, BookSolid } from 'flowbite-svelte-icons';
 
-    import { share } from './State.js';
+    import { share } from './Share.js';
     import { tq } from '../util/translate.js';
-    import { classNavFooter, classLinkHover } from './Style.js';
+    import { classNavFooter, classLinkHover, classNavFooterLink } from './Style.js';
 
     const classFooterText = 'text-sm text-gray-500 dark:text-gray-400';
     let hideAttributions = $state(true);
@@ -47,7 +47,7 @@
 </script>
   
 <Footer class="fixed bottom-0 start-0 w-full flex flex-wrap items-center justify-between pt-2 pb-1 pl-5 pr-5 border-t {classNavFooter}">
-  <FooterCopyright by="OXL" href="https://github.com/O-X-L" copyrightMessage="" classA={classFooterText} />
+  <FooterCopyright by="OXL IT Services" href="https://github.com/O-X-L" copyrightMessage="" classA={classFooterText} />
   <FooterLinkGroup>
     <div class={classFooterText}>
       <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" class={classFooterText}>License: GPLv3</a> |
@@ -57,11 +57,11 @@
     </div>
   </FooterLinkGroup>
   <FooterLinkGroup class="sm:hidden">
-    <Button size="xs" class="ml-2" href="https://webui.ansibleguy.net"><BookSolid /></Button>
+    <Button size="xs" class="ml-2 {classNavFooterLink}" href="https://webui.ansibleguy.net"><BookSolid /></Button>
     <Tooltip placement="bottom">{t('nav.docs')}</Tooltip>
-    <Button size="xs" class="ml-2" href="https://github.com/O-X-L/ansible-webui"><GithubSolid /></Button>
+    <Button size="xs" class="ml-2 {classNavFooterLink}" href="https://github.com/O-X-L/ansible-webui"><GithubSolid /></Button>
     <Tooltip placement="top">{t('nav.repo')}</Tooltip>
-    <Button size="xs" class="ml-2" href="https://github.com/O-X-L/ansible-webui/issues"><BugSolid /></Button>
+    <Button size="xs" class="ml-2 {classNavFooterLink}" href="https://github.com/O-X-L/ansible-webui/issues"><BugSolid /></Button>
     <Tooltip placement="top">{t('nav.bugs')}</Tooltip>
   </FooterLinkGroup>
   <FooterLinkGroup class={classFooterText}>

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { slide } from 'svelte/transition';
 
-    import { share } from '../State.js';
+    import { share } from '../Share.js';
     import { Alert } from 'flowbite-svelte';
     import { tq } from '../../util/translate.js';
     import { API_STATUS_CODES_OK } from '../sub/Config.js';

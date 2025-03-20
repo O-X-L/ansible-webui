@@ -7,19 +7,16 @@
         TableHead, TableHeadCell, Radio, Button, Tooltip,
     } from 'flowbite-svelte';
 
-    import { share } from '../State.js';
     import LogsView from './forms/Logs.svelte';
     import { tq } from '../../util/translate.js';
+    import { share, urlParams } from '../Share.js';
     import { redirectTo } from '../../util/main.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
-    import { classSpinnerDiv, classListContent, classListHeader } from '../Style.js';
-    import { JOB_EXEC_STATI_ACTIVE, type jobType, type executionType } from './Config.js';
+    import { JOB_EXEC_STATI_ACTIVE, type jobType, type executionType, PARAM_JOB } from './Config.js';
+    import { classSpinnerDiv, classListContent, classListHeader, classFooterSpacing } from '../Style.js';
 
     let { open = $bindable(false) } = $props();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const JOB_PARAM = 'job';
 
     let apiResponseHandler: APIResponseHandler = $state();
     let jobList: jobType[] = $state([]);
@@ -57,7 +54,7 @@
             return;
         }
         // todo: redirect to http://127.0.0.1:8000/ui#jobs?search=id:<job>
-        redirectTo(`/ui?job=${jobId}#jobs`, `?job=${jobId}`);
+        redirectTo(`/ui?search=id:${jobId}#jobs`, `?job=${jobId}`);
     }
 
     function loadJobList(j: any, h: string) {
@@ -121,7 +118,7 @@
     }
 
     function openLogsByURL() {
-        let paramJob = urlParams.get(JOB_PARAM);
+        let paramJob = urlParams.get(PARAM_JOB);
         if (!paramJob) {
             return;
         }
@@ -214,9 +211,11 @@
                                 <StopSolid/>
                             </Button>
                             <Tooltip>{t('btn.stop')}</Tooltip>
-
+                            
+                            <!--
                             <Button size="xs" on:click={() => {redirectJob(job.id)}}><CogSolid/></Button>
                             <Tooltip>{t('jobs.job')}</Tooltip>
+                            -->
                         </TableBodyCell>
                     </TableBodyRow>
                     {/each}
@@ -226,3 +225,5 @@
         </AccordionItem>
     {/each}
 </Accordion>
+
+<div class={classFooterSpacing}></div>

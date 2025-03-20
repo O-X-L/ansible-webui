@@ -5,7 +5,7 @@
     ln -s ../../../../src/flowbite-custom/MultiInput.svelte MultiInput.svelte
   */
   import type { SizeType, FormSizeType } from '../../node_modules/flowbite-svelte/dist/types';
-  export function clampSize(s: SizeType) : number {
+  export function clampSize(s: SizeType) {
     return s && s === 'xs' ? 'sm' : s === 'xl' ? 'lg' : s;
   }
 </script>
@@ -84,6 +84,12 @@
     red: 'focus:ring-red-500 focus:border-red-500 dark:focus:ring-red-500 dark:focus:border-red-500'
   };
 
+  const ringWithinClasses = {
+    base: 'focus-within:border-primary-500 focus-within:ring-primary-500 dark:focus-within:border-primary-500 dark:focus-within:ring-primary-500',
+    green: 'focus-within:ring-green-500 focus-within:border-green-500 dark:focus-within:border-green-500 dark:focus-within:ring-green-500',
+    red: 'focus-within:ring-red-500 focus-within:border-red-500 dark:focus-within:ring-red-500 dark:focus-within:border-red-500'
+  };
+
   const colorClasses = {
     base: 'bg-gray-50 text-gray-900 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400',
     tinted: 'bg-gray-50 text-gray-900 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400',
@@ -102,9 +108,10 @@
   let inputClass: string;
   let multiInputClass: string;
   $: {
-    const _color = color === 'base' && background ? 'tinted' : color;
+    const _color = inputInvalid ? 'red' : (color === 'base' && background ? 'tinted' : color);
+    const _colorRing = inputInvalid ? 'red' : color;
     inputClass = twMerge([inputDefaultClass, textSizes[_size], group || 'rounded-lg', group && 'first:rounded-s-lg last:rounded-e-lg', group && '[&:not(:first-child)]:-ms-px', $$props.class], colorClasses[_color]) + ' border-none rounded-none p-0';
-    multiInputClass = twMerge(containerDefaultClass, sizes[size], $$props.class, !disabled && 'focus-within:ring-1 focus-within:border-primary-500 dark:focus-within:border-primary-500', disabled && 'opacity-50 cursor-not-allowed', ringClasses[color], borderClasses[_color], colorClasses[_color]);
+    multiInputClass = twMerge(containerDefaultClass, sizes[_size], $$props.class, !disabled && 'focus-within:ring-1 ' + ringWithinClasses[_colorRing], disabled && 'opacity-50 cursor-not-allowed', ringClasses[_colorRing], borderClasses[_color], colorClasses[_color]);
   }
 
   const clearAll = (e: MouseEvent) => {
@@ -112,6 +119,7 @@
     value = [];
     dispatcher('change');
   };
+
   const clearThisOption = (thisValue: string) => {
     if (disabled) return;
     if (value.includes(thisValue)) {
@@ -119,22 +127,22 @@
       dispatcher('change');
     }
   };
+
   function handleInputSeparation() {
     inputCurrent = inputCurrent.trim();
     if (inputCurrent && !value.includes(inputCurrent)) {
       if (validationCallback && !validationCallback(inputCurrent)) {
         inputInvalid = true;
-        color = 'red';
         return;
       }
       value = [...value, inputCurrent];
     }
     inputCurrent = '';
   };
+
   function handleKeyDown(event: KeyboardEvent) {
     if (disabled || !separators) return;
     inputInvalid = false;
-    color = 'base';
     for (let s of separators) {
       if (event.key == s) {
         handleInputSeparation();
@@ -162,7 +170,7 @@
             </Badge>
           {/each}
         {/if}
-        <input {...$$restProps} placeholder={inputItems.length == 0 ? placeholder : undefined} bind:value={inputCurrent} on:blur on:change on:click on:contextmenu on:focus on:keydown={handleKeyDown} on:keypress on:keyup on:mouseover on:mouseenter on:mouseleave on:paste on:input {...{ type }} class="{inputClass} { inputInvalid ? validationErrorClass : ''}" />
+        <input {...$$restProps} placeholder={inputItems.length == 0 ? placeholder : undefined} bind:value={inputCurrent} on:blur={handleInputSeparation} on:change on:click on:contextmenu on:focus on:keydown={handleKeyDown} on:keypress on:keyup on:mouseover on:mouseenter on:mouseleave on:paste on:input {...{ type }} class="{inputClass} { inputInvalid ? validationErrorClass : ''}" />
       </span>
       <div class="flex ms-auto gap-2 items-center">
         {#if inputItems.length}

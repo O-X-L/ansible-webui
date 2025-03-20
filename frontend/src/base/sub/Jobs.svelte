@@ -11,20 +11,20 @@
         Input, Toggle, Label, Select,
     } from 'flowbite-svelte';
 
-    import { share } from '../State.js';
     import JobForm from './forms/Job.svelte';
     import { tq } from '../../util/translate.js';
     import { classModalLabel } from '../Style.js';
+    import { share, urlParams } from '../Share.js';
     import { type formChoiceType } from '../Types.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import { choicesFromArray } from '../../util/form.js';
     import { redirectTo, isSet } from '../../util/main.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
-    import { type executionPromptsType, JOB_EXEC_STATI_ACTIVE, type jobType } from './Config.js';
+    import { type executionPromptsType, JOB_EXEC_STATI_ACTIVE, type jobType, PARAM_SEARCH } from './Config.js';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
         classPopoverColumn2Text, classPopoverColumn2Div, classCenterChildDiv, classSpinnerDiv,
-        classListContent, classListHeader,
+        classListContent, classListHeader, classFooterSpacing,
     } from '../Style.js';
 
     let { open = $bindable(false) } = $props();
@@ -36,10 +36,14 @@
     let entryActions = $state({});
     let apiErrorMsg = $state('');
     let apiSuccessMsg = $state('');
+    let apiError = $state(false);
     let apiSuccess = $state(false);
     let apiDataHash = $state('');
     let updateLoop: number = $state(0);
     let updatedAt = $state(0);
+    // todo: init search from url-param
+    //let tableSearchTerm = $state('');
+    //let loaded = $state(false);
 
     interface executionPromptsFieldValues {
         tags: string,
@@ -67,10 +71,11 @@
     }
 
     const executionPromptsDefault: executionPromptsFullType = {
-        config: {enforce: false, fields: [], vars: []},
+        config: {fields: [], vars: []},
         field_values: {
             tags: '', tags_skip: '', mode_check: false, mode_diff: false, limit: '',
-            environment_vars: '', cmd_args: '', credentials: null, comment: '',
+            environment_vars: '', cmd_args: '', credentials: null, credentials_req: false,
+            comment: '',
         },
         var_values: {},
     }
@@ -81,20 +86,6 @@
 
     function t(code: string) : string {
       return tq($share, code);
-    }
-
-    function loadJobList(j: any, h: string) {
-        if (j === null || h == apiDataHash) {
-            return;
-        }
-        for (let job of j) {
-            if (!entryActions[job.id]) {
-                entryActions[job.id] = {edit: false, clone: false, exec: false};
-            }
-        }
-        entryList = j;
-        apiDataHash = h;
-        updatedAt = Date.now();
     }
 
     function isJobActive(job: jobType) : boolean {
@@ -126,6 +117,28 @@
         }
         let promptData = {};
 
+        // validation
+        if (executionPrompts.config.fields.includes('limit_req') && !isSet(executionPrompts.field_values.limit)) {
+            apiErrorMsg = t('jobs.execute.required_limit');
+            apiError = true;
+            return;
+        }
+
+        if (executionPrompts.config.fields.includes('credentials_req') && !isSet(executionPrompts.field_values.credentials)) {
+            apiErrorMsg = t('jobs.execute.required_credentials');
+            apiError = true;
+            return;
+        }
+
+        for (let v of executionPrompts.config.vars) {
+            if (v.required && !isSet(executionPrompts.var_values[v.varName])) {
+                apiErrorMsg = `${t('jobs.execute.required_var')}: "${v.name}"`;
+                apiError = true;
+                return;
+            }
+        }
+
+        // encode prompt info
         for (let f of executionPrompts.config.fields) {
             promptData[f] = executionPrompts.field_values[f];
         }
@@ -168,6 +181,11 @@
     }
 
     function searchFilter(item: jobType, searchTerm: string) : boolean {
+        if (searchTerm.includes('id:')) {
+            let sid = searchTerm.split(':')[1];
+            return String(item.id) == sid;
+        }
+
         let s = searchTerm.toLowerCase();
         let c = item.comment ? item.comment : '';
         let i = item.inventory_file ? item.inventory_file : '';
@@ -178,6 +196,18 @@
             i.toLowerCase().includes(s)
         )
     }
+
+    /*
+    function setSearchByURL() {
+        let paramSearch = urlParams.get(PARAM_SEARCH);
+        if (!paramSearch) {
+            return;
+        }
+        tableSearchTerm = paramSearch;
+    }
+    */
+
+    // todo: update search url-param on input
 
     function loadCredentialInfos(j: any) {
         usableCredentials = j;
@@ -192,6 +222,26 @@
             choices.push({value: c.id, name: `${t('creds.shared')} - ${c.name}`});
         }
         return choices;
+    }
+
+    function loadJobList(j: any, h: string) {
+        if (j === null || h == apiDataHash) {
+            return;
+        }
+        for (let job of j) {
+            if (!entryActions[job.id]) {
+                entryActions[job.id] = {edit: false, clone: false, exec: false};
+            }
+        }
+        entryList = j;
+        apiDataHash = h;
+        updatedAt = Date.now();
+        /*
+        if (!loaded) {
+            setSearchByURL();
+            loaded = true;
+        }
+        */
     }
 
     function buildUpdateJobList() {
@@ -218,7 +268,7 @@
     });
 </script>
 
-<APIResponseHandler bind:this={apiResponseHandler} bind:errorMsg={apiErrorMsg}
+<APIResponseHandler bind:this={apiResponseHandler} bind:errorMsg={apiErrorMsg} bind:showError={apiError}
     bind:successMsg={apiSuccessMsg} bind:showSuccess={apiSuccess} />
 
 <div>
@@ -518,10 +568,6 @@
                 {/each}
 
                 <div class={classModalBtns}>
-                    <!--
-                    todo: pass execution-prompt inputs to startJob 
-                    todo: validate execution_prompts_enforce
-                    -->
                     <Button type="button" on:click={() => {startJob(job.id)}}><PlaySolid/></Button>
                     <Tooltip>{t('btn.execute')}</Tooltip>
 
@@ -544,3 +590,5 @@
 {#key addModalId}
     <JobForm bind:open={addModal} action='add' bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 {/key}
+
+<div class={classFooterSpacing}></div>

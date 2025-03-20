@@ -11,14 +11,14 @@
         Dropdown, DropdownItem, Accordion, AccordionItem,
     } from 'flowbite-svelte';
 
-    import { share } from '../State.js';
+    import { share } from '../Share.js';
     import { tq } from '../../util/translate.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import CredentialsForm from './forms/Credentials.svelte';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
         classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
-        classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle,
+        classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle, classFooterSpacing,
     } from '../Style.js';
  
     const credentialsKind = ['user', 'shared'];
@@ -418,3 +418,5 @@
     <CredentialsForm bind:open={addSharedModal} action='add' shared={true}
         bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 {/key}
+
+<div class={classFooterSpacing}></div>

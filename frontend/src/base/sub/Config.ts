@@ -1,6 +1,8 @@
 export const API_STATUS_CODES_OK = [200, 304];
 export const JOB_EXEC_STATI_ACTIVE = [0, 1, 2, 7];
 export const REPO_EXEC_STATI_ACTIVE = [1, 2, 7];
+export const PARAM_JOB = 'job';
+export const PARAM_SEARCH = 'search';
 
 export interface executionPromptVarType {
     name: string,
@@ -12,7 +14,6 @@ export interface executionPromptVarType {
 }
 
 export interface executionPromptsType {
-    enforce: boolean,
     fields: string[],
     vars: executionPromptVarType[],
 }

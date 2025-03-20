@@ -10,12 +10,12 @@
       // ChevronDownOutline, AdjustmentsHorizontalSolid,
     } from 'flowbite-svelte-icons';
 
-    import { share } from './State.js';
+    import { share } from './Share.js';
     import { type formAlertType } from './Types.js';
     import { tq, flagIcon } from '../util/translate.js';
     import { setDarkLightMode } from './DarkLightMode.js';
-    import { classNavFooter, classBtnBase } from './Style.js';
     import { apiGet, getCSRFFormTokenHTML } from '../util/api.js';
+    import { classNavFooter, classBtnBase, classNavFooterLink } from './Style.js';
 
     let loaded: boolean = $state(false);
     let language: string = $state('en');
@@ -129,11 +129,11 @@
     {/if}
     -->
 
-    <Button size="xs" class="ml-2 max-sm:hidden" href="https://webui.ansibleguy.net"><BookSolid /></Button>
+    <Button size="xs" class="ml-2 max-sm:hidden {classNavFooterLink}" href="https://webui.ansibleguy.net"><BookSolid /></Button>
     <Tooltip placement="bottom">{t('nav.docs')}</Tooltip>
-    <Button size="xs" class="ml-2 max-sm:hidden" href="https://github.com/O-X-L/ansible-webui"><GithubSolid /></Button>
+    <Button size="xs" class="ml-2 max-sm:hidden {classNavFooterLink}" href="https://github.com/O-X-L/ansible-webui"><GithubSolid /></Button>
     <Tooltip placement="bottom">{t('nav.repo')}</Tooltip>
-    <Button size="xs" class="ml-2 max-sm:hidden" href="https://github.com/O-X-L/ansible-webui/issues"><BugSolid /></Button>
+    <Button size="xs" class="ml-2 max-sm:hidden {classNavFooterLink}" href="https://github.com/O-X-L/ansible-webui/issues"><BugSolid /></Button>
     <Tooltip placement="bottom">{t('nav.bugs')}</Tooltip>
     {#if $share.backend.authenticated}
       <form method="post" action="/o/">

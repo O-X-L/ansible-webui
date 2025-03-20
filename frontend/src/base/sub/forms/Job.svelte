@@ -3,11 +3,11 @@
         FolderSolid, FileSolid, CloseCircleSolid, TrashBinSolid, FloppyDiskSolid, CirclePlusSolid,
     } from 'flowbite-svelte-icons';
     import {
-        Heading, Button, Modal, Input, Label, Helper, Toggle, Select, Spinner, Alert, Tooltip,
-        AccordionItem, Accordion,
+        Heading, Button, Modal, Input, Label, Helper, Toggle, Select, Spinner, Tooltip,
+        AccordionItem, Accordion, MultiInput,
     } from 'flowbite-svelte';
 
-    import { share } from '../../State.js';
+    import { share } from '../../Share.js';
     import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
     import { rsplit } from '../../../util/main.js';
@@ -225,7 +225,7 @@
         varName: {value: string, color: inputColorType, required: boolean},
         kind: {value: 'text'|'dropdown'},
         required: {value: boolean},
-        choices: {value: string},  // todo: change to multi-input and array
+        choices: {value: string[]},
         regex: {value: string, color: inputColorType, regex: RegExp},
     }
     interface executionPromptSwitches {
@@ -239,11 +239,14 @@
         cmd_args: boolean,
         verbosity: boolean,
         credentials: boolean,
+        credentials_req: boolean,
+        comment: boolean,
     }
 
     let executionPromptsSimple: executionPromptSwitches = $state({
         tags: false, tags_skip: false, mode_check: true, mode_diff: false, limit: true, limit_req: false,
         environment_vars: false, cmd_args: false, verbosity: true, credentials: true, comment: true,
+        credentials_req: false, comment: true,
     });
     let executionPrompts: executionPrompt[] = $state([]);
     let executionPromptId = 0;
@@ -279,7 +282,7 @@
                 varName: p.varName.value,
                 kind: p.kind.value,
                 required: p.required.value,
-                choices: p.choices.value.split(','),
+                choices: p.choices.value,
                 regex: p.regex.value,
             };
             prompts.vars.push(prompt);
@@ -296,7 +299,7 @@
             varName: {value: p.varName, required: true, color: inputBaseColor},
             kind: {value: p.kind},
             required: {value: p.required},
-            choices: {value: p.choices.join(',')},  // todo: change to use multi-input
+            choices: {value: p.choices},
             regex: {value: p.regex, color: inputBaseColor, regex: /^(?!.*\x22.*)(^.*$)$/},
         }
         executionPrompts = [...executionPrompts, p2];
@@ -562,9 +565,16 @@
                             </div>
                         </div>
                         <div>
-                            <Label for="job_exec_prompt_credentials" class={classModalLabel}>{t('jobs.form.credentials')}</Label>
+                            <Label for="job_exec_prompt_creds" class={classModalLabel}>{t('jobs.form.credentials')}</Label>
                             <div class={classCenterChildDiv}>
-                                <Toggle id="job_exec_prompt_credentials" bind:checked={executionPromptsSimple.credentials} />
+                                <Toggle id="job_exec_prompt_creds" bind:checked={executionPromptsSimple.credentials} />
+                            </div>
+                        </div>
+                        <div>
+                            <Label for="job_exec_prompt_creds_req" class={classModalLabel}>{t('jobs.form.prompt_credentials_req')}</Label>
+                            <div class={classCenterChildDiv}>
+                                <Toggle id="job_exec_prompt_creds_req" bind:checked={executionPromptsSimple.credentials_req}
+                                disabled={!executionPromptsSimple.limit} />
                             </div>
                         </div>
                     </div>
@@ -596,16 +606,18 @@
                                 {#if p.kind.value == 'dropdown'}
                                     <div class={classModalInput}>
                                         <Label for="job_prompt_{p.id}_choices" class={classModalLabel}>{t('common.choices')}</Label>
-                                        <Input id="job_prompt_{p.id}_choices" bind:value={p.choices.value} />
+                                        <MultiInput id="job_prompt_{p.id}_choices" bind:value={p.choices.value} />
                                         <Helper class={classModalHelp}>{t('jobs.form.help.prompt_choices')}</Helper>
                                     </div>
                                 {/if}
-                                <div class={classModalInput}>
-                                    <Label for="job_prompt_{p.id}_regex" class={classModalLabel}>{t('jobs.form.prompt_regex')}</Label>
-                                    <Input id="job_prompt_{p.id}_regex" on:input={(e) => {valideInputInstance(e, p)}} 
-                                        bind:value={p.regex.value} bind:color={p.regex.color} />
-                                    <Helper class={classModalHelp}>{@html t('jobs.form.help.prompt_regex')}</Helper>
-                                </div>
+                                {#if p.kind.value == 'text'}
+                                    <div class={classModalInput}>
+                                        <Label for="job_prompt_{p.id}_regex" class={classModalLabel}>{t('jobs.form.prompt_regex')}</Label>
+                                        <Input id="job_prompt_{p.id}_regex" on:input={(e) => {valideInputInstance(e, p)}} 
+                                            bind:value={p.regex.value} bind:color={p.regex.color} />
+                                        <Helper class={classModalHelp}>{@html t('jobs.form.help.prompt_regex')}</Helper>
+                                    </div>
+                                {/if}
                             </div>
                             <div class="flex justify-between">
                                 <div></div>

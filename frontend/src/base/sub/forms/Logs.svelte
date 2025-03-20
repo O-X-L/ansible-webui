@@ -4,7 +4,7 @@
     import { InfoCircleSolid } from 'flowbite-svelte-icons';
     import { Spinner, Modal, Heading } from 'flowbite-svelte';
 
-    import { share } from '../../State.js';
+    import { share } from '../../Share.js';
     import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
     // import { type executionInfos } from '../Config.js';
