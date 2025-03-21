@@ -1,9 +1,3 @@
-export const API_STATUS_CODES_OK = [200, 304];
-export const JOB_EXEC_STATI_ACTIVE = [0, 1, 2, 7];
-export const REPO_EXEC_STATI_ACTIVE = [1, 2, 7];
-export const PARAM_JOB = 'job';
-export const PARAM_SEARCH = 'search';
-
 export interface executionPromptVarType {
     name: string,
     varName: string,
@@ -17,13 +11,6 @@ export interface executionPromptsType {
     fields: string[],
     vars: executionPromptVarType[],
 }
-
-interface repoKindMapType {
-    static: number,
-    git: number,
-}
-
-export const repoKindMap: repoKindMapType = {'static': 1, 'git': 2};
 
 export interface executionType {
     id: number,
@@ -79,4 +66,20 @@ export interface jobType {
     execution_prompts_json: string|null,
     next_run: string|null,
     executions: executionType[],
+}
+
+export interface credentialsSharedType {
+    id: number,
+    name: string,
+    connect_user: string,
+    become_user: string,
+    vault_file: string,
+    vault_id: string,
+    vault_pass_is_set: boolean,
+    become_pass_is_set: boolean,
+    connect_pass_is_set: boolean,
+    ssh_key_is_set: boolean,
+}
+export interface credentialsUserType extends credentialsSharedType {
+    category: string,
 }

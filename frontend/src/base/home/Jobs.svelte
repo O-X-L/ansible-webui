@@ -19,8 +19,9 @@
     import { apiEdit, apiGet } from '../../util/api.js';
     import { choicesFromArray } from '../../util/form.js';
     import { redirectTo, isSet } from '../../util/main.js';
+    import { JOB_EXEC_STATI_ACTIVE, PARAM_SEARCH } from '../Config.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
-    import { type executionPromptsType, JOB_EXEC_STATI_ACTIVE, type jobType, PARAM_SEARCH } from './Config.js';
+    import { type jobType, type executionPromptsType} from './Types.js';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
         classPopoverColumn2Text, classPopoverColumn2Div, classCenterChildDiv, classSpinnerDiv,

@@ -41,6 +41,7 @@ EN = {
     'common.created_at': 'Created at',
     'common.click_to_copy': 'Click to Copy',
     'common.comment': 'Comment',
+    'common.invalid_value': 'Field has invalid value',  # '<msg>: "<field>"'
 
     # auth
     'login.user': 'Username',
@@ -263,6 +264,7 @@ EN = {
     'config.execution': 'Execution',
     'config.internal': 'Internal',
     'config.action.update': 'Settings updated',
+    'config.is_read_only': 'This setting is read-only because it was provided as environment-variable!',
 
     ## form fields
     'config.form.path_run': 'Runtime directory',
@@ -312,8 +314,7 @@ EN = {
     'config.form.help.debug': 'Enable Debug-mode. Do not enable permanent on production systems! '
                               'It can possibly open attack vectors. '
                               'You might need to restart the application to apply this setting',
-    'config.form.help.logo_url': 'Default: <a href="/static/img/logo.svg">img/logo.svg</a>; '
-                                 'Per example: '
+    'config.form.help.logo_url': 'Example: '
                                  '<a href="https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo'
                                  '/vscode-ansible.svg">'
                                  'https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo/vscode-ansible.svg'

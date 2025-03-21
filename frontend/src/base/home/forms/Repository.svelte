@@ -6,7 +6,7 @@
     } from 'flowbite-svelte';
 
     import { share } from '../../Share.js';
-    import { repoKindMap } from '../Config.js';
+    import { repoKindMap } from '../../Config.js';
     import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
     import { type formInfoType } from '../../Types.js';
@@ -55,6 +55,7 @@
     let actionNew = $derived(['add', 'clone'].includes(action));
     let url = $derived(actionNew ? 'repository' : urlExisting);
     let title = $derived(actionNew ? t('repos.new') : t('repos.edit'));
+    let formWarningMsgs: string[] = $state([]);
 
     let form = $state({
         name: {value: '', color: inputBaseColor, required: true, regex: /^.{1,100}/},
@@ -99,7 +100,12 @@
             igoreFields = ignoreFieldsGit;
         }
 
-        submitFormBase(form, method, url, handleSubmitResponse, igoreFields);
+        let [valid, errors] = submitFormBase(
+            form, method, url, handleSubmitResponse, t, 'repos.form.', [], igoreFields,
+        );
+        if (!valid) {
+            formWarningMsgs = errors;
+        }
     }
 
     function setFormInfos(j: any) {
@@ -145,7 +151,7 @@
     {#if !loaded}
         <div class={classSpinnerDiv}><Spinner/></div>
     {:else}
-        <APIResponseHandler bind:this={apiResponseHandler} />
+        <APIResponseHandler bind:this={apiResponseHandler} bind:warningMsgs={formWarningMsgs} />
         {#if rtypeName == 'static'}
             <div class={classModalInputDiv}>
                 <div class={classModalInput}>

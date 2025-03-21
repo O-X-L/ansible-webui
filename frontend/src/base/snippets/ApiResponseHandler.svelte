@@ -3,15 +3,17 @@
 
     import { share } from '../Share.js';
     import { Alert } from 'flowbite-svelte';
-    import { tq } from '../../util/translate.js';
-    import { API_STATUS_CODES_OK } from '../home/Config.js';
-    import { CloseCircleSolid, InfoCircleSolid } from 'flowbite-svelte-icons';
+    import { tq, tqSub } from '../../util/translate.js';
+    import { API_STATUS_CODES_OK } from '../Config.js';
+    import { CloseCircleSolid, InfoCircleSolid, ExclamationCircleSolid } from 'flowbite-svelte-icons';
 
     let {
         showError = $bindable(false),
         errorMsg = $bindable(''),
         showSuccess = $bindable(false),
         successMsg = $bindable(''),
+        // showWarning = $bindable(false),
+        warningMsgs = $bindable([]),
     } = $props();
 
     // const scrollToDiv = `api-response-${Date.now()}`;
@@ -21,9 +23,15 @@
 
     let errorMsgTranslated = $state('');
     let successMsgTranslated = $state('');
+    let warningMsgsTranslated: string[] = $state([]);
+    let showWarning = $derived(warningMsgsTranslated.length > 0);
 
     function t(code: string) : string {
       return tq($share, code);
+    }
+
+    function tSub(s: string) : string {
+        return tqSub($share, s);
     }
 
     export function handleRes(s: number, j: any) {
@@ -45,16 +53,21 @@
     $effect(() => {
         // if we set a language-code as error/success message - we want to translate it
         // todo: pull language-code from api-error and show user the translation
-        if (!errorMsg && !successMsg) {
+        if (!errorMsg && !successMsg && !warningMsgs.length) {
             return;
         }
 
-        errorMsgTranslated = t(errorMsg);
-        successMsgTranslated = t(successMsg);
+        errorMsgTranslated = tSub(t(errorMsg));
+        successMsgTranslated = tSub(t(successMsg));
+        let warnings = []
+        for (let w of warningMsgs) {
+            warnings.push(tSub(t(w)));
+        }
+        warningMsgsTranslated = warnings;
     })
 
     $effect(() => {
-        if (!showError && !showSuccess) {
+        if (!showError && !showSuccess && !showWarning) {
             return;
         }
 
@@ -65,6 +78,8 @@
             [showError, showSuccess] = [false, false];
             successMsg = '';
             errorMsg = '';
+            warningMsgs = [];
+            warningMsgsTranslated = [];
         }, showSuccess ? timeoutSuccess : timeoutError);
     })
 </script>
@@ -82,4 +97,13 @@
             <InfoCircleSolid slot="icon" class="w-5 h-5" /> {successMsgTranslated}
         </Alert>
     </div>
+{/if}
+{#if showWarning}
+    {#each warningMsgsTranslated as m}
+        <div transition:slide>
+            <Alert border color="yellow" class={classAlert} dismissable={true}>
+                <ExclamationCircleSolid slot="icon" class="w-5 h-5" /> {m}
+            </Alert>
+        </div>
+    {/each}
 {/if}

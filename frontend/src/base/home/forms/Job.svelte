@@ -13,7 +13,7 @@
     import { rsplit } from '../../../util/main.js';
     import { type formInfoType, type inputColorType } from '../../Types.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
-    import { type executionPromptsType, type executionPromptVarType } from '../Config.js';
+    import { type executionPromptsType, type executionPromptVarType } from '../../Config.js';
     import {
         inputBaseColor, valideInputBase, submitFormBase, getMethod,
         type formMethod,
@@ -41,6 +41,7 @@
     let actionNew = $derived(['add', 'clone'].includes(action));
     let url = $derived(actionNew ? 'job' : urlExisting);
     let title = $derived(actionNew ? t('jobs.new') : t('jobs.edit'));
+    let formWarningMsgs: string[] = $state([]);
 
     let form = $state({
         name: {value: '', color: inputBaseColor, required: true},
@@ -93,7 +94,12 @@
 
     function submitForm() {
         execPromptsEncode();
-        submitFormBase(form, method, url, handleSubmitResponse);
+        let [valid, errors] = submitFormBase(
+            form, method, url, handleSubmitResponse, t, 'jobs.form.',
+        );
+        if (!valid) {
+            formWarningMsgs = errors;
+        }
     }
 
     function setFormInfos(j: any) {
@@ -333,7 +339,7 @@
     {#if !loaded}
         <div class={classSpinnerDiv}><Spinner/></div>
     {:else}
-        <APIResponseHandler bind:this={apiResponseHandler} />
+        <APIResponseHandler bind:this={apiResponseHandler} bind:warningMsgs={formWarningMsgs} />
 
         <Accordion class={classModalForm}>
             <AccordionItem>

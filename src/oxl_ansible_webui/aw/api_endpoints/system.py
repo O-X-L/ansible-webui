@@ -11,8 +11,9 @@ from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse,
 from aw.utils.util_no_config import is_set, is_null
 from aw.utils.debug import log
 from aw.utils.permission import has_manager_privileges
-from aw.config.hardcoded import SECRET_HIDDEN
 from aw.utils.system import get_system_environment
+from aw.config.environment import check_aw_env_var_is_set
+from aw.config.hardcoded import SECRET_HIDDEN
 
 
 class SystemConfigSettings(BaseResponse):
@@ -118,6 +119,10 @@ class APISystemConfig(APIView):
         try:
             changed = False
             for setting, value in serializer.validated_data.items():
+                if check_aw_env_var_is_set(setting):
+                    # read-only
+                    continue
+
                 if setting in SystemConfig.SECRET_ATTRS:
                     if (setting not in SystemConfig.EMPTY_ATTRS and is_null(value)) or value == SECRET_HIDDEN:
                         value = getattr(config_db, setting)

@@ -9,6 +9,7 @@ from aw.settings import AUTH_MODE
 from aw.utils.util import get_logo
 from aw.utils.version import get_version
 from aw.config.language import TRANSLATIONS
+from aw.config.environment import AW_ENV_VARS
 from aw.utils.deployment import deployment_dev
 from aw.config.defaults import CONFIG_DEFAULTS
 from aw.api_endpoints.base import get_api_user, HDR_CACHE_1W, GenericResponse, API_PERMISSION
@@ -191,5 +192,6 @@ class APIFormInfosConfig(GenericAPIView):
         data['defaults']['path_ansible_config'] = CONFIG_DEFAULTS['path_ansible_config']
         data['defaults']['path_ssh_known_hosts'] = CONFIG_DEFAULTS['path_ssh_known_hosts']
         data['defaults']['debug'] = CONFIG_DEFAULTS['debug'] or deployment_dev()
+        data['env_vars'] = AW_ENV_VARS
 
         return Response(data=data, status=200, headers=HDR_CACHE_1W)

@@ -1,3 +1,4 @@
+import { TT } from './translate.js';
 import { apiEdit, getCSRFFormTokenJSON } from './api.js';
 import { type inputColorType, type formChoiceType } from '../base/Types.js';
 
@@ -46,14 +47,23 @@ export function valideInputBase(e: Event, i: any|formField) {
     }
 }
 
-export function submitFormBase(form: any, method: formMethod, url: string, callback: CallableFunction, ignoreFields: string[] = []) {
+export function submitFormBase(
+    form: any, method: formMethod, url: string, callback: CallableFunction,
+    t: CallableFunction, tb: string,
+    ignoreFields: string[] = [], ignoreFieldsValidate: string[] = [],
+) : [boolean, string[]] {
     let payload = {...getCSRFFormTokenJSON()};
     let valid = true;
+    let validationErrors : string[] = [];
 
     for (let [k, v] of Object.entries(form)) {
-        if (!ignoreFields.includes(k) && !validateFormField(v)) {
-            // todo: give error message (?)
-            console.log("ERROR: Field has invalid value", k);
+        if (ignoreFields.includes(k)) {
+            continue;
+        }
+        if (!ignoreFieldsValidate.includes(k) && !validateFormField(v)) {
+            let e = `${t('common.invalid_value')}: "${tb}${k}"`
+            console.log(`ERROR: ${e}`);
+            validationErrors.push(e + TT);
             v.color = 'red';
             valid = false;
         }
@@ -63,6 +73,7 @@ export function submitFormBase(form: any, method: formMethod, url: string, callb
         console.log("SUBMITTING FORM", payload);
         apiEdit(method, url, payload, callback);
     }
+    return [valid, validationErrors];
 }
 
 export function choicesFromArray(a: string[]) : formChoiceType[] {

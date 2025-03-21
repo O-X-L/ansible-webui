@@ -9,6 +9,8 @@
     import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
     import { type formInfoType } from '../../Types.js';
+    import { SECRET_PLACEHOLDER } from '../../Config.js';
+    import { type credentialsUserType, type credentialsSharedType  } from '../Types.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
     import {
         inputBaseColor, valideInputBase, submitFormBase, getMethod,
@@ -33,11 +35,24 @@
     let apiResponseHandler: APIResponseHandler = $state();
     let formInfos: formInfoType = $state({defaults: {}, choices: {}});
     let loaded = $state(false);
-    let existing = $state({});
     let method: formMethod = $derived(getMethod(action));
     let actionNew = $derived(['add', 'clone'].includes(action));
     let url = $derived(actionNew ? `credentials?shared=${shared}` : urlExisting);
     let title = $derived(actionNew ? t('creds.new') : t('creds.edit'));
+    let formWarningMsgs: string[] = $state([]);
+    let existing: credentialsUserType|credentialsSharedType = $state({
+        id: 0,
+        name: '',
+        become_user: '',
+        connect_user: '',
+        vault_file: '',
+        vault_id: '',
+        become_pass_is_set: false,
+        connect_pass_is_set: false,
+        vault_pass_is_set: false,
+        ssh_key_is_set: false,
+        category: '',
+    });
 
     let form = $state({
         name: {value: '', color: inputBaseColor, required: true, regex: /^.{1,100}/},
@@ -72,7 +87,12 @@
     }
 
     function submitForm() {
-        submitFormBase(form, method, url, handleSubmitResponse);
+        let [valid, errors] = submitFormBase(
+            form, method, url, handleSubmitResponse, t, 'creds.form.',
+        );
+        if (!valid) {
+            formWarningMsgs = errors;
+        }
     }
 
     function setFormInfos(j: any) {
@@ -97,6 +117,18 @@
                 form[k].value = v;
             }
         }
+        if (existing.become_pass_is_set) {
+            form.become_pass.value = SECRET_PLACEHOLDER;
+        }
+        if (existing.connect_pass_is_set) {
+            form.connect_pass.value = SECRET_PLACEHOLDER;
+        }
+        if (existing.vault_pass_is_set) {
+            form.vault_pass.value = SECRET_PLACEHOLDER;
+        }
+        if (existing.ssh_key_is_set) {
+            form.ssh_key.value = SECRET_PLACEHOLDER;
+        }
         loaded = true;
     }
 
@@ -117,7 +149,7 @@
     {#if !loaded}
         <div class={classSpinnerDiv}><Spinner/></div>
     {:else}
-        <APIResponseHandler bind:this={apiResponseHandler} />
+        <APIResponseHandler bind:this={apiResponseHandler} bind:warningMsgs={formWarningMsgs} />
 
         <div class={classModalInputDiv}>
             <div class={classModalInput}>

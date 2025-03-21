@@ -16,6 +16,7 @@
     import { apiEdit, apiGet } from '../../util/api.js';
     import CredentialsForm from './forms/Credentials.svelte';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
+    import { type credentialsUserType, type credentialsSharedType} from './Types.js';
     import {
         classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
         classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle, classFooterSpacing,
@@ -38,24 +39,9 @@
     let updateLoop: number = $state(0);
     let updatedAt = $state(0);
 
-    interface credentialsSharedInfos {
-        id: number,
-        name: string,
-        connect_user: string,
-        become_user: string,
-        vault_file: string,
-        vault_id: string,
-        vault_pass_is_set: boolean,
-        become_pass_is_set: boolean,
-        connect_pass_is_set: boolean,
-        ssh_key_is_set: boolean,
-    }
-    interface credentialsUserInfos extends credentialsSharedInfos {
-        category: string,
-    }
     interface credentialsFullType {
-        shared: credentialsSharedInfos[],
-        user: credentialsUserInfos[],
+        shared: credentialsSharedType[],
+        user: credentialsUserType[],
     }
 
     let entryList: credentialsFullType = $state({'shared': [], 'user': []});
@@ -83,7 +69,7 @@
         updatedAt = Date.now();
     }
 
-    function searchFilter(item: credentialsSharedInfos|credentialsUserInfos, searchTerm: string) : boolean {
+    function searchFilter(item: credentialsSharedType|credentialsUserType, searchTerm: string) : boolean {
         let s = searchTerm.toLowerCase();
         let c = '';
         if (item.category) {

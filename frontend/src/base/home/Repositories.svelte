@@ -15,8 +15,8 @@
     import { tq } from '../../util/translate.js';
     import { isSet } from '../../util/main.js';
     import { apiEdit, apiGet } from '../../util/api.js';
+    import { REPO_EXEC_STATI_ACTIVE, repoKindMap } from '../Config.js';
     import RepositoryForm from './forms/Repository.svelte';
-    import { repoKindMap, REPO_EXEC_STATI_ACTIVE } from './Config.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
         classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,

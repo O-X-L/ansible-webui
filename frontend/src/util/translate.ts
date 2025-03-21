@@ -1,19 +1,64 @@
 const DEFAULT_LANG = 'en'
+export const TT = '%t%'
 
-export function tq(share: any, code: string) : string {
+function getTranslations(share: any) : any|null {
   let userLang = localStorage.language;
-
-  if (!userLang || !share.lang[userLang] || !share.lang[userLang][code]) {
-    if (!share.lang[DEFAULT_LANG] || !share.lang[DEFAULT_LANG][code]) {
-      return code;
+  if (!userLang || !share.lang[userLang]) {
+    if (!share.lang[DEFAULT_LANG]) {
+      return null;
     } else {
-      return share.lang[DEFAULT_LANG][code];
+      return share.lang[DEFAULT_LANG];
     }
   }
+  return share.lang[userLang];
+}
 
-  return share.lang[userLang][code];
+export function tq(share: any, code: string) : string {
+  if (typeof(code) != 'string') {
+    console.log("ERROR: Got non-string value to translate-tq:", code);
+    return 'TRANSLATION ERROR';
+  }
+
+  if (code.includes(' ')) {
+    return code;
+  }
+
+  let t = getTranslations(share);
+  if (!t) {
+    return code;
+  }
+  let c = t[code];
+  if (!c) {
+    c = share.lang[DEFAULT_LANG];
+    if (!c) {
+      return code;
+    }
+  }
+  if (typeof(c) != 'string') {
+    return code;
+  }
+  return c;
 }
 
 export function flagIcon(code: string) : string {
   return `<img src="/static/img/flag_${code}.svg" class="w-6 mx-2" />`
+}
+
+export function tqSub(share: any, s: string) : string {
+  if (typeof(s) != 'string') {
+    console.log("ERROR: Got non-string value to translate-tqSub:", s);
+    return 'TRANSLATION ERROR';
+  }
+  let t = getTranslations(share);
+  if (!t || !s.includes(TT)) {
+    return s;
+  }
+  s = s.replaceAll(TT, '');
+  // todo: refactor for better performance..
+  for (let [lc, lv] of Object.entries(t)) {
+    if (s.includes(lc)) {
+      s = s.replaceAll(lc, lv);
+    }
+  }
+  return s;
 }
