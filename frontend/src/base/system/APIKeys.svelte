@@ -43,6 +43,15 @@
       return tq($share, code);
     }
 
+    function searchFilter(item: apiToken, searchTerm: string) : boolean {
+        let s = searchTerm.toLowerCase();
+        let c = item.comment ? item.comment : '';
+        return (
+            item.token.toLowerCase().includes(s) ||
+            c.toLowerCase().includes(s)
+        )
+    }
+
     function handleSubmitResponse(s: number, j: any) {
         if (s == 200 && j.error === undefined) {
             newKeyPair = j;
@@ -107,7 +116,7 @@
 
 <div>
     <Table striped={true} bind:items={entryList} hoverable={true} shadow placeholder={t('common.search')}
-        filter={(item, searchTerm) => (item.token.toLowerCase().includes(searchTerm.toLowerCase()))}>
+        filter={(item, searchTerm) => (searchFilter(item, searchTerm))}>
     <TableHead theadClass={classListHeader}>
         <TableHeadCell sort={(a, b) => a.token.localeCompare(b.token)} defaultSort>
             {t('api_keys.token')}
