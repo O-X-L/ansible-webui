@@ -17,8 +17,8 @@ RUN apk add --no-cache curl zip bash && \
     cd /tmp/ansible-webui-${AW_VERSION}/frontend && \
     npm install
 
-RUN bash /tmp/ansible-webui-${AW_VERSION}/scripts/frontend/build_base.sh /tmp/ansible-webui-${AW_VERSION}/frontend/ /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_dev && \
-    ls /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_dev/
+RUN bash /tmp/ansible-webui-${AW_VERSION}/scripts/frontend/build_base.sh /tmp/ansible-webui-${AW_VERSION}/frontend/ /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/dist/ && \
+    ls /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/
 
 FROM python:3.11-alpine AS aw
 ARG AW_VERSION
@@ -28,7 +28,7 @@ RUN apk add --no-cache git git-lfs openssh-client sshpass xmlsec && \
     pip install --no-cache-dir "git+https://github.com/O-X-L/ansible-webui.git@${AW_VERSION}" && \
     mkdir -p /play /data/log
 
-COPY --from=builder /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_dev/ /usr/local/lib/python3.11/site-packages/oxl_ansible_webui/aw/static_prod/
+COPY --from=builder /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/ /usr/local/lib/python3.11/site-packages/oxl_ansible_webui/aw/static_prod/
 
 ENV AW_VERSION=${AW_VERSION} \
     AW_DOCKER=1 \

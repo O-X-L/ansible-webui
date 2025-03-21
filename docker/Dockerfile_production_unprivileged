@@ -1,10 +1,28 @@
-FROM python:3.11-alpine
+ARG AW_VERSION=0.0
 
-# BUILD CMD: docker build -f Dockerfile_production -t ansible-webui:<VERSION> --build-arg "AW_VERSION=<VERSION>" --no-cache .
+# BUILD CMD: docker build -f Dockerfile_production_unprivileged -t ansible-webui:<VERSION> --build-arg "AW_VERSION=<VERSION>" --progress=plain --no-cache .
 # RUN:
 #   sudo useradd ansible-webui --shell /usr/sbin/nologin --uid 8785 --user-group
 #   mkdir ${YOUR_DATA_DIR} && chown -R ansible-webui ${YOUR_DATA_DIR}
 #   docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume ${YOUR_DATA_DIR}:/data --volume $(pwd)/ansible/play:/play ansible-webui:<VERSION>
+
+FROM node:23-alpine AS builder
+
+ARG AW_VERSION
+WORKDIR /tmp
+
+RUN echo $AW_VERSION
+
+RUN apk add --no-cache curl zip bash && \
+    curl -sLO https://github.com/O-X-L/ansible-webui/archive/refs/heads/${AW_VERSION}.zip && \
+    unzip /tmp/${AW_VERSION}.zip >/dev/null && \
+    cd /tmp/ansible-webui-${AW_VERSION}/frontend && \
+    npm install
+
+RUN bash /tmp/ansible-webui-${AW_VERSION}/scripts/frontend/build_base.sh /tmp/ansible-webui-${AW_VERSION}/frontend/ /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/dist/ && \
+    ls /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/
+
+FROM python:3.11-alpine AS aw
 
 ARG AW_VERSION
 ARG AW_UID=8785
@@ -17,6 +35,7 @@ RUN apk add --no-cache git git-lfs openssh-client sshpass xmlsec && \
     mkdir -p /play /data/log && \
     chown -R ${AW_USER}:${AW_USER} /data /play
 
+COPY --from=builder /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/ /usr/local/lib/python3.11/site-packages/oxl_ansible_webui/aw/static_prod/
 
 ENV AW_VERSION=${AW_VERSION} \
     AW_DOCKER=1 \
