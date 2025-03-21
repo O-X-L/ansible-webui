@@ -1,5 +1,3 @@
-from hashlib import md5
-
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
 from rest_framework import serializers

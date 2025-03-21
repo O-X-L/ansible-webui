@@ -21,7 +21,7 @@ dynamic = ["dependencies", "version"]
 
 [project.urls]
 Homepage = "https://github.com/O-X-L/ansible-webui"
-Documentation = "https://webui.ansibleguy.net/"
+Documentation = "https://ansible-webui.OXL.app/"
 Repository = "https://github.com/O-X-L/ansible-webui.git"
 Issues = "https://github.com/O-X-L/ansible-webui/issues"
 

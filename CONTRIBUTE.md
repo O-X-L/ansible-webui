@@ -15,7 +15,7 @@ We're also open to allow co-maintainers.
 * Add Unit-Tests (*pytest*)
 * Add [Integration-Tests](https://github.com/O-X-L/ansible-webui/tree/latest/test/integration) for the Web-UI and/or API
 
-Read into the [Troubleshooting Guide](https://webui.ansibleguy.net/usage/troubleshooting.html) to get some insight on how the stack works.
+Read into the [Troubleshooting Guide](https://ansible-webui.OXL.app/usage/troubleshooting.html) to get some insight on how the stack works.
 
 ----
 

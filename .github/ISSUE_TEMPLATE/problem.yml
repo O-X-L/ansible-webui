@@ -11,9 +11,9 @@ body:
       value: |
         Please make sure to go through these steps **before opening an issue**:
 
-        - [ ] Read the documentation: [Docs](https://webui.ansibleguy.net/)
+        - [ ] Read the documentation: [Docs](https://ansible-webui.OXL.app/)
 
-        - [ ] Read the troubleshooting info: [Troubleshooting](https://webui.ansibleguy.net/usage/troubleshooting.html)
+        - [ ] Read the troubleshooting info: [Troubleshooting](https://ansible-webui.OXL.app/usage/troubleshooting.html)
 
         - [ ] Check if there are existing [issues](https://github.com/O-X-L/ansible-webui/issues)
         or [discussions](https://github.com/O-X-L/ansible-webui/discussions) regarding your topic

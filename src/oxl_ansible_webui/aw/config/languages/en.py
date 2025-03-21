@@ -15,8 +15,8 @@ EN = {
     'btn.delete': 'Delete',
     'btn.stop': 'Stop',
     'btn.logs': 'Logs',
-    'btn.home': 'Home',
     'btn.download': 'Download',
+    'nav.home': 'Home',
     'nav.system': 'System',
     'nav.lang': 'Language',
     'nav.darkLight': 'Dark/Light Mode Switch',
@@ -320,7 +320,7 @@ EN = {
                                  'https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo/vscode-ansible.svg'
                                  '</a>',
     'config.form.help.ara_server': 'Provide the URL to your ARA server. Can be used to gather job statistics. See: '
-                                   '<a href="https://webui.ansibleguy.net/usage/integrations.html">'
+                                   '<a href="https://ansible-webui.OXL.app/usage/integrations.html">'
                                    'Documentation - Integrations</a>',
     'config.form.help.global_environment_vars': 'Set environmental variables that will be added to every job execution. '
                                                 'Comma-separated list of key-value pairs. (VAR1=TEST1,VAR2=0)',

@@ -119,7 +119,7 @@
     {/if}
 
     <div class="flex md:order-2">
-    <Button size="xs" class="ml-2"><GlobeSolid/></Button>
+    <Button size="xs" class="ml-2" id="nav-lang"><GlobeSolid/></Button>
     <Dropdown class="w-48 p-3 space-y-1">
       <li class="rounded-sm p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
         <Radio bind:group={language} value={'en'}>{@html flagIcon('gb')} English</Radio>
@@ -128,7 +128,7 @@
         <Radio bind:group={language} value={'de'}>{@html flagIcon('de')} Deutsch</Radio>
       </li>
     </Dropdown>
-    <Tooltip placement="bottom">{t('nav.lang')}</Tooltip>
+    <Tooltip placement="bottom" triggeredBy="#nav-lang">{t('nav.lang')}</Tooltip>
 
     <DarkMode size="sm" btnClass="{classBtnBase} px-4 py-2 ml-2"></DarkMode>
     <Tooltip placement="bottom">{t('nav.darkLight')}</Tooltip>
@@ -139,7 +139,7 @@
     {/if}
     -->
 
-    <Button size="xs" class="ml-2 max-sm:hidden {classNavLink}" href="https://webui.ansibleguy.net"><BookSolid /></Button>
+    <Button size="xs" class="ml-2 max-sm:hidden {classNavLink}" href="https:/ansible-webui.OXL.app"><BookSolid /></Button>
     <Tooltip placement="bottom">{t('nav.docs')}</Tooltip>
     <Button size="xs" class="ml-2 max-sm:hidden {classNavLink}" href="https://github.com/O-X-L/ansible-webui"><GithubSolid /></Button>
     <Tooltip placement="bottom">{t('nav.repo')}</Tooltip>
