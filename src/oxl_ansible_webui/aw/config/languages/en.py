@@ -252,6 +252,8 @@ EN = {
     # system
     'system.settings': 'Settings',
     'system.api_keys': 'API Keys',
+    'system.admin': 'Admin',
+    'system.api_docs': 'API Docs',
 
     # api-keys
     'api_keys.token': 'Token',

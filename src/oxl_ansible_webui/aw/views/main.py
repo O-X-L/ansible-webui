@@ -9,26 +9,6 @@ from aw.settings import LOGIN_REDIRECT_URL
 from aw.utils.http import ui_endpoint_wrapper
 
 
-def _local_iframe(_path: str, title: str) -> str:
-    return f'<iframe src="{_path}" title="{title}"></iframe>'
-
-
-@login_required
-@ui_endpoint_wrapper
-def admin(request) -> HttpResponse:
-    return render(request, status=200, template_name='fallback.html', context={
-        'content': _local_iframe('/_admin/', title='Admin')
-    })
-
-
-@login_required
-@ui_endpoint_wrapper
-def api_docs(request) -> HttpResponse:
-    return render(request, status=200, template_name='fallback.html', context={
-        'content': _local_iframe('/api/_docs', title='API Docs')
-    })
-
-
 @login_required
 @ui_endpoint_wrapper
 def not_implemented(request) -> HttpResponse:
@@ -67,8 +47,6 @@ def system(request) -> HttpResponse:
 
 urlpatterns_ui = [
     path('ui', home),
-    path('ui/system/api_docs', api_docs),
-    path('ui/system/admin/', admin),
     path('ui/system', system),
     re_path(r'^ui/*', not_implemented),
 ]
