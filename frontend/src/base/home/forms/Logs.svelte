@@ -7,7 +7,7 @@
     import { share } from '../../Share.js';
     import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
-    // import { type executionInfos } from '../Config.js';
+    // import { type executionType } from '../Types.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
     import { classModalBackdrop, classSpinnerDiv, classCenterChildDiv } from '../../Style.js';
 

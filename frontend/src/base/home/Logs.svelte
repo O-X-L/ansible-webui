@@ -12,8 +12,9 @@
     import { share, urlParams } from '../Share.js';
     import { redirectTo } from '../../util/main.js';
     import { apiEdit, apiGet } from '../../util/api.js';
+    import { type jobType, type executionType } from './Types.js';
+    import { JOB_EXEC_STATI_ACTIVE, PARAM_JOB } from '../Config.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
-    import { JOB_EXEC_STATI_ACTIVE, type jobType, type executionType, PARAM_JOB } from '../Config.js';
     import { classSpinnerDiv, classListContent, classListHeader, classFooterSpacing } from '../Style.js';
 
     let { open = $bindable(false) } = $props();

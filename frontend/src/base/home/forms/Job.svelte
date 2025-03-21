@@ -4,8 +4,10 @@
     } from 'flowbite-svelte-icons';
     import {
         Heading, Button, Modal, Input, Label, Helper, Toggle, Select, Spinner, Tooltip,
-        AccordionItem, Accordion, MultiInput,
+        AccordionItem, Accordion,
     } from 'flowbite-svelte';
+
+    import MultiInput from '../../../flowbite-custom/MultiInput.svelte';
 
     import { share } from '../../Share.js';
     import { apiGet } from '../../../util/api.js';
@@ -13,7 +15,7 @@
     import { rsplit } from '../../../util/main.js';
     import { type formInfoType, type inputColorType } from '../../Types.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
-    import { type executionPromptsType, type executionPromptVarType } from '../../Config.js';
+    import { type executionPromptsType, type executionPromptVarType } from '../Types.js';
     import {
         inputBaseColor, valideInputBase, submitFormBase, getMethod,
         type formMethod,
