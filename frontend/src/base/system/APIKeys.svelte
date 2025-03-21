@@ -3,7 +3,7 @@
 
     import { TrashBinSolid } from 'flowbite-svelte-icons';
     import {
-        Spinner, Button, Tooltip, Modal, Heading, Label,
+        Spinner, Button, Tooltip, Modal, Heading, Label, Input, Helper,
         Table, TableHead, TableHeadCell, TableBody, TableBodyCell, TableBodyRow,
     } from 'flowbite-svelte';
 
@@ -14,7 +14,7 @@
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
         classSpinnerDiv, classListHeader, classListContent, classFooterSpacing, classModalBackdrop,
-        classModalLabel, classModalForm,
+        classModalLabel, classModalForm, classModalInput 
      } from '../Style.js';
  
     let { open = $bindable(false) } = $props();
@@ -25,10 +25,11 @@
     let updateLoop: number = $state(0);
     let updatedAt = $state(0);
     let newModal = $state(false);
+    let newLoad = $state(false);
 
     interface apiToken {
         token: string
-        comment: string|null  // todo: allow to 
+        comment: string|null
     }
     interface apiKeyPair extends apiToken {
         key: string
@@ -44,15 +45,16 @@
 
     function handleSubmitResponse(s: number, j: any) {
         if (s == 200 && j.error === undefined) {
-            newModal = true;
             newKeyPair = j;
+            newLoad = false;
         }
         apiResponseHandler.handleRes(s, j);
     }
 
     function addAPIKey() {
+        newLoad = true;
         apiSuccessMsg = 'api_keys.action.create';
-        apiEdit('post', 'key', null, handleSubmitResponse);
+        apiEdit('post', 'key', {comment: newKeyPair.comment}, handleSubmitResponse);
     }
 
     function deleteAPIKey(token: string) {
@@ -110,12 +112,16 @@
         <TableHeadCell sort={(a, b) => a.token.localeCompare(b.token)} defaultSort>
             {t('api_keys.token')}
         </TableHeadCell>
+        <TableHeadCell sort={(a, b) => a.comment.localeCompare(b.comment)}>
+            {t('common.comment')}
+        </TableHeadCell>
         <TableHeadCell>{t('common.actions')}</TableHeadCell>
     </TableHead>
     {#key updatedAt}
     <TableBody tableBodyClass="divide-y">
         <TableBodyRow slot="row" let:item>
             <TableBodyCell tdClass={classListContent}>{item.token}</TableBodyCell>
+            <TableBodyCell tdClass={classListContent}>{item.comment ? item.comment : '-'}</TableBodyCell>
             <TableBodyCell tdClass={classListContent}>
                 <Button size="xs" on:click={() => {deleteAPIKey(item.token)}}><TrashBinSolid/></Button>
                 <Tooltip>{t('btn.delete')}</Tooltip>
@@ -132,21 +138,36 @@
 <div class="flex justify-between">
     <div></div>
     <div class="mr-5 mt-10">
-        <Button on:click={() => {addAPIKey()}}>{t('btn.add')}</Button>
-    </div>    
+        <Button on:click={() => {newModal = true}}>{t('btn.add')}</Button>
+    </div>
 </div>
 
 <Modal bind:open={newModal} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
     <div class={classModalForm}>
         <Heading tag="h2">{t('api_keys.new')}</Heading>
 
-        <Label class={classModalLabel}>{t('api_keys.token')}</Label>
-        <button onclick={clickToCopy}>{newKeyPair.token}</button>
-        <Tooltip>{t('common.click_to_copy')}</Tooltip>
+        {#if newLoad}
+            <div class={classSpinnerDiv}><Spinner/></div>
+        {:else if !newKeyPair.token}
+            <div class={classModalInput}>
+                <Label for="api_key_cmt" class={classModalLabel}>{t('common.comment')}</Label>
+                <Input id="api_key_cmt" bind:value={newKeyPair.comment} />
+            </div>
+            <div class="flex justify-between">
+                <div></div>
+                <div class="mr-5 mt-10">
+                    <Button on:click={() => {addAPIKey()}}>{t('btn.add')}</Button>
+                </div>
+            </div>
+        {:else}
+            <Label class={classModalLabel}>{t('api_keys.token')}</Label>
+            <button onclick={clickToCopy}>{newKeyPair.token}</button>
+            <Tooltip>{t('common.click_to_copy')}</Tooltip>
 
-        <Label class={classModalLabel}>{t('api_keys.key')}</Label>
-        <button onclick={clickToCopy}>{newKeyPair.key}</button>
-        <Tooltip>{t('common.click_to_copy')}</Tooltip>
+            <Label class={classModalLabel}>{t('api_keys.key')}</Label>
+            <button onclick={clickToCopy}>{newKeyPair.key}</button>
+            <Tooltip>{t('common.click_to_copy')}</Tooltip>
+        {/if}
     </div>
 </Modal>
 

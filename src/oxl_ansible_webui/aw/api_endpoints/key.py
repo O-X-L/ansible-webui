@@ -15,7 +15,6 @@ from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, Ge
 
 class KeyReadResponse(BaseResponse):
     token = serializers.CharField()
-    id = serializers.CharField()
     comment = serializers.CharField()
     created_at = serializers.CharField()
 
@@ -42,7 +41,6 @@ class APIKey(APIView):
         for key in AwAPIKey.objects.filter(user=get_api_user(request)):
             tokens.append({
                 'token': key.name,
-                'id': md5(key.name.encode('utf-8')).hexdigest(),
                 'comment': key.comment,
             })
 

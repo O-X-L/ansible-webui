@@ -40,6 +40,7 @@ EN = {
     'common.updated_at': 'Updated at',
     'common.created_at': 'Created at',
     'common.click_to_copy': 'Click to Copy',
+    'common.comment': 'Comment',
 
     # auth
     'login.user': 'Username',
