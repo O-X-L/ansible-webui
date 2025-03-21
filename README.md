@@ -55,8 +55,6 @@ Login: User `demo`, Password `Ansible1337`
 
 [![Docs Uptime](https://status.oxl.at/api/v1/endpoints/1--oxl_ansible-webui-documentation/uptimes/7d/badge.svg)](https://status.oxl.at/endpoints/1--oxl_ansible-webui-documentation)
 
-[Alternative Link](https://ansible-webui.readthedocs.io/)
-
 ----
 
 ## Contribute
