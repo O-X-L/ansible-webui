@@ -5,6 +5,8 @@ set -euo pipefail
 SRC_DIR="$1"
 DST_DIR="$2"
 
+cd "$(dirname "$0")/"
+
 bash link_flowbite_custom.sh "$SRC_DIR"
 
 mkdir -p "$DST_DIR"
