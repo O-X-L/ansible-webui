@@ -1,16 +1,27 @@
 const DEFAULT_LANG = 'en'
 export const TT = '%t%'
 
+function getTranslationStore(share: any) : any|null {
+  if (share.lang[DEFAULT_LANG]) {
+    return share.lang;
+  }
+  if (localStorage.languageCache) {
+    return JSON.parse(localStorage.languageCache);
+  }
+  return null;
+}
+
 function getTranslations(share: any) : any|null {
   let userLang = localStorage.language;
-  if (!userLang || !share.lang[userLang]) {
-    if (!share.lang[DEFAULT_LANG]) {
+  let store = getTranslationStore(share);
+  if (!userLang || !store[userLang]) {
+    if (!store[DEFAULT_LANG]) {
       return null;
     } else {
-      return share.lang[DEFAULT_LANG];
+      return store[DEFAULT_LANG];
     }
   }
-  return share.lang[userLang];
+  return store[userLang];
 }
 
 export function tq(share: any, code: string) : string {
@@ -29,12 +40,13 @@ export function tq(share: any, code: string) : string {
   }
   let c = t[code];
   if (!c) {
-    c = share.lang[DEFAULT_LANG];
+    c = getTranslationStore(share)[DEFAULT_LANG][code];
     if (!c) {
       return code;
     }
   }
   if (typeof(c) != 'string') {
+    console.log("ERROR: Translation resulted in non-string value - possible store corruption");
     return code;
   }
   return c;
