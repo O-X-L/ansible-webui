@@ -20,7 +20,7 @@ RUN apk add --no-cache curl zip bash && \
     npm install
 
 RUN bash /tmp/ansible-webui-${AW_VERSION}/scripts/frontend/build_base.sh /tmp/ansible-webui-${AW_VERSION}/frontend/ /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/dist/ && \
-    ls /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/
+    ls /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/dist/
 
 FROM python:3.11-alpine AS aw
 
