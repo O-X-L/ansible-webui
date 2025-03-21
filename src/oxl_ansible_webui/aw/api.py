@@ -7,7 +7,7 @@ from aw.api_endpoints.job import APIJob, APIJobItem, APIJobExecutionItem, APIJob
 from aw.api_endpoints.permission import APIPermission, APIPermissionItem
 from aw.api_endpoints.credentials import APIJobCredentials, APIJobCredentialsItem
 from aw.api_endpoints.filesystem import APIFsBrowse, APIFsExists
-from aw.api_endpoints.system import APISystemConfig, APISystemEnvironment
+from aw.api_endpoints.system import APISystemConfig, APISystemEnvironment, APIUserPasswordChange
 from aw.api_endpoints.repository import APIRepository, APIRepositoryItem, APIRepositoryLogFile
 from aw.api_endpoints.alert import APIAlertPlugin, APIAlertPluginItem, APIAlertUser, APIAlertUserItem, \
     APIAlertGlobal, APIAlertGlobalItem, APIAlertGroup, APIAlertGroupItem
@@ -42,6 +42,7 @@ urlpatterns_api = [
     path('api/alert/user', APIAlertUser.as_view()),
     path('api/config', APISystemConfig.as_view()),
     path('api/environment', APISystemEnvironment.as_view()),
+    path('api/user/password', APIUserPasswordChange.as_view()),
     path('api/fs/browse/<str:repository>', APIFsBrowse.as_view()),
     path('api/fs/exists', APIFsExists.as_view()),
     path('api/_schema/', SpectacularAPIView.as_view(), name='_schema'),

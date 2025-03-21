@@ -178,3 +178,33 @@ class APISystemEnvironment(APIView):
     def get(request):
         del request
         return Response(get_system_environment(), headers=HDR_CACHE_1W)
+
+
+class UserPasswordChangeRequest(BaseResponse):
+    settings = SystemConfigSettings()
+
+
+class APIUserPasswordChange(APIView):
+    http_method_names = ['put']
+    serializer_class = SystemConfigReadResponse
+    permission_classes = API_PERMISSION
+
+    @extend_schema(
+        request=SystemConfigWriteRequest,
+        responses={
+            200: OpenApiResponse(response=GenericResponse, description='Password updated'),
+            400: OpenApiResponse(response=GenericErrorResponse, description='Invalid password provided'),
+        },
+        summary='Update the current users password.',
+        operation_id='system_config_edit',
+    )
+    def put(self, request):
+        user = get_api_user(request)
+        pwd = request.data['password']
+
+        if len(pwd) < 10:
+            return Response({'error': 'Password does not meet requirements'}, status=400)
+
+        user.set_password(pwd)
+        user.save()
+        return Response({'msg': 'Password updated'}, status=200)

@@ -9,7 +9,7 @@
     import { tq } from '../util/translate.js';
     import { classNavFooter, classLinkHover } from './Style.js';
 
-    const classFooterText = 'text-sm text-gray-500 dark:text-gray-400';
+    const classFooterText = 'text-sm max-sm:text-xs text-gray-500 dark:text-gray-400';
     let hideAttributions = $state(true);
 
     let linksAttributionFrontend = [

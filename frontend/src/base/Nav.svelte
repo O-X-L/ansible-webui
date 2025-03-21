@@ -2,22 +2,24 @@
     import { onMount } from 'svelte';
 
     import {
-      Navbar, NavBrand, Dropdown, Button, Tooltip, DarkMode, Spinner, Radio, Alert,
+      Navbar, NavBrand, Dropdown, Button, Tooltip, DarkMode, Spinner, Radio,
     } from 'flowbite-svelte';
     import {
-      LockSolid, BookSolid, BugSolid, GithubSolid, GlobeSolid, ServerSolid, HomeSolid,
+      LockSolid, BookSolid, BugSolid, GithubSolid, GlobeSolid, ServerSolid, HomeSolid, UserSettingsSolid,
     } from 'flowbite-svelte-icons';
 
     import { share } from './Share.js';
-    import { type formAlertType } from './Types.js';
     import { tq, flagIcon } from '../util/translate.js';
     import { setDarkLightMode } from './DarkLightMode.js';
+    import UserSettings from './system/UserSettings.svelte';
     import { apiGet, getCSRFFormTokenHTML } from '../util/api.js';
     import { classNavFooter, classBtnBase, classNavLink } from './Style.js';
 
+    const DEFAULT_LANG = 'en';
+
     let loaded: boolean = $state(false);
-    let language: string = $state('en');
-    let alerts: formAlertType[] = $state([]);
+    let language: string = $state(DEFAULT_LANG);
+    let userSettingsOpen = $state(false);
 
     $effect(() => {
       if (!loaded) {
@@ -42,27 +44,11 @@
 
     function setTranslations(j: any) {
       $share.lang = j;
-    }
-
-    function showBackendFormErrors() {
-      let errors = document.querySelectorAll('.aw-form-alert');
-      if (errors) {
-        for (let e of errors) {
-          if (e.field) {
-            alerts.push({
-              color: 'red',
-              title: `Input into field ${e.field} was invalid`,
-              msg: e.innerText,
-            })
-          } else {
-            alerts.push({
-              color: 'red',
-              title: 'Input was invalid',
-              msg: e.innerText,
-            })
-          }
-        }
+      let cache = {en: j[DEFAULT_LANG]};
+      if (language != DEFAULT_LANG) {
+        cache[language] = j[language];
       }
+      localStorage.languageCache = JSON.stringify(cache);
     }
 
     function t(code: string) : string {
@@ -71,6 +57,9 @@
 
     onMount(() => {
       setDarkLightMode(document);
+      if (localStorage.languageCache) {
+        $share.lang = JSON.parse(localStorage.languageCache);
+      }
       if (localStorage.language) {
         language = localStorage.language;
       } else {
@@ -78,13 +67,12 @@
       }
       apiGet('frontend/info', setBackendStates);
       apiGet('frontend/lang', setTranslations);
-      showBackendFormErrors();
     });
 </script>
   
 <Navbar class="border-b rounded-b-lg {classNavFooter}" {navContainerClass}>
   {#key $share.backend.logo}
-    <NavBrand href="/">
+    <NavBrand href="/" class="max-sm:hidden">
       {#if !$share.backend}
         <Spinner size="sm" />
       {:else}
@@ -132,12 +120,6 @@
 
     <DarkMode size="sm" btnClass="{classBtnBase} px-4 py-2 ml-2"></DarkMode>
     <Tooltip placement="bottom">{t('nav.darkLight')}</Tooltip>
-    <!--
-    {#if $share.backend.authenticated}
-      <Button size="xs" class="ml-2"><AdjustmentsHorizontalSolid /></Button>
-      <Tooltip placement="bottom">Settings</Tooltip>
-    {/if}
-    -->
 
     <Button size="xs" class="ml-2 max-sm:hidden {classNavLink}" href="https:/ansible-webui.OXL.app"><BookSolid /></Button>
     <Tooltip placement="bottom">{t('nav.docs')}</Tooltip>
@@ -145,7 +127,11 @@
     <Tooltip placement="bottom">{t('nav.repo')}</Tooltip>
     <Button size="xs" class="ml-2 max-sm:hidden {classNavLink}" href="https://github.com/O-X-L/ansible-webui/issues"><BugSolid /></Button>
     <Tooltip placement="bottom">{t('nav.bugs')}</Tooltip>
+
     {#if $share.backend.authenticated}
+      <Button size="xs" class="ml-2 {classNavLink}" on:click={() => {userSettingsOpen=true}}><UserSettingsSolid/></Button>
+      <Tooltip placement="bottom">{t('nav.user_settings')}</Tooltip>
+
       <form method="post" action="/o/">
         <Button size="xs" class="ml-2 h-full" type="submit"><LockSolid /></Button>
         <Tooltip placement="bottom">{t('nav.logout')}</Tooltip>
@@ -158,13 +144,4 @@
   </div>
 </Navbar>
 
-{#if alerts.length}
-  <div class="my-5">
-    {#each alerts as alert}
-      <Alert color={alert.color||"red"} class="mx-20">
-        <div class="font-bold">{alert.title}</div>
-        <div>{alert.msg}</div>
-      </Alert>
-    {/each}
-  </div>
-{/if}
+<UserSettings bind:open={userSettingsOpen} />

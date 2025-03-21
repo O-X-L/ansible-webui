@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
 
-    import { Input, Label, Button, Spinner, Toggle } from 'flowbite-svelte';
+    import { Input, Label, Button, Spinner, Toggle, Alert } from 'flowbite-svelte';
 
     import { share } from './Share.js';
     import { tq } from '../util/translate.js';
@@ -10,6 +10,14 @@
     let loaded = $state(false);
     let loginTarget = $derived($share.backend.sso ? '/a/saml/init/' : '/a/login/')
     let rememberUsername = $state(false);
+
+    interface formAlertType {
+        color: 'red'|'yellow'|'green',
+        title: string,
+        msg: string,
+    }
+
+    let alerts: formAlertType[] = $state([]);
 
     function t(code: string) : string {
       return tq($share, code);
@@ -48,8 +56,30 @@
         loaded = true;
     }
 
+    function showBackendFormErrors() {
+      let errors = document.querySelectorAll('.aw-backend-form-alert');
+      if (errors) {
+        for (let e of errors) {
+          if (e.field) {
+            alerts.push({
+              color: 'red',
+              title: `${t('common.invalid_value')}: "${e.field}"`,
+              msg: e.innerText,
+            })
+          } else {
+            alerts.push({
+              color: 'red',
+              title: t('common.invalid_form'),
+              msg: e.innerText,
+            })
+          }
+        }
+      }
+    }
+
     onMount(() => {
         restoreUsername();
+        showBackendFormErrors();
     });
 </script>
 
@@ -58,6 +88,18 @@
         <img loading="lazy" src="{$share.backend.logo}" alt="LOGO" referrerpolicy="no-referrer">
     </div>
 </div>
+
+{#if alerts.length}
+  <div class="my-5">
+    {#each alerts as alert}
+      <Alert color={alert.color||"red"} class="mx-20">
+        <div class="font-bold">{alert.title}</div>
+        <div>{alert.msg}</div>
+      </Alert>
+    {/each}
+  </div>
+{/if}
+
 
 <div class="flex justify-center w-full">
     <div>
@@ -95,36 +137,3 @@
         {/if}
     </div>
 </div>
-
-<!--
-<div align="center" style="display: block;">
-    <img loading="lazy" src="{% get_logo %}" alt="LOGO" onerror="this.style.display='none'" class="aw-img-float" referrerpolicy="no-referrer">
-</div>
-
-    <form class="aw-login-form" method="post" action="{% url 'login' %}">
-        {% csrf_token %}
-        <label for="id_username" class="aw-login-fields">
-            Username:
-            <input class="aw-login-fields form-control" type="text" name="username" autofocus="" autocapitalize="none" autocomplete="username" maxlength="150" required="" id="id_username">
-        </label>
-        <br>
-        <label for="id_password" class="aw-login-fields">
-            Password:
-            <input class="aw-login-fields form-control" type="password" name="password" autocomplete="current-password" required="" id="id_password">
-        </label>
-        <div class="form-check">
-        <input class="form-check-input" type='checkbox' id="aw-login-remember">
-        <label class="form-check-label" for="aw-login-remember">
-            Save Username
-        </label>
-        </div>
-        <div class="aw-login-btn">
-            <button type="submit" value="login" class="btn btn-secondary">Login</button>
-            {% if ''|auth_sso %}
-                <a href="{% url 'login_sso' %}">
-                    <button type="button" class="btn btn-primary">SSO</button>
-                </a>
-            {% endif %}
-        </div>
-    </form>
--->

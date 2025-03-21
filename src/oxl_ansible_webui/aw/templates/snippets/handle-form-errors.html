@@ -1,10 +1,10 @@
 {% if form.errors %}
     {% for field in form %}
         {% for error in field.errors %}
-            <div class="aw-form-alert" hidden="hidden" field="{{ field }}">{{ error|escape }}</div>
+            <div class="aw-backend-form-alert" hidden="hidden" field="{{ field }}">{{ error|escape }}</div>
         {% endfor %}
     {% endfor %}
     {% for error in form.non_field_errors %}
-        <div class="aw-form-alert" hidden="hidden" field="all">{{ error|escape }}</div>
+        <div class="aw-backend-form-alert" hidden="hidden">{{ error|escape }}</div>
     {% endfor %}
 {% endif %}
