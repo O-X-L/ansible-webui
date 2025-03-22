@@ -234,7 +234,7 @@
                                 {#if repoKind == 'git'}
                                     <div class="mb-2">
                                         <Button size="xs" on:click={() => (downloadGitRepo(item.id))}
-                                            disabled={isDownloadActive(item)}>
+                                            disabled={isDownloadActive(item) || item.git_isolate}>
                                             <DownloadSolid/>
                                         </Button>
                                         <Tooltip>{t('btn.download')}</Tooltip>

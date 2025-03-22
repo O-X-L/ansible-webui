@@ -1,3 +1,4 @@
+from time import time
 from datetime import datetime, timedelta
 
 from rest_framework.views import APIView
@@ -7,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from aw.api_endpoints.base import get_api_user, GenericResponse, API_PERMISSION, API_PARAM_HASH, \
     response_data_if_changed
 from aw.utils.permission import get_viewable_jobs
-from aw.model.job import JobExecution
+from aw.model.job import JobExecution, JobExecutionResultHost
 from aw.utils.util import datetime_w_tz
 from aw.model.base import JOB_EXEC_STATI_INACTIVE, JOB_EXEC_STATUS_SUCCESS, JOB_EXEC_STATUS_FAILED, \
     JOB_EXEC_STATUS_STOPPED
@@ -104,6 +105,9 @@ class APIStatsJobs(APIView):
         if 'limit_time' in request.GET:
             limits['created__gte'] = relative_time_to_timestamp(request.GET['limit_time'])
 
+        else:
+            limits['created__gte'] = relative_time_to_timestamp('1w')
+
         if 'limit_users' in request.GET:
             limit_users = []
 
@@ -137,17 +141,41 @@ class APIStatsJobs(APIView):
             **limits,
         ).order_by('-created')
 
-        data = []
+        data = {
+            'stats': [],
+            'mapping': {
+                'jobs': {},
+                'users': {},
+                'status': {},
+                'stats': {
+                    'j': 'job',
+                    's': 'status',
+                    'u': 'user',
+                    'd': 'duration',
+                    't': 'time',
+                    'f': 'failed',
+                    'h': 'host_stats',
+                },
+                'host_stats': {
+                    'h': 'hostname',
+                    **{k: v for v, k in JobExecutionResultHost.STATS_SHORT.items()},
+                },
+            }
+        }
+
         for e in execs:
-            data.append({
-                'job': e.job.id,
-                'job_name': e.job.name,
-                'status': e.status_name,
-                'user': e.user_name,
-                'duration': e.time_duration,
-                'time': e.time_fin_ts,
-                'failed': e.failed,
-                'stats': e.get_stats(),
+            user_id = None if e.user is None else e.user.id
+            data['stats'].append({
+                'j': e.job.id,
+                's': e.status,
+                'u': user_id,
+                'd': e.time_duration_sec,
+                't': e.time_fin_ts,
+                'f': e.failed,
+                'h': [{'h': host, **stats} for host, stats in e.get_stats_short().items()],
             })
+            data['mapping']['jobs'][e.job.id] = e.job.name
+            data['mapping']['users'][user_id] = e.user_name
+            data['mapping']['status'][e.status] = e.status_name
 
         return response_data_if_changed(request, data)

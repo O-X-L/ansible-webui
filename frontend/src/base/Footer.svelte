@@ -13,10 +13,10 @@
     let hideAttributions = $state(true);
 
     let linksAttributionFrontend = [
-        { name: 'SvelteJS', href: 'https://svelte.dev/', license: 'MIT', licenseHref: 'https://github.com/sveltejs/svelte/blob/main/LICENSE.md'},
+        { name: 'Svelte', href: 'https://svelte.dev/', license: 'MIT', licenseHref: 'https://github.com/sveltejs/svelte/blob/main/LICENSE.md'},
         { name: 'Tailwind CSS', href: 'https://tailwindcss.com/', license: 'MIT', licenseHref: 'https://github.com/tailwindlabs/tailwindcss/blob/main/LICENSE' },
         { name: 'Flowbite Svelte', href: 'https://flowbite-svelte.com/', license: 'MIT', licenseHref: 'https://flowbite-svelte.com/docs/pages/license' },
-        // { name: 'ChartJS', href: 'https://www.chartjs.org/' },
+        { name: 'Chart.js', href: 'https://www.chartjs.org/', license: 'MIT', licenseHref: 'https://github.com/chartjs/Chart.js/blob/master/LICENSE.md' },
     ];
     let linksAttributionBackend = [
         { name: 'Ansible', href: 'https://www.ansible.com/', license: 'GPLv3', licenseHref: 'https://github.com/ansible/ansible/?tab=GPL-3.0-1-ov-file#readme' },
@@ -48,7 +48,7 @@
   <FooterCopyright by="OXL IT Services" href="https://github.com/O-X-L" copyrightMessage="" classA={classFooterText} />
   <FooterLinkGroup>
     <div class={classFooterText}>
-      <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" class={classFooterText}>License: GPLv3</a> |
+      <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" class={classFooterText}>{t('footer.oss.license')}: GPLv3</a> |
       <button class={classLinkHover} onclick={() => (hideAttributions = false)}>
         {t('footer.oss')}
       </button>
@@ -75,18 +75,25 @@
         <CloseButton color="red" onclick={() => (hideAttributions = true)} class="mb-4" />
     </div>
     <div class="text-center text-xl font-bold mb-10">
-        Open Source Usage
+        {t('footer.oss')}
     </div>
     <div>
-        <div class="text-lg font-bold pb-6 max-sm:pt-6 max-sm:pb-2">Frontend:</div>
+        <div class="text-lg font-bold pb-6 max-sm:pt-6 max-sm:pb-2">{t('footer.oss.frontend')}:</div>
         <Listgroup active items={linksAttributionFrontend} let:item class="w-80">
-            {item.name} | <a href={item.licenseHref}>License: {item.license}</a>
+            {item.name} | <a href={item.licenseHref}>{t('footer.oss.license')}: {item.license}</a>
         </Listgroup>    
     </div>
     <div>
-        <div class="text-lg font-bold pb-6 max-sm:pt-6 max-sm:pb-2 mt-10">Backend:</div>
+        <div class="text-lg font-bold pb-6 max-sm:pt-6 max-sm:pb-2 mt-10">{t('footer.oss.backend')}:</div>
         <Listgroup active items={linksAttributionBackend} let:item class="w-80">
-            {item.name} | <a href={item.licenseHref}>License: {item.license}</a>
+            {item.name} | <a href={item.licenseHref}>{t('footer.oss.license')}: {item.license}</a>
         </Listgroup>    
     </div>
+    <!--
+    <div>
+        <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FO-X-L%2Fansible-webui?ref=badge_large&issueType=license" alt="FOSSA Status">
+          <img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FO-X-L%2Fansible-webui.svg?type=large&issueType=license"/>
+        </a>
+    </div>
+    -->
 </Drawer>

@@ -84,7 +84,7 @@ def alert_plugin_wrapper(
     if execution.result is not None:
         data['execution']['time_fin'] = int(unix_timestamp(execution.result.time_fin_dt.timetuple()))
         data['execution']['time_fin_pretty'] = execution.result.time_fin_str
-        data['execution']['time_duration'] = execution.result.time_duration.total_seconds()
+        data['execution']['time_duration'] = execution.result.time_duration_sec
         data['execution']['time_duration_pretty'] = execution.result.time_duration_str
 
         if execution.result.error is not None:

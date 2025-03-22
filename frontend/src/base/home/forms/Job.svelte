@@ -142,6 +142,7 @@
     })
 
     // autocomplete via api filesystem-browsing (playbook/inventory)
+    //   todo: browing not working for git-isolate enabled repo
     interface browseResponse {
         dirs: string[],
         files: string[],
