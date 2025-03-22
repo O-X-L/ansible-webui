@@ -20,5 +20,3 @@ export const share = writable({
     lang: {},
     updateInterval: 500,
 } as shareObject);
-
-export const urlParams = new URLSearchParams(window.location.search);

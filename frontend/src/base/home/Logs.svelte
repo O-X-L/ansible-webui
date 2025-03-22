@@ -7,13 +7,13 @@
         TableHead, TableHeadCell, Radio, Button, Tooltip,
     } from 'flowbite-svelte';
 
+    import { share } from '../Share.js';
     import LogsView from './forms/Logs.svelte';
     import { tq } from '../../util/translate.js';
-    import { share, urlParams } from '../Share.js';
-    import { redirectTo } from '../../util/main.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import { type jobType, type executionType } from './Types.js';
     import { JOB_EXEC_STATI_ACTIVE, PARAM_JOB } from '../Config.js';
+    import { redirectTo, getURLHashParams } from '../../util/main.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import { classSpinnerDiv, classListContent, classListHeader, classFooterSpacing } from '../Style.js';
 
@@ -54,8 +54,7 @@
         if (!jobId) {
             return;
         }
-        // todo: redirect to http://127.0.0.1:8000/ui#jobs?search=id:<job>
-        redirectTo(`/ui?search=id:${jobId}#jobs`, `?job=${jobId}`);
+        redirectTo(`/ui#jobs-search=id:${jobId}`);
     }
 
     function loadJobList(j: any, h: string) {
@@ -119,12 +118,12 @@
     }
 
     function openLogsByURL() {
-        let paramJob = urlParams.get(PARAM_JOB);
-        if (!paramJob) {
+        let params = getURLHashParams();
+        if (!params[PARAM_JOB]) {
             return;
         }
         for (let job of jobList) {
-            if (String(job.id) == String(paramJob)) {
+            if (String(job.id) == String(params[PARAM_JOB])) {
                 entryActions[job.id]['open'] = true;
                 let e = document.getElementById(`logs-${job.id}`);
                 if (e) {
@@ -187,7 +186,7 @@
                                 </button>
                             </div>
                         </TableBodyCell>
-                        <TableBodyCell tdClass={classListContent}>
+                        <TableBodyCell tdClass="{classListContent} max-lg:hidden">
                             {#if exec.log_stdout_url}
                                 <div><a href="{exec.log_stdout_url}">{t('logs.exec_log_file')}</a></div>
                             {/if}

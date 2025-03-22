@@ -139,6 +139,10 @@ class JobExecutionResult(BareModel):
         return f"Job execution {self.time_start}: {result}"
 
     @property
+    def time_start_str(self) -> str:
+        return datetime_from_db_str(dt=self.time_start, fmt=SHORT_TIME_FORMAT) + f" {config['timezone']}"
+
+    @property
     def time_fin_str(self) -> str:
         if is_null(self.time_fin):
             return ''
@@ -292,6 +296,67 @@ class JobExecution(BaseJob):
     @property
     def has_failed(self) -> bool:
         return self.status == JOB_EXEC_STATUS_FAILED
+
+    def get_stats(self) -> dict:
+        stats = {}
+        if self.result is not None:
+            for result in JobExecutionResultHost.objects.filter(result=self.result):
+                stats[result.hostname] = {
+                      attr: getattr(result, attr) for attr in JobExecutionResultHost.STATS
+                }
+
+        return stats
+
+    @property
+    def time_start_dt(self) -> (datetime, None):
+        if self.result is None:
+            return None
+
+        return self.result.time_start_dt
+
+    @property
+    def time_start_str(self) -> str:
+        return self.result.time_start_str
+
+    @property
+    def time_start_ts(self) -> (int, None):
+        if self.time_start_dt is None:
+            return None
+
+        return datetime.timestamp(self.time_start_dt)
+
+    @property
+    def time_fin_dt(self) -> (datetime, None):
+        if self.result is None or is_null(self.result.time_fin):
+            return None
+
+        return self.result.time_fin_dt
+
+    @property
+    def time_fin_str(self) -> str:
+        return self.result.time_fin_str
+
+    @property
+    def time_fin_ts(self) -> (int, None):
+        if self.time_fin_dt is None:
+            return None
+
+        return datetime.timestamp(self.time_fin_dt)
+
+    @property
+    def time_duration(self) -> timedelta:
+        return self.result.time_duration
+
+    @property
+    def failed(self) -> bool:
+        return self.result.failed
+
+    @property
+    def user_id(self) -> (int, None):
+        if self.user is None:
+            return None
+
+        return self.user.id
 
 
 class JobQueue(BareModel):

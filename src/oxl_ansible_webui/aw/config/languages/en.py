@@ -28,6 +28,9 @@ EN = {
     'footer.user': 'User',
     'footer.version': 'Version',
     'footer.oss': 'Open Source Usage',
+    'footer.oss.frontend': 'Frontend',
+    'footer.oss.backend': 'Backend',
+    'footer.oss.license': 'License',
 
     # common phrases
     'common.name': 'Name',

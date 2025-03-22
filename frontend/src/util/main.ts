@@ -46,14 +46,43 @@ export function escapeQuotes(data: string) : string {
   return data;
 }
 
-export function redirectTo(url: string, reloadIfSearch: string) {
+export function redirectTo(url: string) {
   window.location.replace(url);
-  if (window.location.search.includes(reloadIfSearch)) {
-      location.reload();
-  }
+  location.reload();
 }
 
 export function clickToCopy(event: MouseEvent) {
   console.log("TEST", event);
   navigator.clipboard.writeText(event.target.innerText);
+}
+
+export function getURLHash() : string {
+  let f = window.location.hash;
+  if (f.includes('?')) {
+    f = f.split('?')[0];
+  }
+  f = f.trim();
+  f = f.replace('#', '');
+  return f;
+}
+
+export function getURLHashPage() : string {
+  let f = getURLHash();
+  return f.split('-')[0];
+}
+
+export function getURLHashParams() : any {
+  let params = {};
+  let f = getURLHash();
+  let params_arr = f.split('-');
+  if (params_arr.length > 1) {
+    params_arr = params_arr.slice(1);
+  }
+  for (let p of params_arr) {
+    if (p.includes('=')) {
+      let pp = p.split('=');
+      params[pp[0]] = pp[1];
+    }
+  }
+  return params;
 }

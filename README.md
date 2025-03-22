@@ -173,3 +173,11 @@ See also: [Contributing](https://github.com/O-X-L/ansible-webui/blob/latest/CONT
     - [x] API Endpoints
 
     - [ ] Permission system
+
+----
+
+# License
+
+[GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html)
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FO-X-L%2Fansible-webui.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FO-X-L%2Fansible-webui?ref=badge_large&issueType=license)

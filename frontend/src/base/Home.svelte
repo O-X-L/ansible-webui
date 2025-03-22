@@ -8,6 +8,7 @@
 
     import { share } from './Share.js';
     import { tq } from '../util/translate.js';
+    import { getURLHashPage } from '../util/main.js';
 
     import Jobs from './home/Jobs.svelte';
     import Logs from './home/Logs.svelte';
@@ -32,20 +33,23 @@
         return;
       }
 
-      let fragment = 'dashboard';
+      let f = 'dashboard';
       if (openTab.jobs) {
-        fragment = 'jobs';
+        f = 'jobs';
       } else if (openTab.logs) {
-        fragment = 'logs';
+        f = 'logs';
       } else if (openTab.repositories) {
-        fragment = 'repositories';
+        f = 'repositories';
       } else if (openTab.credentials) {
-        fragment = 'credentials';
+        f = 'credentials';
       } else if (openTab.alerts) {
-        fragment = 'alerts';
+        f = 'alerts';
       }
 
-      window.location.hash = fragment;
+      let fn = getURLHashPage();
+      if (f != fn) {
+        window.location.hash = f;
+      }
     });
 
     function t(code: string) : string {
@@ -54,20 +58,17 @@
 
     onMount(() => {
       // restore open tab from URL
-      let f = window.location.hash;
-      if (f.includes('?')) {
-        f = f.split('?')[0];
-      }
+      let f = getURLHashPage();
 
-      if (f == '#jobs') {
+      if (f == 'jobs') {
         openTab.jobs = true;
-      } else if (f == '#logs') {
+      } else if (f == 'logs') {
         openTab.logs = true;
-      } else if (f == '#repositories') {
+      } else if (f == 'repositories') {
         openTab.repositories = true;
-      } else if (f == '#credentials') {
+      } else if (f == 'credentials') {
         openTab.credentials = true;
-      } else if (f == '#alerts') {
+      } else if (f == 'alerts') {
         openTab.alerts = true;
       } else {
         openTab.dashboard = true;

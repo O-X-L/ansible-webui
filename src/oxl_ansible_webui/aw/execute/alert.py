@@ -23,13 +23,6 @@ class Alert:
             if has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_READ):
                 self.privileged_users.append(user)
 
-        self.stats = {}
-        if execution.result is not None:
-            for stats in JobExecutionResultHost.objects.filter(result=execution.result):
-                self.stats[stats.hostname] = {
-                      attr: getattr(stats, attr) for attr in JobExecutionResultHost.STATS
-                }
-
         self.error_msgs = {'html': [], 'text': []}
         self._get_task_errors()
 
@@ -61,7 +54,7 @@ class Alert:
             alert_plugin_wrapper(
                 alert=alert,
                 user=user,
-                stats=self.stats,
+                stats=self.execution.get_stats(),
                 execution=self.execution,
                 failed=self.failed,
                 error_msgs=self.error_msgs,
@@ -70,7 +63,7 @@ class Alert:
         else:
             alert_plugin_email(
                 user=user,
-                stats=self.stats,
+                stats=self.execution.get_stats(),
                 execution=self.execution,
                 error_msgs=self.error_msgs,
             )

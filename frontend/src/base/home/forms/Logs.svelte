@@ -149,6 +149,7 @@
         </table>
         <table>
             <tbody>
+                <!-- todo: add internal error messages -->
                 {#each logLines as line (line.nr)}
                     <tr>
                         <td class="pr-3">{line.nr}</td>

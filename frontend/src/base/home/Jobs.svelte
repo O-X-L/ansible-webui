@@ -11,10 +11,10 @@
         Input, Toggle, Label, Select,
     } from 'flowbite-svelte';
 
+    import { share } from '../Share.js';
     import JobForm from './forms/Job.svelte';
     import { tq } from '../../util/translate.js';
     import { classModalLabel } from '../Style.js';
-    import { share, urlParams } from '../Share.js';
     import { type formChoiceType } from '../Types.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import { choicesFromArray } from '../../util/form.js';
@@ -170,7 +170,7 @@
         if (!jobId) {
             return;
         }
-        redirectTo(`/ui?job=${jobId}#logs`, `?job=${jobId}`);
+        redirectTo(`/ui#logs-job=${jobId}`);
     }
 
     function updateExecutionPrompts(encodedPrompts: string|null) {

@@ -13,6 +13,7 @@ from aw.api_endpoints.alert import APIAlertPlugin, APIAlertPluginItem, APIAlertU
     APIAlertGlobal, APIAlertGlobalItem, APIAlertGroup, APIAlertGroupItem
 from aw.api_endpoints.frontend import APIBackendInfo, APIBackendTranslations, APIFormInfosJob, \
     APIFormInfosCredentials, APIFormInfosRepositories, APIFormInfosConfig
+from aw.api_endpoints.stats import APIStatsJobs
 # from aw.api_endpoints.base import not_implemented
 
 urlpatterns_api = [
@@ -53,4 +54,5 @@ urlpatterns_api = [
     path('api/frontend/form/credentials', APIFormInfosCredentials.as_view()),
     path('api/frontend/form/repository', APIFormInfosRepositories.as_view()),
     path('api/frontend/form/config', APIFormInfosConfig.as_view()),
+    path('api/stats/jobs', APIStatsJobs.as_view()),
 ]
