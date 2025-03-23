@@ -18,19 +18,21 @@
     import { classFooterSpacing} from '../Style.js';
     import {
         getRandomTailwindColor, getRandomTailwindColorNegative, getRandomTailwindColorPositive,
-    } from '../../util/main.js';
+    } from '../../util/colors.js';
 
     const CHART_COLOR_EMPTY = 'oklch(0.928 0.006 264.531)';
     const CHART_LABEL_EMPTY = '-';
-    const CHART_COLOR_SUCCESS = 'oklch(0.723 0.219 149.579)';  // --color-green-500
-    const CHART_COLOR_FAILED = 'oklch(0.637 0.237 25.331)';  // --color-red-500
+    const CHART_COLOR_SUCCESS = 'oklch(0.527 0.154 150.069)';  // --color-green-700
+    const CHART_COLOR_FAILED = 'oklch(0.577 0.245 27.325)';  // --color-red-600
+    const CHART_COLOR_CHANGED = 'oklch(0.705 0.213 47.604)';  // --color-orange-500
+    const CHART_COLOR_UNREACHABLE = 'oklch(0.282 0.091 267.935)';  // --color-blue-950
 
     let { open = $bindable(false) } = $props();
 
-    const STATS_TIME_PERIOD = '1w';
+    const STATS_TIME_PERIOD = '1d';
     let updateLoop: number = $state(0);
 
-    interface statsExecutionHosts {
+    interface statsExecutionHost {
         h: string  // hostname
         u: boolean  // unreachable
         ts: number  // tasks-skipped
@@ -47,7 +49,7 @@
         d: string  // duration
         t: number  // time
         f: boolean  // failed
-        h: statsExecutionHosts[]
+        h: statsExecutionHost[]
     }
     interface statsJobsMapping {
         jobs: any
@@ -85,6 +87,7 @@
         borderWidth: number
         borderColor: string
         pointBackgroundColor: string
+        pointStyle: string
         pointRadius: number
         pointHoverRadius: number
         fill: boolean
@@ -101,6 +104,7 @@
     let chartDataExecResults: Chart|undefined = $state();
     let chartDataExecByUser: Chart|undefined = $state();
     let chartDataExecOverTime: Chart|undefined = $state();
+    let chartDataExecHostResults: Chart|undefined = $state();
 
     function t(code: string) : string {
       return tq($share, code);
@@ -126,12 +130,12 @@
             labels: Object.keys(counters),
             datasets: [
                 {
-                    label: 'Succeeded',
+                    label: '✅Succeeded',
                     data: Object.values(counters).map((item) => item.success),
                     backgroundColor: new Array(len).fill(CHART_COLOR_SUCCESS),
                 },
                 {
-                    label: 'Failed',
+                    label: '❌ Failed',
                     data: Object.values(counters).map((item) => item.failed),
                     backgroundColor: new Array(len).fill(CHART_COLOR_FAILED),
                 },
@@ -146,8 +150,12 @@
             options: {
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        stacked: true,
                     },
+                    x: {
+                        stacked: true,
+                    }
                 },
                 responsive: true,
                 plugins: {
@@ -218,11 +226,17 @@
         chartDataExecByUser = new Chart(document.getElementById('chart-exec-by-user'), c);
     }
 
+    const CHART_TIME_MAX_DATAPOINTS = 200;
+
     function getExecOverTimeData() : chartDataTime {
         let jobs_success = {};
         let jobs_failed = {};
 
+        let i = 0;
         for (let s of statsJobsData['stats']) {
+            if (i > CHART_TIME_MAX_DATAPOINTS) {
+                break
+            }
             let n = statsJobsData['mapping']['jobs'][s['j']];
             if (!jobs_success[n]) {
                 jobs_success[n] = [];
@@ -237,10 +251,12 @@
             } else {
                 jobs_success[n].push({x: s['t'] * 1000, y: s['d']});
             }
+            i += 1;
         }
 
         let datasets: chartDatasetLine[] = [];
         let defaults = {
+            pointStyle: 'rectRounded',
             pointRadius: 5,
             pointHoverRadius: 7,
             borderWidth: 0,
@@ -264,14 +280,7 @@
                 ...defaults,
             })
         }
-
-        console.log("TIME", datasets);
-
-        let n = new Date();
-        return {
-            // 7 days - see: STATS_TIME_PERIOD
-            datasets: datasets,
-        }
+        return {datasets: datasets};
     }
 
     function addExecOverTimeChart() {
@@ -318,7 +327,7 @@
                             display: true,
                             text: 'Run Duration'
                         },
-                        min: 0,
+                        min: -1,
                     }
                 },
             },
@@ -326,9 +335,104 @@
         chartDataExecOverTime = new Chart(document.getElementById('chart-exec-over-time'), c);
     }
 
+    /*
+    function combineJobAndResult(s: statsExecution, hs: statsExecutionHost) : string {
+        let n = '';
+        if (s['f']) {
+            n = '❌ ';
+        } else if (hs['u']) {
+            n = '⚫ ';
+        } else if (hs['tc'] > 0) {
+            n = '🔁 ';
+        } else {
+            n = '✅ ';
+        }
+        return n + statsJobsData['mapping']['jobs'][s['j']];
+    }
+    */
+
+    function getExecHostChartData() : chartData {
+        let counters = {};
+
+        for (let s of statsJobsData['stats']) {
+            for (let hs of s['h']) {
+                let h = hs['h'];
+                if (!counters[h]) {
+                    counters[h] = {'failed': 0, 'success': 0, 'unreachable': 0, 'changed': 0};
+                }
+                if (s['f']) {
+                    counters[h]['failed'] += 1;
+                } else if (hs['u']) {
+                    counters[h]['unreachable'] += 1;
+                } else if (hs['tc'] > 0) {
+                    counters[h]['changed'] += 1;
+                } else {
+                    counters[h]['success'] += 1;
+                }
+            }
+        }
+
+        let len = Object.keys(counters).length;
+        return {
+            labels: Object.keys(counters),
+            datasets: [
+                {
+                    label: '✅ Succeeded',
+                    data: Object.values(counters).map((item) => item.success),
+                    backgroundColor: new Array(len).fill(CHART_COLOR_SUCCESS),
+                },
+                {
+                    label: '🔁 Changed',
+                    data: Object.values(counters).map((item) => item.changed),
+                    backgroundColor: new Array(len).fill(CHART_COLOR_CHANGED),
+                },
+                {
+                    label: '⚫ Unreachable',
+                    data: Object.values(counters).map((item) => item.unreachable),
+                    backgroundColor: new Array(len).fill(CHART_COLOR_UNREACHABLE),
+                },
+                {
+                    label: '❌ Failed',
+                    data: Object.values(counters).map((item) => item.failed),
+                    backgroundColor: new Array(len).fill(CHART_COLOR_FAILED),
+                },
+            ],
+        }
+    }
+
+    function addExecHostChart() {
+        let c = {
+            type: 'bar',
+            data: getExecHostChartData(),
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        stacked: true,
+                    },
+                    x: {
+                        stacked: true,
+                    }
+                },
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Execution results by Job',
+                    }
+                }
+            }
+        }
+        chartDataExecResults = new Chart(document.getElementById('chart-exec-host-results'), c);
+    }
+
     function createUpdateChartData() {
         if (!chartDataExecOverTime) {
             addExecOverTimeChart();
+        } else {
+            let n = getExecOverTimeData();
+            chartDataExecOverTime.data.datasets = n.datasets;
+            chartDataExecOverTime.update();
         }
 
         if (!chartDataExecResults) {
@@ -339,6 +443,7 @@
             chartDataExecResults.data.datasets[1].data = n.datasets[1].data;
             chartDataExecResults.update();
         }
+
         if (!chartDataExecByUser) {
             addExecByUserChart();
         } else {
@@ -346,6 +451,17 @@
             chartDataExecByUser.data.labels = n.labels;
             chartDataExecByUser.data.datasets[0].data = n.datasets[0].data;
             chartDataExecByUser.update();
+        }
+
+        if (!chartDataExecHostResults) {
+            addExecHostChart();
+        } else {
+            let n = getExecHostChartData();
+            chartDataExecHostResults.data.datasets[0].data = n.datasets[0].data;
+            chartDataExecHostResults.data.datasets[1].data = n.datasets[1].data;
+            chartDataExecHostResults.data.datasets[2].data = n.datasets[2].data;
+            chartDataExecHostResults.data.datasets[3].data = n.datasets[3].data;
+            chartDataExecHostResults.update();
         }
     }
 
@@ -370,8 +486,8 @@
         statsJobsData.mapping.host_stats = {...statsJobsData.mapping.host_stats, ...j.mapping.host_stats};
         statsJobsData.stats = [...statsJobsData.stats, ...j.stats];
         if (j.stats.length) {
-            lastExecTime = getLastExecTime(j.stats);
             createUpdateChartData();
+            lastExecTime = getLastExecTime(j.stats);
         }
     }
 
@@ -400,13 +516,6 @@
             Legend, SubTitle, Title, Tooltip, Filler,
         );
 
-        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-            Chart.defaults.color = "#ADBABD";
-            Chart.defaults.borderColor = "rgba(255,255,255,0.1)";
-            Chart.defaults.backgroundColor = "rgba(255,255,0,0.1)";
-            Chart.defaults.elements.line.borderColor = "rgba(255,255,0,0.4)";
-        }
-
         // todo: refresh data over websockets
         clearInterval(updateLoop);
         updateLoop = setInterval(() => {
@@ -422,7 +531,9 @@
 </script>
 
 <Heading tag="h1" class="mb-4" customSize="text-3xl font-extrabold  md:text-5xl lg:text-6xl">
-    <Span gradient gradientClass="text-transparent bg-clip-text bg-gradient-to-r to-yellow-400 from-primary-600">Weekly Statistics</Span>
+    <Span gradient gradientClass="text-transparent bg-clip-text bg-gradient-to-r to-yellow-400 from-primary-600">
+        Daily Statistics
+    </Span>
 </Heading>
 
 {#if !loaded}
@@ -430,17 +541,22 @@
         <Spinner/>
     </div>
 {/if}
-<div class="flex">
-    <div class="w-full">
+<div class="flex flex-wrap mb-20 mt-10">
+    <div class="w-full max-h-96">
         <canvas id="chart-exec-over-time" class="w-full"></canvas>
     </div>
 </div>
-<div class="flex">
-    <div>
-        <canvas id="chart-exec-results"></canvas>
+<div class="flex flex-wrap mb-20">
+    <div class="grow max-h-96">
+        <canvas id="chart-exec-results" class="w-full"></canvas>
     </div>
-    <div class="w-52">
+    <div class="my-auto w-80">
         <canvas id="chart-exec-by-user"></canvas>
+    </div>
+</div>
+<div class="flex flex-wrap mb-20">
+    <div class="grow max-h-96">
+        <canvas id="chart-exec-host-results" class="w-full"></canvas>
     </div>
 </div>
 
