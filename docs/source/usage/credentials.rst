@@ -32,6 +32,14 @@ Users that are members of the :code:`AW Credentials Managers` group are able to 
 
 Access to global credentials can be controlled using :ref:`permissions <usage_permission>`.
 
+* Whenever jobs are executed by a user (*via WebUI or API*) AW verifies that the user is actually permitted to use the credentials.
+
+* Whenever jobs are created or modified - the modifying user is set as job-owner.
+
+  When executing jobs on a schedule - AW verifies that this job-owner is permitted to use the configured credentials.
+
+  If a job-owner gets deleted - the linked scheduled jobs will get denied access to any credentials.
+
 |creds_perm|
 
 ----

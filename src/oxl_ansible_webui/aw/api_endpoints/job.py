@@ -173,6 +173,8 @@ class APIJob(APIView):
                 status=403,
             )
 
+        serializer.validated_data['owner'] = user
+
         try:
             serializer.save()
 
@@ -280,6 +282,8 @@ class APIJobItem(APIView):
                         data={'error': "Not privileged to use provided credentials"},
                         status=403,
                     )
+
+                serializer.validated_data['owner'] = user
 
                 try:
                     Job.objects.filter(id=job.id).update(**serializer.validated_data)

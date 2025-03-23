@@ -36,6 +36,8 @@ Known Issues
 
   * Run Ansible-Runner as `dedicated user <https://github.com/ansible/ansible-runner/issues/1350>`_ (*not yet implemented in Ansible-Runner and AW*)
 
+  * Run multiple Instances of this lightweight App in separate containers to cleanly separate the access to credentials.
+
 ----
 
 Features
@@ -56,6 +58,14 @@ Security considerations this project does take into account:
 * Usage of GitHub's `dependabot <https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-supply-chain-security#what-is-dependabot>`_ and `CodeQL <https://docs.github.com/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/about-code-scanning-with-codeql>`_
 
 * Usage of `Content-Security-Policy <https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP>`_ to protect against XSS and injections
+
+* Whenever jobs are executed by a user (*via WebUI or API*) AW verifies that the user is actually permitted to use the credentials.
+
+* Whenever jobs are created or modified - the modifying user is set as job-owner.
+
+  When executing jobs on a schedule - AW verifies that this job-owner is permitted to use the configured credentials.
+
+  If a job-owner gets deleted - the linked scheduled jobs will get denied access to any credentials.
 
 ----
 

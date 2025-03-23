@@ -223,6 +223,9 @@ class APIJobCredentials(APIView):
 
                     serializer.validated_data[field] = value
 
+        if not are_global:
+            serializer.validated_data['user'] = user
+
         try:
             serializer.save()
 

@@ -18,5 +18,5 @@ interface shareObject {
 export const share = writable({
     backend: {},
     lang: {},
-    updateInterval: 500,
+    updateInterval: 1000,
 } as shareObject);

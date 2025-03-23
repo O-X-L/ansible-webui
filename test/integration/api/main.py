@@ -85,6 +85,7 @@ def test_add():
                        'kgxe9HT+S1tzHIYoCyZ5AAAADXN1cGVyc3Rlc0BzdXA= '
                        '-----END OPENSSH PRIVATE KEY-----'
         }},
+        # todo: create user-credentials with an user-id that's not ours and validate that the backend fixed it
 
         # repos
         {'l': 'repository', 'd': {
@@ -114,6 +115,7 @@ def test_add():
             'name': 'jup5', 'playbook_file': 'nope_nr2.yml', 'inventory_file': 'hosts.yml', 'schedule': '5 4 * * *',
             'environment_vars': 'MY=1,SUPER=2,VARS=3',
         }},
+        # todo: create job with an owner-id that's not ours and validate that the backend fixed it
 
         # perms
         {'l': 'permission', 'd': {'name': 'perm1', 'jobs': 1, 'credentials': 1}},
