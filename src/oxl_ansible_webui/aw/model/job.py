@@ -189,15 +189,16 @@ class JobExecutionResultHost(BareModel):
         'unreachable', 'tasks_skipped', 'tasks_ok', 'tasks_failed', 'tasks_rescued',
         'tasks_ignored', 'tasks_changed',
     ]
-    STATS_SHORT = {
-        'unreachable': 'ur',
-        'tasks_skipped': 'ts',
-        'tasks_ok': 'to',
-        'tasks_failed': 'tf',
-        'tasks_rescued': 'tr',
-        'tasks_ignored': 'ti',
-        'tasks_changed': 'tc',
-    }
+    STATS_SHORT = [
+        'hostname',
+        'unreachable',
+        'tasks_skipped',
+        'tasks_ok',
+        'tasks_failed',
+        'tasks_rescued',
+        'tasks_ignored',
+        'tasks_changed',
+    ]
     # ansible_runner.runner.Runner.stats
     hostname = models.CharField(max_length=300, null=False)
     unreachable = models.BooleanField(choices=CHOICES_BOOL, default=False)
@@ -324,14 +325,13 @@ class JobExecution(BaseJob):
 
         return stats
 
-    def get_stats_short(self) -> dict:
-        stats = {}
+    def get_stats_short(self) -> list:
+        stats = []
         if self.result is not None:
             for result in JobExecutionResultHost.objects.filter(result=self.result):
-                stats[result.hostname] = {
-                      JobExecutionResultHost.STATS_SHORT[attr]:
-                          getattr(result, attr) for attr in JobExecutionResultHost.STATS
-                }
+                hs = [result.hostname]
+                hs.extend([getattr(result, attr) for attr in JobExecutionResultHost.STATS])
+                stats.append(hs)
 
         return stats
 

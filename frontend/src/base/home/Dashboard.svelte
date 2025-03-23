@@ -32,25 +32,6 @@
     const STATS_TIME_PERIOD = '1d';
     let updateLoop: number = $state(0);
 
-    interface statsExecutionHost {
-        h: string  // hostname
-        u: boolean  // unreachable
-        ts: number  // tasks-skipped
-        to: number  // tasks-ok
-        tf: number  // tasks-failed
-        tr: number  // tasks-rescued
-        ti: number  // tasks-ignored
-        tc: number  // tasks-changed
-    }
-    interface statsExecution {
-        j: number  // job id
-        s: number  // status id
-        u: number|null  // user id
-        d: string  // duration
-        t: number  // time
-        f: boolean  // failed
-        h: statsExecutionHost[]
-    }
     interface statsJobsMapping {
         jobs: any
         users: any
@@ -58,6 +39,24 @@
         stats: any
         host_stats: any
     }
+    type statsExecutionHost = [
+        string,  // 0 hostname
+        boolean,  // 1 unreachable
+        number,  // 2 tasks-skipped
+        number,  // 3 tasks-ok
+        number,  // 4 tasks-failed
+        number,  // 5 tasks-ignored
+        number,  // 6 tasks-changed
+    ]
+    type statsExecution = [
+        number,  // 0 job id
+        number,  // 1 status id
+        number|null,  // 2 user id
+        number,  // 3 duration
+        number,  // 4 time
+        boolean,  // 5 failed
+        statsExecutionHost[],  // 6
+    ];
     interface statsJobs {
         stats: statsExecution[]
         mapping: statsJobsMapping
@@ -114,11 +113,11 @@
         let counters = {};
 
         for (let s of statsJobsData['stats']) {
-            let n = statsJobsData['mapping']['jobs'][s['j']];
+            let n = statsJobsData['mapping']['jobs'][s[0]];
             if (!counters[n]) {
                 counters[n] = {'failed': 0, 'success': 0};
             }
-            if (s['f']) {
+            if (s[5]) {
                 counters[n]['failed'] += 1;
             } else {
                 counters[n]['success'] += 1;
@@ -174,8 +173,8 @@
 
         for (let s of statsJobsData['stats']) {
             let n = 'Scheduled';
-            if (s['u'] !== null) {
-                n = statsJobsData['mapping']['users'][s['u']];
+            if (s[2] !== null) {
+                n = statsJobsData['mapping']['users'][s[2]];
             }
             if (!data[n]) {
                 data[n] = 0;
@@ -237,19 +236,19 @@
             if (i > CHART_TIME_MAX_DATAPOINTS) {
                 break
             }
-            let n = statsJobsData['mapping']['jobs'][s['j']];
+            let n = statsJobsData['mapping']['jobs'][s[0]];
             if (!jobs_success[n]) {
                 jobs_success[n] = [];
                 jobs_failed[n] = [];
             }
-            if (!s['t'] || s['t'] == 0) {
+            if (!s[4] || s[4] == 0) {
                 console.log("INVALID TIME:", s);
                 continue;
             }
-            if (s['f']) {
-                jobs_failed[n].push({x: s['t'] * 1000, y: s['d']});
+            if (s[5]) {
+                jobs_failed[n].push({x: s[4] * 1000, y: s[3]});
             } else {
-                jobs_success[n].push({x: s['t'] * 1000, y: s['d']});
+                jobs_success[n].push({x: s[4] * 1000, y: s[3]});
             }
             i += 1;
         }
@@ -355,16 +354,16 @@
         let counters = {};
 
         for (let s of statsJobsData['stats']) {
-            for (let hs of s['h']) {
-                let h = hs['h'];
+            for (let hs of s[6]) {
+                let h = hs[0];
                 if (!counters[h]) {
                     counters[h] = {'failed': 0, 'success': 0, 'unreachable': 0, 'changed': 0};
                 }
-                if (s['f']) {
+                if (s[5]) {
                     counters[h]['failed'] += 1;
-                } else if (hs['u']) {
+                } else if (hs[1]) {
                     counters[h]['unreachable'] += 1;
-                } else if (hs['tc'] > 0) {
+                } else if (hs[6] > 0) {
                     counters[h]['changed'] += 1;
                 } else {
                     counters[h]['success'] += 1;
@@ -468,8 +467,8 @@
     function getLastExecTime(stats: statsExecution[]) : number {
         let t = 0;
         for (let s of stats) {
-            if (s['t'] > t) {
-                t = s['t'];
+            if (s[4] > t) {
+                t = s[4];
             }
         }
         return t;
