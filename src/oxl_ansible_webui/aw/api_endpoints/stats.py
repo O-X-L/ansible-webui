@@ -90,7 +90,6 @@ class APIStatsJobs(APIView):
         ]
     )
     def get(request):
-        start_time = time()
         user = get_api_user(request)
         job_ids = [job.id for job in get_viewable_jobs(user)]
 
@@ -141,14 +140,12 @@ class APIStatsJobs(APIView):
             else:
                 limits['status__in'] = [JOB_EXEC_STATUS_SUCCESS, JOB_EXEC_STATUS_STOPPED]
 
-        print("STATS 1", time() - start_time)
         execs = JobExecution.objects.filter(
             job__in=job_ids,
             status__in=JOB_EXEC_STATI_INACTIVE,
             **limits,
         ).order_by('-created')
 
-        print("STATS 2", time() - start_time)
         data = {
             'stats': [],
             'mapping': {
@@ -167,7 +164,6 @@ class APIStatsJobs(APIView):
                 'host_stats': JobExecutionResultHost.STATS_SHORT,
             }
         }
-        print("STATS 3", time() - start_time)
 
         for e in execs:
             user_id = None if e.user is None else e.user.id
@@ -177,14 +173,13 @@ class APIStatsJobs(APIView):
                 user_id,
                 e.time_duration_sec,
                 e.time_fin_ts,
-                e.failed,
+                1 if e.failed else 0,
                 e.get_stats_short(),
             ])
             data['mapping']['jobs'][e.job.id] = e.job.name
             data['mapping']['users'][user_id] = e.user_name
             data['mapping']['status'][e.status] = e.status_name
 
-        print("STATS 4", time() - start_time)
         if len(data['stats']) == 0:
             return Response(data=None, status=304)
 

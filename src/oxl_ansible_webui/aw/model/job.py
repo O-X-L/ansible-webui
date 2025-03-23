@@ -167,7 +167,7 @@ class JobExecutionResult(BareModel):
         if is_null(self.time_fin):
             return timedelta(0)
 
-        return self.time_fin_dt - self.time_start_dt
+        return self.time_fin - self.time_start
 
     @property
     def time_duration_sec(self) -> int:
@@ -329,8 +329,11 @@ class JobExecution(BaseJob):
         stats = []
         if self.result is not None:
             for result in JobExecutionResultHost.objects.filter(result=self.result):
-                hs = [result.hostname]
-                hs.extend([getattr(result, attr) for attr in JobExecutionResultHost.STATS])
+                hs = [
+                    result.hostname,
+                    1 if result.unreachable else 0,
+                ]
+                hs.extend([getattr(result, attr) for attr in JobExecutionResultHost.STATS[1:]])
                 stats.append(hs)
 
         return stats
@@ -366,10 +369,10 @@ class JobExecution(BaseJob):
 
     @property
     def time_fin_ts(self) -> (int, None):
-        if self.time_fin_dt is None:
+        if self.result.time_fin is None:
             return None
 
-        return int(datetime.timestamp(self.time_fin_dt))
+        return int(datetime.timestamp(self.result.time_fin))
 
     @property
     def time_duration(self) -> timedelta:

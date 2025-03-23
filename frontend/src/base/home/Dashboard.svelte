@@ -41,7 +41,7 @@
     }
     type statsExecutionHost = [
         string,  // 0 hostname
-        boolean,  // 1 unreachable
+        number,  // 1 unreachable (0/1 boolean)
         number,  // 2 tasks-skipped
         number,  // 3 tasks-ok
         number,  // 4 tasks-failed
@@ -54,7 +54,7 @@
         number|null,  // 2 user id
         number,  // 3 duration
         number,  // 4 time
-        boolean,  // 5 failed
+        number,  // 5 failed (0/1 boolean)
         statsExecutionHost[],  // 6
     ];
     interface statsJobs {
@@ -117,7 +117,7 @@
             if (!counters[n]) {
                 counters[n] = {'failed': 0, 'success': 0};
             }
-            if (s[5]) {
+            if (s[5] == 1) {
                 counters[n]['failed'] += 1;
             } else {
                 counters[n]['success'] += 1;
@@ -245,7 +245,7 @@
                 console.log("INVALID TIME:", s);
                 continue;
             }
-            if (s[5]) {
+            if (s[5] == 1) {
                 jobs_failed[n].push({x: s[4] * 1000, y: s[3]});
             } else {
                 jobs_success[n].push({x: s[4] * 1000, y: s[3]});
@@ -359,9 +359,9 @@
                 if (!counters[h]) {
                     counters[h] = {'failed': 0, 'success': 0, 'unreachable': 0, 'changed': 0};
                 }
-                if (s[5]) {
+                if (s[5] == 1) {
                     counters[h]['failed'] += 1;
-                } else if (hs[1]) {
+                } else if (hs[1] == 1) {
                     counters[h]['unreachable'] += 1;
                 } else if (hs[6] > 0) {
                     counters[h]['changed'] += 1;
