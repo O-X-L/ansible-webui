@@ -1,10 +1,11 @@
-from time import time
 from datetime import datetime, timedelta
 
 from rest_framework.views import APIView
+from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from django.core.exceptions import ObjectDoesNotExist
 
+from aw.config.main import config
 from aw.api_endpoints.base import get_api_user, GenericResponse, API_PERMISSION, API_PARAM_HASH, \
     response_data_if_changed
 from aw.utils.permission import get_viewable_jobs
@@ -15,12 +16,12 @@ from aw.model.base import JOB_EXEC_STATI_INACTIVE, JOB_EXEC_STATUS_SUCCESS, JOB_
 from aw.base import USERS
 
 
-def relative_time_to_timestamp(t: str) -> (int, float, None):
+def relative_time_to_dt(t: str) -> (datetime, None):
     if t.isnumeric():
-        return int(t)
+        return datetime.fromtimestamp(int(t), tz=config.timezone)
 
     if t.replace('.', '').isnumeric():
-        return float(t)
+        return datetime.fromtimestamp(float(t), tz=config.timezone)
 
     n = datetime_w_tz()
 
@@ -102,16 +103,19 @@ class APIStatsJobs(APIView):
             job_ids = job_ids_new
 
         limits = {}
+        limit_time = None
         if 'limit_time' in request.GET:
-            limits['created__gte'] = relative_time_to_timestamp(request.GET['limit_time'])
+            limit_time = relative_time_to_dt(request.GET['limit_time'])
 
-        else:
-            limits['created__gte'] = relative_time_to_timestamp('1w')
+        if limit_time is None:
+            limit_time = relative_time_to_dt('1w')
+
+        limits['created__gte'] = limit_time
 
         if 'limit_users' in request.GET:
             limit_users = []
 
-            if request.GET['limit_users'].lower() == 'scheduled':
+            if request.GET['limit_users'].lower() == 'schedule':
                 limits['user__isnull'] = True
 
             else:
@@ -177,5 +181,8 @@ class APIStatsJobs(APIView):
             data['mapping']['jobs'][e.job.id] = e.job.name
             data['mapping']['users'][user_id] = e.user_name
             data['mapping']['status'][e.status] = e.status_name
+
+        if len(data['stats']) == 0:
+            return Response(data=None, status=304)
 
         return response_data_if_changed(request, data)

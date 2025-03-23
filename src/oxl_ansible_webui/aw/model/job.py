@@ -170,11 +170,11 @@ class JobExecutionResult(BareModel):
         return self.time_fin_dt - self.time_start_dt
 
     @property
-    def time_duration_sec(self) -> float:
+    def time_duration_sec(self) -> int:
         if is_null(self.time_fin):
             return 0
 
-        return self.time_duration.total_seconds()
+        return int(self.time_duration.total_seconds())
 
     @property
     def time_duration_str(self) -> str:
@@ -351,7 +351,7 @@ class JobExecution(BaseJob):
         if self.time_start_dt is None:
             return None
 
-        return datetime.timestamp(self.time_start_dt)
+        return int(datetime.timestamp(self.time_start_dt))
 
     @property
     def time_fin_dt(self) -> (datetime, None):
@@ -369,14 +369,14 @@ class JobExecution(BaseJob):
         if self.time_fin_dt is None:
             return None
 
-        return datetime.timestamp(self.time_fin_dt)
+        return int(datetime.timestamp(self.time_fin_dt))
 
     @property
     def time_duration(self) -> timedelta:
         return self.result.time_duration
 
     @property
-    def time_duration_sec(self) -> float:
+    def time_duration_sec(self) -> int:
         return self.result.time_duration_sec
 
     @property
