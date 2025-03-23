@@ -188,6 +188,10 @@ def _migration_needed() -> bool:
     return changed or not _schema_up_to_date()
 
 
+def _get_random_pwd() -> str:
+    return ''.join(random_choice(ascii_letters + digits + '!.-+') for _ in range(14))
+
+
 def create_first_superuser():
     from aw.base import USERS
     if len(USERS.objects.filter(is_superuser=True)) == 0:
@@ -198,7 +202,7 @@ def create_first_superuser():
             name = 'ansible'
 
         if pwd is None:
-            pwd = ''.join(random_choice(ascii_letters + digits + '!.-+') for _ in range(14))
+            pwd = _get_random_pwd()
 
         USERS.objects.create_superuser(
             username=name,
@@ -220,6 +224,17 @@ def create_manager_groups():
     from django.contrib.auth.models import Group
     for grp in GRP_MANAGER.values():
         Group.objects.get_or_create(name=grp)
+
+
+def create_schedule_user():
+    # just to reserve the username as it is referenced internally
+    from aw.base import USERS
+    if len(USERS.objects.filter(username='schedule')) == 0:
+        USERS.objects.create(
+            username='schedule',
+            email='schedule@localhost',
+            password=_get_random_pwd(),
+        )
 
 
 def cleanup_job_stati():

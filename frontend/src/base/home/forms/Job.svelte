@@ -70,6 +70,7 @@
         cmd_args: {value: '', color: inputBaseColor},
         execution_prompts: {value: '', color: inputBaseColor},  // legacy prompts
         execution_prompts_json: {value: '', color: inputBaseColor},
+        owner: {value: $share.backend.user_id},
     });
 
     function t(code: string) : string {

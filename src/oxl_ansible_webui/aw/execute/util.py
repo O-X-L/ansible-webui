@@ -88,11 +88,8 @@ def create_dirs(path: (str, Path), desc: str):
 
 def job_logs(job: Job, execution: JobExecution) -> dict:
     safe_job_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=job.name)
-    if is_null(execution.user):
-        safe_user_name = 'scheduled'
-    else:
-        safe_user_name = execution.user.username.replace('.', '_')
-        safe_user_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=safe_user_name)
+    safe_user_name = execution.user_name.replace('.', '_')
+    safe_user_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=safe_user_name)
 
     timestamp = datetime_w_tz().strftime(FILE_TIME_FORMAT)
     log_file = f"{config['path_log']}/{safe_job_name}_{timestamp}_{safe_user_name}"

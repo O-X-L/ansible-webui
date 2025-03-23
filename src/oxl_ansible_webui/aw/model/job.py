@@ -81,7 +81,7 @@ class Job(BaseJob):
     form_fields = [
         'name', 'playbook_file', 'inventory_file', 'repository', 'schedule', 'enabled', 'limit', 'verbosity',
         'mode_diff', 'mode_check', 'tags', 'tags_skip', 'verbosity', 'comment', 'environment_vars', 'cmd_args',
-        'credentials_default', 'credentials_needed', 'credentials_category',
+        'credentials_default', 'credentials_needed', 'credentials_category', 'owner',
     ]
     CHANGE_FIELDS = form_fields.copy()
     CHANGE_FIELDS.extend(['execution_prompts', 'execution_prompts_json'])
@@ -111,6 +111,11 @@ class Job(BaseJob):
     execution_prompts_max_len = 5000
     execution_prompts = models.CharField(max_length=execution_prompts_max_len, **DEFAULT_NONE)  # todo: remove later
     execution_prompts_json = models.CharField(max_length=execution_prompts_max_len, default='')
+
+    owner = models.ForeignKey(
+        USERS, on_delete=models.SET_NULL, null=True, default=1,
+        related_name='job_fk_user', editable=False,
+    )
 
     def __str__(self) -> str:
         limit = '' if self.limit is None else f' [{self.limit}]'
@@ -256,11 +261,7 @@ class JobExecution(BaseJob):
     )
 
     def __str__(self) -> str:
-        executor = 'scheduled'
-        if self.user is not None:
-            executor = self.user.username
-
-        return f"Job '{self.job.name}' execution @ {self.time_created_str} by '{executor}': {self.status_name}"
+        return f"Job '{self.job.name}' execution @ {self.time_created_str} by '{self.user_name}': {self.status_name}"
 
     @property
     def status_name(self) -> str:
@@ -303,7 +304,7 @@ class JobExecution(BaseJob):
 
     @property
     def user_name(self) -> str:
-        return self.user.username if self.user is not None else 'Scheduled'
+        return self.user.username if self.user is not None else 'schedule'
 
     @property
     def is_active(self) -> bool:
