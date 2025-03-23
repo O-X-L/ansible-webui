@@ -16,6 +16,7 @@
     import { apiGet } from '../../util/api.js';
     import { tq } from '../../util/translate.js';
     import { classFooterSpacing} from '../Style.js';
+    import { arraysEqual } from '../../util/main.js';
     import {
         getRandomTailwindColor, getRandomTailwindColorNegative, getRandomTailwindColorPositive,
     } from '../../util/colors.js';
@@ -30,6 +31,7 @@
     let { open = $bindable(false) } = $props();
 
     const STATS_TIME_PERIOD = '1d';
+    const CHART_TIME_MAX_DATAPOINTS = 200;
     let updateLoop: number = $state(0);
 
     interface statsJobsMapping {
@@ -103,6 +105,7 @@
     let chartDataExecResults: Chart|undefined = $state();
     let chartDataExecByUser: Chart|undefined = $state();
     let chartDataExecOverTime: Chart|undefined = $state();
+    let chartDataExecOverTimeJobs: string[] = $state([]);
     let chartDataExecHostResults: Chart|undefined = $state();
 
     function t(code: string) : string {
@@ -225,9 +228,7 @@
         chartDataExecByUser = new Chart(document.getElementById('chart-exec-by-user'), c);
     }
 
-    const CHART_TIME_MAX_DATAPOINTS = 200;
-
-    function getExecOverTimeData() : chartDataTime {
+    function getExecOverTimeData() : [boolean, chartDataTime] {
         let jobs_success = {};
         let jobs_failed = {};
 
@@ -253,6 +254,7 @@
             i += 1;
         }
 
+        let dataset_keys = [];
         let datasets: chartDatasetLine[] = [];
         let defaults = {
             pointStyle: 'rectRounded',
@@ -264,29 +266,40 @@
         }
 
         for (let [k, v] of Object.entries(jobs_success)) {
+            let d = `✅ ${k}`;
             datasets.push({
-                label: `✅ ${k}`,
+                label: d,
                 data: v,
                 pointBackgroundColor: getRandomTailwindColorPositive(),
                 ...defaults,
             })
+            dataset_keys.push(d);
         }
         for (let [k, v] of Object.entries(jobs_failed)) {
+            let d = `❌ ${k}`;
             datasets.push({
-                label: `❌ ${k}`,
+                label: d,
                 data: v,
                 pointBackgroundColor: getRandomTailwindColorNegative(),
                 ...defaults,
             })
+            dataset_keys.push(d);
         }
-        return {datasets: datasets};
+
+        let changed = !arraysEqual(dataset_keys.sort(), chartDataExecOverTimeJobs);
+        if (changed) {
+            chartDataExecOverTimeJobs = dataset_keys;
+        }
+        return [changed, {datasets: datasets}];
     }
 
     function addExecOverTimeChart() {
+        let [_, data] = getExecOverTimeData();
         let c = {
             type: 'line',
-            data: getExecOverTimeData(),
+            data: data,
             options: {
+                responsive: true,
                 plugins: {
                     title: {
                         text: 'Executions over Time',
@@ -422,15 +435,24 @@
                 }
             }
         }
-        chartDataExecResults = new Chart(document.getElementById('chart-exec-host-results'), c);
+        chartDataExecHostResults = new Chart(document.getElementById('chart-exec-host-results'), c);
     }
 
     function createUpdateChartData() {
         if (!chartDataExecOverTime) {
             addExecOverTimeChart();
         } else {
-            let n = getExecOverTimeData();
-            chartDataExecOverTime.data.datasets = n.datasets;
+            let [changed, n] = getExecOverTimeData();
+
+            // only replace the whole dataset if jobs change (reloads whole chart)
+            if (changed) {
+                chartDataExecOverTime.data.datasets = n.datasets;
+
+            } else if (chartDataExecOverTime !== undefined) {
+                for (let i = 0; i < n.datasets.length; i++) {
+                    chartDataExecOverTime.data.datasets[i].data = n.datasets[i].data;
+                }
+            }
             chartDataExecOverTime.update();
         }
 
@@ -540,22 +562,22 @@
         <Spinner/>
     </div>
 {/if}
-<div class="flex flex-wrap mb-20 mt-10">
-    <div class="w-full max-h-96">
-        <canvas id="chart-exec-over-time" class="w-full"></canvas>
+<div class="flex justify-center mb-20 mt-10">
+    <div class="w-full max-h-[30rem]">
+        <canvas id="chart-exec-over-time"></canvas>
     </div>
 </div>
-<div class="flex flex-wrap mb-20">
-    <div class="grow max-h-96">
-        <canvas id="chart-exec-results" class="w-full"></canvas>
+<div class="flex justify-between flex-wrap mb-20">
+    <div class="grow max-h-[30rem]">
+        <canvas id="chart-exec-results"></canvas>
     </div>
     <div class="my-auto w-80">
         <canvas id="chart-exec-by-user"></canvas>
     </div>
 </div>
-<div class="flex flex-wrap mb-20">
-    <div class="grow max-h-96">
-        <canvas id="chart-exec-host-results" class="w-full"></canvas>
+<div class="flex justify-center flex-wrap mb-20">
+    <div class="grow max-h-[30rem]">
+        <canvas id="chart-exec-host-results"></canvas>
     </div>
 </div>
 
