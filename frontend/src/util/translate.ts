@@ -1,7 +1,7 @@
 const DEFAULT_LANG = 'en'
 export const TT = '%t%'
 
-function getTranslationStore(share: any) : any|null {
+export function getTranslationStore(share: any) : any|null {
   if (share.lang[DEFAULT_LANG]) {
     return share.lang;
   }
@@ -14,6 +14,9 @@ function getTranslationStore(share: any) : any|null {
 function getTranslations(share: any) : any|null {
   let userLang = localStorage.language;
   let store = getTranslationStore(share);
+  if (!store) {
+    return null
+  }
   if (!userLang || !store[userLang]) {
     if (!store[DEFAULT_LANG]) {
       return null;

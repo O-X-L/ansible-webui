@@ -1,6 +1,6 @@
 ARG AW_VERSION=0.0
 
-# BUILD CMD: docker build -f Dockerfile_production_unprivileged -t ansible-webui:<VERSION> --build-arg "AW_VERSION=<VERSION>" --progress=plain --no-cache .
+# BUILD: docker build -f Dockerfile_production_unprivileged -t ansible-webui:<VERSION> --build-arg "AW_VERSION=<VERSION>" --progress=plain --no-cache .
 # RUN:
 #   sudo useradd ansible-webui --shell /usr/sbin/nologin --uid 8785 --user-group
 #   mkdir ${YOUR_DATA_DIR} && chown -R ansible-webui ${YOUR_DATA_DIR}

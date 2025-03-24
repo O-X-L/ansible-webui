@@ -9,16 +9,17 @@
     } from 'flowbite-svelte-icons';
 
     import { share } from './Share.js';
-    import { tq, flagIcon } from '../util/translate.js';
     import { setDarkLightMode } from './DarkLightMode.js';
     import UserSettings from './system/UserSettings.svelte';
     import { apiGet, getCSRFFormTokenHTML } from '../util/api.js';
     import { classNavFooter, classBtnBase, classNavLink } from './Style.js';
+    import { tq, flagIcon, getTranslationStore } from '../util/translate.js';
 
     const DEFAULT_LANG = 'en';
 
     let loaded: boolean = $state(false);
     let language: string = $state(DEFAULT_LANG);
+    let languageStoreExists = $state(false);
     let userSettingsOpen = $state(false);
 
     $effect(() => {
@@ -56,6 +57,11 @@
     }
 
     onMount(() => {
+      languageStoreExists = getTranslationStore($share) != null
+      apiGet('frontend/lang', setTranslations);
+      if (!getTranslationStore($share)) {
+        setTimeout(location.reload, 2000);
+      }
       setDarkLightMode(document);
       if (localStorage.languageCache) {
         $share.lang = JSON.parse(localStorage.languageCache);
@@ -66,7 +72,6 @@
         localStorage.language = language;
       }
       apiGet('frontend/info', setBackendStates);
-      apiGet('frontend/lang', setTranslations);
     });
 </script>
   

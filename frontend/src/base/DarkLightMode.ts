@@ -1,4 +1,4 @@
-import { Chart } from 'chart.js';
+import { Chart, LineController, LineElement } from 'chart.js';
 
 export function getDarkLightMode() : 'dark'|'light' {
     let lastColorMode = localStorage.getItem('color-theme');
@@ -17,7 +17,8 @@ export function setDarkLightMode(doc: HTMLDocument, mode: string = '') {
         mode = getDarkLightMode();
     }
 
-    if (mode == 'dark') {
+    if (mode == 'dark' && Chart.defaults) {
+      Chart.register(LineController, LineElement);
       Chart.defaults.color = "#ADBABD";
       Chart.defaults.borderColor = "rgba(255,255,255,0.1)";
       Chart.defaults.backgroundColor = "rgba(255,255,0,0.1)";

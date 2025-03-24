@@ -198,7 +198,7 @@
         return {
             labels: Object.keys(data),
             datasets: [{
-                label: 'Automatic vs Manual Job runs',
+                label: 'Runs',
                 data: Object.values(data),
                 backgroundColor: colors,
                 hoverOffset: 4,
