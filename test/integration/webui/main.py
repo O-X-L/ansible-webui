@@ -94,15 +94,15 @@ def _open_and_wait_for_load(url: str):
 
 def login(user: str, pwd: str):
     print('TESTING LOGIN')
-    login_url = f'{BASE_URL}/a/login/'
-    _open_and_wait_for_load(login_url)
+    url = f'{BASE_URL}/a/login/'
+    _open_and_wait_for_load(url)
 
     DRIVER.find_element(By.ID, 'id_username').send_keys(user)
     DRIVER.find_element(By.ID, 'id_password').send_keys(pwd)
     DRIVER.find_element(By.ID, 'id_password').send_keys(Keys.RETURN)
 
-    assert _check_requests(login_url)
-    assert _check_console_logs(login_url)
+    assert _check_requests(url)
+    assert _check_console_logs(url)
 
     login_redirect = f'{BASE_URL}/ui#dashboard'
     assert DRIVER.current_url == login_redirect

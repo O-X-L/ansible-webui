@@ -4,6 +4,8 @@ from time import sleep
 from seleniumwire import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
 import chromedriver_autoinstaller
 
 # pylint: disable=R0801
@@ -15,6 +17,7 @@ options.add_argument('--disable-extensions')
 options.add_argument('--disable-logging')
 options.add_argument('--log-level=3')
 options.add_argument('--remote-debugging-port=9222')
+options.add_argument('--enable-javascript')
 chromedriver_autoinstaller.install()
 DRIVER = webdriver.Chrome(options=options)
 
@@ -22,10 +25,17 @@ DRIVER = webdriver.Chrome(options=options)
 def _get_requests(url: str) -> dict:
     reqs = {'main': None, 'sub': []}
 
+    if url.find('#') != -1:
+        url = url.split('#', 1)[0]
+
     for r in DRIVER.requests:
-        if not r.response or r.url.endswith('favicon.ico'):
+        if not r.response or r.url.endswith('favicon.ico') or \
+                r.url.find('google') != -1 or \
+                r.url.find('chrome_component') != -1 or \
+                r.url.find('chromewebstore') != -1:
             continue
 
+        print(f" > {r.url.replace(BASE_URL, '')}")
         if r.url == url:
             reqs['main'] = r
 
@@ -36,15 +46,17 @@ def _get_requests(url: str) -> dict:
     return reqs
 
 
-def _check_requests(url: str) -> bool:
+def _check_requests(url: str, sub: bool = False) -> bool:
     reqs = _get_requests(url)
-    if reqs['main'] is None:
-        return False
+    if not sub:
+        if reqs['main'] is None:
+            print(f"ERROR: No direct request to URL found: '{reqs}'")
+            return False
 
-    sc = reqs['main'].response.status_code
-    if sc not in [200, 302]:
-        print(f"ERROR: Bad response-code {sc} @ '{reqs['main']}'")
-        return False
+        sc = reqs['main'].response.status_code
+        if sc not in [200, 302]:
+            print(f"ERROR: Bad response-code {sc} @ '{reqs['main']}'")
+            return False
 
     for sr in reqs['sub']:
         sc = sr.response.status_code
@@ -69,43 +81,73 @@ def _check_console_logs(url: str) -> bool:
     return True
 
 
-def _response_ok(url: str) -> bool:
-    return _check_requests(url) and _check_console_logs(url)
+def _wait_for_load():
+    WebDriverWait(
+        DRIVER, 5.0, 0.2,
+    ).until(expected_conditions.presence_of_element_located((By.ID, 'loaded')))
+
+
+def _open_and_wait_for_load(url: str):
+    DRIVER.get(url)
+    _wait_for_load()
 
 
 def login_fallback(user: str, pwd: str):
     print('TESTING FALLBACK-LOGIN')
-    login_url = f'{BASE_URL}/a/login/fallback/'
-    DRIVER.get(login_url)
+    url = f'{BASE_URL}/a/login/fallback/'
+    _open_and_wait_for_load(url)
+
     DRIVER.find_element(By.ID, 'id_username').send_keys(user)
     DRIVER.find_element(By.ID, 'id_password').send_keys(pwd)
     DRIVER.find_element(By.ID, 'id_password').send_keys(Keys.RETURN)
-    assert _response_ok(login_url)
 
-    login_redirect = f'{BASE_URL}/ui/jobs/manage'
+    assert _check_requests(url)
+    assert _check_console_logs(url)
+
+    login_redirect = f'{BASE_URL}/ui#dashboard'
     assert DRIVER.current_url == login_redirect
 
 
-def test_get_locations(locations: list):
-    for location in locations:
-        print(f'TESTING GET {location}')
+def test_get_locations(to_check: dict):
+    for location, tab_fragment in to_check.items():
+        print(f'TESTING GET /{location}')
         url = f'{BASE_URL}/{location}'
-        sleep(0.1)
-        DRIVER.get(url)
-        assert _response_ok(url)
+        _open_and_wait_for_load(url)
+
+        assert _check_requests(url)
+        assert _check_console_logs(url)
+
+        for tab_class, fragment in tab_fragment.items():
+            print(f'TESTING GET /{location}{fragment}')
+            DRIVER.find_element(By.CLASS_NAME, tab_class).click()
+            _wait_for_load()
+            sleep(2)  # wait for JS async fetches (in case they would fail)
+
+            assert _check_requests(url, sub=True)
+            assert _check_console_logs(url)
 
 
 def test_auth_pages():
-    test_get_locations([
-        'a/login/', 'a/login/fallback/',
-    ])
+    test_get_locations({
+        'a/login/': {},
+        'a/login/fallback/': {},
+    })
 
 
 def test_fallback_main_pages():
-    # not all.. but some to make sure the fallback-auth is working
-    test_get_locations([
-        'ui/jobs/manage', 'ui/jobs/log', 'ui/system/config', 'a/password_change/',
-    ])
+    test_get_locations({
+        'ui': {
+            'tab-jobs': '#jobs',
+            'tab-logs': '#logs',
+            'tab-repositories': '#repositories',
+            'tab-credentials': '#credentials',
+            'tab-dashboard': '#dashboard',
+        },
+        'ui/system': {
+            'tab-admin': '#admin',
+            'tab-settings': '#settings',
+        },
+    })
 
 
 def main():

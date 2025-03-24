@@ -12,7 +12,7 @@
     import { setDarkLightMode } from './DarkLightMode.js';
     import UserSettings from './system/UserSettings.svelte';
     import { apiGet, getCSRFFormTokenHTML } from '../util/api.js';
-    import { classNavFooter, classBtnBase, classNavLink } from './Style.js';
+    import { classNavFooter, classBtnBase, classBtnLink } from './Style.js';
     import { tq, flagIcon, getTranslationStore } from '../util/translate.js';
 
     const DEFAULT_LANG = 'en';
@@ -101,12 +101,12 @@
   -->
     {#if $share.backend.authenticated}
       <div class="flex md:order-1 mr-5">
-        <Button id="nav-btn-home" size="xs" class="ml-2 {classNavLink}" href="/ui"
+        <Button id="nav-btn-home" size="xs" class="ml-2 {classBtnLink}" href="/ui"
           disabled={window.location.pathname == '/ui'}>
           <HomeSolid/></Button>
         <Tooltip placement="bottom">{t('nav.home')}</Tooltip>
 
-        <Button id="nav-btn-system" size="xs" class="ml-2 {classNavLink}" href="/ui/system"
+        <Button id="nav-btn-system" size="xs" class="ml-2 {classBtnLink}" href="/ui/system"
           disabled={window.location.pathname == '/ui/system'}>
           <ServerSolid/></Button>
         <Tooltip placement="bottom">{t('nav.system')}</Tooltip>
@@ -128,18 +128,18 @@
     <DarkMode id="nav-btn-darkmode" size="sm" btnClass="{classBtnBase} px-4 py-2 ml-2"></DarkMode>
     <Tooltip placement="bottom">{t('nav.darkLight')}</Tooltip>
 
-    <Button id="nav-btn-docs" size="xs" class="ml-2 max-sm:hidden {classNavLink}"
+    <Button id="nav-btn-docs" size="xs" class="ml-2 max-sm:hidden {classBtnLink}"
       href="https:/ansible-webui.OXL.app"><BookSolid /></Button>
     <Tooltip placement="bottom">{t('nav.docs')}</Tooltip>
-    <Button id="nav-btn-repo" size="xs" class="ml-2 max-sm:hidden {classNavLink}"
+    <Button id="nav-btn-repo" size="xs" class="ml-2 max-sm:hidden {classBtnLink}"
       href="https://github.com/O-X-L/ansible-webui"><GithubSolid /></Button>
     <Tooltip placement="bottom">{t('nav.repo')}</Tooltip>
-    <Button id="nav-btn-bugs" size="xs" class="ml-2 max-sm:hidden {classNavLink}"
+    <Button id="nav-btn-bugs" size="xs" class="ml-2 max-sm:hidden {classBtnLink}"
       href="https://github.com/O-X-L/ansible-webui/issues"><BugSolid /></Button>
     <Tooltip placement="bottom">{t('nav.bugs')}</Tooltip>
 
     {#if $share.backend.authenticated}
-      <Button id="nav-btn-user-settings" size="xs" class="ml-2 {classNavLink}"
+      <Button id="nav-btn-user-settings" size="xs" class="ml-2 {classBtnLink}"
         on:click={() => {userSettingsOpen=true}}><UserSettingsSolid/></Button>
       <Tooltip placement="bottom">{t('nav.user_settings')}</Tooltip>
 

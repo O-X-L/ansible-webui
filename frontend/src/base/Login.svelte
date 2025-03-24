@@ -5,10 +5,15 @@
 
     import { share } from './Share.js';
     import { tq } from '../util/translate.js';
+    import { classBtnLink } from './Style.js';
     import { getCSRFFormTokenHTML } from '../util/api.js';
 
+    const LOGIN_URL_DEFAULT = '/a/login/';
+    const LOGIN_URL_FALLBACK = '/a/login/fallback/';
+    const LOGIN_URL_SAML = '/a/saml/init/';
+
     let loaded = $state(false);
-    let loginTarget = $derived($share.backend.sso ? '/a/saml/init/' : '/a/login/')
+    let loginTarget = $derived(getLoginURL());
     let rememberUsername = $state(false);
 
     interface formAlertType {
@@ -21,6 +26,16 @@
 
     function t(code: string) : string {
       return tq($share, code);
+    }
+
+    function getLoginURL() {
+        if (!$share.backend.sso) {
+            return LOGIN_URL_DEFAULT;
+        }
+        if (window.location.pathname.includes('fallback')) {
+            return LOGIN_URL_FALLBACK;
+        }
+        return LOGIN_URL_SAML;
     }
 
     function saveUsername() {
@@ -126,9 +141,9 @@
                     {#if $share.backend.sso}
                         <div>
                             {#if window.location.pathname.includes('fallback')}
-                                <Button href="/a/login/" class="mt-2">{t('login.sso')}</Button>
+                                <Button href={LOGIN_URL_DEFAULT} class="ml-2 mt-5 {classBtnLink}">{t('login.sso')}</Button>
                             {:else}
-                                <Button href="/a/login/fallback/" class="mt-2">{t('login.localUser')}</Button>
+                                <Button href={LOGIN_URL_FALLBACK} class="ml-2 mt-5 {classBtnLink}">{t('login.localUser')}</Button>
                             {/if}
                         </div>
                     {/if}
