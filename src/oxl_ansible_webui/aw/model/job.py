@@ -225,6 +225,7 @@ class JobExecutionResultHost(BareModel):
 
 
 class JobExecution(BaseJob):
+    # pylint: disable=R0904
     api_fields_read = [
         'id', 'job', 'job_name', 'user', 'user_name', 'result', 'status', 'status_name', 'time_start', 'time_fin',
         'failed', 'error_s', 'error_m', 'log_stdout', 'log_stdout_url', 'log_stderr', 'log_stderr_url', 'job_comment',

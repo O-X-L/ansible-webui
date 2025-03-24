@@ -1,4 +1,3 @@
-from time import time
 from datetime import datetime, timedelta
 
 from rest_framework.views import APIView
@@ -10,7 +9,7 @@ from aw.config.main import config
 from aw.api_endpoints.base import get_api_user, GenericResponse, API_PERMISSION, API_PARAM_HASH, \
     response_data_if_changed
 from aw.utils.permission import get_viewable_jobs
-from aw.model.job import JobExecution, JobExecutionResultHost
+from aw.model.job import JobExecution, JobExecutionResultHost, Job
 from aw.utils.util import datetime_w_tz
 from aw.model.base import JOB_EXEC_STATI_INACTIVE, JOB_EXEC_STATUS_SUCCESS, JOB_EXEC_STATUS_FAILED, \
     JOB_EXEC_STATUS_STOPPED
@@ -18,6 +17,7 @@ from aw.base import USERS
 
 
 def relative_time_to_dt(t: str) -> (datetime, None):
+    # pylint: disable=R0911
     if t.isnumeric():
         return datetime.fromtimestamp(int(t), tz=config.timezone)
 
@@ -50,14 +50,62 @@ def relative_time_to_dt(t: str) -> (datetime, None):
     return datetime.timestamp(n)
 
 
+def _build_stats_jobs_query_limits(request, job_ids: list[Job]) -> dict:
+    if 'limit_jobs' in request.GET:
+        job_ids_new = []
+        for limit_job in request.GET['limit_jobs'].split(','):
+            if limit_job.isnumeric():
+                limit_job = int(limit_job)
+                if limit_job in job_ids:
+                    job_ids_new.append(limit_job)
+
+        job_ids = job_ids_new
+
+    limits = {'job__in': job_ids}
+    limit_time = None
+    if 'limit_time' in request.GET:
+        limit_time = relative_time_to_dt(request.GET['limit_time'])
+
+    if limit_time is None:
+        limit_time = relative_time_to_dt('1w')
+
+    limits['created__gte'] = limit_time
+
+    if 'limit_users' in request.GET:
+        limit_users = []
+
+        if request.GET['limit_users'].lower() == 'schedule':
+            limits['user__isnull'] = True
+
+        else:
+            for limit_user in request.GET['limit_users'].split(','):
+                try:
+                    user = USERS.objects.get(username=limit_user)
+                    if user is None:
+                        continue
+
+                    limit_users.append(user.id)
+
+                except ObjectDoesNotExist:
+                    continue
+
+            limits['user__in'] = limit_users
+
+    if 'failed' in request.GET:
+        if request.GET['failed']:
+            limits['status'] = JOB_EXEC_STATUS_FAILED
+
+        else:
+            limits['status__in'] = [JOB_EXEC_STATUS_SUCCESS, JOB_EXEC_STATUS_STOPPED]
+
+    return limits
+
+
 class APIStatsJobs(APIView):
     http_method_names = ['get']
     serializer_class = GenericResponse
     permission_classes = API_PERMISSION
 
-    # todo: params that allow for limit
-    #    by job
-    #    time period (1w,2w,1m)
     @staticmethod
     @extend_schema(
         request=None,
@@ -93,57 +141,9 @@ class APIStatsJobs(APIView):
         user = get_api_user(request)
         job_ids = [job.id for job in get_viewable_jobs(user)]
 
-        if 'limit_jobs' in request.GET:
-            job_ids_new = []
-            for limit_job in request.GET['limit_jobs'].split(','):
-                if limit_job.isnumeric():
-                    limit_job = int(limit_job)
-                    if limit_job in job_ids:
-                        job_ids_new.append(limit_job)
-
-            job_ids = job_ids_new
-
-        limits = {}
-        limit_time = None
-        if 'limit_time' in request.GET:
-            limit_time = relative_time_to_dt(request.GET['limit_time'])
-
-        if limit_time is None:
-            limit_time = relative_time_to_dt('1w')
-
-        limits['created__gte'] = limit_time
-
-        if 'limit_users' in request.GET:
-            limit_users = []
-
-            if request.GET['limit_users'].lower() == 'schedule':
-                limits['user__isnull'] = True
-
-            else:
-                for limit_user in request.GET['limit_users'].split(','):
-                    try:
-                        user = USERS.objects.get(username=limit_user)
-                        if user is None:
-                            continue
-
-                        limit_users.append(user.id)
-
-                    except ObjectDoesNotExist:
-                        continue
-
-                limits['user__in'] = limit_users
-
-        if 'failed' in request.GET:
-            if request.GET['failed']:
-                limits['status'] = JOB_EXEC_STATUS_FAILED
-
-            else:
-                limits['status__in'] = [JOB_EXEC_STATUS_SUCCESS, JOB_EXEC_STATUS_STOPPED]
-
         execs = JobExecution.objects.filter(
-            job__in=job_ids,
             status__in=JOB_EXEC_STATI_INACTIVE,
-            **limits,
+            **_build_stats_jobs_query_limits(request, job_ids),
         ).order_by('-created')
 
         data = {
