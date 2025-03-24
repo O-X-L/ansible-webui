@@ -317,32 +317,40 @@
                 <div>
                     <Button size="xs" on:click={() => {
                         entryActions[item.id].exec = true; updateExecutionPrompts(item.execution_prompts_json);
-                        }} disabled={isJobActive(item)}>
+                        }} disabled={isJobActive(item)} id="jobs-btn-exec-{item.id}">
                         <PlaySolid/>
                     </Button>
                     <Tooltip>{t('btn.execute')}</Tooltip>
 
                     <Button size="xs" on:click={() => {stopJob(item.id, item.executions[0].id)}}
-                        disabled={!isJobActive(item)} >
+                        disabled={!isJobActive(item)} id="jobs-btn-stop-{item.id}">
                         <StopSolid/>
                     </Button>
                     <Tooltip>{t('btn.stop')}</Tooltip>
 
-                    <Button size="xs" on:click={() => (redirectLogs(item.id))}><BookOpenSolid/></Button>
+                    <Button size="xs" on:click={() => (redirectLogs(item.id))} id="jobs-btn-logs-{item.id}">
+                        <BookOpenSolid/>
+                    </Button>
                     <Tooltip>{t('btn.logs')}</Tooltip>
                 </div>
                 <div class="mt-2">
                     <JobForm bind:open={entryActions[item.id].edit} action='edit' existingID={item.id}
                         bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-                    <Button size="xs" on:click={() => {entryActions[item.id].edit = true}}><EditSolid/></Button>
+                    <Button size="xs" on:click={() => {entryActions[item.id].edit = true}} id="jobs-btn-edit-{item.id}">
+                        <EditSolid/>
+                    </Button>
                     <Tooltip>{t('btn.edit')}</Tooltip>
 
                     <JobForm bind:open={entryActions[item.id].clone} action='clone' existingID={item.id}
                         bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-                    <Button size="xs" on:click={() => {entryActions[item.id].clone = true}}><FileCloneSolid/></Button>
+                    <Button size="xs" on:click={() => {entryActions[item.id].clone = true}} id="jobs-btn-clone-{item.id}">
+                        <FileCloneSolid/>
+                    </Button>
                     <Tooltip>{t('btn.clone')}</Tooltip>
 
-                    <Button size="xs" on:click={() => {deleteJob(item.id)}}><TrashBinSolid/></Button>
+                    <Button size="xs" on:click={() => {deleteJob(item.id)}} id="jobs-btn-delete-{item.id}">
+                        <TrashBinSolid/>
+                    </Button>
                     <Tooltip>{t('btn.delete')}</Tooltip>
                 </div>
             </TableBodyCell>
@@ -569,11 +577,11 @@
                 {/each}
 
                 <div class={classModalBtns}>
-                    <Button type="button" on:click={() => {startJob(job.id)}}><PlaySolid/></Button>
+                    <Button id="jobs-btn-exec-start" type="button" on:click={() => {startJob(job.id)}}><PlaySolid/></Button>
                     <Tooltip>{t('btn.execute')}</Tooltip>
 
-                    <Button on:click={() => (entryActions[job.id].exec = false)} class="inline-block ml-2"><CloseCircleSolid/></Button>
-                    <Tooltip>{t('btn.discard')}</Tooltip>
+                    <Button id="jobs-btn-exec-close" on:click={() => (entryActions[job.id].exec = false)} class="inline-block ml-2"><CloseCircleSolid/></Button>
+                    <Tooltip>{t('btn.close')}</Tooltip>
                 </div>
             </Modal>
             
@@ -584,7 +592,7 @@
 <div class="flex justify-between">
     <div></div>
     <div class="mr-5 mt-10">
-        <Button on:click={() => {addModalId = Date.now(); addModal = true}}>{t('btn.add')}</Button>
+        <Button on:click={() => {addModalId = Date.now(); addModal = true}} id="jobs-btn-add">{t('btn.add')}</Button>
     </div>    
 </div>
 
@@ -593,3 +601,4 @@
 {/key}
 
 <div class={classFooterSpacing}></div>
+<div id="loaded" class="h-0 w-0"></div>

@@ -8,7 +8,7 @@
 
     import { share } from '../Share.js';
     import { tq } from '../../util/translate.js';
-    import { classSpinnerDiv } from '../Style.js';
+    import { classSpinnerDiv, classFooterSpacing } from '../Style.js';
 
     let { open = $bindable(false) } = $props();
     
@@ -61,3 +61,6 @@
         <div class={classSpinnerDiv}><Spinner/></div>
     </AccordionItem>
 </Accordion>
+
+<div class={classFooterSpacing}></div>
+<div id="loaded" class="h-0 w-0"></div>

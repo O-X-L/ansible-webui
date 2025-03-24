@@ -1,9 +1,9 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
 
-    import { TrashBinSolid } from 'flowbite-svelte-icons';
+    import { TrashBinSolid, CloseCircleSolid } from 'flowbite-svelte-icons';
     import {
-        Spinner, Button, Tooltip, Modal, Heading, Label, Input, Helper,
+        Spinner, Button, Tooltip, Modal, Heading, Label, Input,
         Table, TableHead, TableHeadCell, TableBody, TableBodyCell, TableBodyRow,
     } from 'flowbite-svelte';
 
@@ -14,7 +14,7 @@
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
         classSpinnerDiv, classListHeader, classListContent, classFooterSpacing, classModalBackdrop,
-        classModalLabel, classModalForm, classModalInput 
+        classModalLabel, classModalForm, classModalInput, classModalBtns,
      } from '../Style.js';
  
     let { open = $bindable(false) } = $props();
@@ -147,7 +147,7 @@
 <div class="flex justify-between">
     <div></div>
     <div class="mr-5 mt-10">
-        <Button on:click={() => {newModal = true}}>{t('btn.add')}</Button>
+        <Button id="apikeys-btn-add" on:click={() => {newModal = true}}>{t('btn.add')}</Button>
     </div>
 </div>
 
@@ -165,7 +165,7 @@
             <div class="flex justify-between">
                 <div></div>
                 <div class="mr-5 mt-10">
-                    <Button on:click={() => {addAPIKey()}}>{t('btn.add')}</Button>
+                    <Button id="apikeys-btn-add-submit" on:click={() => {addAPIKey()}}>{t('btn.add')}</Button>
                 </div>
             </div>
         {:else}
@@ -177,7 +177,15 @@
             <button onclick={clickToCopy}>{newKeyPair.key}</button>
             <Tooltip>{t('common.click_to_copy')}</Tooltip>
         {/if}
+
+        <div class={classModalBtns}>
+            <Button id="apikeys-btn-add-close" on:click={() => (newModal = false)} class="inline-block ml-2">
+                <CloseCircleSolid/>
+            </Button>
+            <Tooltip>{t('btn.close')}</Tooltip>
+        </div>
     </div>
 </Modal>
 
 <div class={classFooterSpacing}></div>
+<div id="loaded" class="h-0 w-0"></div>

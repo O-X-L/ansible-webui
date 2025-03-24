@@ -591,3 +591,4 @@
 -->
 
 <div class={classFooterSpacing}></div>
+<div id="loaded" class="h-0 w-0"></div>

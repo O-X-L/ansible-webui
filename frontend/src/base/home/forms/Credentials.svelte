@@ -18,7 +18,7 @@
     } from '../../../util/form.js';
     import {
         classModalBackdrop, classModalLabel, classModalBtns, classModalForm, classModalInputDiv,
-        classModalInput, classModalHelp, classSpinnerDiv,
+        classModalInput, classModalHelp, classSpinnerDiv, classSpoilerItem,
     } from '../../Style.js';
 
     let {
@@ -168,7 +168,7 @@
         </div>
 
         <Accordion class={classModalForm}>
-            <AccordionItem>
+            <AccordionItem defaultClass="{classSpoilerItem} creds-form-accounts">
                 <span slot="header">{t('creds.form.accounts')}</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
@@ -200,7 +200,7 @@
                     </div>
                 </div>
             </AccordionItem>
-            <AccordionItem>
+            <AccordionItem defaultClass="{classSpoilerItem} creds-form-vault">
                 <span slot="header">{t('creds.form.vault')}</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
@@ -225,10 +225,10 @@
         </Accordion>
 
         <div class={classModalBtns}>
-            <Button type="button" on:click={submitForm}><FloppyDiskSolid/></Button>
+            <Button id="creds-btn-save" type="button" on:click={submitForm}><FloppyDiskSolid/></Button>
             <Tooltip>{t('btn.save')}</Tooltip>
 
-            <Button on:click={() => (open = false)} class="inline-block ml-2"><CloseCircleSolid/></Button>
+            <Button id="creds-btn-discard" on:click={() => (open = false)} class="inline-block ml-2"><CloseCircleSolid/></Button>
             <Tooltip>{t('btn.discard')}</Tooltip>
         </div>
     {/if}

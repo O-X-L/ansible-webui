@@ -101,44 +101,50 @@
   -->
     {#if $share.backend.authenticated}
       <div class="flex md:order-1 mr-5">
-        <Button size="xs" class="ml-2 {classNavLink}" href="/ui" disabled={window.location.pathname == '/ui'}>
+        <Button id="nav-btn-home" size="xs" class="ml-2 {classNavLink}" href="/ui"
+          disabled={window.location.pathname == '/ui'}>
           <HomeSolid/></Button>
         <Tooltip placement="bottom">{t('nav.home')}</Tooltip>
 
-        <Button size="xs" class="ml-2 {classNavLink}" href="/ui/system" disabled={window.location.pathname == '/ui/system'}>
+        <Button id="nav-btn-system" size="xs" class="ml-2 {classNavLink}" href="/ui/system"
+          disabled={window.location.pathname == '/ui/system'}>
           <ServerSolid/></Button>
         <Tooltip placement="bottom">{t('nav.system')}</Tooltip>
       </div>
     {/if}
 
     <div class="flex md:order-2">
-    <Button size="xs" class="ml-2" id="nav-lang"><GlobeSolid/></Button>
+    <Button size="xs" class="ml-2" id="nav-btn-lang"><GlobeSolid/></Button>
     <Dropdown class="w-48 p-3 space-y-1">
       <li class="rounded-sm p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-        <Radio bind:group={language} value={'en'}>{@html flagIcon('gb')} English</Radio>
+        <Radio id="nav-btn-lang-en" bind:group={language} value={'en'}>{@html flagIcon('gb')} English</Radio>
       </li>
       <li class="rounded-sm p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-        <Radio bind:group={language} value={'de'}>{@html flagIcon('de')} Deutsch</Radio>
+        <Radio id="nav-btn-lang-de" bind:group={language} value={'de'}>{@html flagIcon('de')} Deutsch</Radio>
       </li>
     </Dropdown>
-    <Tooltip placement="bottom" triggeredBy="#nav-lang">{t('nav.lang')}</Tooltip>
+    <Tooltip placement="bottom" triggeredBy="#nav-btn-lang">{t('nav.lang')}</Tooltip>
 
-    <DarkMode size="sm" btnClass="{classBtnBase} px-4 py-2 ml-2"></DarkMode>
+    <DarkMode id="nav-btn-darkmode" size="sm" btnClass="{classBtnBase} px-4 py-2 ml-2"></DarkMode>
     <Tooltip placement="bottom">{t('nav.darkLight')}</Tooltip>
 
-    <Button size="xs" class="ml-2 max-sm:hidden {classNavLink}" href="https:/ansible-webui.OXL.app"><BookSolid /></Button>
+    <Button id="nav-btn-docs" size="xs" class="ml-2 max-sm:hidden {classNavLink}"
+      href="https:/ansible-webui.OXL.app"><BookSolid /></Button>
     <Tooltip placement="bottom">{t('nav.docs')}</Tooltip>
-    <Button size="xs" class="ml-2 max-sm:hidden {classNavLink}" href="https://github.com/O-X-L/ansible-webui"><GithubSolid /></Button>
+    <Button id="nav-btn-repo" size="xs" class="ml-2 max-sm:hidden {classNavLink}"
+      href="https://github.com/O-X-L/ansible-webui"><GithubSolid /></Button>
     <Tooltip placement="bottom">{t('nav.repo')}</Tooltip>
-    <Button size="xs" class="ml-2 max-sm:hidden {classNavLink}" href="https://github.com/O-X-L/ansible-webui/issues"><BugSolid /></Button>
+    <Button id="nav-btn-bugs" size="xs" class="ml-2 max-sm:hidden {classNavLink}"
+      href="https://github.com/O-X-L/ansible-webui/issues"><BugSolid /></Button>
     <Tooltip placement="bottom">{t('nav.bugs')}</Tooltip>
 
     {#if $share.backend.authenticated}
-      <Button size="xs" class="ml-2 {classNavLink}" on:click={() => {userSettingsOpen=true}}><UserSettingsSolid/></Button>
+      <Button id="nav-btn-user-settings" size="xs" class="ml-2 {classNavLink}"
+        on:click={() => {userSettingsOpen=true}}><UserSettingsSolid/></Button>
       <Tooltip placement="bottom">{t('nav.user_settings')}</Tooltip>
 
       <form method="post" action="/o/">
-        <Button size="xs" class="ml-2 h-full" type="submit"><LockSolid /></Button>
+        <Button id="nav-btn-logout" size="xs" class="ml-2 h-full" type="submit"><LockSolid /></Button>
         <Tooltip placement="bottom">{t('nav.logout')}</Tooltip>
         {@html getCSRFFormTokenHTML()}
       </form>

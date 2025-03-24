@@ -1,15 +1,15 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
 
-    import { InfoCircleSolid } from 'flowbite-svelte-icons';
-    import { Spinner, Modal, Heading } from 'flowbite-svelte';
+    import { InfoCircleSolid, CloseCircleSolid } from 'flowbite-svelte-icons';
+    import { Spinner, Modal, Heading, Button, Tooltip } from 'flowbite-svelte';
 
     import { share } from '../../Share.js';
     import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
     // import { type executionType } from '../Types.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
-    import { classModalBackdrop, classSpinnerDiv, classCenterChildDiv } from '../../Style.js';
+    import { classModalBackdrop, classSpinnerDiv, classCenterChildDiv, classModalBtns } from '../../Style.js';
 
     let {
         open = $bindable(false),
@@ -163,6 +163,10 @@
                 <InfoCircleSolid class="inline-block mr-2" /> {t('logs.exec_finished')}
             </div>
         {/if}
+        <div class={classModalBtns}>
+            <Button id="logs-btn-close" on:click={() => (open = false)} class="inline-block ml-2"><CloseCircleSolid/></Button>
+            <Tooltip>{t('btn.close')}</Tooltip>
+        </div>
         <div class="h-28"></div>
         <div id={endDiv} class="w-0 h-0"></div>
     {/if}

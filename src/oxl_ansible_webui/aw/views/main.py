@@ -7,6 +7,7 @@ from django.urls import path, re_path
 from aw.config.hardcoded import LOGIN_PATH
 from aw.settings import LOGIN_REDIRECT_URL
 from aw.utils.http import ui_endpoint_wrapper
+from aw.utils.util import get_logo
 
 
 @login_required
@@ -26,6 +27,12 @@ def catchall(request) -> HttpResponse:
 def not_found(request) -> HttpResponse:
     del request
     return HttpResponse(content=b'Not found', status=404)
+
+
+def favicon(request) -> HttpResponse:
+    del request
+    return redirect(get_logo())
+
 
 @login_required
 @ui_endpoint_wrapper

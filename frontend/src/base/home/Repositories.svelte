@@ -21,6 +21,7 @@
     import {
         classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
         classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle, classFooterSpacing,
+        classSpoilerItem,
     } from '../Style.js';
  
     let { open = $bindable(false) } = $props();
@@ -168,7 +169,7 @@
 <div>
     <Accordion>
         {#each Object.keys(repoKindMap) as repoKind (repoKind) }
-            <AccordionItem>
+            <AccordionItem defaultClass="{classSpoilerItem} repos-kind-{repoKind}">
                 <span slot="header">{t(`repos.${repoKind}`)}</span>
                 <div>
                   <Table striped={true} bind:items={entryLists[repoKind]} hoverable={true} shadow
@@ -411,12 +412,12 @@
 <div class="flex justify-between">
     <div></div>
     <div class="mr-5 mt-10">
-        <Button>{t('btn.add')}<ChevronDownOutline class="w-6 h-6 ms-2 text-white dark:text-white" /></Button>
+        <Button id="repos-btn-add-dd">{t('btn.add')}<ChevronDownOutline class="w-6 h-6 ms-2 text-white dark:text-white" /></Button>
         <Dropdown>
-            <DropdownItem on:click={() => {addStaticModalId = Date.now(); addStaticModal = true}}>
+            <DropdownItem id="repos-btn-add-static" on:click={() => {addStaticModalId = Date.now(); addStaticModal = true}}>
                 <FolderOpenSolid class="inline-block"/> {t('repos.static')}
             </DropdownItem>
-            <DropdownItem on:click={() => {addGitModalId = Date.now(); addGitModal = true}}>
+            <DropdownItem id="repos-btn-add-git" on:click={() => {addGitModalId = Date.now(); addGitModal = true}}>
                 <CodeBranchSolid class="inline-block"/> {t('repos.git')}
             </DropdownItem>
         </Dropdown>
@@ -433,3 +434,4 @@
 {/key}
 
 <div class={classFooterSpacing}></div>
+<div id="loaded" class="h-0 w-0"></div>

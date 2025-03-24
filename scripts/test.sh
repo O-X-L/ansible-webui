@@ -6,12 +6,6 @@ cd "$(dirname "$0")/.."
 
 export PYTHONPATH=''
 
-echo ''
-echo 'UNIT TESTS'
-echo ''
-
-python3 -m pytest
-
 function failure() {
   echo ''
   echo '### FAILED ###'
@@ -20,16 +14,29 @@ function failure() {
   exit 1
 }
 
+##############################
+
 echo ''
-echo 'INTEGRATION TESTS WEB-UI'
+echo 'BUILD FRONTEND'
 echo ''
+
+FORCE_UPDATE=1 bash scripts/frontend/build.sh
+
+##############################
+
+echo ''
+echo 'UNIT TESTS'
+echo ''
+
+python3 -m pytest
+
+##############################
 
 if pgrep -f 'oxl-ansible-webui'
 then
   echo 'An instance of Ansible-WebUI is already running! Stop it first (pkill -f oxl_ansible_webui)'
   exit 1
 fi
-
 
 echo 'Starting Ansible-WebUI..'
 trap "pkill -f oxl_ansible_webui; exit" INT
@@ -43,14 +50,9 @@ export AW_ADMIN_PWD='someSecret!Pwd'
 python3 src/oxl_ansible_webui/ >/dev/null 2>/dev/null &
 echo ''
 sleep 10
-
 set +e
-if ! python3 test/integration/webui/main.py
-then
-  failure
-fi
 
-sleep 1
+##############################
 
 echo ''
 echo 'INTEGRATION TESTS API'
@@ -67,13 +69,27 @@ then
 fi
 
 sleep 1
+
+##############################
+
+echo ''
+echo 'INTEGRATION TESTS WEB-UI'
+echo ''
+
+if ! python3 test/integration/webui/main.py
+then
+  failure
+fi
+
+sleep 1
 pkill -f oxl_ansible_webui
+sleep 5
+
+##############################
 
 echo ''
 echo 'INTEGRATION TESTS SAML'
 echo ''
-
-sleep 5
 
 echo 'Starting Ansible-WebUI with SAML enabled..'
 # shellcheck disable=SC2155
@@ -84,7 +100,6 @@ python3 src/oxl_ansible_webui/ >/dev/null 2>/dev/null &
 echo ''
 sleep 5
 
-set +e
 if ! python3 test/integration/auth/saml.py
 then
   failure
@@ -94,8 +109,10 @@ sleep 1
 export AW_CONFIG=''
 pkill -f oxl_ansible_webui
 
+##############################
+
 echo ''
-echo 'TESTING TO CLI TOOLS'
+echo 'TESTING CLI TOOLS'
 echo ''
 
 REPO_BASE="$(pwd)"
@@ -104,6 +121,8 @@ export AW_DB="${REPO_BASE}/src/oxl_ansible_webui/aw.dev.db"
 python3 "${REPO_BASE}/src/oxl_ansible_webui/cli.py" --version
 python3 "${REPO_BASE}/src/oxl_ansible_webui/manage.py"
 cd "$REPO_BASE"
+
+##############################
 
 echo ''
 echo 'TESTING TO INITIALIZE AW-DB'

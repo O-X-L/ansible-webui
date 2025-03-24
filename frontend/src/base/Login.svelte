@@ -137,3 +137,5 @@
         {/if}
     </div>
 </div>
+
+<div id="loaded" class="h-0 w-0"></div>

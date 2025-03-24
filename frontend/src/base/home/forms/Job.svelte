@@ -22,7 +22,7 @@
     } from '../../../util/form.js';
     import {
         classModalBackdrop, classModalLabel, classModalHelp, classModalBtns, classModalForm,
-        classModalInputDiv, classCenterChildDiv, classModalInput, classSpinnerDiv,
+        classModalInputDiv, classCenterChildDiv, classModalInput, classSpinnerDiv, classSpoilerItem,
     } from '../../Style.js';
 
     let {
@@ -346,7 +346,7 @@
         <APIResponseHandler bind:this={apiResponseHandler} bind:warningMsgs={formWarningMsgs} />
 
         <Accordion class={classModalForm}>
-            <AccordionItem>
+            <AccordionItem defaultClass="{classSpoilerItem} job-form-main">
                 <span slot="header">Main</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
@@ -420,7 +420,7 @@
                     </div>
                 </div>
             </AccordionItem>
-            <AccordionItem>
+            <AccordionItem defaultClass="{classSpoilerItem} job-form-exec">
                 <span slot="header">Execution</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
@@ -455,7 +455,7 @@
                     </div>
                 </div>
             </AccordionItem>
-            <AccordionItem>
+            <AccordionItem defaultClass="{classSpoilerItem} job-form-creds">
                 <span slot="header">Credentials</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
@@ -477,7 +477,7 @@
                     </div>
                 </div>
             </AccordionItem>
-            <AccordionItem>
+            <AccordionItem defaultClass="{classSpoilerItem} job-form-schedule">
                 <span slot="header">Scheduling</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
@@ -493,7 +493,7 @@
                     </div>
                 </div>
             </AccordionItem>
-            <AccordionItem>
+            <AccordionItem defaultClass="{classSpoilerItem} job-form-misc">
                 <span slot="header">Additional</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
@@ -508,7 +508,7 @@
                     </div>
                 </div>
             </AccordionItem>
-            <AccordionItem>
+            <AccordionItem defaultClass="{classSpoilerItem} job-form-prompts">
                 <span slot="header">{t('jobs.form.execution_prompts')}</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInputDiv}>
@@ -647,10 +647,10 @@
         </Accordion>
 
         <div class={classModalBtns}>
-            <Button type="button" on:click={submitForm}><FloppyDiskSolid/></Button>
+            <Button id="job-btn-save" type="button" on:click={submitForm}><FloppyDiskSolid/></Button>
             <Tooltip>{t('btn.save')}</Tooltip>
 
-            <Button on:click={() => (open = false)} class="inline-block ml-2"><CloseCircleSolid/></Button>
+            <Button id="job-btn-discard" on:click={() => (open = false)} class="inline-block ml-2"><CloseCircleSolid/></Button>
             <Tooltip>{t('btn.discard')}</Tooltip>
         </div>
     {/if}

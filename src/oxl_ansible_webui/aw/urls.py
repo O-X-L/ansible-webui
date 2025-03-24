@@ -6,7 +6,7 @@ from django.contrib.auth.views import LoginView, PasswordChangeView
 
 from web_serve_static import urlpatterns_static
 from aw.api import urlpatterns_api
-from aw.views.main import urlpatterns_ui, catchall, logout, not_found
+from aw.views.main import urlpatterns_ui, catchall, logout, not_found, favicon
 from aw.config.environment import check_aw_env_var_true, auth_mode_saml
 from aw.utils.deployment import deployment_dev
 from aw.views.forms.auth import saml_sp_initiated_login, saml_sp_initiated_login_init
@@ -38,6 +38,7 @@ urlpatterns += [
     path('a/password_change/', PasswordChangeView.as_view()),
     path('_admin/', admin.site.urls),
     path('o/', logout),
+    path('favicon.ico', favicon),
 ]
 
 # UI

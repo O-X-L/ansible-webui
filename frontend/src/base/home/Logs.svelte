@@ -15,7 +15,9 @@
     import { JOB_EXEC_STATI_ACTIVE, PARAM_JOB } from '../Config.js';
     import { redirectTo, getURLHashParams } from '../../util/main.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
-    import { classSpinnerDiv, classListContent, classListHeader, classFooterSpacing } from '../Style.js';
+    import {
+        classSpinnerDiv, classListContent, classListHeader, classFooterSpacing, classSpoilerItem,
+    } from '../Style.js';
 
     let { open = $bindable(false) } = $props();
 
@@ -157,7 +159,7 @@
 
 <Accordion>
     {#each jobList as job (job.id)}
-        <AccordionItem bind:open={entryActions[job.id]['open']}>
+        <AccordionItem bind:open={entryActions[job.id]['open']} defaultClass="{classSpoilerItem} logs-job-{job.id}">
             <span slot="header">{job.name}</span>
             {#if !executionList[job.id] || !executionList[job.id].length}
                 <div class={classSpinnerDiv}><Spinner/></div>
@@ -203,11 +205,14 @@
                         <TableBodyCell tdClass={classListContent}>
                             <LogsView bind:open={entryActions[job.id][exec.id]}
                                 jobID={job.id} jobName={job.name} bind:exec={executionList[job.id][execIdx]} />
-                            <Button size="xs" on:click={() => {entryActions[job.id][exec.id] = true}}><BookOpenSolid/></Button>
+                            <Button size="xs" on:click={() => {entryActions[job.id][exec.id] = true}}
+                                id="logs-job-{job.id}-show">
+                                <BookOpenSolid/>
+                            </Button>
                             <Tooltip>{t('btn.logs')}</Tooltip>
 
                             <Button size="xs" on:click={() => {stopJob(job.id, exec.id)}}
-                                disabled={!isJobExecutionActive(exec)}>
+                                disabled={!isJobExecutionActive(exec)} id="logs-job-{job.id}-stop">
                                 <StopSolid/>
                             </Button>
                             <Tooltip>{t('btn.stop')}</Tooltip>
@@ -227,3 +232,4 @@
 </Accordion>
 
 <div class={classFooterSpacing}></div>
+<div id="loaded" class="h-0 w-0"></div>

@@ -17,7 +17,7 @@
     } from '../../../util/form.js';
     import {
         classModalBackdrop, classModalLabel, classModalBtns, classModalForm, classModalInputDiv,
-        classModalInput, classModalHelp, classSpinnerDiv,
+        classModalInput, classModalHelp, classSpinnerDiv, classSpoilerItem,
     } from '../../Style.js';
 
     let {
@@ -194,7 +194,7 @@
                 </div>
             </div>
             <Accordion class={classModalForm}>
-                <AccordionItem>
+                <AccordionItem defaultClass="{classSpoilerItem} repo-form-git-opts">
                     <span slot="header">{t('repos.form.git_options')}</span>
                     <div class={classModalInputDiv}>
                         <div class={classModalInput}>
@@ -222,7 +222,7 @@
                         </div>
                     </div>
                 </AccordionItem>
-                <AccordionItem>
+                <AccordionItem defaultClass="{classSpoilerItem} repo-form-git-hooks">
                     <span slot="header">{t('repos.form.git_hooks')}</span>
                     <div class={classModalInputDiv}>
                         <div class={classModalInput}>
@@ -260,10 +260,10 @@
         {/if}
 
         <div class={classModalBtns}>
-            <Button type="button" on:click={submitForm}><FloppyDiskSolid/></Button>
+            <Button id="repo-btn-save" type="button" on:click={submitForm}><FloppyDiskSolid/></Button>
             <Tooltip>{t('btn.save')}</Tooltip>
 
-            <Button on:click={() => (open = false)} class="inline-block ml-2"><CloseCircleSolid/></Button>
+            <Button id="repo-btn-discard" on:click={() => (open = false)} class="inline-block ml-2"><CloseCircleSolid/></Button>
             <Tooltip>{t('btn.discard')}</Tooltip>
         </div>
     {/if}

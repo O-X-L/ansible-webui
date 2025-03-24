@@ -11,6 +11,7 @@ EN = {
     'btn.discard': 'Discard',
     'btn.edit': 'Edit',
     'btn.clone': 'Clone',
+    'btn.close': 'Close',
     'btn.execute': 'Execute',
     'btn.delete': 'Delete',
     'btn.stop': 'Stop',

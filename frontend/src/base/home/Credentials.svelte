@@ -20,6 +20,7 @@
     import {
         classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
         classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle, classFooterSpacing,
+        classSpoilerItem,
     } from '../Style.js';
  
     const credentialsKind = ['user', 'shared'];
@@ -127,7 +128,7 @@
 <div>
     <Accordion>
         {#each credentialsKind as credsKind (credsKind) }
-            <AccordionItem>
+            <AccordionItem defaultClass="{classSpoilerItem} creds-kind-{credsKind}">
                 <span slot="header">{t(`creds.${credsKind}`)}</span>
         
                 <div>
@@ -384,12 +385,12 @@
 <div class="flex justify-between">
     <div></div>
     <div class="mr-5 mt-10">
-        <Button>{t('btn.add')}<ChevronDownOutline class="w-6 h-6 ms-2 text-white dark:text-white" /></Button>
+        <Button id="creds-btn-add-dd">{t('btn.add')}<ChevronDownOutline class="w-6 h-6 ms-2 text-white dark:text-white" /></Button>
         <Dropdown>
-            <DropdownItem on:click={() => {addUserModalId = Date.now(); addUserModal = true}}>
+            <DropdownItem id="creds-btn-add-user" on:click={() => {addUserModalId = Date.now(); addUserModal = true}}>
                 <UserSolid class="inline-block"/> {t('creds.user')}
             </DropdownItem>
-            <DropdownItem on:click={() => {addSharedModalId = Date.now(); addSharedModal = true}}>
+            <DropdownItem id="creds-btn-add-shared" on:click={() => {addSharedModalId = Date.now(); addSharedModal = true}}>
                 <UsersGroupSolid class="inline-block"/> {t('creds.shared')}
             </DropdownItem>
         </Dropdown>
@@ -406,3 +407,4 @@
 {/key}
 
 <div class={classFooterSpacing}></div>
+<div id="loaded" class="h-0 w-0"></div>

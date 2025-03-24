@@ -7,14 +7,18 @@ on:
     branches: [latest]
     paths:
       - '**.py'
+      - 'test/integration/api/**'
       - 'requirements_test.txt'
       - '.github/workflows/test_backend.yml'
+
   pull_request:
     branches: [latest]
     paths:
       - '**.py'
+      - 'test/integration/api/**'
       - 'requirements_test.txt'
       - '.github/workflows/test_backend.yml'
+
 jobs:
   test:
     runs-on: ubuntu-latest

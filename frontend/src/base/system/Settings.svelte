@@ -17,7 +17,7 @@
     import { valideInputBase, inputBaseColor, submitFormBase } from '../../util/form.js';
     import {
         classModalBtns, classModalLabel, classModalInput, classModalHelp, classModalInputDiv, classSpinnerDiv,
-        classFooterSpacing,
+        classFooterSpacing, classSpoilerItem,
     } from '../Style.js';
 
     let { open = $bindable(false) } = $props();
@@ -171,7 +171,7 @@
 <div class={classSpinnerDiv}><Spinner/></div>
 {:else}
 <Accordion>
-    <AccordionItem>
+    <AccordionItem defaultClass="{classSpoilerItem} settings-exec">
         <span slot="header">{t('config.execution')}</span>
 
         <div class={classModalInputDiv}>
@@ -208,7 +208,7 @@
             </div>
         </div>
     </AccordionItem>
-    <AccordionItem>
+    <AccordionItem defaultClass="{classSpoilerItem} settings-paths">
         <span slot="header">{t('config.paths')}</span>
 
         <div class={classModalInputDiv}>
@@ -279,7 +279,7 @@
             </div>
         </div>
     </AccordionItem>
-    <AccordionItem>
+    <AccordionItem defaultClass="{classSpoilerItem} settings-mailing">
         <span slot="header">{t('config.mailing')}</span>
 
         <div class={classModalInputDiv}>
@@ -348,7 +348,7 @@
             </div>
         </div>
     </AccordionItem>
-    <AccordionItem>
+    <AccordionItem defaultClass="{classSpoilerItem} settings-internal">
         <span slot="header">{t('config.internal')}</span>
 
         <div class={classModalInputDiv}>
@@ -395,7 +395,7 @@
 </Accordion>
 
 <div class={classModalBtns}>
-    <Button type="button" on:click={submitForm}><FloppyDiskSolid/></Button>
+    <Button id="settings-btn-save" type="button" on:click={submitForm}><FloppyDiskSolid/></Button>
     <Tooltip>{t('btn.save')}</Tooltip>
 </div>
 
@@ -421,3 +421,4 @@
 </div>
 
 <div class={classFooterSpacing}></div>
+<div id="loaded" class="h-0 w-0"></div>
