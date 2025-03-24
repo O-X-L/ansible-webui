@@ -151,7 +151,7 @@ def test_existence():
         'ui': [
             'nav-btn-home',
             'nav-btn-system',
-            'nav-btn-lang',  # open and check if nav-btn-lang-en and nav-btn-lang-de exist
+            'nav-btn-lang',
             'nav-btn-darkmode',
             'nav-btn-docs',
             'nav-btn-repo',
@@ -174,6 +174,8 @@ def test_js_actions():
     cnf = {
         'ui': {
             'tab-jobs': [
+                ['#nav-btn-lang', '#nav-btn-lang-de'],
+                ['#nav-btn-lang', '#nav-btn-lang-en'],
                 [
                     '#jobs-btn-add', '.job-form-main', '.job-form-exec', '.job-form-creds', '.job-form-schedule',
                     '.job-form-misc', '.job-form-prompts',
@@ -212,6 +214,7 @@ def test_js_actions():
             ],
             'tab-settings': [
                 ['.settings-exec', '.settings-paths', '.settings-mailing', '.settings-internal', '#settings-btn-save'],
+                ['#nav-btn-logout'],  # needs to be the last step
             ]
         }
     }
@@ -251,8 +254,6 @@ def main():
     try:
         login(user=environ['AW_ADMIN'], pwd=environ['AW_ADMIN_PWD'])
         test_main_pages()
-        # test_actions_views()
-        # todo: add action post variants
         test_existence()
         test_js_actions()
 
