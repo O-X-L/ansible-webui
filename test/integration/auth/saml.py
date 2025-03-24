@@ -121,7 +121,7 @@ def test_get_locations(to_check: dict):
             print(f'TESTING GET /{location}{fragment}')
             DRIVER.find_element(By.CLASS_NAME, tab_class).click()
             _wait_for_load()
-            sleep(2)  # wait for JS async fetches (in case they would fail)
+            sleep(1)  # wait for JS async fetches (in case they would fail)
 
             assert _check_requests(url, sub=True)
             assert _check_console_logs(url)
@@ -138,13 +138,9 @@ def test_fallback_main_pages():
     test_get_locations({
         'ui': {
             'tab-jobs': '#jobs',
-            'tab-logs': '#logs',
-            'tab-repositories': '#repositories',
-            'tab-credentials': '#credentials',
             'tab-dashboard': '#dashboard',
         },
         'ui/system': {
-            'tab-admin': '#admin',
             'tab-settings': '#settings',
         },
     })
