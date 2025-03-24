@@ -7,7 +7,7 @@ from re import sub as regex_replace
 
 from aw.config.main import config
 from aw.config.hardcoded import FILE_TIME_FORMAT
-from aw.utils.util import write_file_0600, is_null, datetime_w_tz
+from aw.utils.util import write_file_0600, datetime_w_tz
 from aw.utils.handlers import AnsibleConfigError
 from aw.model.job import JobExecution, Job
 from aw.model.repository import Repository

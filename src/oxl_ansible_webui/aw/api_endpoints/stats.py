@@ -51,6 +51,7 @@ def relative_time_to_dt(t: str) -> (datetime, None):
 
 
 def _build_stats_jobs_query_limits(request, job_ids: list[Job]) -> dict:
+    # pylint: disable=R0912
     if 'limit_jobs' in request.GET:
         job_ids_new = []
         for limit_job in request.GET['limit_jobs'].split(','):
