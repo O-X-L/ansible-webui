@@ -84,6 +84,8 @@ jobs:
           sleep 1
 
           pkill -f oxl_ansible_webui
+        env:
+          PYTHONUNBUFFERED: 1
 
       - name: Running Integration Tests - AUTH SAML
         run: |
@@ -102,3 +104,5 @@ jobs:
           sleep 1
 
           pkill -f oxl_ansible_webui
+        env:
+          PYTHONUNBUFFERED: 1
