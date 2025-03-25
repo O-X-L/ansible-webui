@@ -1,4 +1,4 @@
-# Basic WebUI for using Ansible
+# Simple WebUI for using Ansible
 
 [![Lint](https://github.com/O-X-L/ansible-webui/actions/workflows/lint.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/lint.yml)
 [![Test Frontend](https://github.com/O-X-L/ansible-webui/actions/workflows/test_frontend.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/test_frontend.yml)
