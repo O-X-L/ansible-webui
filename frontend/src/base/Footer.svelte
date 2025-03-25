@@ -91,11 +91,4 @@
             {item.name} | <a href={item.licenseHref}>{t('footer.oss.license')}: {item.license}</a>
         </Listgroup>    
     </div>
-    <!--
-    <div>
-        <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FO-X-L%2Fansible-webui?ref=badge_large&issueType=license" alt="FOSSA Status">
-          <img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FO-X-L%2Fansible-webui.svg?type=large&issueType=license"/>
-        </a>
-    </div>
-    -->
 </Drawer>
