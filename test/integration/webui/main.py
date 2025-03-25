@@ -170,6 +170,20 @@ def test_existence():
                 print(f"ERROR: Element '{elementID}' not found @ '{url}'")
 
 
+def _click_on(element: str, cls: bool = False):
+    if cls:
+        DRIVER.execute_script(
+            'arguments[0].click()',
+            DRIVER.find_element(By.CLASS_NAME, element),
+        )
+
+    else:
+        DRIVER.execute_script(
+            'arguments[0].click()',
+            DRIVER.find_element(By.ID, element),
+        )
+
+
 def test_js_actions():
     cnf = {
         'ui': {
@@ -214,7 +228,6 @@ def test_js_actions():
             ],
             'tab-settings': [
                 ['.settings-exec', '.settings-paths', '.settings-mailing', '.settings-internal', '#settings-btn-save'],
-                ['#nav-btn-logout'],  # needs to be the last step
             ]
         }
     }
@@ -233,15 +246,10 @@ def test_js_actions():
                     print(f'TRIGGER JS ACTION /{location} CHAIN-{i} {element}')
 
                     if element.startswith('#'):
-                        DRIVER.execute_script(
-                        'arguments[0].click()',
-                        DRIVER.find_element(By.ID, element[1:]),
-                        )
+                        _click_on(element[1:])
+
                     else:
-                        DRIVER.execute_script(
-                        'arguments[0].click()',
-                        DRIVER.find_element(By.CLASS_NAME, element[1:]),
-                        )
+                        _click_on(element[1:], cls=True)
 
                     sleep(1)
                     assert _check_requests(url, sub=True)
@@ -250,12 +258,26 @@ def test_js_actions():
                 DRIVER.refresh()  # exit from open JS elements
 
 
+def logout():
+    print('TRIGGER LOGOUT')
+    url = f'{BASE_URL}/o/'
+    _click_on('nav-btn-logout')
+
+    sleep(1)
+    assert _check_requests(url)
+    assert _check_console_logs(url)
+
+    login_redirect = f'{BASE_URL}/a/login/'
+    assert DRIVER.current_url == login_redirect
+
+
 def main():
     try:
         login(user=environ['AW_ADMIN'], pwd=environ['AW_ADMIN_PWD'])
         test_main_pages()
         test_existence()
         test_js_actions()
+        logout()
 
     finally:
         DRIVER.quit()
