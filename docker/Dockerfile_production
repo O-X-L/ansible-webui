@@ -28,7 +28,6 @@ RUN apk add --no-cache git git-lfs openssh-client sshpass xmlsec && \
     mkdir -p /play /data/log
 
 COPY --from=builder /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/ /usr/local/lib/python3.11/site-packages/oxl_ansible_webui/aw/static_prod/
-COPY --from=tester /tmp/.tests_ok /tmp/.tests_ok
 
 ENV AW_VERSION=${AW_VERSION} \
     AW_DOCKER=1 \
