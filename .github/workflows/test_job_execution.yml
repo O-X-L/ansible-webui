@@ -3,10 +3,23 @@
 name: Test Job-Execution
 
 on:
-  workflow_run:
-    workflows: [test_backend]
-    types:
-      - completed
+  push:
+    branches: [latest]
+    paths:
+      - '**.py'
+      - 'test/integration/**.yml'
+      - 'test/integration/job-exec/**'
+      - 'requirements_test.txt'
+      - '.github/workflows/test_job_execution.yml'
+
+  pull_request:
+    branches: [latest]
+    paths:
+      - '**.py'
+      - 'test/integration/**.yml'
+      - 'test/integration/job-exec/**'
+      - 'requirements_test.txt'
+      - '.github/workflows/test_job_execution.yml'
 
 jobs:
   test:
@@ -32,5 +45,24 @@ jobs:
           pip install -r requirements.txt >/dev/null
           pip install -r requirements_test_backend.txt >/dev/null
 
-      # todo: trigger jobs via api and verify expected outcome/status
-      #   https://github.com/O-X-L/ansible-webui/issues/11
+      - name: Running Job-Execution Integration Tests
+        run: |
+          export AW_ENV='dev'
+          export AW_DB="/tmp/$(date +%s).aw.db"
+          export AW_ADMIN='tester'
+          export AW_ADMIN_PWD='someSecret!Pwd'
+          rm -rf src/oxl_ansible_webui/aw/migrations/*
+          python3 src/oxl_ansible_webui/ >/dev/null 2>/dev/null &
+          sleep 5
+
+          echo 'JOB-EXECUTION INTEGRATION TESTS'
+          echo 'Create API key'
+          api_key="$(python3 src/oxl_ansible_webui/cli.py -a api-key.create -p "$AW_ADMIN" | grep 'Key=' | cut -d '=' -f2)"
+          export AW_API_KEY="$api_key"
+          sleep 1
+          python3 test/integration/job-exec/main.py
+          sleep 1
+
+          pkill -f oxl_ansible_webui
+        env:
+          PYTHONUNBUFFERED: 1

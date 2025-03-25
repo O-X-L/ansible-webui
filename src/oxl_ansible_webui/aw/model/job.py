@@ -229,12 +229,12 @@ class JobExecution(BaseJob):
     api_fields_read = [
         'id', 'job', 'job_name', 'user', 'user_name', 'result', 'status', 'status_name', 'time_start', 'time_fin',
         'failed', 'error_s', 'error_m', 'log_stdout', 'log_stdout_url', 'log_stderr', 'log_stderr_url', 'job_comment',
-        'comment', 'credential_global', 'credential_user', 'command', 'log_stdout_repo', 'log_stderr_repo',
+        'comment', 'credentials_global', 'credentials_user', 'command', 'log_stdout_repo', 'log_stderr_repo',
         'log_stdout_repo_url', 'log_stderr_repo_url',
     ]
     api_fields_exec = [
         'comment', 'limit', 'verbosity', 'mode_diff', 'mode_check', 'environment_vars', 'tags', 'tags_skip',
-        'cmd_args',
+        'cmd_args', 'credentials_global', 'credentials_user',
     ]
     log_file_fields = ['log_stdout', 'log_stderr', 'log_stdout_repo', 'log_stderr_repo']
 
@@ -255,10 +255,10 @@ class JobExecution(BaseJob):
     log_stderr_repo = models.CharField(max_length=300, **DEFAULT_NONE)
     command = models.CharField(max_length=2000, **DEFAULT_NONE)
 
-    credential_global = models.ForeignKey(
+    credentials_global = models.ForeignKey(
         JobGlobalCredentials, on_delete=models.SET_NULL, related_name='jobexec_fk_credglob', null=True,
     )
-    credential_user = models.ForeignKey(
+    credentials_user = models.ForeignKey(
         JobUserCredentials, on_delete=models.SET_NULL, related_name='jobexec_fk_credusr', null=True,
     )
 

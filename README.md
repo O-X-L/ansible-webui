@@ -61,9 +61,11 @@ Login: User `demo`, Password `Ansible1337`
 
 Feel free to contribute to this project using [pull-requests](https://github.com/O-X-L/ansible-webui/pulls), [issues](https://github.com/O-X-L/ansible-webui/issues) and [discussions](https://github.com/O-X-L/ansible-webui/discussions)!
 
-Testers are also very welcome! Please [give feedback](https://github.com/O-X-L/ansible-webui/discussions)
+What we need:
 
-You can also provide translations for your language.
+* Testers and [feedback](https://github.com/O-X-L/ansible-webui/discussions)
+* More [Test-cases](https://github.com/O-X-L/ansible-webui/tree/latest/test/integration)
+* Translations for your languages
 
 See also: [Contributing](https://github.com/O-X-L/ansible-webui/blob/latest/CONTRIBUTE.md)
 

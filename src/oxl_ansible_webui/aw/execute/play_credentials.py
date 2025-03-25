@@ -63,14 +63,14 @@ def get_credentials_to_use(job: Job, execution: JobExecution) -> (BaseJobCredent
     credentials = None
 
     # todo: write warn log if user tried to execute job using non-permitted credentials (if execution.cred*)
-    if execution.user is not None and is_set(execution.credential_user) and \
-            execution.credential_user.user.id == execution.user.id:
-        credentials = execution.credential_user
+    if execution.user is not None and is_set(execution.credentials_user) and \
+            execution.credentials_user.user.id == execution.user.id:
+        credentials = execution.credentials_user
 
-    elif is_set(execution.credential_global) and _scheduled_or_has_credentials_access(
-        user=execution.user, credentials=execution.credential_global, job_owner=job.owner,
+    elif is_set(execution.credentials_global) and _scheduled_or_has_credentials_access(
+        user=execution.user, credentials=execution.credentials_global, job_owner=job.owner,
     ):
-        credentials = execution.credential_global
+        credentials = execution.credentials_global
 
     elif is_set(job.credentials_default) and _scheduled_or_has_credentials_access(
         user=execution.user, credentials=job.credentials_default, job_owner=job.owner,
@@ -102,7 +102,7 @@ def get_credentials_to_use(job: Job, execution: JobExecution) -> (BaseJobCredent
     return credentials
 
 
-def get_runner_credential_args(creds: BaseJobCredentials) -> dict:
+def get_runner_credentials_args(creds: BaseJobCredentials) -> dict:
     args = {}
 
     if not is_set(creds):

@@ -20,7 +20,7 @@ from aw.execute.util import update_status, overwrite_and_delete_file, decode_job
     create_dirs, is_execution_status, config_error
 from aw.utils.debug import log
 from aw.execute.repository import ExecuteRepository
-from aw.execute.play_credentials import get_runner_credential_args, get_credentials_to_use
+from aw.execute.play_credentials import get_runner_credentials_args, get_credentials_to_use
 from aw.model.base import JOB_EXEC_STATUS_FAILED
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
@@ -182,7 +182,7 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path, project_dir: 
     update_status(execution, status='Running')
     return {
         **opts,
-        **get_runner_credential_args(creds=creds),
+        **get_runner_credentials_args(creds=creds),
     }
 
 

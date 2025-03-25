@@ -54,7 +54,8 @@
         limit: string,
         environment_vars: string,
         cmd_args: string,
-        credentials: number|null,
+        credentials: string|null,  // credential_user / credential_global
+        credentials_req: boolean,
         comment: string|null,
     }
     interface executionPromptsFullType {
@@ -141,7 +142,17 @@
 
         // encode prompt info
         for (let f of executionPrompts.config.fields) {
-            promptData[f] = executionPrompts.field_values[f];
+            if(f == 'credentials') {
+                if (isSet(executionPrompts.field_values.credentials)) {
+                    let credsKind = 'credentials_global';
+                    if (executionPrompts.field_values.credentials.includes('user-')) {
+                        credsKind = 'credentials_user';
+                    }
+                    promptData[credsKind] = parseInt(executionPrompts.field_values.credentials?.split('-')[1], 10);
+                }
+            } else {
+                promptData[f] = executionPrompts.field_values[f];
+            }
         }
 
         if (executionPrompts.config.vars.length) {
@@ -217,10 +228,10 @@
     function buildCredentialChoices(cr: credentialsType) : formChoiceType[] {
         let choices: formChoiceType[] = [];
         for (let c of cr.user) {
-            choices.push({value: c.id, name: `${t('creds.user')} - ${c.name}`});
+            choices.push({value: `user-${c.id}`, name: `${t('creds.user')} - ${c.name}`});
         }
         for (let c of cr.shared) {
-            choices.push({value: c.id, name: `${t('creds.shared')} - ${c.name}`});
+            choices.push({value: `shared-${c.id}`, name: `${t('creds.shared')} - ${c.name}`});
         }
         return choices;
     }

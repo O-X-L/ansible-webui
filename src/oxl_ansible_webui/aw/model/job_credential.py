@@ -141,7 +141,7 @@ class JobUserCredentials(BaseJobCredentials):
     api_fields_read = JobGlobalCredentials.api_fields_read.copy()
     api_fields_read.extend(['user', 'category'])
     api_fields_write = JobGlobalCredentials.api_fields_write.copy()
-    api_fields_write.extend(['user', 'category'])
+    api_fields_write.extend(['category'])
     form_fields = JobGlobalCredentials.api_fields_write.copy()
     form_fields.append('category')
 

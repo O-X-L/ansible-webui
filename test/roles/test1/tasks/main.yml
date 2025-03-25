@@ -8,7 +8,12 @@
 - name: TEST 1 | Checking environmental variable
   ansible.builtin.assert:
     that:
-      - lookup('ansible.builtin.env', 'TEST1_VAR2') == 'run2'
+      - lookup('ansible.builtin.env', 'TEST1_VAR2') == 'SomeRandomValue'
+  when: test == 'run2'
+
+- name: TEST 1 | Showing environmental variable
+  ansible.builtin.debug:
+    msg: "ENV VAR: {{ lookup('ansible.builtin.env', 'TEST1_VAR2') }}"
   when: test == 'run2'
 
 - name: TEST 1 | Sleeping

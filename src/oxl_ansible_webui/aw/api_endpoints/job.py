@@ -304,10 +304,10 @@ class APIJobItem(APIView):
     @extend_schema(
         request=None,
         responses={
-            200: OpenApiResponse(JobReadResponse, description='Job execution queued'),
-            400: OpenApiResponse(JobReadResponse, description='Bad parameters provided'),
-            403: OpenApiResponse(JobReadResponse, description='Not privileged to execute the job'),
-            404: OpenApiResponse(JobReadResponse, description='Job does not exist'),
+            200: OpenApiResponse(GenericResponse, description='Job execution queued'),
+            400: OpenApiResponse(GenericResponse, description='Bad parameters provided'),
+            403: OpenApiResponse(GenericResponse, description='Not privileged to execute the job'),
+            404: OpenApiResponse(GenericResponse, description='Job does not exist'),
         },
         summary='Execute a job.',
         operation_id='job_execute'
@@ -334,7 +334,7 @@ class APIJobItem(APIView):
                     )
 
                 else:
-                    execution = JobExecution(user=user, job=job, comment='Triggered')
+                    execution = JobExecution(user=user, job=job)
 
                 execution.save()
                 queue_add(execution=execution)

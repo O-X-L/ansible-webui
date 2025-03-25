@@ -111,11 +111,11 @@ def _log_global_user(are_global: bool, lower: bool = False) -> str:
 def credentials_in_use(credentials: BaseJobCredentials) -> bool:
     if isinstance(credentials, JobGlobalCredentials):
         in_use_jobs = Job.objects.filter(credentials_default=credentials).exists()
-        in_use_execs = JobExecution.objects.filter(credential_global=credentials).exists()
+        in_use_execs = JobExecution.objects.filter(credentials_global=credentials).exists()
         in_use = in_use_jobs or in_use_execs
 
     else:
-        in_use = JobExecution.objects.filter(credential_user=credentials).exists()
+        in_use = JobExecution.objects.filter(credentials_user=credentials).exists()
 
     return in_use
 
