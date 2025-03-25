@@ -3,6 +3,8 @@ from sys import exit as sys_exit
 
 from requests import Session, Response
 
+# pylint: disable=R0801
+
 BASE_URL = 'http://127.0.0.1:8000/api'
 API_USER = environ['AW_ADMIN']
 API_KEY = environ['AW_API_KEY']

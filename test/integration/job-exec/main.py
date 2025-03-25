@@ -5,6 +5,8 @@ from sys import exit as sys_exit
 
 from requests import Session
 
+# pylint: disable=R0801
+
 BASE_URL = 'http://127.0.0.1:8000/api'
 API_USER = environ['AW_ADMIN']
 API_KEY = environ['AW_API_KEY']
@@ -40,6 +42,7 @@ def _api_request(location: str, method: str = None, data: dict = None) -> dict:
         sys_exit(1)
 
     if not res.ok:
+        # pylint: disable=W0212
         print('ERROR: BAD RESPONSE', res._content)
         sys_exit(1)
 

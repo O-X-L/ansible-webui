@@ -119,7 +119,7 @@ def test_get_locations(to_check: dict):
 
         for tab_class, fragment in tab_fragment.items():
             print(f'TESTING GET /{location}{fragment}')
-            DRIVER.find_element(By.CLASS_NAME, tab_class).click()
+            _click_on(tab_class, cls=True)
             _wait_for_load()
             sleep(2)  # wait for JS async fetches (in case they would fail)
 
@@ -237,7 +237,7 @@ def test_js_actions():
         _open_and_wait_for_load(url)
 
         for tab_class, element_chains in tab_elements.items():
-            DRIVER.find_element(By.CLASS_NAME, tab_class).click()
+            _click_on(tab_class, cls=True)
             _wait_for_load()
             sleep(1)
 
