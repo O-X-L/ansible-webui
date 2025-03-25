@@ -52,7 +52,25 @@ echo ''
 sleep 10
 set +e
 
+##############################
 
+echo ''
+echo 'INTEGRATION TESTS API'
+echo ''
+
+echo 'Create API key'
+api_key="$(python3 src/oxl_ansible_webui/cli.py -a api-key.create -p "$AW_ADMIN" | grep 'Key=' | cut -d '=' -f2)"
+export AW_API_KEY="$api_key"
+sleep 1
+
+if ! python3 test/integration/api/main.py
+then
+  failure
+fi
+
+sleep 1
+
+##############################
 
 echo ''
 echo 'INTEGRATION TESTS WEB-UI'
