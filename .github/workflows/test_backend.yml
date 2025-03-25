@@ -8,7 +8,8 @@ on:
     paths:
       - '**.py'
       - 'test/integration/api/**'
-      - 'requirements_test.txt'
+      - 'requirements.txt'
+      - 'requirements_test_backend.txt'
       - '.github/workflows/test_backend.yml'
 
   pull_request:
@@ -16,7 +17,8 @@ on:
     paths:
       - '**.py'
       - 'test/integration/api/**'
-      - 'requirements_test.txt'
+      - 'requirements.txt'
+      - 'requirements_test_backend.txt'
       - '.github/workflows/test_backend.yml'
 
 jobs:

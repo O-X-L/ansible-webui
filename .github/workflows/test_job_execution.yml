@@ -9,7 +9,8 @@ on:
       - '**.py'
       - 'test/integration/**.yml'
       - 'test/integration/job-exec/**'
-      - 'requirements_test.txt'
+      - 'requirements.txt'
+      - 'requirements_test_backend.txt'
       - '.github/workflows/test_job_execution.yml'
 
   pull_request:
@@ -18,7 +19,8 @@ on:
       - '**.py'
       - 'test/integration/**.yml'
       - 'test/integration/job-exec/**'
-      - 'requirements_test.txt'
+      - 'requirements.txt'
+      - 'requirements_test_backend.txt'
       - '.github/workflows/test_job_execution.yml'
 
 jobs:
