@@ -260,6 +260,10 @@ def test_js_actions():
 
 def logout():
     print('TRIGGER LOGOUT')
+    url = f'{BASE_URL}/ui'
+    _open_and_wait_for_load(url)
+    DRIVER.refresh()
+
     url = f'{BASE_URL}/o/'
     _click_on('nav-btn-logout')
 
