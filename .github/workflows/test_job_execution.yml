@@ -51,6 +51,7 @@ jobs:
           export AW_DB="/tmp/$(date +%s).aw.db"
           export AW_ADMIN='tester'
           export AW_ADMIN_PWD='someSecret!Pwd'
+          export AW_PATH_PLAY=$(pwd)/test
           rm -rf src/oxl_ansible_webui/aw/migrations/*
           python3 src/oxl_ansible_webui/ >/dev/null 2>/dev/null &
           sleep 5
