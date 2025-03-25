@@ -7,13 +7,10 @@ We're also open to allow co-maintainers.
 ## What to contribute?
 
 * [Find and report issues/bugs](https://github.com/O-X-L/ansible-webui/issues/new)
-* [Start Discussions about Implementations/Optimizations](https://github.com/O-X-L/ansible-webui/discussions/new/choose)
-* Help optimizing/polishing the frontend is very welcome
-  * Fix/optimize styles/css
-  * Extend/fix/optimize JS
-
+* [Translations](https://github.com/O-X-L/ansible-webui/blob/latest/CONTRIBUTE.md#translations) for your language(s)
+* Add [Integration-Tests](https://github.com/O-X-L/ansible-webui/tree/latest/test/integration) for Web-UI, API and Job-Execution
 * Add Unit-Tests (*pytest*)
-* Add [Integration-Tests](https://github.com/O-X-L/ansible-webui/tree/latest/test/integration) for the Web-UI and/or API
+* [Start Discussions about Implementations/Optimizations](https://github.com/O-X-L/ansible-webui/discussions/new/choose)
 
 Read into the [Troubleshooting Guide](https://ansible-webui.OXL.app/usage/troubleshooting.html) to get some insight on how the stack works.
 
@@ -25,7 +22,7 @@ Read into the [Troubleshooting Guide](https://ansible-webui.OXL.app/usage/troubl
 * As we mainly use SQLite as database we should keep the DB writes to a minimum, so we do not run into locking issues (`OperationalError: database is locked`)
 * Important fixes and features should be added to the CHANGELOG.md file
 * This project is API-first - the API should be built for clean external usage.
-* Add new views and APIs to the integration tests (`test/integration/`)
+* Add new views, APIs and job-execution-features to the integration tests (`test/integration/`)
 
 ----
 

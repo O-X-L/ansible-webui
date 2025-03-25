@@ -65,7 +65,7 @@ What we need:
 
 * Testers and [feedback](https://github.com/O-X-L/ansible-webui/discussions)
 * More [Test-cases](https://github.com/O-X-L/ansible-webui/tree/latest/test/integration)
-* Translations for your languages
+* [Translations](https://github.com/O-X-L/ansible-webui/blob/latest/CONTRIBUTE.md#translations) for your language(s)
 
 See also: [Contributing](https://github.com/O-X-L/ansible-webui/blob/latest/CONTRIBUTE.md)
 
