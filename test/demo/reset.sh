@@ -38,4 +38,4 @@ echo '### UPDATING ###'
 docker pull "$IMAGE"
 
 echo '### STARTING ###'
-docker run -d --restart unless-stopped --name ansible-webui --publish 8000:8000 --volume "$DIR_DATA":/data --volume "$DIR_PLAY":/play --env AW_ADMIN_PWD="$AW_ADMIN_PWD" --env AW_ADMIN="$AW_ADMIN" --env AW_HOSTNAMES=demo.webui.ansibleguy.net --env AW_PROXY=1 "$IMAGE"
+docker run -d --restart unless-stopped --name ansible-webui --publish 8000:8000 --volume "$DIR_DATA":/data --volume "$DIR_PLAY":/play --env AW_ADMIN_PWD="$AW_ADMIN_PWD" --env AW_ADMIN="$AW_ADMIN" --env AW_HOSTNAMES=demo.ansible-webui.OXL.app --env AW_PROXY=1 "$IMAGE"

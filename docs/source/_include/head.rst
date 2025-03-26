@@ -1,7 +1,7 @@
 .. tip::
     Check out `the repository on GitHub <https://github.com/O-X-L/ansible-webui>`_
 
-    Check out the demo at: `demo.webui.ansibleguy.net <https://demo.webui.ansibleguy.net>`_ |
+    Check out the demo at: `demo.ansible-webui.OXL.app <https://demo.ansible-webui.OXL.app>`_ |
     Login: User :code:`demo`, Password :code:`Ansible1337`
 
 .. warning::

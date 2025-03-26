@@ -47,7 +47,7 @@ docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)
 
 ## Demo
 
-Check out the demo at: [demo.webui.ansibleguy.net](https://demo.webui.ansibleguy.net)
+Check out the demo at: [demo.ansible-webui.OXL.app](https://demo.ansible-webui.OXL.app)
 
 Login: User `demo`, Password `Ansible1337`
 

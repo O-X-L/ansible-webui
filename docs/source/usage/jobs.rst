@@ -23,7 +23,7 @@ You can use the UI at :code:`Jobs - Manage` to create and execute jobs.
 Create
 ******
 
-To get an overview - Check out the demo at: `demo.webui.ansibleguy.net <https://demo.webui.ansibleguy.net>`_ | Login: User :code:`demo`, Password :code:`Ansible1337`
+To get an overview - Check out the demo at: `demo.ansible-webui.OXL.app <https://demo.ansible-webui.OXL.app>`_ | Login: User :code:`demo`, Password :code:`Ansible1337`
 
 The job creation form will help you by browsing for playbooks and inventories. For this to work correctly - you should first select the repository to use (*if any is in use*).
 
