@@ -11,6 +11,8 @@ The goal is to allow users to quickly install & run a WebUI for using Ansible lo
 
 Keep it simple.
 
+![Intro GIF](https://raw.githubusercontent.com/O-X-L/ansible-webui/refs/heads/latest/docs/source/_static/img/intro.gif)
+
 ----
 
 ## Setup

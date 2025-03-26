@@ -25,3 +25,4 @@ frontend/node_modules/
 frontend/dist/
 frontend/src/.update_now
 src/oxl_ansible_webui/aw/static_dev/
+src/oxl_ansible_webui/aw/static_prod/dist/

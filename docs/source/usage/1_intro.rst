@@ -1,10 +1,15 @@
 .. _usage_intro:
 
+.. |intro_gif| image:: ../_static/img/intro.gif
+   :class: wiki-img
+
 .. include:: ../_include/head.rst
 
 =========
 1 - Intro
 =========
+
+|intro_gif|
 
 Comparison
 **********
