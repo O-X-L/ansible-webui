@@ -11,14 +11,14 @@
 WebUI
 *****
 
-Runtime system configuration can be managed using the WebUI :code:`System - Config` page.
+Runtime system configuration can be managed using the WebUI :code:`System - Settings` page.
 
 ----
 
 Jobs
 ====
 
-Jobs can be managed at the :code:`Jobs - Manage` page.
+Jobs can be managed at the :code:`Home - Jobs` page.
 
 **Tip**: The file-browsing also allows you to use your keyboard. Select using Up/Down/Enter keys and auto-complete input using the Tab key!
 
@@ -41,7 +41,7 @@ See: :ref:`Usage - Repositories <usage_repositories>`
 Environmental variables
 ***********************
 
-You can find the currently set environmental variables at the :code:`System - Config` page.
+You can find the currently set environmental variables at the :code:`System - Settings` page.
 
 ----
 

@@ -16,7 +16,7 @@
 Jobs
 ====
 
-You can use the UI at :code:`Jobs - Manage` to create and execute jobs.
+You can use the UI at :code:`Home - Jobs` to create and execute jobs.
 
 ----
 

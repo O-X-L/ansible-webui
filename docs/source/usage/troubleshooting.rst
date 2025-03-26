@@ -23,7 +23,7 @@ It will be beneficial for the troubleshooting process if we find out in which th
 Debugging
 *********
 
-You can enable the debug mode at the :code:`System - Config` page.
+You can enable the debug mode at the :code:`System - Settings` page.
 
 If that is not possible you can alternatively set the :code:`AW_DEBUG` environmental variable.
 

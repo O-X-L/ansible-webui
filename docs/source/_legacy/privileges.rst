@@ -56,7 +56,7 @@ Available ones are:
 Permissions
 ***********
 
-The UI at :code:`Settings - Permissions` allows you to create job, credential & repository permissions and link them to users and groups.
+The UI at :code:`System - Permissions` allows you to create job, credential & repository permissions and link them to users and groups.
 
 |perm_ui|
 

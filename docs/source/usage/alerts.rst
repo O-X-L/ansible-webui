@@ -9,7 +9,7 @@
 Alerts
 ======
 
-You can use the UI at :code:`Settings - Alerts` to create alerting rules for your jobs.
+You can use the UI at :code:`Home - Alerts` to create alerting rules for your jobs.
 
 Options are:
 
@@ -27,7 +27,7 @@ There are currently two types of alerts: E-Mail and plugins.
 E-Mail
 ******
 
-You need to configure your mailserver at the :code:`System - Config` page.
+You need to configure your mailserver at the :code:`System - Settings` page.
 
 After that you can receive e-mails on job finish/failure.
 
@@ -116,7 +116,7 @@ There is a generic alert-plugin interface for custom solutions.
           }
         }
 
-* Create a plugin at :code:`Settings - Alerts` that points to your executable
+* Create a plugin at :code:`Home - Alerts` that points to your executable
 
 * Link the plugin in alerts
 
