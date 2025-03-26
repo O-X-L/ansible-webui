@@ -165,7 +165,7 @@ class ExecuteRepository:
             return
 
         self._run_repo_config_cmds(cmds=self.repository.git_hook_cleanup, env=self._git_env())
-        if self.repository.git_isolate and not self.isolate_subdir == self.ISOLATE_BROWSABLE:
+        if self.repository.git_isolate and self.isolate_subdir != self.ISOLATE_BROWSABLE:
             rmtree(self.get_path_repo(), ignore_errors=True)
 
     def get_path_repo(self) -> Path:
