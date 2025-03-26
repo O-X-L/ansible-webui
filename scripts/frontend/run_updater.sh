@@ -8,6 +8,7 @@ REPO_BASE="$(pwd)/../.."
 
 SRC_DIR="${REPO_BASE}/frontend"
 DST_DIR="${REPO_BASE}/src/oxl_ansible_webui/aw/static_dev/dist"
+export FORCE_UPDATE=0
 
 mkdir -p "${DST_DIR}"
 rm -f "${DST_DIR}/"*.js

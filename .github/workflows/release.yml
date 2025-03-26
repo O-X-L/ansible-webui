@@ -27,10 +27,26 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '23.x'
+
+      - name: Install build dependencies
         run: |
           pip install -r requirements_build.txt >/dev/null
           pip install -r requirements.txt >/dev/null
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: frontend/
+
+      - name: Building frontend
+        run: |
+          bash scripts/frontend/build.sh
+          ls src/oxl_ansible_webui/aw/static_dev/dist/
+          mv src/oxl_ansible_webui/aw/static_dev/dist/ src/oxl_ansible_webui/aw/static_prod/
+          bash scripts/frontend/validate_prod_build.sh
 
       # NOTE: timeout for running the app includes db migrations
       - name: Testing to build Ansible-WebUI with PIP

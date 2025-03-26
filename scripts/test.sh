@@ -20,7 +20,7 @@ echo ''
 echo 'BUILD FRONTEND'
 echo ''
 
-FORCE_UPDATE=1 bash scripts/frontend/build.sh
+bash scripts/frontend/build.sh
 
 ##############################
 

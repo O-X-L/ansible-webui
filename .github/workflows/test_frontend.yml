@@ -70,8 +70,6 @@ jobs:
 
       - name: Building frontend
         run: bash scripts/frontend/build.sh
-        env:
-          FORCE_UPDATE: 1
 
       - name: Running Integration Tests
         run: |

@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-FORCE_UPDATE="${FORCE_UPDATE:-0}"
+FORCE_UPDATE="${FORCE_UPDATE:-1}"
 
 cd "$(dirname "$0")/"
 

@@ -91,13 +91,15 @@ To build the frontend bundles - you can either run:
 
 * `bash ./scripts/run_dev.sh` for the full app
 * `bash ./scripts/frontend/run_updater.sh` for automatic update whenever code changes
-* `bash ./scripts/frontend/build.sh` to build it once (set `FORCE_UPDATE=1` env-var if no changes were made)
+* `bash ./scripts/frontend/build.sh` to build it once
 
 The bundles are generated into `src/oxl_ansible_webui/aw/static_dev` - django will use this statics-directory in dev-mode.
 
 DO NOT copy & commit bundles to/in `src/oxl_ansible_webui/aw/static` - they are only generated/updated on release.
 
 This is also necessary if a sub-component is used in multiple others. You will see a 404 error if the js-files are missing from the script. (*as they are not copied to django's static-dir*)
+
+When adding additional svelte-apps - they should be added to `script/frontend/validate_prod_build.sh`.
 
 ### Translations
 
