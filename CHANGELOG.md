@@ -13,8 +13,11 @@
 
 **BREAKING CHANGES**:
 
-* Existing **Execution Prompts** are NOT compatible! You will have to manually re-configure them.
-* Existing **Permissions** are NOT compatible! You will have to manually re-configure them.
+* Existing **Execution Prompts** are NOT compatible!
+  You will have to manually re-configure them.
+* Existing **Permissions** are NOT compatible!
+  In this version the permission-system is only configurable using the Django-Admin interface.
+  It will be refactored in the next releases [#15](https://github.com/O-X-L/ansible-webui/issues/15)
 
 ## Version 0
 
