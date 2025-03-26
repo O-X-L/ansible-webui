@@ -4,6 +4,10 @@ Without these projects - this one would not be possible.
 
 Thanks to all OSS contributors involved and the related communities. ❤️
 
+## Fork base
+
+This project was forked from [ansibleguy/webui](https://github.com/ansibleguy/webui) | License: [GPLv3](https://github.com/ansibleguy/webui/blob/latest/LICENSE.txt)
+
 ## Frontend
 
 * [Svelte](https://svelte.dev/) | License: [MIT](https://github.com/sveltejs/svelte/blob/main/LICENSE.md)
