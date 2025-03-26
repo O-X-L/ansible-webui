@@ -172,7 +172,7 @@ class ExecuteRepository:
         path_repo = get_path_repo_wo_isolate(self.repository)
 
         if self.repository.git_isolate:
-            path_repo = path_repo / self.isolate_subdir
+            path_repo = path_repo / str(self.isolate_subdir)
             path_repo.mkdir(mode=0o750, parents=True, exist_ok=True)
 
         return path_repo

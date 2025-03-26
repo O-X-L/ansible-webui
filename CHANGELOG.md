@@ -2,6 +2,12 @@
 
 ## Version 1
 
+tbd
+
+----
+
+## Version 0
+
 ### 0.8.0
 
 * Completely refactored frontend (SvelteJS & TailwindCSS)
@@ -19,7 +25,7 @@
   In this version the permission-system is only configurable using the Django-Admin interface.
   It will be refactored in the next releases [#15](https://github.com/O-X-L/ansible-webui/issues/15)
 
-## Version 0
+----
 
 ### 0.0.25
 
