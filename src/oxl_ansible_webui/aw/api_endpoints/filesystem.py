@@ -11,7 +11,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParamet
 from aw.config.main import config
 from aw.api_endpoints.base import API_PERMISSION, BaseResponse, GenericErrorResponse
 from aw.model.repository import Repository
-from aw.execute.repository import get_path_repo_wo_isolate
+from aw.execute.repository import get_path_repo_wo_isolate, ExecuteRepository
 from aw.utils.util import is_set
 
 
@@ -68,14 +68,10 @@ class APIFsBrowse(APIView):
                     browse_root = Path(repository.static_path)
 
                 else:
-                    if repository.git_isolate:
-                        # do not validate as the repo does not exist..
-                        all_valid = ['.*']
-                        items['files'] = all_valid
-                        items['dirs'] = all_valid
-                        return Response(items)
-
                     browse_root = get_path_repo_wo_isolate(repository)
+                    if repository.git_isolate:
+                        browse_root = browse_root / ExecuteRepository.ISOLATE_BROWSABLE
+
                     if is_set(repository.git_playbook_base):
                         browse_root = browse_root / repository.git_playbook_base
 

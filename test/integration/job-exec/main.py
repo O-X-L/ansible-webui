@@ -1,5 +1,6 @@
 from os import environ
 from pathlib import Path
+from shutil import rmtree
 from time import sleep, time
 from sys import exit as sys_exit
 
@@ -81,7 +82,7 @@ def test_simple(jid: int = 1):
 
 
 def test_params(jid: int = 2):
-    print('PARAMS | ADD JOB')
+    print('\nPARAMS | ADD JOB')
     _api_request(
         'job',
         'post',
@@ -122,7 +123,7 @@ def test_params(jid: int = 2):
         assert log.find(f'ENV VAR: {env_var}') != -1
 
 
-    print('PARAMS | EXECUTE (limit & tags)')
+    print('\nPARAMS | EXECUTE (limit & tags)')
     limit = 'srv2'
     tags = 'database'
     tags_skip = 'webserver'
@@ -146,7 +147,7 @@ def test_params(jid: int = 2):
 
 
 def test_creds(jid: int = 3):
-    print('CREDS | ADD JOB')
+    print('\nCREDS | ADD JOB')
     _api_request(
         'job',
         'post',
@@ -194,7 +195,7 @@ def test_creds(jid: int = 3):
 
 
 def test_repo_git(jid: int = 4):
-    print('REPO GIT | ADD REPO')
+    print('\nREPO GIT | ADD REPO')
     repo = f'myRepo-{int(time())}'
     origin = 'https://github.com/O-X-L/ansible-webui.git'
     branch = 'latest'
@@ -218,6 +219,7 @@ def test_repo_git(jid: int = 4):
     )
 
     print('REPO GIT | EXECUTE (not isolated)')
+    rmtree(f'/tmp/ansible-webui/repositories/{repo}', ignore_errors=True)  # clean auto-downloaded repo
     _api_request(
         f'job/{jid}',
         'post',

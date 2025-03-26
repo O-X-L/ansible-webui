@@ -19,6 +19,7 @@ from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE,
     CHOICE_PERMISSION_EXECUTE
 from aw.execute.repository import api_update_repository
 from aw.api_endpoints.job_util import get_log_file_content
+from aw.execute.repository import ExecuteRepository
 
 
 class RepositoryWriteRequest(serializers.ModelSerializer):
@@ -133,7 +134,11 @@ class APIRepository(APIView):
             return Response(data={'error': f"Provided repository data is not valid: '{rtype_error}'"}, status=400)
 
         try:
-            serializer.save()
+            repo = serializer.save()
+
+            # init git-repo
+            if repo.rtype == 2:
+                ExecuteRepository(repo).create_or_update_repository()
 
         except IntegrityError as err:
             return Response(data={'error': f"Provided repository data is not valid: '{err}'"}, status=400)

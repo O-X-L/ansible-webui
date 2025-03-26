@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
+
     import {
         FolderSolid, FileSolid, CloseCircleSolid, TrashBinSolid, FloppyDiskSolid, CirclePlusSolid,
     } from 'flowbite-svelte-icons';
@@ -10,9 +12,9 @@
     import MultiInput from '../../../flowbite-custom/MultiInput.svelte';
 
     import { share } from '../../Share.js';
-    import { apiGet } from '../../../util/api.js';
+    import { isSet, rsplit } from '../../../util/main.js';
     import { tq } from '../../../util/translate.js';
-    import { rsplit } from '../../../util/main.js';
+    import { apiGet, apiEdit } from '../../../util/api.js';
     import { type formInfoType, type inputColorType } from '../../Types.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
     import { type executionPromptsType, type executionPromptVarType } from '../Types.js';
@@ -336,6 +338,25 @@
         }
         executionPrompts = filtered;
     }
+
+    // update isolated git repo
+    function nullCallback() {}
+
+    function updateCreateGitRepo() {
+        if (isSet(form.repository.value)) {
+            apiEdit('post', `repository/${form.repository.value}`, null, nullCallback);
+        }
+    }
+
+    onMount(() => {
+        updateCreateGitRepo();
+    })
+
+    $effect(() => {
+        if (isSet(form.repository.value)) {
+            updateCreateGitRepo();
+        }
+    })
 </script>
 
 <Modal bind:open={open} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
@@ -385,7 +406,7 @@
                                     </button>
                                 {/each}
                                 {#if !fsBrowseChoices.dirs.length && !fsBrowseChoices.files.length}
-                                    <Spinner size="sm"/>
+                                    <div class={classSpinnerDiv}><Spinner size="sm"/></div>
                                 {/if}
                             </div>
                         {/if}

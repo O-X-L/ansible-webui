@@ -18,11 +18,14 @@ from aw.model.base import JOB_EXEC_STATUS_FAILED
 
 
 class ExecuteRepository:
+    ISOLATE_BROWSABLE = 'isolated'
+
     def __init__(self, repository: Repository, execution: JobExecution = None, path_run: Path = None):
         self.repository = repository
         self.path_run = path_run
         self.execution = execution
         self.path_repo = None
+        self.isolate_subdir = self.execution.id if self.execution is not None else self.ISOLATE_BROWSABLE
         create_dirs(path=config['path_log'], desc='log')
 
     def create_repository(self, env: dict):
@@ -162,14 +165,14 @@ class ExecuteRepository:
             return
 
         self._run_repo_config_cmds(cmds=self.repository.git_hook_cleanup, env=self._git_env())
-        if self.repository.git_isolate:
+        if self.repository.git_isolate and not self.isolate_subdir == self.ISOLATE_BROWSABLE:
             rmtree(self.get_path_repo(), ignore_errors=True)
 
     def get_path_repo(self) -> Path:
         path_repo = get_path_repo_wo_isolate(self.repository)
 
         if self.repository.git_isolate:
-            path_repo = path_repo / self.execution.id
+            path_repo = path_repo / self.isolate_subdir
             path_repo.mkdir(mode=0o750, parents=True, exist_ok=True)
 
         return path_repo
@@ -226,6 +229,9 @@ class ExecuteRepository:
         return origin
 
     def _log_file_write(self, content: str):
+        if self.repository.log_stdout is None:
+            return
+
         write_file_0640(
             file=self.repository.log_stdout,
             content=f"{content}\n"
