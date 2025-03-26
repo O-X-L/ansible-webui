@@ -2,9 +2,14 @@
 
 ## Version 1
 
-### 1.0.0
+### 0.8.0
 
 * Completely refactored frontend (SvelteJS & TailwindCSS)
+* Permission checks for scheduled jobs (job-owners) [c40f049c](https://github.com/O-X-L/ansible-webui/commit/c40f049c6a248ec682bbb03bf25dff4632381d91)
+* Fix for job-form file-browsing when using isolated git-repo [#19](https://github.com/O-X-L/ansible-webui/issues/19)
+* Updated some API endpoints
+* Implemented new Stats-Endpoint
+* Some basic charts on the WebUI dashboard 
 
 **BREAKING CHANGES**:
 

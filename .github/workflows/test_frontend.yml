@@ -15,6 +15,7 @@ on:
       - 'frontend/*.config.ts'
       - 'test/integration/auth/**'
       - 'test/integration/webui/**'
+      - 'src/oxl_ansible_webui/aw/migrations/*.py'  # to be released
       - 'requirements.txt'
       - 'requirements_test_frontend.txt'
       - '.github/workflows/test_frontend.yml'
@@ -31,6 +32,7 @@ on:
       - 'frontend/*.config.ts'
       - 'test/integration/auth/**'
       - 'test/integration/webui/**'
+      - 'src/oxl_ansible_webui/aw/migrations/*.py'  # to be released
       - 'requirements.txt'
       - 'requirements_test_frontend.txt'
       - '.github/workflows/test_frontend.yml'

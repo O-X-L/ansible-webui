@@ -4,19 +4,14 @@ name: 'CodeQL'
 
 on:
   push:
-    tags:
-      - '*'
-  # takes too long to run on every push..
-  # push:
-  #   branches: ['latest']
-  #  paths:
-  #    - '**.py'
-  #    - '.github/workflows/codeql.yml'
-  # pull_request:
-  #  branches: ['latest']
-  #  paths:
-  #    - '**.py'
-  #    - '.github/workflows/codeql.yml'
+    branches: [latest]
+    paths:
+      - 'src/oxl_ansible_webui/aw/migrations/*.py'  # to be released
+
+  pull_request:
+    branches: [latest]
+    paths:
+      - 'src/oxl_ansible_webui/aw/migrations/*.py'  # to be released
 
 jobs:
   analyze:
