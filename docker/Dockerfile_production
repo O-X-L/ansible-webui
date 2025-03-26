@@ -10,14 +10,16 @@ WORKDIR /tmp
 
 RUN echo $AW_VERSION
 
+# NOTE: need to change .../archive/refs/tags/... to .../refs/heads/... if branch is the target
 RUN apk add --no-cache curl zip bash && \
-    curl -sLO https://github.com/O-X-L/ansible-webui/archive/refs/heads/${AW_VERSION}.zip && \
+    curl -sLO https://github.com/O-X-L/ansible-webui/archive/refs/tags/${AW_VERSION}.zip && \
     unzip /tmp/${AW_VERSION}.zip >/dev/null && \
     cd /tmp/ansible-webui-${AW_VERSION}/frontend && \
     npm install
 
 RUN bash /tmp/ansible-webui-${AW_VERSION}/scripts/frontend/build_base.sh /tmp/ansible-webui-${AW_VERSION}/frontend/ /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/dist/ && \
-    ls /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/dist/
+    ls /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/dist/ && \
+    bash /tmp/ansible-webui-${AW_VERSION}/scripts/frontend/validate_prod_build.sh
 
 FROM python:3.11-alpine AS aw
 ARG AW_VERSION

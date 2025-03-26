@@ -16,6 +16,7 @@ tbd
 * Updated some API endpoints
 * Implemented new Stats-Endpoint
 * Some basic charts on the WebUI dashboard 
+* Logging of user logon/logoff/failed-logon
 
 **BREAKING CHANGES**:
 
