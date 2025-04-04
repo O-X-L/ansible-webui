@@ -118,6 +118,10 @@
         return settingsRead.read_only.includes(k);
     }
 
+    function isDeploymentDev(): boolean {
+        return Object.keys(settingsRead.env_vars).includes('deployment') && settingsRead.env_vars['deployment'] == 'dev';
+    }
+
     function valideInput(e: Event) {
         valideInputBase(e, form);
     }
@@ -373,8 +377,8 @@
 
             <div class={classModalInput}>
                 <Label for="cnf_debug" class={classModalLabel}>{t('config.form.debug')}</Label>
-                <Toggle id="cnf_debug" bind:checked={form.debug.value} disabled={isRO('debug') || isRO('deployment')} />
-                {#if isRO('debug') || isRO('deployment')}
+                <Toggle id="cnf_debug" bind:checked={form.debug.value} disabled={isRO('debug') || isDeploymentDev()} />
+                {#if isRO('debug') || isDeploymentDev()}
                     <Tooltip>{t('config.is_read_only')}</Tooltip>
                 {/if}
                 <Helper class={classModalHelp}>{t('config.form.help.debug')}</Helper>

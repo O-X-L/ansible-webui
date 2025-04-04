@@ -208,7 +208,7 @@
                             <Input id="repos_git_pb_base" bind:value={form.git_playbook_base.value}
                                 bind:color={form.git_playbook_base.color}
                                 on:input={valideInput} on:blur={valideInput} />
-                            <Helper class={classModalHelp}>{@html t('repos.form.help.git_origin')}</Helper>
+                            <Helper class={classModalHelp}>{@html t('repos.form.help.git_playbook_base')}</Helper>
                         </div>
                         <div class={classModalInput}>
                             <Label for="repo_git_lfs" class={classModalLabel}>{t('repos.form.git_lfs')}</Label>

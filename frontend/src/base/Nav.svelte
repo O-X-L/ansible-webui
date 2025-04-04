@@ -129,7 +129,7 @@
     <Tooltip placement="bottom">{t('nav.darkLight')}</Tooltip>
 
     <Button id="nav-btn-docs" size="xs" class="ml-2 max-sm:hidden {classBtnLink}"
-      href="https:/ansible-webui.OXL.app"><BookSolid /></Button>
+      href="https://ansible-webui.OXL.app"><BookSolid /></Button>
     <Tooltip placement="bottom">{t('nav.docs')}</Tooltip>
     <Button id="nav-btn-repo" size="xs" class="ml-2 max-sm:hidden {classBtnLink}"
       href="https://github.com/O-X-L/ansible-webui"><GithubSolid /></Button>
