@@ -116,7 +116,7 @@ def _update_schema_version() -> None:
                 conn.commit()
 
             except (IndexError, OperationalError) as err:
-                log(msg=f"Error updating database schema version: '{err}'", level=3)
+                log(msg=f"Unable to update database schema version: '{err}'", level=3)
 
 
 def install_or_migrate_db():
