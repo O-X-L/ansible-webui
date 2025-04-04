@@ -36,6 +36,8 @@ export AW_PATH_PLAY="$(pwd)/test"
 export AW_ADMIN='tester'
 export AW_ADMIN_PWD='someSecret!Pwd'
 
+bash scripts/migrate_db.sh >/dev/null
+
 python3 src/oxl_ansible_webui/ 2>&1 | grep -E 'ERROR|FATAL|Warning: operationId|Except'  &
 echo ''
 sleep 10
