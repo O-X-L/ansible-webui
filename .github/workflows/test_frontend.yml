@@ -75,18 +75,7 @@ jobs:
 
       - name: Running Integration Tests
         run: |
-          export AW_ENV='dev'
-          export AW_DB="/tmp/$(date +%s).aw.db"
-          export AW_ADMIN='tester'
-          export AW_ADMIN_PWD='someSecret!Pwd'
-          rm -rf src/oxl_ansible_webui/aw/migrations/*
-          python3 src/oxl_ansible_webui/ >/dev/null 2>/dev/null &
-          sleep 5
-
-          echo 'WEB-UI INTEGRATION TESTS'
-          python3 test/integration/webui/main.py
-          sleep 1
-
+          bash scripts/test_webui.sh
           pkill -f oxl_ansible_webui
         env:
           PYTHONUNBUFFERED: 1
@@ -94,19 +83,6 @@ jobs:
       - name: Running Integration Tests - AUTH SAML
         run: |
           sleep 5
-          export AW_ENV='dev'
-          export AW_DB="/tmp/$(date +%s).aw.db"
-          export AW_ADMIN='tester'
-          export AW_ADMIN_PWD='someSecret!Pwd'
-          export AW_CONFIG="$(pwd)/test/integration/auth/saml.yml"
-          rm -rf src/oxl_ansible_webui/aw/migrations/*
-          python3 src/oxl_ansible_webui/ >/dev/null 2>/dev/null &
-          sleep 5
-
-          echo 'WEB-UI AUTH-SAML INTEGRATION TESTS'
-          python3 test/integration/auth/saml.py
-          sleep 1
-
-          pkill -f oxl_ansible_webui
+          bash scripts/test_auth_saml.sh
         env:
           PYTHONUNBUFFERED: 1

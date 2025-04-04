@@ -126,6 +126,11 @@ python3 -m pip install -r ${REPO}/requirements_test_frontend.txt
 
 bash ${REPO}/scripts/lint.sh
 bash ${REPO}/scripts/test.sh
+# or run single tests:
+bash ${REPO}/scripts/test_api.sh
+bash ${REPO}/scripts/test_job_exec.sh
+bash ${REPO}/scripts/test_webui.sh
+bash ${REPO}/scripts/test_webui_auth_saml.sh
 ```
 
 ----

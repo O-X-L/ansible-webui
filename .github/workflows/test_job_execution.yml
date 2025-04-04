@@ -48,24 +48,6 @@ jobs:
           pip install -r requirements_test_backend.txt >/dev/null
 
       - name: Running Job-Execution Integration Tests
-        run: |
-          export AW_ENV='dev'
-          export AW_DB="/tmp/$(date +%s).aw.db"
-          export AW_ADMIN='tester'
-          export AW_ADMIN_PWD='someSecret!Pwd'
-          export AW_PATH_PLAY=$(pwd)/test
-          rm -rf src/oxl_ansible_webui/aw/migrations/*
-          python3 src/oxl_ansible_webui/ >/dev/null 2>/dev/null &
-          sleep 5
-
-          echo 'JOB-EXECUTION INTEGRATION TESTS'
-          echo 'Create API key'
-          api_key="$(python3 src/oxl_ansible_webui/cli.py -a api-key.create -p "$AW_ADMIN" | grep 'Key=' | cut -d '=' -f2)"
-          export AW_API_KEY="$api_key"
-          sleep 1
-          python3 test/integration/job-exec/main.py
-          sleep 1
-
-          pkill -f oxl_ansible_webui
+        run: bash scripts/test_job_exec.sh
         env:
           PYTHONUNBUFFERED: 1

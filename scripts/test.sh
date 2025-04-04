@@ -1,18 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
 cd "$(dirname "$0")/.."
 
 export PYTHONPATH=''
-
-function failure() {
-  echo ''
-  echo '### FAILED ###'
-  echo ''
-  pkill -f oxl_ansible_webui
-  exit 1
-}
 
 ##############################
 
@@ -32,82 +24,23 @@ python3 -m pytest
 
 ##############################
 
-if pgrep -f 'oxl-ansible-webui'
-then
-  echo 'An instance of Ansible-WebUI is already running! Stop it first (pkill -f oxl_ansible_webui)'
-  exit 1
-fi
-
-echo 'Starting Ansible-WebUI..'
-trap "pkill -f oxl_ansible_webui; exit" INT
-export AW_ENV='dev'
-# shellcheck disable=SC2155
-export AW_DB="/tmp/$(date +%s).aw.db"
-# shellcheck disable=SC2155
-export AW_PATH_PLAY="$(pwd)/test"
-export AW_ADMIN='tester'
-export AW_ADMIN_PWD='someSecret!Pwd'
-python3 src/oxl_ansible_webui/ >/dev/null 2>/dev/null &
-echo ''
-sleep 10
-set +e
-
-##############################
-
-echo ''
-echo 'INTEGRATION TESTS API'
-echo ''
-
-echo 'Create API key'
-api_key="$(python3 src/oxl_ansible_webui/cli.py -a api-key.create -p "$AW_ADMIN" | grep 'Key=' | cut -d '=' -f2)"
-export AW_API_KEY="$api_key"
-sleep 1
-
-if ! python3 test/integration/api/main.py
-then
-  failure
-fi
-
+bash ./scripts/test_api.sh
 sleep 1
 
 ##############################
 
-echo ''
-echo 'INTEGRATION TESTS WEB-UI'
-echo ''
-
-if ! python3 test/integration/webui/main.py
-then
-  failure
-fi
-
+bash ./scripts/test_job_exec.sh
 sleep 1
-pkill -f oxl_ansible_webui
-sleep 5
 
 ##############################
 
-echo ''
-echo 'INTEGRATION TESTS SAML'
-echo ''
-
-echo 'Starting Ansible-WebUI with SAML enabled..'
-# shellcheck disable=SC2155
-export AW_DB="/tmp/$(date +%s).aw.db"
-# shellcheck disable=SC2155
-export AW_CONFIG="$(pwd)/test/integration/auth/saml.yml"
-python3 src/oxl_ansible_webui/ >/dev/null 2>/dev/null &
-echo ''
-sleep 5
-
-if ! python3 test/integration/auth/saml.py
-then
-  failure
-fi
-
+bash ./scripts/test_webui.sh
 sleep 1
-export AW_CONFIG=''
-pkill -f oxl_ansible_webui
+
+##############################
+
+bash ./scripts/test_auth_saml.sh
+sleep 1
 
 ##############################
 
