@@ -43,6 +43,15 @@ docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 oxlorg/ansible-
 docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play oxlorg/ansible-webui:latest
 ```
 
+### Optional Dependencies
+
+```bash
+pip install oxl-ansible-webui[mysql]
+pip install oxl-ansible-webui[psql]
+pip install oxl-ansible-webui[ara]
+pip install oxl-ansible-webui[saml]
+```
+
 ----
 
 ## Demo
@@ -164,9 +173,9 @@ See also: [Contributing](https://github.com/O-X-L/ansible-webui/blob/latest/CONT
 
   - [x] Manage and execute Jobs
 
-- [ ] Database
+- [x] Database
 
-  - [ ] Support for MySQL
+  - [x] Support for MySQL
 
 - [ ] Testing
 
@@ -174,9 +183,11 @@ See also: [Contributing](https://github.com/O-X-L/ansible-webui/blob/latest/CONT
 
   - [ ] Integration Tests
 
-    - [x] Basic WebUI checks
+    - [x] WebUI checks
 
     - [x] API Endpoints
+
+    - [x] Job Execution
 
     - [ ] Permission system
 

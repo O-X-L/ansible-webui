@@ -351,6 +351,9 @@ class JobExecution(BaseJob):
 
     @property
     def time_start_str(self) -> str:
+        if self.result is None:
+            return ''
+
         return self.result.time_start_str
 
     @property
@@ -362,32 +365,44 @@ class JobExecution(BaseJob):
 
     @property
     def time_fin_dt(self) -> (datetime, None):
-        if self.result is None or is_null(self.result.time_fin):
+        if self.result is None or self.result.time_fin is None:
             return None
 
         return self.result.time_fin_dt
 
     @property
     def time_fin_str(self) -> str:
+        if self.result is None or self.result.time_fin is None:
+            return ''
+
         return self.result.time_fin_str
 
     @property
     def time_fin_ts(self) -> (int, None):
-        if self.result.time_fin is None:
+        if self.result is None or self.result.time_fin is None:
             return None
 
         return int(datetime.timestamp(self.result.time_fin))
 
     @property
     def time_duration(self) -> timedelta:
+        if self.result is None:
+            return timedelta(seconds=0)
+
         return self.result.time_duration
 
     @property
     def time_duration_sec(self) -> int:
+        if self.result is None:
+            return 0
+
         return self.result.time_duration_sec
 
     @property
     def failed(self) -> bool:
+        if self.result is None:
+            return False
+
         return self.result.failed
 
     @property

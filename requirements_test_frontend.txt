@@ -3,3 +3,5 @@ blinker<1.8.0
 selenium-wire
 chromedriver-autoinstaller
 requests
+
+grafana-django-saml2-auth

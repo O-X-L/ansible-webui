@@ -21,6 +21,8 @@ Quote: ara provides Ansible reporting by recording ansible and ansible-playbook 
 
 `Documentation <https://ara.readthedocs.io/>`_ | `Repository <https://github.com/ansible-community/ara>`_
 
+PIP Dependency: :code:`ara` or :code:`oxl-ansible-webui[ara]`
+
 ----
 
 Identity Providers using SAML SSO

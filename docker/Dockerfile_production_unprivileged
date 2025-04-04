@@ -14,7 +14,7 @@ WORKDIR /tmp
 RUN echo $AW_VERSION
 
 # NOTE: need to change .../archive/refs/tags/... to .../refs/heads/... if branch is the target
-RUN apk add --no-cache curl zip bash && \
+RUN apk add --update --no-cache curl zip bash && \
     curl -sLO https://github.com/O-X-L/ansible-webui/archive/refs/tags/${AW_VERSION}.zip && \
     unzip /tmp/${AW_VERSION}.zip >/dev/null && \
     cd /tmp/ansible-webui-${AW_VERSION}/frontend && \
@@ -30,7 +30,7 @@ ARG AW_VERSION
 ARG AW_UID=8785
 ARG AW_USER=aw
 
-RUN apk add --no-cache git git-lfs openssh-client sshpass xmlsec && \
+RUN apk add --update --no-cache git git-lfs openssh-client sshpass xmlsec && \
     pip install --no-cache-dir --upgrade pip 2>/dev/null && \
     pip install --no-cache-dir "git+https://github.com/O-X-L/ansible-webui.git@${AW_VERSION}" && \
     adduser --uid ${AW_UID} --home /home/ansible-webui --shell /usr/sbin/nologin --disabled-password ${AW_USER} ${AW_USER} && \

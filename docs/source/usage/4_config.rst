@@ -123,9 +123,48 @@ Some settings are only available as environmental variables.
    Set a comma-separated list of hostnames that are in use and should be trusted. If not set you might encounter 'CSRF' errors.
 
 
+* **AW_DB_TYPE**
+
+   The type of database to use. Default: :code:`sqlite`
+
+   Choices: :code:`mysql`, :code:`postgresql`
+
+   For non-SQLite you will have to install the dependencies: :code:`oxl-ansible-webui[mysql]` or :code:`oxl-ansible-webui[psql]`
+
+   For MySQL you might also have to install a system dependency: :code:`apt install default-libmysqlclient-dev` or :code:``
+
+   **Tip**: You can migrate data between database-types like this:
+
+   * Dump: :code`oxl-ansible-webui-manage dumpdata > dump.json`
+   * Load: :code`oxl-ansible-webui-manage loaddata dump.json`
+
 * **AW_DB**
 
    Define the path where the SQLite3 database is placed. Default: :code:`${HOME}/.config/ansible-webui/aw.db`
+
+   If not SQLite:
+
+   Database to use. Can also be an `Easy Connect string or DSN <https://docs.djangoproject.com/en/5.2/ref/databases/#full-dsn-and-easy-connect>`_.
+
+
+* **AW_DB_HOST**
+
+   Database hostname/DNS/IP.
+
+
+* **AW_DB_PORT**
+
+   Database port.
+
+
+* **AW_DB_USER**
+
+   User to use for DB-authentication.
+
+
+* **AW_DB_PWD**
+
+   Password to use for DB-authentication.
 
 
 * **AW_PORT**
@@ -159,6 +198,8 @@ Some settings are only available as environmental variables.
     One of :code:`saml`, :code:`ldap` or :code:`local`. Default: :code:`local`
 
     If the mode is set to :code:`saml` or :code:`ldap` - you need to define its config inside the config file.
+
+    For non-local auth you will have to install the dependencies: :code:`oxl-ansible-webui[saml]` or :code:`oxl-ansible-webui[ldap]`
 
 
 General System Settings

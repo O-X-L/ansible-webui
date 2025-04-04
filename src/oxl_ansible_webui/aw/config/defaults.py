@@ -47,6 +47,11 @@ CONFIG_DEFAULTS = {
     'path_log': f"{environ['HOME']}/.local/share/ansible-webui",
     'path_template': None,  # only for custom overrides
     'db': f"{environ['HOME']}/.config/ansible-webui",
+    'db_type': 'sqlite',
+    'db_user': '',
+    'db_pwd': '',
+    'db_host': '',
+    'db_port': '',
     'timezone': datetime.now().astimezone().tzname(),
     'secret': ''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(50)),
     'session_timeout': 12 * 60 * 60,  # 12h

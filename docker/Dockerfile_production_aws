@@ -14,7 +14,7 @@ FROM public.ecr.aws/docker/library/golang:1.17-alpine AS ssm-builder
 ARG SSM_VERSION=1.2.694.0
 # ssm version: https://github.com/aws/session-manager-plugin/releases
 
-RUN apk add --no-cache make git gcc libc-dev curl bash zip && \
+RUN apk add --update --no-cache make git gcc libc-dev curl bash zip && \
     curl -sLO https://github.com/aws/session-manager-plugin/archive/${SSM_VERSION}.tar.gz && \
     mkdir -p /go/src/github.com && \
     tar xzf ${SSM_VERSION}.tar.gz && \
@@ -34,7 +34,7 @@ FROM oxlorg/ansible-webui-unprivileged:${AW_VERSION}
 ARG AW_USER=aw
 
 USER root
-RUN apk add py3-boto3 aws-cli
+RUN apk add --update --no-cache py3-boto3 aws-cli
 COPY --from=ssm-builder /go/src/github.com/session-manager-plugin/bin/linux_amd64_plugin/session-manager-plugin \
                         /go/src/github.com/session-manager-plugin/bin/linux_amd64/ssmcli \
                         /usr/bin/

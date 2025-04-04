@@ -26,9 +26,12 @@ if not deployment_prod():
     DB_BACKUP_RETENTION_DAYS = 1
 
 DB_BACKUP_RETENTION = DB_BACKUP_RETENTION_DAYS * 24 * 60 * 60
+DB_TYPE = get_aw_env_var('db_type')
+if DB_TYPE is None or DB_TYPE not in ['mysql', 'psql', 'sqlite']:
+    DB_TYPE = 'sqlite'
 
 
-def _check_if_writable():
+def _sqlite_check_if_writable():
     try:
         test_file = DB_FILE.parent / '.awtest'
         with open(test_file, 'w', encoding='utf-8') as _file:
@@ -42,77 +45,90 @@ def _check_if_writable():
 
 
 def _schema_up_to_date_base() -> bool:
-    try:
-        with db_connect(DB_FILE) as conn:
-            return conn.execute('SELECT schema_version FROM aw_schemametadata').fetchall()[0][0] == VERSION
+    if DB_TYPE == 'sqlite':
+        try:
+            with db_connect(DB_FILE) as conn:
+                return conn.execute('SELECT schema_version FROM aw_schemametadata').fetchall()[0][0] == VERSION
 
-    except (IndexError, OperationalError):
-        return False
+        except (IndexError, OperationalError):
+            return False
+
+    return False
 
 
 def _schema_up_to_date() -> bool:
-    if not Path(DB_FILE).is_file():
-        return False
+    if DB_TYPE == 'sqlite':
+        if not Path(DB_FILE).is_file():
+            return False
 
-    try:
-        return _schema_up_to_date_base()
+        try:
+            return _schema_up_to_date_base()
 
-    except DatabaseError as err:
-        # this may happen if WAL or SHM got corrupted (p.e. connection was not closed gracefully)
-        log_warn(msg=f"Trying to fix database error: '{err}'", _stderr=True)
-        backup_ext = f".{datetime.now().strftime(FILE_TIME_FORMAT)}{DB_BACKUP_EXT}"
-        db_shm = f'{DB_FILE}-shm'
-        db_wal = f'{DB_FILE}-wal'
+        except DatabaseError as err:
+            # this may happen if WAL or SHM got corrupted (p.e. connection was not closed gracefully)
+            log_warn(msg=f"Trying to fix database error: '{err}'", _stderr=True)
+            backup_ext = f".{datetime.now().strftime(FILE_TIME_FORMAT)}{DB_BACKUP_EXT}"
+            db_shm = f'{DB_FILE}-shm'
+            db_wal = f'{DB_FILE}-wal'
 
-        if Path(db_shm).is_file():
-            move(db_shm, f'{db_shm}{backup_ext}')
+            if Path(db_shm).is_file():
+                move(db_shm, f'{db_shm}{backup_ext}')
 
-        if Path(db_wal).is_file():
-            move(db_wal, f'{db_wal}{backup_ext}')
+            if Path(db_wal).is_file():
+                move(db_wal, f'{db_wal}{backup_ext}')
 
-        return _schema_up_to_date_base()
+            return _schema_up_to_date_base()
+
+    return _schema_up_to_date_base()
 
 
 def _get_current_schema_version() -> (str, None):
-    try:
-        with db_connect(DB_FILE) as conn:
-            return conn.execute('SELECT schema_version FROM aw_schemametadata').fetchall()[0][0]
+    if DB_TYPE == 'sqlite':
+        try:
+            with db_connect(DB_FILE) as conn:
+                return conn.execute('SELECT schema_version FROM aw_schemametadata').fetchall()[0][0]
 
-    except (IndexError, OperationalError):
-        return None
+        except (IndexError, OperationalError):
+            return None
+
+    return None
 
 
 def _update_schema_version() -> None:
     previous = _get_current_schema_version()
 
-    with db_connect(DB_FILE) as conn:
-        try:
-            if previous is None:
-                conn.execute(
-                    "INSERT INTO aw_schemametadata (created, updated, schema_version) VALUES "
-                    f"(DATETIME('now'), DATETIME('now'), '{VERSION}')",
-                )
+    if DB_TYPE == 'sqlite':
+        with db_connect(DB_FILE) as conn:
+            try:
+                if previous is None:
+                    conn.execute(
+                        "INSERT INTO aw_schemametadata (created, updated, schema_version) VALUES "
+                        f"(DATETIME('now'), DATETIME('now'), '{VERSION}')",
+                    )
 
-            else:
-                conn.execute(
-                    "UPDATE aw_schemametadata SET "
-                    f"schema_version = '{VERSION}', schema_version_prev = '{previous}', "
-                    "updated = DATETIME('now') WHERE id = 1"
-                )
+                else:
+                    conn.execute(
+                        "UPDATE aw_schemametadata SET "
+                        f"schema_version = '{VERSION}', schema_version_prev = '{previous}', "
+                        "updated = DATETIME('now') WHERE id = 1"
+                    )
 
-            conn.commit()
+                conn.commit()
 
-        except (IndexError, OperationalError) as err:
-            log(msg=f"Error updating database schema version: '{err}'", level=3)
+            except (IndexError, OperationalError) as err:
+                log(msg=f"Error updating database schema version: '{err}'", level=3)
 
 
 def install_or_migrate_db():
-    log(msg=f"Using DB: {DB_FILE}", level=4)
-    _check_if_writable()
-    if not Path(DB_FILE).is_file():
-        return install()
+    if DB_TYPE in ['mysql', 'psql']:
+        return net_install_migrate()
 
-    return migrate()
+    log(msg=f"Using DB: {DB_FILE}", level=4)
+    _sqlite_check_if_writable()
+    if not Path(DB_FILE).is_file():
+        return sqlite_install()
+
+    return sqlite_migrate()
 
 
 def _manage_db(action: str, cmd: list, backup: str = None) -> dict:
@@ -140,7 +156,7 @@ def _manage_db(action: str, cmd: list, backup: str = None) -> dict:
     return result
 
 
-def _clean_old_db_backups():
+def _sqlite_clean_old_db_backups():
     possible_db_backup_files = listdir(DB_FILE.parent)
     for file in possible_db_backup_files:
         if file.startswith(DB_FILE.name) and file.endswith(DB_BACKUP_EXT):
@@ -151,15 +167,14 @@ def _clean_old_db_backups():
                 remove(backup_file)
 
 
-def install():
+def sqlite_install():
     log(msg=f"Initializing database {DB_FILE}..", level=3)
-    _migration_needed()
     _manage_db(action='initialization', cmd=['migrate'])
     _update_schema_version()
 
 
-def migrate():
-    _clean_old_db_backups()
+def sqlite_migrate():
+    _sqlite_clean_old_db_backups()
 
     if _migration_needed() and check_aw_env_var_true(var='db_migrate', fallback=True):
         backup = f"{DB_FILE}.{datetime.now().strftime(FILE_TIME_FORMAT)}{DB_BACKUP_EXT}"
@@ -169,6 +184,34 @@ def migrate():
         log(msg=f"Upgrading database {DB_FILE}", level=3)
         if _manage_db(action='migration', cmd=['migrate'], backup=backup)['rc'] == 0:
             _update_schema_version()
+
+
+def net_install_migrate():
+    # user@host:port/name
+    db_host = get_aw_env_var('db_host')
+    db_port = get_aw_env_var('db_port')
+    db_name = get_aw_env_var('db')
+    db_user = get_aw_env_var('db_user')
+    db = ''
+
+    if db_user is not None:
+        db += f'{db_user}@'
+
+    if db_host is not None:
+        db += db_host
+
+    if db_port is not None:
+        db += f':{db_port}'
+
+    if db_name is not None:
+        if db == '':
+            db = db_name
+        else:
+            db += f'/{db_name}'
+
+    log(msg=f"Using DB: {db}", level=4)
+    _manage_db(action='migration', cmd=['migrate'])
+    _update_schema_version()
 
 
 def _migration_needed() -> bool:

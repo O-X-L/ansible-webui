@@ -17,6 +17,7 @@ cd "$(dirname "$0")/../docker"
 IMAGE_REPO="oxlorg/ansible-webui"
 IMAGE_REPO_UNPRIV="${IMAGE_REPO}-unprivileged"
 IMAGE_REPO_AWS="${IMAGE_REPO}-aws"
+IMAGE_REPO_MYSQL="${IMAGE_REPO}-mysql"
 
 # todo: allow for multi-platform builds
 # RELEASE_ARCHS="linux/arm/v7,linux/arm64/v8,linux/amd64"
@@ -29,6 +30,9 @@ image_unpriv_latest="${IMAGE_REPO_UNPRIV}:latest"
 
 image_aws="${IMAGE_REPO_AWS}:${VERSION}"
 image_aws_latest="${IMAGE_REPO_AWS}:latest"
+
+image_mysql="${IMAGE_REPO_MYSQL}:${VERSION}"
+image_mysql_latest="${IMAGE_REPO_MYSQL}:latest"
 
 container="ansible-webui-${VERSION}"
 
@@ -51,6 +55,7 @@ then
   docker image rm "$image" || true
   docker image rm "$image_unpriv" || true
   docker image rm "$image_aws" || true
+  docker image rm "$image_mysql" || true
 fi
 
 if [[ "$REPLY" =~ ^[Yy]$ ]]
@@ -60,6 +65,7 @@ then
     docker image rm "$image_latest" || true
     docker image rm "$image_unpriv_latest" || true
     docker image rm "$image_aws_latest" || true
+    docker image rm "$image_mysql_latest" || true
   fi
 fi
 
@@ -88,4 +94,13 @@ docker build -f Dockerfile_production_aws -t "$image_aws" --network host --build
 if [[ "$REPLY" =~ ^[Yy]$ ]]
 then
   docker build -f Dockerfile_production_aws -t "$image_aws_latest" --network host --build-arg "AW_VERSION=${VERSION}" .
+fi
+
+echo ''
+echo "### BUILDING IMAGE ${image_mysql} ###"
+docker build -f Dockerfile_production_mysql -t "$image_mysql" --network host --build-arg "AW_VERSION=${VERSION}" --no-cache --progress=plain .
+
+if [[ "$REPLY" =~ ^[Yy]$ ]]
+then
+  docker build -f Dockerfile_production_mysql -t "$image_mysql_latest" --network host --build-arg "AW_VERSION=${VERSION}" .
 fi

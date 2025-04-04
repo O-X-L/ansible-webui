@@ -19,8 +19,9 @@ except ImportError:
 from aw.config.hardcoded import LOGIN_PATH, ENV_KEY_CONFIG, ENV_KEY_SAML
 from aw.config.defaults import CONFIG_DEFAULTS, inside_docker, behind_proxy
 from aw.utils.deployment import deployment_dev, deployment_prod
-from aw.config.environment import get_aw_env_var_or_default, auth_mode_saml
+from aw.config.environment import get_aw_env_var_or_default, auth_mode_saml, get_aw_env_var
 from aw.utils.debug import log
+from aw.dependencies import saml_installed, mysql_installed, psql_installed, log_dependency_error
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIRS = [
@@ -71,32 +72,44 @@ MIDDLEWARE = [
 ]
 
 # Database
-if deployment_prod():
-    DB_FILE = Path(get_aw_env_var_or_default('db'))
+DB_FILE = None
+DB_TYPE = 'sqlite'
+if config['db_type'] in ['mysql', 'postgresql']:
+    DB_TYPE = config['db_type']
+    if DB_TYPE == 'mysql' and not mysql_installed():
+        log_dependency_error('MySQL', 'mysql')
 
-    if DB_FILE.name.find('.') == -1 and not DB_FILE.exists():
-        try:
-            DB_FILE.mkdir(mode=0o750, parents=True, exist_ok=True)
+    elif DB_TYPE == 'psql' and not psql_installed():
+        log_dependency_error('PostgreSQL', 'psql')
 
-        except (OSError, FileNotFoundError):
-            raise ValueError(f"Unable to created database directory: '{DB_FILE}'")
-
-    if DB_FILE.is_dir():
-        DB_FILE = DB_FILE / 'aw.db'
-
-else:
-    dev_db_file = 'aw.dev.db' if deployment_dev() else 'aw.staging.db'
-    if 'AW_DB' in environ:
+if DB_TYPE == 'sqlite':
+    if deployment_prod():
         DB_FILE = Path(get_aw_env_var_or_default('db'))
+
+        if DB_FILE.name.find('.') == -1 and not DB_FILE.exists():
+            try:
+                DB_FILE.mkdir(mode=0o750, parents=True, exist_ok=True)
+
+            except (OSError, FileNotFoundError):
+                raise ValueError(f"Unable to created database directory: '{DB_FILE}'")
+
         if DB_FILE.is_dir():
-            DB_FILE = DB_FILE / dev_db_file
+            DB_FILE = DB_FILE / 'aw.db'
 
     else:
-        DB_FILE = dev_db_file
-        DB_FILE = BASE_DIR / DB_FILE
+        dev_db_file = 'aw.dev.db' if deployment_dev() else 'aw.staging.db'
+        if 'AW_DB' in environ:
+            DB_FILE = Path(get_aw_env_var_or_default('db'))
+            if DB_FILE.is_dir():
+                DB_FILE = DB_FILE / dev_db_file
 
-DATABASES = {
-    'default': {
+        else:
+            DB_FILE = dev_db_file
+            DB_FILE = BASE_DIR / DB_FILE
+
+
+AW_DB_ENGINES = {
+    'sqlite': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': DB_FILE,
         'OPTIONS': {
@@ -105,8 +118,26 @@ DATABASES = {
             # see: https://github.com/django/django/commit/a0204ac183ad6bca71707676d994d5888cf966aa
         },
         'ATOMIC_REQUESTS': False,  # default
-    }
+    },
+    'mysql': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': get_aw_env_var('db'),
+        'USER': get_aw_env_var_or_default('db_user'),
+        'PASSWORD': get_aw_env_var_or_default('db_password'),
+        'HOST': get_aw_env_var_or_default('db_host'),
+        'PORT': get_aw_env_var_or_default('db_port'),
+    },
+    'postgresql': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': get_aw_env_var('db'),
+        'USER': get_aw_env_var_or_default('db_user'),
+        'PASSWORD': get_aw_env_var_or_default('db_password'),
+        'HOST': get_aw_env_var_or_default('db_host'),
+        'PORT': get_aw_env_var_or_default('db_port'),
+    },
 }
+
+DATABASES = {'default': AW_DB_ENGINES[DB_TYPE]}
 
 
 def debug_mode() -> bool:
@@ -221,7 +252,10 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 # Authentication
 AUTH_MODE = CONFIG_DEFAULTS['auth_mode']
 SAML2_AUTH = {}
-if auth_mode_saml():
+if auth_mode_saml() and not saml_installed():
+    log_dependency_error('SAML', 'saml')
+
+elif auth_mode_saml():
     INSTALLED_APPS.append('django_saml2_auth')
 
     try:

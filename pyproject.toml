@@ -29,6 +29,20 @@ Issues = "https://github.com/O-X-L/ansible-webui/issues"
 dependencies = {file = ["requirements.txt"]}
 version = {file = ["VERSION"]}
 
+[project.optional-dependencies]
+mysql = [
+    "mysqlclient",
+]
+psql = [
+    "psycopg[binary,pool]",
+]
+saml = [
+    "grafana-django-saml2-auth",
+]
+ara = [
+    "ara",
+]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
