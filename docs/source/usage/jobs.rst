@@ -53,3 +53,16 @@ You have two options to execute a job:
     These will be shown in the job overview:
 
     |job_exec|
+
+
+----
+
+Metadata
+********
+
+AW will pass some meta-data about it's execution-context to Ansible:
+
+* :code:`AW_OWNER_USER` => Username of the job owner
+* :code:`AW_OWNER_EMAIL` => E-Mail Address of the job owner
+* :code:`AW_EXECUTION_USER` => Username of the executing user
+* :code:`AW_EXECUTION_EMAIL` => E-Mail Address of the executing user

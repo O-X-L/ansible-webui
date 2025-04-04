@@ -114,6 +114,15 @@ def _environmental_variables(job: Job, execution: JobExecution) -> dict:
     if 'ANSIBLE_HOST_KEY_CHECKING' not in env_vars:
         env_vars['ANSIBLE_HOST_KEY_CHECKING'] = True
 
+    # pass aw-metadata to ansible (https://github.com/O-X-L/ansible-webui/issues/5)
+    if is_set(job.owner):
+        env_vars['AW_OWNER_USER'] = job.owner.username
+        env_vars['AW_OWNER_EMAIL'] = job.owner.email
+
+    if is_set(execution.user):
+        env_vars['AW_EXECUTION_USER'] = execution.user.username
+        env_vars['AW_EXECUTION_EMAIL'] = execution.user.email
+
     return env_vars
 
 
