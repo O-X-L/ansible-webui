@@ -13,7 +13,7 @@ from aw.config.main import VERSION
 from aw.settings import DB_FILE
 from aw.utils.subps import process
 from aw.utils.debug import log, log_error, log_warn
-from aw.utils.deployment import deployment_prod, is_release_version
+from aw.utils.deployment import deployment_prod
 from aw.config.hardcoded import FILE_TIME_FORMAT, GRP_MANAGER
 from aw.config.environment import check_aw_env_var_true, get_aw_env_var, check_aw_env_var_is_set
 
@@ -172,20 +172,7 @@ def migrate():
 
 
 def _migration_needed() -> bool:
-    if is_release_version():
-        # stable versions should only have released migrations
-        return not _schema_up_to_date()
-
-    changed = False
-
-    for stdout in [
-        _manage_db(action='schema-creation', cmd=['makemigrations'])['stdout'],
-        _manage_db(action='schema-creation', cmd=['makemigrations', 'aw'])['stdout'],
-    ]:
-        if stdout.find('No changes detected') == -1:
-            changed = True
-
-    return changed or not _schema_up_to_date()
+    return not _schema_up_to_date()
 
 
 def _get_random_pwd() -> str:
@@ -240,5 +227,7 @@ def create_schedule_user():
 def cleanup_job_stati():
     from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED
     from aw.model.job import JobExecution
+    from aw.model.job_credential import JobUserTMPCredentials
 
     JobExecution.objects.filter(status__in=JOB_EXEC_STATI_ACTIVE).update(status=JOB_EXEC_STATUS_FAILED)
+    JobUserTMPCredentials.objects.all().delete()
