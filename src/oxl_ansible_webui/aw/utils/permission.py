@@ -2,7 +2,7 @@ from aw.model.job import Job
 from aw.model.permission import JobPermissionMapping, JobPermissionMemberUser, JobPermissionMemberGroup, \
     CHOICE_PERMISSION_READ, JobCredentialsPermissionMapping, JobRepositoryPermissionMapping, JobPermission, \
     CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
-from aw.model.job_credential import BaseJobCredentials, JobGlobalCredentials
+from aw.model.job_credential import BaseJobCredentials, JobSharedCredentials
 from aw.model.repository import Repository
 from aw.base import USERS
 from aw.utils.debug import log
@@ -121,7 +121,7 @@ def get_viewable_jobs(user: USERS) -> list[Job]:
 def get_viewable_credentials(user: USERS) -> list[BaseJobCredentials]:
     credentials_viewable = []
 
-    for credentials in JobGlobalCredentials.objects.all():
+    for credentials in JobSharedCredentials.objects.all():
         if has_credentials_permission(user=user, credentials=credentials, permission_needed=CHOICE_PERMISSION_READ):
             credentials_viewable.append(credentials)
 

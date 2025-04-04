@@ -140,10 +140,13 @@ class APIRepository(APIView):
             if repo.rtype == 2:
                 ExecuteRepository(repo).create_or_update_repository()
 
+            return Response({
+                'msg': f"Repository '{serializer.validated_data['name']}' created successfully",
+                'id': repo.id,
+            })
+
         except IntegrityError as err:
             return Response(data={'error': f"Provided repository data is not valid: '{err}'"}, status=400)
-
-        return Response({'msg': f"Repository '{serializer.validated_data['name']}' created successfully"})
 
 
 class APIRepositoryItem(GenericAPIView):
@@ -219,7 +222,7 @@ class APIRepositoryItem(GenericAPIView):
 
         try:
             Repository.objects.filter(id=repo_id).update(**serializer.validated_data)
-            return Response(data={'msg': f"Repository '{repository.name}' updated"}, status=200)
+            return Response(data={'msg': f"Repository '{repository.name}' updated", 'id': repo_id}, status=200)
 
         except IntegrityError as err:
             return Response(data={'error': f"Provided repository data is not valid: '{err}'"}, status=400)
@@ -253,7 +256,7 @@ class APIRepositoryItem(GenericAPIView):
                     )
 
                 repository.delete()
-                return Response(data={'msg': f"Repository '{repository.name}' deleted"}, status=200)
+                return Response(data={'msg': f"Repository '{repository.name}' deleted", 'id': repo_id}, status=200)
 
         except ObjectDoesNotExist:
             pass
@@ -292,7 +295,10 @@ class APIRepositoryItem(GenericAPIView):
                 )
                 repository_update_thread.start()
 
-                return Response(data={'msg': f"Repository '{repository.name}' update initiated"}, status=200)
+                return Response(
+                    data={'msg': f"Repository '{repository.name}' update initiated", 'id': repo_id},
+                    status=200,
+                )
 
         except ObjectDoesNotExist:
             pass

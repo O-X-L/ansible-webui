@@ -1,5 +1,5 @@
 from aw.model.job import Job
-from aw.model.job_credential import JobGlobalCredentials
+from aw.model.job_credential import JobSharedCredentials
 from aw.base import USERS, GROUPS
 from aw.model.repository import Repository
 
@@ -11,13 +11,13 @@ def choices_job() -> list[tuple]:
 
 def choices_global_credentials() -> list[tuple]:
     # todo: only show credentials the user is privileged to view => get_viewable_credentials(user)
-    return [(credentials.id, credentials.name) for credentials in JobGlobalCredentials.objects.all()]
+    return [(credentials.id, credentials.name) for credentials in JobSharedCredentials.objects.all()]
 
 
 # def choices_credentials(user: USERS) -> dict:
 #     return {
 #         'global': [
-#             (c.id, c.name) for c in JobGlobalCredentials.objects.all()
+#             (c.id, c.name) for c in JobSharedCredentials.objects.all()
 #             if has_credentials_permission(user, c, CHOICE_PERMISSION_READ)
 #         ],
 #         'user': [(c.id, c.name) for c in JobUserCredentials.objects.filter(user=user)],

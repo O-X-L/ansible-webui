@@ -196,7 +196,7 @@ class APIUserPasswordChange(APIView):
             400: OpenApiResponse(response=GenericErrorResponse, description='Invalid password provided'),
         },
         summary='Update the current users password.',
-        operation_id='system_config_edit',
+        operation_id='system_user_pwd_change',
     )
     def put(self, request):
         user = get_api_user(request)

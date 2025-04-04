@@ -56,6 +56,10 @@ class GenericResponse(BaseResponse):
     msg = serializers.CharField()
 
 
+class GenericItemResponse(GenericResponse):
+    id = serializers.IntegerField()
+
+
 class GenericErrorResponse(BaseResponse):
     error = serializers.CharField()
 
@@ -76,7 +80,7 @@ class LogDownloadResponse(BaseResponse):
 
 def api_docs_put(item: str) -> dict:
     return {
-        200: OpenApiResponse(response=GenericResponse, description=f'{item} updated'),
+        200: OpenApiResponse(response=GenericItemResponse, description=f'{item} updated'),
         400: OpenApiResponse(response=GenericErrorResponse, description=f'Invalid {item} data provided'),
         403: OpenApiResponse(response=GenericErrorResponse, description=f'Not privileged to edit the {item}'),
         404: OpenApiResponse(response=GenericErrorResponse, description=f'{item} does not exist'),
@@ -85,7 +89,7 @@ def api_docs_put(item: str) -> dict:
 
 def api_docs_delete(item: str) -> dict:
     return {
-        200: OpenApiResponse(response=GenericResponse, description=f'{item} deleted'),
+        200: OpenApiResponse(response=GenericItemResponse, description=f'{item} deleted'),
         400: OpenApiResponse(response=GenericErrorResponse, description=f'Invalid {item} data provided'),
         403: OpenApiResponse(response=GenericErrorResponse, description=f'Not privileged to delete the {item}'),
         404: OpenApiResponse(response=GenericErrorResponse, description=f'{item} does not exist'),
@@ -94,7 +98,7 @@ def api_docs_delete(item: str) -> dict:
 
 def api_docs_post(item: str) -> dict:
     return {
-        200: OpenApiResponse(response=GenericResponse, description=f'{item} created'),
+        200: OpenApiResponse(response=GenericItemResponse, description=f'{item} created'),
         400: OpenApiResponse(response=GenericErrorResponse, description=f'Invalid {item} data provided'),
         403: OpenApiResponse(response=GenericErrorResponse, description=f'Not privileged to create {item}'),
     }

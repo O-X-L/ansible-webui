@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 
 from aw.model.job import Job
-from aw.model.job_credential import JobGlobalCredentials
+from aw.model.job_credential import JobSharedCredentials
 from aw.model.permission import JobPermission, JobPermissionMapping, JobPermissionMemberUser, \
     JobPermissionMemberGroup, JobCredentialsPermissionMapping, JobRepositoryPermissionMapping
 from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user, api_docs_put, api_docs_delete, \
@@ -52,7 +52,7 @@ class PermissionWriteRequest(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         self.fields['jobs'] = serializers.MultipleChoiceField(choices=[job.id for job in Job.objects.all()])
         self.fields['credentials'] = serializers.MultipleChoiceField(
-            choices=[creds.id for creds in JobGlobalCredentials.objects.all()]
+            choices=[creds.id for creds in JobSharedCredentials.objects.all()]
         )
         self.fields['repositories'] = serializers.MultipleChoiceField(
             choices=[repo.id for repo in Repository.objects.all()]
@@ -68,7 +68,7 @@ class PermissionWriteRequest(serializers.ModelSerializer):
         return attrs
 
     @staticmethod
-    def create_or_update(validated_data: dict, perm: JobPermission = None):
+    def create_or_update(validated_data: dict, perm: JobPermission = None) -> JobPermission:
         # pylint: disable=R0912,R0915
         if 'permission' in validated_data:
             permission = validated_data['permission']
@@ -111,7 +111,7 @@ class PermissionWriteRequest(serializers.ModelSerializer):
             credentials = []
             for creds_id in validated_data['credentials']:
                 try:
-                    credentials.append(JobGlobalCredentials.objects.get(id=creds_id))
+                    credentials.append(JobSharedCredentials.objects.get(id=creds_id))
 
                 except ObjectDoesNotExist:
                     continue
@@ -152,6 +152,7 @@ class PermissionWriteRequest(serializers.ModelSerializer):
             perm.groups.set(groups)
 
         perm.save()
+        return perm
 
 
 def build_permissions(perm_id_filter: int = None) -> (list, dict):
@@ -269,15 +270,17 @@ class APIPermission(GenericAPIView):
             )
 
         try:
-            serializer.create_or_update(validated_data=serializer.validated_data, perm=None)
+            o = serializer.create_or_update(validated_data=serializer.validated_data, perm=None)
+            return Response({
+                'msg': f"Permission '{serializer.validated_data['name']}' created successfully",
+                'id': o.id,
+            })
 
         except IntegrityError as err:
             return Response(
                 data={'error': f"Provided permission data is not valid: '{err}'"},
                 status=400,
             )
-
-        return Response({'msg': f"Permission '{serializer.validated_data['name']}' created successfully"})
 
 
 class APIPermissionItem(GenericAPIView):
@@ -332,7 +335,7 @@ class APIPermissionItem(GenericAPIView):
 
         try:
             serializer.create_or_update(validated_data=serializer.validated_data, perm=permission)
-            return Response(data={'msg': f"Permission '{permission.name}' updated"}, status=200)
+            return Response(data={'msg': f"Permission '{permission.name}' updated", 'id': perm_id}, status=200)
 
         except IntegrityError as err:
             return Response(data={'error': f"Provided permission data is not valid: '{err}'"}, status=400)
@@ -361,7 +364,7 @@ class APIPermissionItem(GenericAPIView):
                     )
 
                 permission.delete()
-                return Response(data={'msg': f"Permission '{permission.name}' deleted"}, status=200)
+                return Response(data={'msg': f"Permission '{permission.name}' deleted", 'id': perm_id}, status=200)
 
         except ObjectDoesNotExist:
             pass

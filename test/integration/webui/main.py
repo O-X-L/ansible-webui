@@ -196,6 +196,8 @@ def test_js_actions():
                     '.job-form-misc', '.job-form-prompts',
                     '#job-btn-discard'
                 ],
+                # todo: test job-execution
+                # todo: test tmp-credentials
                 # #jobs-btn-exec-{id}, #jobs-btn-stop-{id}, #jobs-btn-logs-{id},
                 # #jobs-btn-edit-{id}, #jobs-btn-clone-{id}, #jobs-btn-delete-{id}
                 # #jobs-btn-exec-start, #jobs-btn-exec-close

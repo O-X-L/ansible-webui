@@ -9,7 +9,7 @@ from aw.config.hardcoded import JOB_EXECUTION_LIMIT
 from aw.model.job import Job, JobExecution
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_EXECUTE, \
     CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
-from aw.model.job_credential import JobGlobalCredentials
+from aw.model.job_credential import JobSharedCredentials
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, \
     LogDownloadResponse, api_docs_put, api_docs_delete, api_docs_post, validate_no_xss, GenericErrorResponse, \
     response_data_if_changed, API_PARAM_HASH
@@ -93,8 +93,8 @@ def _has_credentials_permission(user: USERS, data: dict) -> bool:
     if 'credentials_default' in data and is_set(data['credentials_default']):
         try:
             credentials = data['credentials_default']
-            if not isinstance(credentials, JobGlobalCredentials):
-                credentials = JobGlobalCredentials.objects.get(id=credentials)
+            if not isinstance(credentials, JobSharedCredentials):
+                credentials = JobSharedCredentials.objects.get(id=credentials)
 
             return has_credentials_permission(
                 user=user,
@@ -176,15 +176,14 @@ class APIJob(APIView):
         serializer.validated_data['owner'] = user
 
         try:
-            serializer.save()
+            o = serializer.save()
+            return Response(data={'msg': 'Job created', 'id': o.id}, status=200)
 
         except IntegrityError as err:
             return Response(
                 data={'error': f"Provided job data is not valid: '{err}'"},
                 status=400,
             )
-
-        return Response(data={'msg': 'Job created'}, status=200)
 
 
 class APIJobItem(APIView):
@@ -248,7 +247,7 @@ class APIJobItem(APIView):
                     return Response(data={'error': f"Not privileged to delete the job '{job.name}'"}, status=403)
 
                 job.delete()
-                return Response(data={'msg': f"Job '{job.name}' deleted"}, status=200)
+                return Response(data={'msg': f"Job '{job.name}' deleted", 'id': job_id}, status=200)
 
         except ObjectDoesNotExist:
             pass
@@ -294,7 +293,7 @@ class APIJobItem(APIView):
                         status=400,
                     )
 
-                return Response(data={'msg': f"Job '{job.name}' updated"}, status=200)
+                return Response(data={'msg': f"Job '{job.name}' updated", 'id': job_id}, status=200)
 
         except ObjectDoesNotExist:
             pass
@@ -305,9 +304,9 @@ class APIJobItem(APIView):
         request=None,
         responses={
             200: OpenApiResponse(GenericResponse, description='Job execution queued'),
-            400: OpenApiResponse(GenericResponse, description='Bad parameters provided'),
-            403: OpenApiResponse(GenericResponse, description='Not privileged to execute the job'),
-            404: OpenApiResponse(GenericResponse, description='Job does not exist'),
+            400: OpenApiResponse(GenericErrorResponse, description='Bad parameters provided'),
+            403: OpenApiResponse(GenericErrorResponse, description='Not privileged to execute the job'),
+            404: OpenApiResponse(GenericErrorResponse, description='Job does not exist'),
         },
         summary='Execute a job.',
         operation_id='job_execute'
@@ -338,7 +337,7 @@ class APIJobItem(APIView):
 
                 execution.save()
                 queue_add(execution=execution)
-                return Response(data={'msg': f"Job '{job.name}' execution queued"}, status=200)
+                return Response(data={'msg': f"Job '{job.name}' execution queued", 'id': execution.id}, status=200)
 
         except ObjectDoesNotExist:
             pass
@@ -378,7 +377,7 @@ class APIJobExecutionItem(APIView):
                     return Response(data={'error': f"Job execution '{job.name}' is not running"}, status=400)
 
                 update_status(execution, 'Stopping')
-                return Response(data={'msg': f"Job execution '{job.name}' stopping"}, status=200)
+                return Response(data={'msg': f"Job execution '{job.name}' stopping", 'id': exec_id}, status=200)
 
         except ObjectDoesNotExist:
             pass

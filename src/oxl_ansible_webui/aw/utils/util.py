@@ -1,19 +1,20 @@
-import os
 import unicodedata
 import re as regex
 from platform import python_version
 from datetime import datetime, timedelta
 from time import time
 from os import open as open_file
+from os import remove as remove_file
 from pathlib import Path
 from functools import lru_cache, wraps
 from math import ceil
 from sys import maxunicode
-from threading import Thread
+from random import choice as random_choice
+from string import digits, ascii_letters, punctuation
 
+from pytz import utc
 from pkg_resources import get_distribution
 from crontab import CronTab
-from pytz import utc
 from django.utils.html import escape as escape_html
 
 from aw.config.main import config
@@ -87,19 +88,6 @@ def write_file_0600(file: (str, Path), content: str):
         _file.write(content)
 
 
-def write_pipe_0600(file: (str, Path), content: str):
-    os.mkfifo(file, mode=0o600)
-
-    def pipe_writer(f: (str, Path), c: str):
-        # will be blocked until ansible connects to the other end of the pipe
-        with open(f, 'wb') as fh:
-            fh.write(c.encode('utf-8'))
-
-        os.remove(file)
-
-    Thread(target=pipe_writer, args=(file, content)).start()
-
-
 def _open_file_0640(path: (str, Path), flags):
     return open_file(path, flags, 0o640)
 
@@ -111,6 +99,26 @@ def write_file_0640(file: (str, Path), content: str):
 
     with open(file, mode, encoding='utf-8', opener=_open_file_0640) as _file:
         _file.write(content)
+
+
+def get_random_str(l: int = 50) -> str:
+    return ''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(l))
+
+
+def overwrite_and_delete_file(file: (str, Path)):
+    if not isinstance(file, Path):
+        file = Path(file)
+
+    if not file.is_file():
+        return
+
+    for _ in range(3):
+        write_file_0600(
+            file=file,
+            content=get_random_str(),
+        )
+
+    remove_file(file)
 
 
 def get_ansible_versions() -> str:

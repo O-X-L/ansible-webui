@@ -111,7 +111,7 @@ class APIBackendTranslations(GenericAPIView):
         request=None,
         responses={200: GenericResponse},
         summary='Return text-translations in needed for frontend rendering',
-        operation_id='backend_infos',
+        operation_id='backend_translations',
     )
     def get(request):
         del request

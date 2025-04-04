@@ -67,10 +67,14 @@ def get_credentials_to_use(job: Job, execution: JobExecution) -> (BaseJobCredent
             execution.credentials_user.user.id == execution.user.id:
         credentials = execution.credentials_user
 
-    elif is_set(execution.credentials_global) and _scheduled_or_has_credentials_access(
-        user=execution.user, credentials=execution.credentials_global, job_owner=job.owner,
+    elif execution.user is not None and is_set(execution.credentials_tmp) and \
+            execution.credentials_tmp.user.id == execution.user.id:
+        credentials = execution.credentials_tmp
+
+    elif is_set(execution.credentials_shared) and _scheduled_or_has_credentials_access(
+        user=execution.user, credentials=execution.credentials_shared, job_owner=job.owner,
     ):
-        credentials = execution.credentials_global
+        credentials = execution.credentials_shared
 
     elif is_set(job.credentials_default) and _scheduled_or_has_credentials_access(
         user=execution.user, credentials=job.credentials_default, job_owner=job.owner,

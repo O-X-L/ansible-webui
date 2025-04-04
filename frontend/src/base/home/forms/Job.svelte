@@ -252,13 +252,14 @@
         verbosity: boolean,
         credentials: boolean,
         credentials_req: boolean,
+        credentials_tmp: boolean,
         comment: boolean,
     }
 
     let executionPromptsSimple: executionPromptSwitches = $state({
         tags: false, tags_skip: false, mode_check: true, mode_diff: false, limit: true, limit_req: false,
         environment_vars: false, cmd_args: false, verbosity: true, credentials: true, comment: true,
-        credentials_req: false, comment: true,
+        credentials_req: false, credentials_tmp: false,
     });
     let executionPrompts: executionPrompt[] = $state([]);
     let executionPromptId = 0;
@@ -605,7 +606,14 @@
                             <Label for="job_exec_prompt_creds_req" class={classModalLabel}>{t('jobs.form.prompt_credentials_req')}</Label>
                             <div class={classCenterChildDiv}>
                                 <Toggle id="job_exec_prompt_creds_req" bind:checked={executionPromptsSimple.credentials_req}
-                                disabled={!executionPromptsSimple.limit} />
+                                disabled={!executionPromptsSimple.credentials} />
+                            </div>
+                        </div>
+                        <div>
+                            <Label for="job_exec_prompt_creds_tmp" class={classModalLabel}>{t('jobs.form.prompt_credentials_tmp')}</Label>
+                            <div class={classCenterChildDiv}>
+                                <Toggle id="job_exec_prompt_creds_tmp" bind:checked={executionPromptsSimple.credentials_tmp}
+                                disabled={!executionPromptsSimple.credentials} />
                             </div>
                         </div>
                     </div>

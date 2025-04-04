@@ -69,15 +69,17 @@ class APIAlertPlugin(GenericAPIView):
             )
 
         try:
-            serializer.save()
+            o = serializer.save()
+            return Response({
+                'msg': f"Alert-Plugin '{serializer.validated_data['name']}' created successfully",
+                'id': o.id,
+            })
 
         except IntegrityError as err:
             return Response(
                 data={'error': f"Provided Alert-Plugin data is not valid: '{err}'"},
                 status=400,
             )
-
-        return Response({'msg': f"Alert-Plugin '{serializer.validated_data['name']}' created successfully"})
 
 
 class APIAlertPluginItem(GenericAPIView):
@@ -143,7 +145,7 @@ class APIAlertPluginItem(GenericAPIView):
 
         try:
             AlertPlugin.objects.filter(id=plugin.id).update(**serializer.validated_data)
-            return Response(data={'msg': f"Alert-Plugin '{plugin.name}' updated"}, status=200)
+            return Response(data={'msg': f"Alert-Plugin '{plugin.name}' updated", 'id': plugin_id}, status=200)
 
         except IntegrityError as err:
             return Response(data={'error': f"Provided Alert-Plugin data is not valid: '{err}'"}, status=400)
@@ -166,7 +168,7 @@ class APIAlertPluginItem(GenericAPIView):
             plugin = AlertPlugin.objects.get(id=plugin_id)
             if plugin is not None:
                 plugin.delete()
-                return Response(data={'msg': f"Alert-Plugin '{plugin.name}' deleted"}, status=200)
+                return Response(data={'msg': f"Alert-Plugin '{plugin.name}' deleted", 'id': plugin_id}, status=200)
 
         except ObjectDoesNotExist:
             pass
@@ -241,15 +243,14 @@ class APIAlertUser(GenericAPIView):
 
         try:
             serializer.validated_data['user_id'] = user.id
-            serializer.save()
+            o = serializer.save()
+            return Response({'msg': f"Alert '{serializer.validated_data['name']}' created successfully", 'id': o.id})
 
         except IntegrityError as err:
             return Response(
                 data={'error': f"Provided Alert data is not valid: '{err}'"},
                 status=400,
             )
-
-        return Response({'msg': f"Alert '{serializer.validated_data['name']}' created successfully"})
 
 
 class APIAlertUserItem(GenericAPIView):
@@ -316,7 +317,7 @@ class APIAlertUserItem(GenericAPIView):
             AlertUser.objects.filter(id=alert.id).update(
                 **{**serializer.validated_data, 'user': user.id}
             )
-            return Response(data={'msg': f"Alert '{alert.name}' updated"}, status=200)
+            return Response(data={'msg': f"Alert '{alert.name}' updated", 'id': alert_id}, status=200)
 
         except IntegrityError as err:
             return Response(data={'error': f"Provided Alert data is not valid: '{err}'"}, status=400)
@@ -334,7 +335,7 @@ class APIAlertUserItem(GenericAPIView):
             alert = AlertUser.objects.get(id=alert_id, user=user)
             if alert is not None:
                 alert.delete()
-                return Response(data={'msg': f"Alert '{alert.name}' deleted"}, status=200)
+                return Response(data={'msg': f"Alert '{alert.name}' deleted", 'id': alert_id}, status=200)
 
         except ObjectDoesNotExist:
             pass
@@ -406,15 +407,14 @@ class APIAlertGlobal(GenericAPIView):
             )
 
         try:
-            serializer.save()
+            o = serializer.save()
+            return Response({'msg': f"Alert '{serializer.validated_data['name']}' created successfully", 'id': o.id})
 
         except IntegrityError as err:
             return Response(
                 data={'error': f"Provided Alert data is not valid: '{err}'"},
                 status=400,
             )
-
-        return Response({'msg': f"Alert '{serializer.validated_data['name']}' created successfully"})
 
 
 class APIAlertGlobalItem(GenericAPIView):
@@ -481,7 +481,7 @@ class APIAlertGlobalItem(GenericAPIView):
         try:
             update_jobs(alert=alert, job_ids=serializer.validated_data.pop('jobs'))
             AlertGlobal.objects.filter(id=alert.id).update(**serializer.validated_data)
-            return Response(data={'msg': f"Alert '{alert.name}' updated"}, status=200)
+            return Response(data={'msg': f"Alert '{alert.name}' updated", 'id': alert_id}, status=200)
 
         except IntegrityError as err:
             return Response(data={'error': f"Provided Alert data is not valid: '{err}'"}, status=400)
@@ -504,7 +504,7 @@ class APIAlertGlobalItem(GenericAPIView):
             alert = AlertGlobal.objects.get(id=alert_id)
             if alert is not None:
                 alert.delete()
-                return Response(data={'error': f"Alert '{alert.name}' deleted"}, status=200)
+                return Response(data={'error': f"Alert '{alert.name}' deleted", 'id': alert_id}, status=200)
 
         except ObjectDoesNotExist:
             pass
@@ -576,15 +576,14 @@ class APIAlertGroup(GenericAPIView):
             )
 
         try:
-            serializer.save()
+            o = serializer.save()
+            return Response({'msg': f"Alert '{serializer.validated_data['name']}' created successfully", 'id': o.id})
 
         except IntegrityError as err:
             return Response(
                 data={'error': f"Provided Alert data is not valid: '{err}'"},
                 status=400,
             )
-
-        return Response({'msg': f"Alert '{serializer.validated_data['name']}' created successfully"})
 
 
 class APIAlertGroupItem(GenericAPIView):
@@ -655,7 +654,7 @@ class APIAlertGroupItem(GenericAPIView):
         try:
             update_jobs(alert=alert, job_ids=serializer.validated_data.pop('jobs'))
             AlertGroup.objects.filter(id=alert.id).update(**serializer.validated_data)
-            return Response(data={'msg': f"Alert '{alert.name}' updated"}, status=200)
+            return Response(data={'msg': f"Alert '{alert.name}' updated", 'id': alert_id}, status=200)
 
         except IntegrityError as err:
             return Response(data={'error': f"Provided Alert data is not valid: '{err}'"}, status=400)
@@ -678,7 +677,7 @@ class APIAlertGroupItem(GenericAPIView):
             alert = AlertGroup.objects.get(id=alert_id)
             if alert is not None:
                 alert.delete()
-                return Response(data={'msg': f"Alert '{alert.name}' deleted"}, status=200)
+                return Response(data={'msg': f"Alert '{alert.name}' deleted", 'id': alert_id}, status=200)
 
         except ObjectDoesNotExist:
             pass

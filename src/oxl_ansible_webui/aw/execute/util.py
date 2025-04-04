@@ -1,36 +1,19 @@
 from pathlib import Path
-from random import choice as random_choice
-from string import digits, ascii_letters, punctuation
+from string import digits
 from datetime import datetime
-from os import remove as remove_file
 from re import sub as regex_replace
+from random import choice as random_choice
 
 from aw.config.main import config
 from aw.config.hardcoded import FILE_TIME_FORMAT
-from aw.utils.util import write_file_0600, datetime_w_tz
 from aw.utils.handlers import AnsibleConfigError
 from aw.model.job import JobExecution, Job
 from aw.model.repository import Repository
+from aw.utils.util import datetime_w_tz
 
 
 def config_error(msg: str):
     raise AnsibleConfigError(msg).with_traceback(None) from None
-
-
-def overwrite_and_delete_file(file: (str, Path)):
-    if not isinstance(file, Path):
-        file = Path(file)
-
-    if not file.is_file():
-        return
-
-    for _ in range(3):
-        write_file_0600(
-            file=file,
-            content=''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(50)),
-        )
-
-    remove_file(file)
 
 
 def decode_job_env_vars(env_vars_csv: str, src: str) -> dict:

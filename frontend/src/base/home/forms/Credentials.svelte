@@ -27,17 +27,18 @@
         success = $bindable(false),
         action = 'add',
         existingID = null,
-        shared = false,
+        kind = '',
+        customResponseHandler = null,
     } = $props();
 
-    const urlExisting = `credentials/${existingID}?shared=${shared}`;
+    const urlExisting = `credentials/${kind}/${existingID}`;
 
     let apiResponseHandler: APIResponseHandler = $state();
     let formInfos: formInfoType = $state({defaults: {}, choices: {}});
     let loaded = $state(false);
     let method: formMethod = $derived(getMethod(action));
     let actionNew = $derived(['add', 'clone'].includes(action));
-    let url = $derived(actionNew ? `credentials?shared=${shared}` : urlExisting);
+    let url = $derived(actionNew ? `credentials/${kind}` : urlExisting);
     let title = $derived(actionNew ? t('creds.new') : t('creds.edit'));
     let formWarningMsgs: string[] = $state([]);
     let existing: credentialsUserType|credentialsSharedType = $state({
@@ -87,8 +88,17 @@
     }
 
     function submitForm() {
+        let responseHandler = handleSubmitResponse;
+        if (customResponseHandler) {
+            responseHandler = customResponseHandler;
+        }
+
+        if (kind == 'tmp') {
+            form.name.value = `TMP-Creds-${Date.now()}`;
+        }
+
         let [valid, errors] = submitFormBase(
-            form, method, url, handleSubmitResponse, t, 'creds.form.',
+            form, method, url, responseHandler, t, 'creds.form.',
         );
         if (!valid) {
             formWarningMsgs = errors;
@@ -151,21 +161,23 @@
     {:else}
         <APIResponseHandler bind:this={apiResponseHandler} bind:warningMsgs={formWarningMsgs} />
 
-        <div class={classModalInputDiv}>
-            <div class={classModalInput}>
-                <Label for="creds_name" class={classModalLabel}>{t('common.name')}</Label>
-                <Input id="creds_name" bind:value={form.name.value} bind:color={form.name.color}
-                    on:input={valideInput} on:blur={valideInput} required={form.name.required} />
-            </div>
-            {#if !shared}
+        {#if kind != 'tmp'}
+            <div class={classModalInputDiv}>
                 <div class={classModalInput}>
-                    <Label for="creds_cat" class={classModalLabel}>{t('creds.form.category')}</Label>
-                    <Input id="creds_cat" bind:value={form.category.value} bind:color={form.category.color}
-                        on:input={valideInput} on:blur={valideInput} />
-                    <Helper class={classModalHelp}>{t('creds.form.help.category')}</Helper>
+                    <Label for="creds_name" class={classModalLabel}>{t('common.name')}</Label>
+                    <Input id="creds_name" bind:value={form.name.value} bind:color={form.name.color}
+                        on:input={valideInput} on:blur={valideInput} required={form.name.required} />
                 </div>
-            {/if}
-        </div>
+                {#if kind == 'user'}
+                    <div class={classModalInput}>
+                        <Label for="creds_cat" class={classModalLabel}>{t('creds.form.category')}</Label>
+                        <Input id="creds_cat" bind:value={form.category.value} bind:color={form.category.color}
+                            on:input={valideInput} on:blur={valideInput} />
+                        <Helper class={classModalHelp}>{t('creds.form.help.category')}</Helper>
+                    </div>
+                {/if}
+            </div>
+        {/if}
 
         <Accordion class={classModalForm}>
             <AccordionItem defaultClass="{classSpoilerItem} creds-form-accounts">

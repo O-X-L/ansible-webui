@@ -82,8 +82,8 @@ class AlertGlobal(BaseAlert):
 
 
 class AlertGlobalJobMapping(BareModel):
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)
-    alert = models.ForeignKey(AlertGlobal, on_delete=models.CASCADE)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='alertglobmap_fk_job')
+    alert = models.ForeignKey(AlertGlobal, on_delete=models.CASCADE, related_name='alertglobmap_fk_alert')
 
     def __str__(self) -> str:
         return f"{self.alert} linked to job '{self.job.name}'"
@@ -132,8 +132,8 @@ class AlertGroup(BaseAlert):
 
 
 class AlertGroupJobMapping(BareModel):
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)
-    alert = models.ForeignKey(AlertGroup, on_delete=models.CASCADE)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='alertgrpmap_fk_job')
+    alert = models.ForeignKey(AlertGroup, on_delete=models.CASCADE, related_name='alertgrpmap_fk_alert')
 
     def __str__(self) -> str:
         return f"{self.alert} linked to job '{self.job.name}'"
@@ -175,8 +175,8 @@ class AlertUser(BaseAlert):
 
 
 class AlertUserJobMapping(BareModel):
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)
-    alert = models.ForeignKey(AlertUser, on_delete=models.CASCADE)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='alertusermap_fk_job')
+    alert = models.ForeignKey(AlertUser, on_delete=models.CASCADE, related_name='alertusermap_fk_alert')
 
     def __str__(self) -> str:
         return f"{self.alert} linked to job '{self.job.name}'"

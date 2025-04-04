@@ -91,12 +91,12 @@
         )
     }
 
-    function deleteCredentials(credentialsID: number, shared: boolean) {
+    function deleteCredentials(credentialsID: number, kind: string) {
         if (!credentialsID) {
             return;
         }
         apiSuccessMsg = 'creds.action.delete';
-        apiEdit('delete', `credentials/${credentialsID}?shared=${shared}`, null, apiResponseHandler.handleRes);
+        apiEdit('delete', `credentials/${kind}/${credentialsID}`, null, apiResponseHandler.handleRes);
     }
 
     function buildUpdateCredsList() {
@@ -258,18 +258,18 @@
                             </TableBodyCell>
                             <TableBodyCell tdClass={classListContent}>
                                 <CredentialsForm bind:open={entryActions[credsKind][item.id].edit} action='edit'
-                                    existingID={item.id} shared={credsKind == 'shared'}
+                                    existingID={item.id} kind={credsKind}
                                     bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                                 <Button size="xs" on:click={() => {entryActions[credsKind][item.id].edit = true}}><EditSolid/></Button>
                                 <Tooltip>{t('btn.edit')}</Tooltip>
             
                                 <CredentialsForm bind:open={entryActions[credsKind][item.id].clone} action='clone'
-                                    existingID={item.id} shared={credsKind == 'shared'}
+                                    existingID={item.id} kind={credsKind}
                                     bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                                 <Button size="xs" on:click={() => {entryActions[credsKind][item.id].clone = true}}><FileCloneSolid/></Button>
                                 <Tooltip>{t('btn.clone')}</Tooltip>
             
-                                <Button size="xs" on:click={() => {deleteCredentials(item.id, credsKind == 'shared')}}><TrashBinSolid/></Button>
+                                <Button size="xs" on:click={() => {deleteCredentials(item.id, credsKind)}}><TrashBinSolid/></Button>
                                 <Tooltip>{t('btn.delete')}</Tooltip>
                             </TableBodyCell>
                         </TableBodyRow>
@@ -398,11 +398,11 @@
 </div>
 
 {#key addUserModalId}
-    <CredentialsForm bind:open={addUserModal} action='add' shared={false}
+    <CredentialsForm bind:open={addUserModal} action='add' kind='user'
         bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 {/key}
 {#key addSharedModalId}
-    <CredentialsForm bind:open={addSharedModal} action='add' shared={true}
+    <CredentialsForm bind:open={addSharedModal} action='add' kind='shared'
         bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 {/key}
 

@@ -79,6 +79,7 @@ EN = {
     'jobs.info.last_run': 'Last Run',
     'jobs.info.duration': 'Duration',
     'jobs.info.failed': 'Failed',
+    'jobs.execute.tmp_credentials': 'Provide Credentials',
     'jobs.execute.required_limit': 'A limit is required',
     'jobs.execute.required_var': 'Required variable missing',  # '<msg>: "<varname>"'
     'jobs.execute.required_credentials': 'Credentials are required',
@@ -112,6 +113,7 @@ EN = {
     'jobs.form.credentials': 'Credentials',
     'jobs.form.prompt_limit_req': 'Require Limit',
     'jobs.form.prompt_credentials_req': 'Require Credentials',
+    'jobs.form.prompt_credentials_tmp': 'Temporary Credentials',
     'jobs.form.prompt_fields': 'Fields to prompt',
     'jobs.form.prompt_vars': 'Variables to prompt',
     'jobs.form.prompt_name': 'Display Name',

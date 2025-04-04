@@ -11,6 +11,12 @@
 .. |creds_perm| image:: ../_static/img/credentials_permission.png
    :class: wiki-img
 
+.. |creds_prompt| image:: ../_static/img/credentials_prompt.png
+   :class: wiki-img
+
+.. |creds_tmp| image:: ../_static/img/credentials_tmp.png
+   :class: wiki-img
+
 ===========
 Credentials
 ===========
@@ -60,6 +66,18 @@ Jobs that are executed by an user will use: (*if the job is set to need credenti
 Jobs
 ****
 
-You can define if a job needs credentials to run in its settings:
+You can define if a job needs credentials to run:
 
 |creds_job|
+
+You also have some options on how credentials may be provided at the execution-prompts:
+
+* :code:`Credentials` => Prompt for which User/Shared-Credentials to use
+* :code:`Require Credentials` => Do not allow WebUI execution without the user selecting/providing credentials
+* :code:`Temporary Credentials` => Allow the user to provide credentials that will only be available for this execution
+
+|creds_prompt|
+
+Temporary credentials can be used to manually provide credentials for one execution. They are deleted afterwards.
+
+|creds_tmp|

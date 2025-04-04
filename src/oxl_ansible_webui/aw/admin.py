@@ -7,7 +7,7 @@ from aw.model.api import AwAPIKey
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobError, JobExecutionResultHost
 from aw.model.permission import JobPermission, JobPermissionMemberUser, JobPermissionMemberGroup, \
     JobPermissionMapping
-from aw.model.job_credential import JobGlobalCredentials, JobUserCredentials
+from aw.model.job_credential import JobSharedCredentials, JobUserCredentials
 from aw.model.repository import Repository
 from aw.model.system import SystemConfig, UserExtended
 from aw.model.alert import AlertUser, AlertGroup, AlertGlobal, AlertPlugin
@@ -35,7 +35,7 @@ admin.site.register(JobPermissionMapping)
 admin.site.register(JobExecutionResult)
 admin.site.register(JobExecutionResultHost)
 admin.site.register(JobError)
-admin.site.register(JobGlobalCredentials)
+admin.site.register(JobSharedCredentials)
 admin.site.register(JobUserCredentials)
 admin.site.register(AwAPIKey)
 admin.site.register(Repository)

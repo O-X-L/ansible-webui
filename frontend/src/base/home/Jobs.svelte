@@ -19,6 +19,7 @@
     import { apiEdit, apiGet } from '../../util/api.js';
     import { choicesFromArray } from '../../util/form.js';
     import { redirectTo, isSet } from '../../util/main.js';
+    import CredentialsForm from './forms/Credentials.svelte';
     import { JOB_EXEC_STATI_ACTIVE, PARAM_SEARCH } from '../Config.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import { type jobType, type executionPromptsType} from './Types.js';
@@ -54,7 +55,7 @@
         limit: string,
         environment_vars: string,
         cmd_args: string,
-        credentials: string|null,  // credential_user / credential_global
+        credentials: string|null,  // credential_user / credential_global / credentials_tmp
         credentials_req: boolean,
         comment: string|null,
     }
@@ -85,6 +86,8 @@
     let executionPrompts: executionPromptsFullType = $state(JSON.parse(JSON.stringify(executionPromptsDefault)));
     let usableCredentials: credentialsType = $state({shared: [], user: []});
     let usableCredentialChoices = $derived(buildCredentialChoices(usableCredentials));
+    let addTMPCredsModal = $state(false);
+    let addTMPCredsModalId = $state(Date.now());
 
     function t(code: string) : string {
       return tq($share, code);
@@ -142,15 +145,21 @@
 
         // encode prompt info
         for (let f of executionPrompts.config.fields) {
-            if(f == 'credentials') {
-                if (isSet(executionPrompts.field_values.credentials)) {
-                    let credsKind = 'credentials_global';
+            if (['credentials_tmp', 'credentials'].includes(f) && isSet(executionPrompts.field_values.credentials)) {
+                if (f == 'credentials_tmp') {
+                    promptData['credentials_tmp'] = executionPrompts.field_values.credentials;
+
+                } else if (f == 'credentials') {
+                    if (executionPrompts.config.fields.includes('credentials_tmp')) {
+                        continue;
+                    }
+                    let credsKind = 'credentials_shared';
                     if (executionPrompts.field_values.credentials.includes('user-')) {
                         credsKind = 'credentials_user';
                     }
                     promptData[credsKind] = parseInt(executionPrompts.field_values.credentials?.split('-')[1], 10);
                 }
-            } else {
+            } else if (f != 'credentials_req') {
                 promptData[f] = executionPrompts.field_values[f];
             }
         }
@@ -190,6 +199,17 @@
             return;
         }
         executionPrompts.config = JSON.parse(encodedPrompts);
+    }
+
+    function handleExecutionCredentialsCreateResponse(s: number, j: any) {
+        if (s == 200 && j.error === undefined) {
+            executionPrompts.field_values.credentials = j.id;
+            apiSuccessMsg = 'creds.action.create';
+            apiSuccess = true;
+            addTMPCredsModal = false;
+        } else {
+            apiResponseHandler.handleRes(s, j);
+        }
     }
 
     function searchFilter(item: jobType, searchTerm: string) : boolean {
@@ -529,7 +549,7 @@
                     </table>
                 </div>
             </Popover>
-            <Modal bind:open={entryActions[job.id].exec} size="sm" autoclose={true} placement="top-center" backdropClass={classModalBackdrop}>
+            <Modal bind:open={entryActions[job.id].exec} size="sm" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
                 <Heading tag="h2">{t('jobs.execute')}</Heading>
 
                 {#if executionPrompts.config.fields.includes('limit')}
@@ -566,7 +586,7 @@
                     <Label for="job_prompt_{job.id}_cmd_args" class={classModalLabel}>{t('jobs.form.cmd_args')}</Label>
                     <Input id="job_prompt_{job.id}_cmd_args" bind:value={executionPrompts.field_values.cmd_args} />
                 {/if}
-                {#if executionPrompts.config.fields.includes('credentials')}
+                {#if executionPrompts.config.fields.includes('credentials') && !executionPrompts.config.fields.includes('credentials_tmp')}
                     <Label for="job_prompt_{job.id}_creds" class={classModalLabel}>{t('jobs.form.credentials')}</Label>
                     <Select id="job_prompt_{job.id}_creds" items={usableCredentialChoices}
                         bind:value={executionPrompts.field_values.credentials} />
@@ -586,16 +606,24 @@
                             bind:value={executionPrompts.var_values[v.varName]} />
                     {/if}                    
                 {/each}
-
+                <div class={classModalBtns}>
+                    {#if executionPrompts.config.fields.includes('credentials_tmp')}
+                        <Button type="button" on:click={() => {addTMPCredsModalId = Date.now(); addTMPCredsModal = true}}
+                            disabled={executionPrompts.field_values.credentials != null}>
+                            {t('jobs.execute.tmp_credentials')}
+                        </Button>
+                    {/if}
+                </div>
                 <div class={classModalBtns}>
                     <Button id="jobs-btn-exec-start" type="button" on:click={() => {startJob(job.id)}}><PlaySolid/></Button>
                     <Tooltip>{t('btn.execute')}</Tooltip>
 
-                    <Button id="jobs-btn-exec-close" on:click={() => (entryActions[job.id].exec = false)} class="inline-block ml-2"><CloseCircleSolid/></Button>
+                    <Button id="jobs-btn-exec-close" on:click={() => (entryActions[job.id].exec = false)} class="inline-block ml-2">
+                        <CloseCircleSolid/>
+                    </Button>
                     <Tooltip>{t('btn.close')}</Tooltip>
                 </div>
             </Modal>
-            
         </div>
     {/each}
 </div>
@@ -610,6 +638,14 @@
 {#key addModalId}
     <JobForm bind:open={addModal} action='add' bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 {/key}
+{#if executionPrompts.config.fields.includes('credentials_tmp')}
+    {#key addTMPCredsModalId}
+        <CredentialsForm bind:open={addTMPCredsModal} action='add' kind='tmp'
+            bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} customResponseHandler={handleExecutionCredentialsCreateResponse} />
+   
+    {/key}
+{/if}
+
 
 <div class={classFooterSpacing}></div>
 <div id="loaded" class="h-0 w-0"></div>

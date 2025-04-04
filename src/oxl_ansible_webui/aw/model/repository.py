@@ -3,7 +3,7 @@ from django.db import models
 from aw.config.main import config
 from aw.config.hardcoded import SHORT_TIME_FORMAT
 from aw.model.base import BaseModel, DEFAULT_NONE, CHOICES_BOOL, CHOICES_JOB_EXEC_STATUS
-from aw.model.job_credential import JobGlobalCredentials
+from aw.model.job_credential import JobSharedCredentials
 from aw.utils.util import get_choice_value_by_key, get_choice_key_by_value, datetime_from_db_str, is_null
 
 CHOICES_REPOSITORY = [
@@ -57,7 +57,7 @@ class Repository(BaseModel):
     git_override_update = models.CharField(max_length=1000, **DEFAULT_NONE)
     git_playbook_base = models.CharField(max_length=300, **DEFAULT_NONE)
     git_credentials = models.ForeignKey(
-        JobGlobalCredentials, on_delete=models.SET_NULL, related_name='repo_fk_cred', null=True, blank=True,
+        JobSharedCredentials, on_delete=models.SET_NULL, related_name='repo_fk_cred', null=True, blank=True,
     )
     git_timeout = models.PositiveSmallIntegerField(default=30)
 

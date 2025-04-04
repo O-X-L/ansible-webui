@@ -2,7 +2,7 @@ from django.db import models
 
 from aw.model.base import BareModel, BaseModel, CHOICES_BOOL
 from aw.model.job import Job
-from aw.model.job_credential import JobGlobalCredentials
+from aw.model.job_credential import JobSharedCredentials
 from aw.model.repository import Repository
 from aw.base import USERS, GROUPS
 from aw.utils.util import get_choice_value_by_key
@@ -50,7 +50,7 @@ class JobPermission(BaseModel):
     )
     jobs_all = models.BooleanField(choices=CHOICES_BOOL, default=False)
     credentials = models.ManyToManyField(
-        JobGlobalCredentials,
+        JobSharedCredentials,
         through='JobCredentialsPermissionMapping',
         through_fields=('permission', 'credentials'),
     )
@@ -93,7 +93,7 @@ class JobPermissionMapping(BareModel):
 
 
 class JobCredentialsPermissionMapping(BareModel):
-    credentials = models.ForeignKey(JobGlobalCredentials, on_delete=models.CASCADE)
+    credentials = models.ForeignKey(JobSharedCredentials, on_delete=models.CASCADE)
     permission = models.ForeignKey(JobPermission, on_delete=models.CASCADE)
 
     def __str__(self) -> str:

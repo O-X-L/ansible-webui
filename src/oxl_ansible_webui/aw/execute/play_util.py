@@ -13,11 +13,10 @@ except (ImportError, ModuleNotFoundError):
     ara_callback_plugins = None
 
 from aw.config.main import config
-from aw.utils.util import is_set, datetime_w_tz, write_file_0640
+from aw.utils.util import is_set, datetime_w_tz, write_file_0640, overwrite_and_delete_file
 from aw.model.job_credential import BaseJobCredentials
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, JobError
-from aw.execute.util import update_status, overwrite_and_delete_file, decode_job_env_vars, \
-    create_dirs, is_execution_status, config_error
+from aw.execute.util import update_status, decode_job_env_vars, create_dirs, is_execution_status, config_error
 from aw.utils.debug import log
 from aw.execute.repository import ExecuteRepository
 from aw.execute.play_credentials import get_runner_credentials_args, get_credentials_to_use
@@ -208,6 +207,9 @@ def runner_logs(cfg: RunnerConfig, log_files: dict):
 def runner_cleanup(execution: JobExecution, path_run: Path, exec_repo: ExecuteRepository):
     overwrite_and_delete_file(f"{path_run}/env/passwords")
     overwrite_and_delete_file(f"{path_run}/env/ssh_key")
+    if is_set(execution.credentials_tmp):
+        execution.credentials_tmp.cleanup_secret()
+        execution.credentials_tmp.delete()
 
     try:
         exec_repo.cleanup_repository()

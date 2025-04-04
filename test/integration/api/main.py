@@ -73,11 +73,13 @@ def test_add():
         {'l': 'key', 'd': None},
 
         # creds
-        {'l': 'credentials', 'd': {'name': 'cred1', 'become_user': 'guy', 'become_pass': 'sePwd', 'vault_id': 'myID'}},
-        {'l': 'credentials', 'd': {
+        {'l': 'credentials/shared', 'd': {
+            'name': 'cred1', 'become_user': 'guy', 'become_pass': 'sePwd', 'vault_id': 'myID',
+        }},
+        {'l': 'credentials/shared', 'd': {
             'name': 'c2', 'become_user': 'otherDude', 'become_pass': 'hup', 'vault_pass': 'secUry',
         }},
-        {'l': 'credentials', 'd': {
+        {'l': 'credentials/shared', 'd': {
             'name': 'cssh', 'connect_user': 'superGuy',
             'ssh_key': '-----BEGIN OPENSSH PRIVATE KEY----- '
                        'b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW '
@@ -171,7 +173,7 @@ def test_delete():
         'repository/1',
         # 'permission/1',
         'job/1',
-        'credentials/1',
+        'credentials/shared/1',
         'alert/plugin/1',
         'alert/global/1',
         'alert/group/1',

@@ -3,10 +3,10 @@ from django.db.utils import IntegrityError
 from rest_framework.views import APIView
 from rest_framework import serializers
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from aw.model.job import Job, JobExecution
-from aw.model.job_credential import BaseJobCredentials, JobUserCredentials, JobGlobalCredentials
+from aw.model.job_credential import BaseJobCredentials, JobUserCredentials, JobSharedCredentials, JobUserTMPCredentials
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, api_docs_delete, \
     api_docs_put, api_docs_post, validate_no_xss, GenericErrorResponse, response_data_if_changed, API_PARAM_HASH
@@ -16,10 +16,10 @@ from aw.utils.util import is_null
 from aw.base import USERS
 
 
-class JobGlobalCredentialsReadResponse(serializers.ModelSerializer):
+class JobSharedCredentialsReadResponse(serializers.ModelSerializer):
     class Meta:
-        model = JobGlobalCredentials
-        fields = JobGlobalCredentials.api_fields_read
+        model = JobSharedCredentials
+        fields = JobSharedCredentials.api_fields_read
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -27,21 +27,21 @@ class JobGlobalCredentialsReadResponse(serializers.ModelSerializer):
             setattr(self, f'{secret_attr}_is_set', serializers.BooleanField(required=False))
 
 
-class JobUserCredentialsReadResponse(JobGlobalCredentialsReadResponse):
+class JobUserCredentialsReadResponse(JobSharedCredentialsReadResponse):
     class Meta:
         model = JobUserCredentials
         fields = JobUserCredentials.api_fields_read
 
 
 class JobCredentialsList(BaseResponse):
-    shared = serializers.ListSerializer(child=JobGlobalCredentialsReadResponse())
+    shared = serializers.ListSerializer(child=JobSharedCredentialsReadResponse())
     user = serializers.ListSerializer(child=JobUserCredentialsReadResponse())
 
 
-class JobGlobalCredentialsWriteRequest(serializers.ModelSerializer):
+class JobSharedCredentialsWriteRequest(serializers.ModelSerializer):
     class Meta:
-        model = JobGlobalCredentials
-        fields = JobGlobalCredentials.api_fields_write
+        model = JobSharedCredentials
+        fields = JobSharedCredentials.api_fields_write
 
     name = serializers.CharField(validators=[])  # uc on update
     vault_pass = serializers.CharField(
@@ -58,14 +58,14 @@ class JobGlobalCredentialsWriteRequest(serializers.ModelSerializer):
     )
 
     def validate(self, attrs: dict):
-        for field in JobGlobalCredentials.api_fields_write:
+        for field in JobSharedCredentials.api_fields_write:
             if field in attrs and field not in BaseJobCredentials.SECRET_ATTRS:
                 validate_no_xss(value=attrs[field], field=field)
 
         return attrs
 
 
-class JobUserCredentialsWriteRequest(JobGlobalCredentialsWriteRequest):
+class JobUserCredentialsWriteRequest(JobSharedCredentialsWriteRequest):
     class Meta:
         model = JobUserCredentials
         fields = JobUserCredentials.api_fields_write
@@ -78,40 +78,23 @@ class JobUserCredentialsWriteRequest(JobGlobalCredentialsWriteRequest):
         return attrs
 
 
-def are_global_credentials(request) -> bool:
-    return 'shared' not in request.GET or request.GET['shared'] == 'true'
+class JobTMPCredentialsWriteRequest(JobSharedCredentialsWriteRequest):
+    class Meta:
+        model = JobUserTMPCredentials
+        fields = JobUserTMPCredentials.api_fields_write
 
+    def validate(self, attrs: dict):
+        for field in JobUserCredentials.api_fields_write:
+            if field in attrs and field not in BaseJobCredentials.SECRET_ATTRS:
+                validate_no_xss(value=attrs[field], field=field)
 
-def _find_credentials(
-        credentials_id: int, are_global: bool, user: USERS
-) -> (BaseJobCredentials, None):
-    try:
-        if are_global:
-            return JobGlobalCredentials.objects.get(id=credentials_id)
-
-        return JobUserCredentials.objects.get(id=credentials_id, user=user)
-
-    except ObjectDoesNotExist:
-        return None
-
-
-def _log_global_user(are_global: bool, lower: bool = False) -> str:
-    if are_global:
-        msg = 'Global credentials'
-
-    else:
-        msg = 'User credentials'
-
-    if lower:
-        return msg.lower()
-
-    return msg
+        return attrs
 
 
 def credentials_in_use(credentials: BaseJobCredentials) -> bool:
-    if isinstance(credentials, JobGlobalCredentials):
+    if isinstance(credentials, JobSharedCredentials):
         in_use_jobs = Job.objects.filter(credentials_default=credentials).exists()
-        in_use_execs = JobExecution.objects.filter(credentials_global=credentials).exists()
+        in_use_execs = JobExecution.objects.filter(credentials_shared=credentials).exists()
         in_use = in_use_jobs or in_use_execs
 
     else:
@@ -129,7 +112,6 @@ def _validate_and_fix_ssh_key(key: str) -> (str, None):
         return ''
 
     if key.find(SSH_KEY_PREFIX) == -1:
-        # only support unencrypted keys for now
         return None
 
     key = key.replace(SSH_KEY_PREFIX, '').replace(SSH_KEY_APPENDIX, '').strip().replace(' ', '\n')
@@ -137,16 +119,9 @@ def _validate_and_fix_ssh_key(key: str) -> (str, None):
 
 
 class APIJobCredentials(APIView):
-    http_method_names = ['get', 'post']
+    http_method_names = ['get']
     serializer_class = GenericResponse
     permission_classes = API_PERMISSION
-    parameters = [
-        OpenApiParameter(
-            name='shared', type=bool, default=True,
-            description='If the credentials are global or user-specific',
-            required=False,
-        ),
-    ]
 
     @extend_schema(
         request=None,
@@ -155,141 +130,267 @@ class APIJobCredentials(APIView):
         },
         summary='Return list of all credentials the current user is privileged to view.',
         operation_id='credentials_list',
-        parameters=[
-            parameters[0],
-            API_PARAM_HASH,
-        ]
+        parameters=[API_PARAM_HASH]
     )
     def get(self, request):
         user = get_api_user(request)
-        credentials_global = []
-        credentials_global_raw = JobGlobalCredentials.objects.all()
-        for credentials in credentials_global_raw:
+        credentials_shared = []
+        credentials_shared_raw = JobSharedCredentials.objects.all()
+        for credentials in credentials_shared_raw:
             if has_credentials_permission(
                 user=user,
                 credentials=credentials,
                 permission_needed=CHOICE_PERMISSION_READ,
             ):
-                credentials_global.append(JobGlobalCredentialsReadResponse(instance=credentials).data)
+                credentials_shared.append(JobSharedCredentialsReadResponse(instance=credentials).data)
 
         credentials_user_raw = JobUserCredentials.objects.filter(user=user)
         credentials_user = []
         for credentials in credentials_user_raw:
             credentials_user.append(JobUserCredentialsReadResponse(instance=credentials).data)
 
-        return response_data_if_changed(request, data={'shared': credentials_global, 'user': credentials_user})
+        return response_data_if_changed(request, data={'shared': credentials_shared, 'user': credentials_user})
 
-    @extend_schema(
-        request=JobGlobalCredentialsWriteRequest,
-        responses=api_docs_post('Credentials'),
-        summary='Create credentials.',
-        operation_id='credentials_create',
-        parameters=parameters,
-    )
-    def post(self, request):
-        user = get_api_user(request)
-        are_global = are_global_credentials(request)
 
-        if are_global and not has_manager_privileges(user=user, kind='credentials'):
-            return Response(data={'error': 'Not privileged to create global credentials'}, status=403)
+def _validate_create_creds(serializer: serializers.BaseSerializer) -> (None, Response):
+    if not serializer.is_valid():
+        return Response(
+            data={'error': f"Provided shared-credentials data is not valid: '{serializer.errors}'"},
+            status=400,
+        )
 
-        if are_global:
-            self.serializer_class = JobGlobalCredentialsWriteRequest
+    for field in BaseJobCredentials.SECRET_ATTRS:
+        value = serializer.validated_data[field]
+        if field in BaseJobCredentials.SECRET_ATTRS:
+            if is_null(value) or value == SECRET_HIDDEN:
+                serializer.validated_data[field] = None
 
-        else:
-            self.serializer_class = JobUserCredentialsWriteRequest
+            elif field == 'ssh_key':
+                value = _validate_and_fix_ssh_key(value)
+                if value is None:
+                    return Response(
+                        data={'error': 'Provided shared-credentials ssh-key is not valid'},
+                        status=400,
+                    )
 
-        serializer = self.serializer_class(data=request.data)
+                serializer.validated_data[field] = value
 
-        if not serializer.is_valid():
-            return Response(
-                data={'error': f"Provided {_log_global_user(are_global)} data is not valid: '{serializer.errors}'"},
-                status=400,
-            )
+    return None
 
-        for field in BaseJobCredentials.SECRET_ATTRS:
-            value = serializer.validated_data[field]
+
+def _update_creds(credentials: BaseJobCredentials, serializer: serializers.BaseSerializer) -> (None, Response):
+    if not serializer.is_valid():
+        return Response(
+            data={'error': f"Provided credentials data is not valid: '{serializer.errors}'"},
+            status=400,
+        )
+
+    try:
+        # not working with password properties: 'Job.objects.filter(id=job_id).update(**serializer.data)'
+        for field, value in serializer.validated_data.items():
             if field in BaseJobCredentials.SECRET_ATTRS:
-                if is_null(value) or value == SECRET_HIDDEN:
-                    serializer.validated_data[field] = None
+                if (field not in BaseJobCredentials.EMPTY_ATTRS and is_null(value)) or value == SECRET_HIDDEN:
+                    value = getattr(credentials, field)
 
                 elif field == 'ssh_key':
                     value = _validate_and_fix_ssh_key(value)
                     if value is None:
                         return Response(
-                            data={'error': f"Provided {_log_global_user(are_global)} ssh-key is not valid'"},
+                            data={'error': 'Provided ssh-key is not valid'},
                             status=400,
                         )
 
-                    serializer.validated_data[field] = value
+            elif field == 'user':
+                continue
 
-        if not are_global:
-            serializer.validated_data['user'] = user
+            setattr(credentials, field, value)
 
-        try:
-            serializer.save()
+    except IntegrityError as err:
+        return Response(
+            data={'error': f"Provided credentials data is not valid: '{err}'"},
+            status=400,
+        )
 
-        except IntegrityError as err:
-            return Response(
-                data={'error': f"Provided {_log_global_user(are_global)} data is not valid: '{err}'"},
-                status=400,
-            )
-
-        return Response(data={'msg': f'{_log_global_user(are_global, lower=False)} created'}, status=200)
+    return None
 
 
-class APIJobCredentialsItem(APIView):
-    http_method_names = ['get', 'delete', 'put']
+class APIJobSharedCredentials(APIView):
+    http_method_names = ['get', 'post']
     serializer_class = GenericResponse
     permission_classes = API_PERMISSION
-    parameters = [
-        OpenApiParameter(
-            name='shared', type=bool, default=True,
-            description='If the credentials are global or user-specific',
-            required=False,
-        ),
-    ]
 
     @extend_schema(
         request=None,
         responses={
-            200: OpenApiResponse(JobUserCredentialsReadResponse, description='Return information about credentials'),
+            200: OpenApiResponse(JobCredentialsList, description='Return list of shared-redentials'),
+        },
+        summary='Return list of all shared-credentials the current user is privileged to view.',
+        operation_id='credentials_shared_list',
+        parameters=[API_PARAM_HASH]
+    )
+    def get(self, request):
+        user = get_api_user(request)
+        credentials_shared = []
+        credentials_shared_raw = JobSharedCredentials.objects.all()
+        for credentials in credentials_shared_raw:
+            if has_credentials_permission(
+                user=user,
+                credentials=credentials,
+                permission_needed=CHOICE_PERMISSION_READ,
+            ):
+                credentials_shared.append(JobSharedCredentialsReadResponse(instance=credentials).data)
+
+        return response_data_if_changed(request, data=credentials_shared)
+
+    @extend_schema(
+        request=JobSharedCredentialsWriteRequest,
+        responses=api_docs_post('Credentials'),
+        summary='Create shared-credentials.',
+        operation_id='credentials_shared_create',
+    )
+    def post(self, request):
+        user = get_api_user(request)
+
+        if not has_manager_privileges(user=user, kind='credentials'):
+            return Response(data={'error': 'Not privileged to create shared-credentials'}, status=403)
+
+        serializer = JobSharedCredentialsWriteRequest(data=request.data)
+        validation_error = _validate_create_creds(serializer)
+        if validation_error is not None:
+            return validation_error
+
+        try:
+            o = serializer.save()
+            return Response(data={'msg': 'Shared-credentials created', 'id': o.id}, status=200)
+
+        except IntegrityError as err:
+            return Response(
+                data={'error': f"Provided shared-credentials data is not valid: '{err}'"},
+                status=400,
+            )
+
+
+class APIJobUserCredentials(APIView):
+    http_method_names = ['get', 'post']
+    serializer_class = GenericResponse
+    permission_classes = API_PERMISSION
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(JobCredentialsList, description='Return list of user-credentials'),
+        },
+        summary='Return list of user-credentials of the current user.',
+        operation_id='credentials_user_list',
+        parameters=[API_PARAM_HASH]
+    )
+    def get(self, request):
+        user = get_api_user(request)
+        credentials_user_raw = JobUserCredentials.objects.filter(user=user)
+        credentials_user = []
+        for credentials in credentials_user_raw:
+            credentials_user.append(JobUserCredentialsReadResponse(instance=credentials).data)
+
+        return response_data_if_changed(request, data=credentials_user)
+
+    @extend_schema(
+        request=JobSharedCredentialsWriteRequest,
+        responses=api_docs_post('Credentials'),
+        summary='Create user-credentials.',
+        operation_id='credentials_user_create',
+    )
+    def post(self, request):
+        user = get_api_user(request)
+
+        serializer = JobUserCredentialsWriteRequest(data=request.data)
+        validation_error = _validate_create_creds(serializer)
+        if validation_error is not None:
+            return validation_error
+
+        serializer.validated_data['user'] = user
+
+        try:
+            o = serializer.save()
+            return Response(data={'msg': 'User-credentials created', 'id': o.id}, status=200)
+
+        except IntegrityError as err:
+            return Response(
+                data={'error': f"Provided user-credentials data is not valid: '{err}'"},
+                status=400,
+            )
+
+
+class APIJobTMPCredentials(APIView):
+    http_method_names = ['post']
+    serializer_class = GenericResponse
+    permission_classes = API_PERMISSION
+
+    @extend_schema(
+        request=JobSharedCredentialsWriteRequest,
+        responses=api_docs_post('Credentials'),
+        summary='Create temporary-credentials.',
+        operation_id='credentials_tmp_create',
+    )
+    def post(self, request):
+        user = get_api_user(request)
+
+        serializer = JobTMPCredentialsWriteRequest(data=request.data)
+        validation_error = _validate_create_creds(serializer)
+        if validation_error is not None:
+            return validation_error
+
+        serializer.validated_data['user'] = user
+
+        try:
+            o = serializer.save()
+            return Response(data={'msg': 'Temporary-credentials created', 'id': o.id}, status=200)
+
+        except IntegrityError as err:
+            return Response(
+                data={'error': f"Provided temporary-credentials data is not valid: '{err}'"},
+                status=400,
+            )
+
+def _get_shared_creds(credentials_id: int) -> (JobUserCredentials, None):
+    try:
+        return JobSharedCredentials.objects.get(id=credentials_id)
+
+    except ObjectDoesNotExist:
+        return None
+
+
+class APIJobSharedCredentialsItem(APIView):
+    http_method_names = ['get', 'delete', 'put']
+    serializer_class = JobSharedCredentialsReadResponse
+    permission_classes = API_PERMISSION
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(JobSharedCredentialsReadResponse, description='Return information about credentials'),
             403: OpenApiResponse(GenericErrorResponse, description='Not privileged to view the credentials'),
             404: OpenApiResponse(GenericErrorResponse, description='Credentials not exist'),
         },
         summary='Return information about a set of credentials.',
-        operation_id='credentials_view',
-        parameters=parameters,
+        operation_id='credentials_shared_view',
     )
     def get(self, request, credentials_id: int):
         user = get_api_user(request)
-        are_global = are_global_credentials(request)
 
-        if are_global:
-            self.serializer_class = JobGlobalCredentialsReadResponse
-
-        else:
-            self.serializer_class = JobUserCredentialsReadResponse
-
-        credentials = _find_credentials(
-            credentials_id=credentials_id,
-            are_global=are_global,
-            user=user,
-        )
+        credentials = _get_shared_creds(credentials_id)
         if credentials is None:
-            base_msg = f"{_log_global_user(are_global)} with ID {credentials_id} do not exist"
-            if not are_global:
-                return Response(data={'error': f"{base_msg} or belong to another user"}, status=404)
+            return Response(
+                data={'error': f"Shared-credentials with ID {credentials_id} do not exist"},
+                status=404,
+            )
 
-            return Response(data={'error': base_msg}, status=404)
-
-        if are_global and not has_credentials_permission(
+        if not has_credentials_permission(
             user=user,
             credentials=credentials,
             permission_needed=CHOICE_PERMISSION_READ,
         ):
             return Response(
-                data={'error': f"{_log_global_user(are_global)} '{credentials.name}' are not viewable"},
+                data={'error': f"Shared-credentials '{credentials.name}' are not viewable"},
                 status=403,
             )
 
@@ -298,129 +399,168 @@ class APIJobCredentialsItem(APIView):
     @extend_schema(
         request=None,
         responses=api_docs_delete('Credentials'),
-        summary='Delete credentials.',
-        operation_id='credentials_delete',
-        parameters=parameters,
+        summary='Delete shared-credentials.',
+        operation_id='credentials_shared_delete',
     )
     def delete(self, request, credentials_id: int):
         user = get_api_user(request)
-        are_global = are_global_credentials(request)
 
-        if are_global:
-            self.serializer_class = JobGlobalCredentialsReadResponse
-
-        else:
-            self.serializer_class = JobUserCredentialsReadResponse
-
-        credentials = _find_credentials(
-            credentials_id=credentials_id,
-            are_global=are_global,
-            user=user,
-        )
+        credentials = _get_shared_creds(credentials_id)
         if credentials is None:
-            base_msg = f"{_log_global_user(are_global)} with ID {credentials_id} do not exist"
-            if not are_global:
-                return Response(data={'error': f"{base_msg} or belong to another user"}, status=404)
+            return Response(data={
+                'error': f"Shared-credentials with ID {credentials_id} do not exist"},
+                status=404,
+            )
 
-            return Response(data={'error': base_msg}, status=404)
-
-        if are_global and not has_credentials_permission(
+        if not has_credentials_permission(
             user=user,
             credentials=credentials,
             permission_needed=CHOICE_PERMISSION_DELETE,
         ):
             return Response(
-                data={'error': f"Not privileged to delete the {_log_global_user(are_global, lower=True)} "
-                               f"'{credentials.name}'"},
-                status=403)
+                data={'error': f"Not privileged to delete the shared-credentials '{credentials.name}'"},
+                status=403,
+            )
 
         if credentials_in_use(credentials):
             return Response(
-                data={'error': f"{_log_global_user(are_global)} '{credentials.name}' cannot be deleted "
-                               "as they are still in use"},
+                data={'error': f"Shared-credentials '{credentials.name}' cannot be deleted as they are still in use"},
                 status=400,
             )
 
         credentials.delete()
-        return Response(data={'msg': f"{_log_global_user(are_global)} '{credentials.name}' deleted"}, status=200)
+        return Response(
+            data={'msg': f"Shared-credentials '{credentials.name}' deleted", 'id': credentials_id},
+            status=200,
+        )
 
     @extend_schema(
-        request=JobGlobalCredentialsWriteRequest,
+        request=JobSharedCredentialsWriteRequest,
         responses=api_docs_put('Credentials'),
-        summary='Modify credentials.',
-        operation_id='credentials_edit',
-        parameters=parameters,
+        summary='Modify shared-credentials.',
+        operation_id='credentials_shared_edit',
     )
     def put(self, request, credentials_id: int):
         user = get_api_user(request)
-        are_global = are_global_credentials(request)
 
-        if are_global:
-            self.serializer_class = JobGlobalCredentialsWriteRequest
-
-        else:
-            self.serializer_class = JobUserCredentialsWriteRequest
-
-        credentials = _find_credentials(
-            credentials_id=credentials_id,
-            are_global=are_global,
-            user=user,
-        )
+        credentials = _get_shared_creds(credentials_id)
         if credentials is None:
-            base_msg = f"{_log_global_user(are_global)} with ID {credentials_id} do not exist"
-            if not are_global:
-                return Response(data={'error': f"{base_msg} or belong to another user"}, status=404)
+            return Response(
+                data={'error': f"Shared-credentials with ID {credentials_id} do not exist"},
+                status=404,
+            )
 
-            return Response(data={'error': base_msg}, status=404)
-
-        if are_global and not has_credentials_permission(
+        if not has_credentials_permission(
             user=user,
             credentials=credentials,
             permission_needed=CHOICE_PERMISSION_WRITE,
         ):
             return Response(
-                data={'error': f"Not privileged to modify the {_log_global_user(are_global, lower=True)} "
-                               f"'{credentials.name}'"},
+                data={'error': f"Not privileged to modify the shared-credentials '{credentials.name}'"},
                 status=403,
             )
 
         serializer = self.serializer_class(data=request.data)
-        if not serializer.is_valid():
+        update_error = _update_creds(credentials, serializer)
+        if update_error is not None:
+            return update_error
+
+        credentials.save()
+
+        return Response(data={
+            'msg': f"Shared-credentials '{credentials.name}' updated",
+            'id': credentials_id
+        }, status=200)
+
+
+def _get_user_creds(credentials_id: int, user: USERS) -> (JobUserCredentials, None):
+    try:
+        return JobUserCredentials.objects.get(id=credentials_id, user=user)
+
+    except ObjectDoesNotExist:
+        return None
+
+
+class APIJobUserCredentialsItem(APIView):
+    http_method_names = ['get', 'delete', 'put']
+    serializer_class = JobUserCredentialsReadResponse
+    permission_classes = API_PERMISSION
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(JobUserCredentialsReadResponse, description='Return information about credentials'),
+            403: OpenApiResponse(GenericErrorResponse, description='Not privileged to view the credentials'),
+            404: OpenApiResponse(GenericErrorResponse, description='Credentials not exist'),
+        },
+        summary='Return information about a set of user-credentials.',
+        operation_id='credentials_user_view',
+    )
+    def get(self, request, credentials_id: int):
+        user = get_api_user(request)
+
+        credentials = _get_user_creds(credentials_id, user)
+        if credentials is None:
             return Response(
-                data={'error': f"Provided {_log_global_user(are_global, lower=True)} data is not valid: "
-                               f"'{serializer.errors}'"},
+                data={'error': f"User-credentials with ID {credentials_id} do not exist"},
+                status=404,
+            )
+
+        return Response(data=self.serializer_class(instance=credentials).data, status=200)
+
+    @extend_schema(
+        request=None,
+        responses=api_docs_delete('Credentials'),
+        summary='Delete user-credentials.',
+        operation_id='credentials_user_delete',
+    )
+    def delete(self, request, credentials_id: int):
+        user = get_api_user(request)
+
+        credentials = _get_user_creds(credentials_id, user)
+        if credentials is None:
+            return Response(
+                data={'error': f"User-credentials with ID {credentials_id} do not exist or belong to another user"},
+                status=404,
+            )
+
+        if credentials_in_use(credentials):
+            return Response(
+                data={'error': f"User-credentials '{credentials.name}' cannot be deleted as they are still in use"},
                 status=400,
             )
 
-        try:
-            # not working with password properties: 'Job.objects.filter(id=job_id).update(**serializer.data)'
-            for field, value in serializer.validated_data.items():
-                if field in BaseJobCredentials.SECRET_ATTRS:
-                    if (field not in BaseJobCredentials.EMPTY_ATTRS and is_null(value)) or value == SECRET_HIDDEN:
-                        value = getattr(credentials, field)
+        credentials.delete()
+        return Response(data={
+            'msg': f"User-credentials '{credentials.name}' deleted",
+            'id': credentials_id
+        }, status=200)
 
-                    elif field == 'ssh_key':
-                        value = _validate_and_fix_ssh_key(value)
-                        if value is None:
-                            return Response(
-                                data={'error': f"Provided {_log_global_user(are_global)} ssh-key is not valid'"},
-                                status=400,
-                            )
+    @extend_schema(
+        request=JobSharedCredentialsWriteRequest,
+        responses=api_docs_put('Credentials'),
+        summary='Modify user-credentials.',
+        operation_id='credentials_user_edit',
+    )
+    def put(self, request, credentials_id: int):
+        user = get_api_user(request)
 
-                elif field == 'user':
-                    continue
-
-                setattr(credentials, field, value)
-
-            if not are_global:
-                credentials.user = user
-
-            credentials.save()
-
-        except IntegrityError as err:
+        credentials = _get_user_creds(credentials_id, user)
+        if credentials is None:
             return Response(
-                data={'error': f"Provided {_log_global_user(are_global, lower=True)} data is not valid: '{err}'"},
-                status=400,
+                data={'error': f"User-credentials with ID {credentials_id} do not exist or belong to another user"},
+                status=404,
             )
 
-        return Response(data={'msg': f"{_log_global_user(are_global)} '{credentials.name}' updated"}, status=200)
+        serializer = self.serializer_class(data=request.data)
+        update_error = _update_creds(credentials, serializer)
+        if update_error is not None:
+            return update_error
+
+        credentials.user = user
+        credentials.save()
+
+        return Response(
+            data={'msg': f"User-credentials '{credentials.name}' updated", 'id': credentials_id},
+            status=200,
+        )

@@ -8,6 +8,15 @@ tbd
 
 ## Version 0
 
+### 0.8.2
+
+Fixes:
+
+* Quote value of prompted extra vars [#23](https://github.com/O-X-L/ansible-webui/issues/23)
+
+Features:
+* Ability to supply one-off credentials at execution [#18](https://github.com/O-X-L/ansible-webui/issues/18)
+
 ### 0.8.1
 
 * Completely refactored frontend (SvelteJS & TailwindCSS)

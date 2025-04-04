@@ -161,7 +161,7 @@ def test_creds(jid: int = 3):
     become_user = 'admin'
     connect_user = 'tester'
     _api_request(
-        'credentials?shared=false',
+        'credentials/user',
         'post',
         {
             'name': 'myUser', 'become_user': become_user, 'become_pass': 'hup', 'connect_user': connect_user,
@@ -192,6 +192,7 @@ def test_creds(jid: int = 3):
     assert Path(e['log_stdout']).is_file()
 
     # todo: test more combinations to catch edge-cases in credential-handling
+    # todo: create tmp-credentials and make sure they are removed/cleaned after execution
 
 
 def test_repo_git(jid: int = 4):

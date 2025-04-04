@@ -9,7 +9,7 @@ from django.utils import timezone
 from aw.config.main import config
 from aw.model.base import BareModel, BaseModel, CHOICES_BOOL, DEFAULT_NONE, CHOICES_JOB_EXEC_STATUS
 from aw.config.hardcoded import SHORT_TIME_FORMAT
-from aw.model.job_credential import JobGlobalCredentials, JobUserCredentials
+from aw.model.job_credential import JobSharedCredentials, JobUserCredentials, JobUserTMPCredentials
 from aw.base import USERS
 from aw.model.repository import Repository
 from aw.utils.util import get_choice_key_by_value, get_choice_value_by_key, datetime_from_db_str, is_null, \
@@ -103,7 +103,7 @@ class Job(BaseJob):
 
     credentials_needed = models.BooleanField(choices=CHOICES_BOOL, default=False)
     credentials_default = models.ForeignKey(
-        JobGlobalCredentials, on_delete=models.SET_NULL, related_name='job_fk_creddflt', null=True, blank=True,
+        JobSharedCredentials, on_delete=models.SET_NULL, related_name='job_fk_creddflt', null=True, blank=True,
     )
     credentials_category = models.CharField(max_length=100, **DEFAULT_NONE)
     repository = models.ForeignKey(Repository, on_delete=models.SET_NULL, related_name='job_fk_repo', **DEFAULT_NONE)
@@ -229,12 +229,12 @@ class JobExecution(BaseJob):
     api_fields_read = [
         'id', 'job', 'job_name', 'user', 'user_name', 'result', 'status', 'status_name', 'time_start', 'time_fin',
         'failed', 'error_s', 'error_m', 'log_stdout', 'log_stdout_url', 'log_stderr', 'log_stderr_url', 'job_comment',
-        'comment', 'credentials_global', 'credentials_user', 'command', 'log_stdout_repo', 'log_stderr_repo',
+        'comment', 'credentials_shared', 'credentials_user', 'command', 'log_stdout_repo', 'log_stderr_repo',
         'log_stdout_repo_url', 'log_stderr_repo_url',
     ]
     api_fields_exec = [
         'comment', 'limit', 'verbosity', 'mode_diff', 'mode_check', 'environment_vars', 'tags', 'tags_skip',
-        'cmd_args', 'credentials_global', 'credentials_user',
+        'cmd_args', 'credentials_shared', 'credentials_user', 'credentials_tmp',
     ]
     log_file_fields = ['log_stdout', 'log_stderr', 'log_stdout_repo', 'log_stderr_repo']
 
@@ -255,11 +255,14 @@ class JobExecution(BaseJob):
     log_stderr_repo = models.CharField(max_length=300, **DEFAULT_NONE)
     command = models.CharField(max_length=2000, **DEFAULT_NONE)
 
-    credentials_global = models.ForeignKey(
-        JobGlobalCredentials, on_delete=models.SET_NULL, related_name='jobexec_fk_credglob', null=True,
+    credentials_shared = models.ForeignKey(
+        JobSharedCredentials, on_delete=models.SET_NULL, related_name='jobexec_fk_credglob', null=True,
     )
     credentials_user = models.ForeignKey(
         JobUserCredentials, on_delete=models.SET_NULL, related_name='jobexec_fk_credusr', null=True,
+    )
+    credentials_tmp = models.ForeignKey(
+        JobUserTMPCredentials, on_delete=models.SET_NULL, related_name='jobexec_fk_credtmp', null=True,
     )
 
     def __str__(self) -> str:
