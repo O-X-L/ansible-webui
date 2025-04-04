@@ -3,6 +3,7 @@
 name: Test Frontend
 
 on:
+  workflow_dispatch:
   push:
     branches: [latest]
     paths:

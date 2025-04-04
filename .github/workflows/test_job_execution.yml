@@ -3,6 +3,7 @@
 name: Test Job-Execution
 
 on:
+  workflow_dispatch:
   push:
     branches: [latest]
     paths:
