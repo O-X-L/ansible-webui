@@ -160,7 +160,7 @@
 
             for (let [k, v] of Object.entries(executionPrompts.var_values)) {
                 if (v && v.trim()) {
-                    c.push(`-e "${k}=${v}"`)
+                    c.push(`-e "${k}='${v}'"`)
                 }
             }
 
