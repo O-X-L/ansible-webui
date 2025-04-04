@@ -9,6 +9,10 @@ def inside_docker() -> bool:
     return 'AW_DOCKER' in environ and environ['AW_DOCKER'] == '1'
 
 
+def behind_proxy() -> bool:
+    return 'AW_PROXY' in environ
+
+
 def _get_existing_ansible_config_file() -> (str, None):
     # https://docs.ansible.com/ansible/latest/reference_appendices/config.html#the-configuration-file
 

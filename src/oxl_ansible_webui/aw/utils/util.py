@@ -19,6 +19,7 @@ from django.utils.html import escape as escape_html
 from aw.config.main import config
 from aw.config.hardcoded import SHORT_TIME_FORMAT
 from aw.utils.util_no_config import set_timezone
+from aw.config.defaults import behind_proxy, inside_docker
 
 # allow import from other modules
 # pylint: disable=W0611
@@ -269,3 +270,14 @@ def get_logo() -> str:
         return f"{STATIC_URL}{url}"
 
     return config['logo_url']
+
+
+def get_client_ip(request) -> str:
+    if behind_proxy() or inside_docker():
+        if 'X-Forwarded-For' in request.headers:
+            return request.headers['X-Forwarded-For']
+
+        if 'X-Real-IP' in request.headers:
+            return request.headers['X-Real-IP ']
+
+    return request.META.get('REMOTE_ADDR')

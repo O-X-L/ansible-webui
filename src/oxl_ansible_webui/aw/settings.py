@@ -17,7 +17,7 @@ except ImportError:
 
 
 from aw.config.hardcoded import LOGIN_PATH, ENV_KEY_CONFIG, ENV_KEY_SAML
-from aw.config.defaults import CONFIG_DEFAULTS, inside_docker
+from aw.config.defaults import CONFIG_DEFAULTS, inside_docker, behind_proxy
 from aw.utils.deployment import deployment_dev, deployment_prod
 from aw.config.environment import get_aw_env_var_or_default, auth_mode_saml
 from aw.utils.debug import log
@@ -153,14 +153,14 @@ def get_main_web_address() -> str:
         return f'http://localhost:{PORT_WEB}'
 
     _hostname = environ['AW_HOSTNAMES'].split(',', 1)[0]
-    if 'AW_PROXY' in environ or inside_docker():
+    if behind_proxy() or inside_docker():
         # we will not know what port the proxy is serving this service - assume its 443
         return f'https://{_hostname}'
 
     return f'https://{_hostname}:{PORT_WEB}'
 
 
-if 'AW_PROXY' in environ:
+if behind_proxy():
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     USE_X_FORWARDED_HOST = True
 

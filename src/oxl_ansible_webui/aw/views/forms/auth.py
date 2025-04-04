@@ -8,6 +8,7 @@ from django_saml2_auth.user import create_jwt_token
 from aw.utils.http import ui_endpoint_wrapper_auth
 from aw.settings import SAML2_AUTH, LOGIN_PATH, LOGIN_REDIRECT_URL
 from aw.utils.debug import log, log_error
+from aw.utils.util import get_client_ip
 
 
 # SP-initiated SAML SSO; see: https://github.com/grafana/django-saml2-auth/issues/105
@@ -36,17 +37,15 @@ def saml_sp_initiated_login_init(request) -> HttpResponse:
 @receiver(user_logged_in)
 def user_logged_in_callback(sender, request, user, **kwargs):
     del sender
-    ip = request.META.get('REMOTE_ADDR')
-    log(f"Login successful: User '{user}' from IP {ip}")
+    log(f"Login successful: User '{user}' from IP {get_client_ip(request)}")
 
 
 @receiver(user_logged_out)
 def user_logged_out_callback(sender, request, user, **kwargs):
     del sender
-    ip = request.META.get('REMOTE_ADDR')
-    log(f"Logout successful: User '{user}' from IP {ip}")
+    log(f"Logout successful: User '{user}' from IP {get_client_ip(request)}")
 
 
 @receiver(user_login_failed)
 def user_login_failed_callback(sender, credentials, **kwargs):
-    log_error(f"Login failed: '{credentials}'")
+    log_error(f"Login failed: User '{credentials['username']}'")
