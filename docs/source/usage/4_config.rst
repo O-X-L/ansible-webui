@@ -131,14 +131,14 @@ Some settings are only available as environmental variables.
 
    * For non-SQLite you will have to install the dependencies: :code:`oxl-ansible-webui[mysql]` or :code:`oxl-ansible-webui[psql]`
 
-     For MySQL you might also have to install a system dependency: :code:`apt install default-libmysqlclient-dev` or :code:``
+     For MariaDB/MySQL you might also have to install a system dependency: :code:`apt install default-libmysqlclient-dev` or :code:`apk add mariadb-dev`
 
    * **Tip**: You can migrate data between database-types like this:
 
      Make sure to use the same AW-version on dump and load!
 
-     * Dump: :code`oxl-ansible-webui-manage dumpdata > dump.json`
-     * Load: :code`oxl-ansible-webui-manage loaddata dump.json`
+     * Dump: :code:`oxl-ansible-webui-manage dumpdata > dump.json`
+     * Load: :code:`oxl-ansible-webui-manage loaddata dump.json`
 
    * **MariaDB/MySQL setup**:
 
