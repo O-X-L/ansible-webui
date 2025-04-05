@@ -42,7 +42,6 @@ jobs:
         ports:
           - '127.0.0.1:5432:5432'
         env:
-          POSTGRES_USER: 'aw'
           POSTGRES_PASSWORD: 'test'
           POSTGRES_DB: 'aw'
 
