@@ -30,7 +30,7 @@ jobs:
         options: >
           --health-cmd="healthcheck.sh --connect --innodb_initialized"
         ports:
-          - '3306:3306'
+          - '127.0.0.1:3306:3306'
         env:
           MARIADB_ROOT_PASSWORD: 'test'
           MARIADB_DATABASE: 'aw'
@@ -55,5 +55,3 @@ jobs:
 
       - name: Testing MariaDB/MySQL
         run: bash scripts/test_db_mariadb.sh
-        env:
-          AW_DB_HOST: 'test_mariadb'
