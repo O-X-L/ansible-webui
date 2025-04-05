@@ -1,0 +1,55 @@
+---
+
+name: Test Databases
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [latest]
+    paths:
+      - 'src/oxl_ansible_webui/db.py'
+      - '.github/workflows/test_dbs.yml'
+
+  pull_request:
+    branches: [latest]
+    paths:
+      - 'src/oxl_ansible_webui/db.py'
+      - '.github/workflows/test_dbs.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    defaults:
+      run:
+        shell: bash
+
+    services:
+      mariadb:
+        image: mariadb:latest
+        ports:
+          - '3306:3306'
+        env:
+          MARIADB_ROOT_PASSWORD: 'test'
+          MARIADB_DATABASE: 'aw'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install backend dependencies
+        run: |
+          pip install -r requirements.txt >/dev/null
+          pip install -r requirements_test_backend.txt >/dev/null
+
+      - name: Testing MariaDB/MySQL
+        run: bash scripts/test_db_mariadb.sh
+        env:
+          AW_DB_HOST: 'mariadb'
