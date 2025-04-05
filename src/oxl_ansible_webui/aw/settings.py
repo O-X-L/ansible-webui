@@ -74,7 +74,7 @@ MIDDLEWARE = [
 # Database
 DB_FILE = None
 DB_TYPE = 'sqlite'
-if config['db_type'] in ['mysql', 'postgresql']:
+if config['db_type'] in ['mysql', 'psql']:
     DB_TYPE = config['db_type']
     if DB_TYPE == 'mysql' and not mysql_installed():
         log_dependency_error('MySQL', 'mysql')
@@ -127,7 +127,7 @@ AW_DB_ENGINES = {
         'HOST': get_aw_env_var_or_default('db_host'),
         'PORT': get_aw_env_var_or_default('db_port'),
     },
-    'postgresql': {
+    'psql': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': get_aw_env_var('db'),
         'USER': get_aw_env_var_or_default('db_user'),
