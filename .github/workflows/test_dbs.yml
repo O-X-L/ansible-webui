@@ -25,8 +25,10 @@ jobs:
         shell: bash
 
     services:
-      mariadb:
-        image: mariadb:latest
+      test_mariadb:
+        image: 'mariadb:latest'
+        options: >
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
         ports:
           - '3306:3306'
         env:
@@ -46,11 +48,25 @@ jobs:
 
       - name: Install backend dependencies
         run: |
-          sudo apt install default-libmysqlclient-dev
           pip install -r requirements.txt >/dev/null
           pip install -r requirements_test_backend.txt >/dev/null
+          sudo apt install default-libmysqlclient-dev >/dev/null
           pip install mysqlclient >/dev/null
-          sleep 5  # wait for db to init
 
       - name: Testing MariaDB/MySQL
-        run: bash scripts/test_db_mariadb.sh
+        run: |
+          sc=0
+          while ! host $AW_DB_HOST >/dev/null 2>/dev/null
+          do
+            if (( sc > 30 ))
+            then
+              exit 1
+            fi
+            sleep 1  # wait for db to start
+            ((sc++))
+            echo $sc
+          done
+
+          bash scripts/test_db_mariadb.sh
+        env:
+          AW_DB_HOST: 'test_mariadb'
