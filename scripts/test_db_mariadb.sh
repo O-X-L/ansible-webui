@@ -12,7 +12,7 @@ echo ''
 
 export AW_DB_TYPE='mysql'
 export AW_DB='aw'
-export AW_DB_HOST="${AW_DB_HOST:-'127.0.0.1'}"
+export AW_DB_HOST="${AW_DB_HOST:-127.0.0.1}"
 export AW_DB_PORT='3306'
 export AW_DB_USER='root'
 export AW_DB_PWD='test'

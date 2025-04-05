@@ -53,13 +53,5 @@ jobs:
           sudo apt install default-libmysqlclient-dev >/dev/null
           pip install mysqlclient >/dev/null
 
-      - name: Checking MariaDB
-        run: |
-          docker ps -a
-          docker network ls
-          ip a
-          sudo apt install net-tools
-          netstat -tulpn
-
       - name: Testing MariaDB/MySQL
         run: bash scripts/test_db_mariadb.sh
