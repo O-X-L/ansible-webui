@@ -46,8 +46,10 @@ jobs:
 
       - name: Install backend dependencies
         run: |
+          sudo apt install default-libmysqlclient-dev
           pip install -r requirements.txt >/dev/null
           pip install -r requirements_test_backend.txt >/dev/null
+          pip install mysqlclient >/dev/null
 
       - name: Testing MariaDB/MySQL
         run: bash scripts/test_db_mariadb.sh
