@@ -30,14 +30,21 @@ trap "pkill -f oxl_ansible_webui; exit" INT
 
 export AW_ENV='dev'
 # shellcheck disable=SC2155
-export AW_DB="/tmp/$(date +%s).aw.db"
-# shellcheck disable=SC2155
 export AW_PATH_PLAY="$(pwd)/test"
 export AW_ADMIN='tester'
 export AW_ADMIN_PWD='someSecret!Pwd'
 
-bash scripts/migrate_db.sh >/dev/null
+if [ -z "$AW_TEST_DB" ]
+then
+  # shellcheck disable=SC2155
+  export AW_DB="/tmp/$(date +%s).aw.db"
 
-python3 src/oxl_ansible_webui/ 2>&1 | grep -E 'ERROR|FATAL|Warning: operationId|Except'  &
+  bash scripts/migrate_db.sh >/dev/null
+  python3 src/oxl_ansible_webui/ 2>&1 | grep -E 'ERROR|FATAL|Warning: operationId|Except'  &
+else
+  bash scripts/migrate_db.sh
+  python3 src/oxl_ansible_webui/ &
+fi
+
 echo ''
 sleep 10

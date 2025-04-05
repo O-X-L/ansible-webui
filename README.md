@@ -11,7 +11,7 @@ The goal is to allow users to quickly install & run a WebUI for using Ansible lo
 
 Keep it simple.
 
-[![Tech-Stack](https://skillicons.dev/icons?i=ansible,django,svelte,tailwind,sqlite)](#)
+[![Tech-Stack](https://skillicons.dev/icons?i=ansible,django,svelte,tailwind)](#)
 
 <img src="https://raw.githubusercontent.com/O-X-L/ansible-webui/refs/heads/latest/docs/source/_static/img/intro.gif" alt="Intro GIF" width="70%"/>
 

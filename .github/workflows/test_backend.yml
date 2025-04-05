@@ -30,6 +30,15 @@ jobs:
       run:
         shell: bash
 
+    services:
+      mariadb:
+        image: mariadb:latest
+        ports:
+          - '3306:3306'
+        env:
+          MARIADB_ROOT_PASSWORD: 'test'
+          MARIADB_DATABASE: 'aw'
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -124,3 +133,8 @@ jobs:
           bash scripts/test_api.sh
         env:
           PYTHONUNBUFFERED: 1
+
+      - name: Testing database - MariaDB/MySQL
+        run: bash scripts/test_db_mariadb.sh
+        env:
+          AW_DB_HOST: 'mariadb'

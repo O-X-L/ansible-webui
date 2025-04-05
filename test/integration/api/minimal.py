@@ -1,0 +1,91 @@
+from os import environ
+from sys import exit as sys_exit
+
+from requests import Session, Response
+
+# pylint: disable=R0801
+
+BASE_URL = 'http://127.0.0.1:8000/api'
+API_USER = environ['AW_ADMIN']
+API_KEY = environ['AW_API_KEY']
+
+api = Session()
+api.headers['X-Api-Key'] = API_KEY
+api.headers['accept'] = 'application/json'
+
+
+def _api_request(location: str, method: str = None, data: dict = None) -> Response:
+    url = f'{BASE_URL}/{location}'
+
+    if method is None:
+        method = 'get'
+
+    print(f'TESTING API {method} {location}')
+
+    if method == 'get':
+        return api.get(url)
+
+    if method == 'post':
+        return api.post(url=url, data=data)
+
+    print('ERROR: - got unsupported method!')
+    sys_exit(1)
+
+
+def _api_request_ok(location: str, method: str = None, data: dict = None) -> bool:
+    response = _api_request(location, method, data)
+    if not response.ok:
+        print(f"GOT ERROR: {response.content}")
+        sys_exit(1)
+
+    return response.ok
+
+
+def test_add_locations(location_data_list: list[dict]):
+    for loc_data in location_data_list:
+        assert _api_request_ok(loc_data['l'], 'post', loc_data['d'])
+
+
+def test_get_locations(locations: list):
+    for location in locations:
+        assert _api_request_ok(location)
+
+
+def test_add():
+    # NOTE: do not reference entries with ID 1! they should be deleted later on
+    test_add_locations([
+        {'l': 'key', 'd': None},
+
+        # creds
+        {'l': 'credentials/shared', 'd': {
+            'name': 'cred1', 'become_user': 'guy', 'become_pass': 'sePwd', 'vault_id': 'myID',
+        }},
+
+        # repos
+        {'l': 'repository', 'd': {
+            'name': 'gitty1', 'rtype': 2, 'git_origin': 'https://github.com/O-X-L/ansible-webui.git',
+            'git_branch': 'latest',
+        }},
+
+        # jobs
+        {'l': 'job', 'd': {
+            'name': 'job1', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/hosts.yml', 'tags': 'svc1',
+            'limit': 'srv1',
+        }},
+    ])
+
+
+def test_list():
+    test_get_locations([
+        'credentials', 'job', 'job_exec', 'key', 'permission', 'config', 'repository',
+        'fs/exists?item=/etc', 'alert/global', 'alert/group', 'alert/user', 'alert/plugin',
+    ])
+
+
+def main():
+    test_add()
+    test_list()
+
+
+if __name__ == '__main__':
+    main()
