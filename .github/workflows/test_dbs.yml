@@ -53,21 +53,6 @@ jobs:
           sudo apt install default-libmysqlclient-dev >/dev/null
           pip install mysqlclient >/dev/null
 
-      - name: Waiting/checking for MariaDB/MySQL
-        run: |
-          sc=0
-          while ! host $AW_DB_HOST >/dev/null 2>/dev/null
-          do
-            if (( sc > 30 ))
-            then
-              exit 1
-            fi
-            sleep 1
-            ((sc++))
-          done
-        env:
-          AW_DB_HOST: 'test_mariadb'
-
       - name: Testing MariaDB/MySQL
         run: bash scripts/test_db_mariadb.sh
         env:
