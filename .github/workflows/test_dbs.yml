@@ -54,5 +54,3 @@ jobs:
 
       - name: Testing MariaDB/MySQL
         run: bash scripts/test_db_mariadb.sh
-        env:
-          AW_DB_HOST: 'mariadb'
