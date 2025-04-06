@@ -32,6 +32,11 @@ DB_TYPE = get_aw_env_var('db_type')
 if DB_TYPE is None or DB_TYPE not in ['mysql', 'psql', 'sqlite']:
     DB_TYPE = 'sqlite'
 
+
+class DummyException(BaseException):
+    pass
+
+
 try:
     from MySQLdb import connect as mysql_connect
     from MySQLdb._exceptions import MySQLError
@@ -41,7 +46,7 @@ except (ImportError, ModuleNotFoundError):
         log_dependency_error('MySQL', 'mysql')
         raise EnvironmentError('Database-client dependencies are missing!')
 
-    MySQLError = None
+    MySQLError = DummyException
 
 try:
     from psycopg import connect as psql_connect
@@ -52,7 +57,7 @@ except (ImportError, ModuleNotFoundError):
         log_dependency_error('PostgreSQL', 'psql')
         raise EnvironmentError('Database-client dependencies are missing!')
 
-    PSQLError = None
+    PSQLError = DummyException
 
 
 class AbstractDBConnection:
