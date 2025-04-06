@@ -41,6 +41,8 @@ except (ImportError, ModuleNotFoundError):
         log_dependency_error('MySQL', 'mysql')
         raise EnvironmentError('Database-client dependencies are missing!')
 
+    MySQLError = None
+
 try:
     from psycopg import connect as psql_connect
     from psycopg.errors import Error as PSQLError
@@ -49,6 +51,8 @@ except (ImportError, ModuleNotFoundError):
     if DB_TYPE == 'psql':
         log_dependency_error('PostgreSQL', 'psql')
         raise EnvironmentError('Database-client dependencies are missing!')
+
+    PSQLError = None
 
 
 class AbstractDBConnection:
