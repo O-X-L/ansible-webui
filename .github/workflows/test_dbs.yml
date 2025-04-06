@@ -61,6 +61,11 @@ jobs:
           pip install -r requirements.txt >/dev/null
           pip install -r requirements_test_backend.txt >/dev/null
 
+      - name: Testing SQLite
+        run: bash scripts/test_db_sqlite.sh
+        env:
+          PYTHONUNBUFFERED: 1
+
       - name: Install MariaDB/MySQL dependencies
         run: |
           sudo apt install default-libmysqlclient-dev >/dev/null

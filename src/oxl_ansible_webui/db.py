@@ -101,7 +101,9 @@ class AbstractDBConnection:
 
     def __exit__(self, a, b, c):
         del a, b, c
-        self.cursor.close()
+        if self.cursor is not None:
+            self.cursor.close()
+
         self.connection.close()
 
     def execute(self, cmd: str) -> None:
