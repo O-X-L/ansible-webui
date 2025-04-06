@@ -34,6 +34,8 @@
         { name: 'drf-spectacular', href: 'https://drf-spectacular.readthedocs.io/', license: 'BSD 3-Clause', licenseHref: 'https://github.com/tfranzel/drf-spectacular/blob/master/LICENSE' },
         { name: 'crontab', href: 'https://pypi.org/project/crontab/', license: 'LGPLv3', licenseHref: 'https://github.com/josiahcarlson/parse-crontab/blob/master/LICENSE3' },
         { name: 'premailer', href: 'https://premailer.io/', license: 'BSD 3-Clause', licenseHref: 'https://github.com/peterbe/premailer/blob/master/LICENSE' },
+        { name: 'mysqlclient', href: 'https://github.com/PyMySQL/mysqlclient', license: 'GPLv2', licenseHref: 'https://github.com/PyMySQL/mysqlclient/blob/main/LICENSE' },
+        { name: 'psycopg', href: 'https://github.com/psycopg/psycopg', license: 'LGPLv3', licenseHref: 'https://github.com/psycopg/psycopg/blob/master/LICENSE.txt' },
     ];
     let transitionParamsLeft = {
         x: -320,
