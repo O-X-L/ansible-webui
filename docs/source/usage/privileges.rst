@@ -26,6 +26,8 @@ Available ones are:
 
 * :code:`AW Job Managers` - create new jobs, view and update all existing ones
 
+* :code:`AW Job Executors` - read and execute all existing jobs
+
 * :code:`AW Permission Managers` - create, update and delete permissions
 
 * :code:`AW Repository Managers` - create new repositories, view and update all existing ones
@@ -33,6 +35,8 @@ Available ones are:
 * :code:`AW Credentials Managers` - create new global credentials, view and update all existing ones
 
 * :code:`AW System Managers` - configure system settings
+
+* :code:`AW Managers` - equivalent of being a member of all of the groups listed above
 
 ----
 

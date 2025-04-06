@@ -1,7 +1,7 @@
 from aw.model.job import Job
 from aw.model.permission import JobPermissionMapping, JobPermissionMemberUser, JobPermissionMemberGroup, \
     CHOICE_PERMISSION_READ, JobCredentialsPermissionMapping, JobRepositoryPermissionMapping, JobPermission, \
-    CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
+    CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE, CHOICE_PERMISSION_EXECUTE
 from aw.model.job_credential import BaseJobCredentials, JobSharedCredentials
 from aw.model.repository import Repository
 from aw.base import USERS
@@ -45,7 +45,7 @@ def _has_permission(
         permission_links: (JobPermissionMapping, JobCredentialsPermissionMapping), permission_needed: int,
         user: USERS, permission_attr_all: str, manager: str = None,
 ) -> bool:
-    if user.is_superuser:
+    if user.is_superuser or has_manager_privileges(user=user, kind='full'):
         return True
 
     if manager is not None and \
@@ -62,7 +62,7 @@ def _has_permission(
             )
             return True
 
-    # lined permissions
+    # linked permissions
     for link in permission_links:
         if _evaluate_permission(permission=link.permission, user=user, permission_needed=permission_needed):
             log(
@@ -75,6 +75,13 @@ def _has_permission(
 
 
 def has_job_permission(user: USERS, job: Job, permission_needed: int) -> bool:
+    if job.owner is not None and job.owner == user:
+        return True
+
+    if permission_needed in [CHOICE_PERMISSION_EXECUTE, CHOICE_PERMISSION_READ] and \
+            has_manager_privileges(user=user, kind='exec'):
+        return True
+
     return _has_permission(
         permission_links=JobPermissionMapping.objects.filter(job=job),
         permission_needed=permission_needed,
@@ -142,4 +149,5 @@ def has_manager_privileges(user: USERS, kind: str) -> bool:
     if user.is_superuser:
         return True
 
-    return user.groups.filter(name=GRP_MANAGER[kind]).exists()
+    return user.groups.filter(name=GRP_MANAGER[kind]).exists() or \
+        user.groups.filter(name=GRP_MANAGER['full']).exists()

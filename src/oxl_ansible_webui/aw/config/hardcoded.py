@@ -12,7 +12,9 @@ KEY_TIME_FORMAT = '%Y-%m-%d-%H-%M-%S'
 MIN_SECRET_LEN = 30
 JOB_EXECUTION_LIMIT = 20
 GRP_MANAGER = {
+    'full': 'AW Managers',
     'job': 'AW Job Managers',
+    'exec': 'AW Job Executors',
     'permission': 'AW Permission Managers',
     'repository': 'AW Repository Managers',
     'credentials': 'AW Credentials Managers',
