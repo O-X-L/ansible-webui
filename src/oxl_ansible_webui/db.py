@@ -139,7 +139,7 @@ def _schema_up_to_date_base() -> bool:
         try:
             return db.query('SELECT schema_version FROM aw_schemametadata')[0] == VERSION
 
-        except (IndexError, SQLiteOperationalError, MySQLError, PSQLError):
+        except (IndexError, TypeError, SQLiteOperationalError, MySQLError, PSQLError):
             return False
 
 
@@ -192,7 +192,7 @@ def _update_schema_version() -> None:
         try:
             previous = db.query('SELECT schema_version FROM aw_schemametadata')[0]
 
-        except (IndexError, SQLiteOperationalError, MySQLError, PSQLError):
+        except (IndexError, TypeError, SQLiteOperationalError, MySQLError, PSQLError):
             previous = None
 
         try:
