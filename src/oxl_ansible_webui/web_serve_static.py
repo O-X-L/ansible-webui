@@ -2,17 +2,18 @@
 used to serve static files if no proxy is in use
 source: django.contrib.staticfiles.views(serve)
 
-can be switched off by setting the environmental variable 'AW_STATIC'
+can be switched off by setting the environmental variable 'AW_SERVE_STATIC'
 """
 from posixpath import normpath
 from os import path as os_path
 from re import escape as regex_escape
 
-from django.contrib.staticfiles import finders
 from django.http import Http404
 from django.views import static
-from django.conf import settings
 from django.urls import re_path
+from django.contrib.staticfiles import finders
+
+from aw.settings import STATIC_URL
 
 
 def serve(request, path, **kwargs):
@@ -22,6 +23,7 @@ def serve(request, path, **kwargs):
     if not absolute_path:
         if path.endswith("/") or path == "":
             raise Http404('Directory indexes are not allowed here.')
+
         raise Http404(f"'{path}' could not be found")
 
     document_root, path = os_path.split(absolute_path)
@@ -30,5 +32,5 @@ def serve(request, path, **kwargs):
 
 # pylint: disable=C0209
 urlpatterns_static = [re_path(
-    r"^%s(?P<path>.*)$" % regex_escape(settings.STATIC_URL.lstrip('/')), serve,
+    r"^%s(?P<path>.*)$" % regex_escape(STATIC_URL[1:]), serve,
 )]

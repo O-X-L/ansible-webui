@@ -1,11 +1,17 @@
 {% extends "../base.html" %}
 {% load util %}
 {% block content %}
-    <h2>Sorry, you are not allowed to access this app</h2>
-    <p>To report a problem with your access please contact your system administrator</p>
-    {% if error_code %}<p>Error code: {{ error_code }}{{ error_code|saml_error_by_code }}</p>{% endif %}
-    {% if reason %}<p>Reason: {{ reason }}</p>{% endif %}
-    <a href="/a/login/">
-        <button type="button" class="btn btn-secondary">Local Login</button>
-    </a>
+    <div class="aw-backend-form-alert" hidden="hidden">You are not allowed to access this app</div>
+    {% if error_code %}
+    <div class="aw-backend-form-alert" hidden="hidden">
+        Error code: {{ error_code }}{{ error_code|saml_error_by_code }}
+    </div>
+    {% endif %}
+    {% if reason %}
+        <div class="aw-backend-form-alert" hidden="hidden">
+            Reason: {{ reason }}
+        </div>
+    {% endif %}
+    <div id="login-saml"></div>
+    <script type="module" src="/static/dist/login_saml.js"></script>
 {% endblock %}

@@ -25,6 +25,7 @@ export default defineConfig({
         home: "./src/home.ts",
         login: "./src/login.ts",
         system: "./src/system.ts",
+        login_saml: "./src/login_saml.ts",
       },
     },
   },

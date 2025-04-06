@@ -249,50 +249,6 @@ CSRF_COOKIE_AGE = None  # session-based
 SESSION_COOKIE_HTTPONLY = True
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
-# Authentication
-AUTH_MODE = CONFIG_DEFAULTS['auth_mode']
-SAML2_AUTH = {}
-if auth_mode_saml() and not saml_installed():
-    log_dependency_error('SAML', 'saml')
-
-elif auth_mode_saml():
-    INSTALLED_APPS.append('django_saml2_auth')
-
-    try:
-        with open(environ[ENV_KEY_CONFIG], 'r', encoding='utf-8') as _config:
-            SAML2_AUTH = yaml_load(_config.read())[environ[ENV_KEY_SAML]]
-
-        try:
-            # basic validation to help users find/fix their issues faster
-            _ = SAML2_AUTH['ASSERTION_URL']
-            _ = SAML2_AUTH['ENTITY_ID']
-            _ = SAML2_AUTH['ATTRIBUTES_MAP']
-            _ = SAML2_AUTH['ATTRIBUTES_MAP']['username']
-            _ = SAML2_AUTH['ATTRIBUTES_MAP']['email']
-            if 'METADATA_AUTO_CONF_URL' not in SAML2_AUTH and 'METADATA_LOCAL_FILE_PATH' not in SAML2_AUTH:
-                raise KeyError('METADATA_AUTO_CONF_URL or METADATA_LOCAL_FILE_PATH')
-
-            if ('TOKEN_REQUIRED' not in SAML2_AUTH or SAML2_AUTH['TOKEN_REQUIRED']) and \
-                    'token' not in SAML2_AUTH['ATTRIBUTES_MAP']:
-                raise KeyError('TOKEN_REQUIRED but not configured in ATTRIBUTES_MAP')
-
-            if 'JWT_ALGORITHM' not in SAML2_AUTH:
-                # for SSO-login page; internal communications
-                SAML2_AUTH['JWT_ALGORITHM'] = CONFIG_DEFAULTS['jwt_algo']
-                SAML2_AUTH['JWT_SECRET'] = CONFIG_DEFAULTS['jwt_secret']
-                SAML2_AUTH['JWT_EXP'] = 60
-
-        except KeyError as err:
-            log(msg=f"Invalid SAML config: '{err}'", level=1)
-            SAML2_AUTH = {}
-
-    except (YAMLError, KeyError) as err:
-        log(msg=f"Failed to load SAML config: '{err}'", level=1)
-        SAML2_AUTH = {}
-
-    if len(SAML2_AUTH) > 0:
-        AUTH_MODE = 'saml'
-
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 USE_I18N = True
@@ -359,3 +315,52 @@ SPECTACULAR_SETTINGS = {
 
 if deployment_dev():
     SPECTACULAR_SETTINGS['SWAGGER_UI_SETTINGS']['persistAuthorization'] = True
+
+
+# Authentication
+def _build_saml_config() -> dict:
+    if not auth_mode_saml():
+        return {}
+
+    if not saml_installed():
+        log_dependency_error('SAML', 'saml')
+
+    try:
+        with open(environ[ENV_KEY_CONFIG], 'r', encoding='utf-8') as _config:
+            saml_cnf = yaml_load(_config.read())[environ[ENV_KEY_SAML]]
+
+    except (YAMLError, KeyError) as err:
+        log(msg=f"Failed to load SAML config: '{err}'", level=1)
+        return {}
+
+    try:
+        # basic validation to help users find/fix their issues faster
+        _ = saml_cnf['ASSERTION_URL']
+        _ = saml_cnf['ENTITY_ID']
+        _ = saml_cnf['ATTRIBUTES_MAP']
+        _ = saml_cnf['ATTRIBUTES_MAP']['username']
+        _ = saml_cnf['ATTRIBUTES_MAP']['email']
+        if 'METADATA_AUTO_CONF_URL' not in saml_cnf and 'METADATA_LOCAL_FILE_PATH' not in saml_cnf:
+            raise KeyError('METADATA_AUTO_CONF_URL or METADATA_LOCAL_FILE_PATH')
+
+        if ('TOKEN_REQUIRED' not in saml_cnf or saml_cnf['TOKEN_REQUIRED']) and \
+                'token' not in saml_cnf['ATTRIBUTES_MAP']:
+            raise KeyError('TOKEN_REQUIRED but not configured in ATTRIBUTES_MAP')
+
+        if 'JWT_ALGORITHM' not in saml_cnf:
+            # for SSO-login page; internal communications
+            saml_cnf['JWT_ALGORITHM'] = CONFIG_DEFAULTS['jwt_algo']
+            saml_cnf['JWT_SECRET'] = CONFIG_DEFAULTS['jwt_secret']
+            saml_cnf['JWT_EXP'] = 60
+
+    except KeyError as err:
+        log(msg=f"Invalid SAML config: '{err}'", level=1)
+        return {}
+
+    return saml_cnf
+
+
+AUTH_MODE = get_aw_env_var_or_default('auth_mode')
+SAML2_AUTH = _build_saml_config()
+if len(SAML2_AUTH) > 0:
+    INSTALLED_APPS.append('django_saml2_auth')

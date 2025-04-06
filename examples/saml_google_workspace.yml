@@ -3,7 +3,7 @@
 # ENVIRONMENTAL VARIABLES
 #   AW_CONFIG=/etc/ansible-webui/config.yml (this config file)
 
-# GOOGLE ADMIN SETTINGS (https://admin.google.com/ac/apps/saml/)
+# GOOGLE ADMIN SETTINGS (https://admin.google.com/ac/apps/unified or https://admin.google.com/ac/security/ssocert)
 #   Provider details:
 #     ACS URL: https://<YOUR-DOMAIN>/a/saml/acs/
 #     Entity ID: https://<YOUR-DOMAIN>/a/saml/acs/
@@ -30,7 +30,8 @@ SAML:
 
     CREATE_USER: true
     NEW_USER_PROFILE:
-        USER_GROUPS: []
+        USER_GROUPS:
+            - 'AW Managers'
         ACTIVE_STATUS: true
         STAFF_STATUS: true
         SUPERUSER_STATUS: false
@@ -42,5 +43,5 @@ SAML:
         last_name: 'last_name'
         groups: 'groups'
 
-    GROUPS_MAP:  # map IDP groups to django groups
-        'IDP GROUP': 'AW Job Managers'
+    # GROUPS_MAP:  # map IDP groups to django groups
+    #     'IDP GROUP': 'AW Job Managers'

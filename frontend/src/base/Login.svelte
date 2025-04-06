@@ -5,8 +5,8 @@
 
     import { share } from './Share.js';
     import { tq } from '../util/translate.js';
-    import { classBtnLink } from './Style.js';
     import { getCSRFFormTokenHTML } from '../util/api.js';
+    import { classBtnLink, classFooterSpacing } from './Style.js';
 
     const LOGIN_URL_DEFAULT = '/a/login/';
     const LOGIN_URL_FALLBACK = '/a/login/fallback/';
@@ -153,4 +153,5 @@
     </div>
 </div>
 
+<div class={classFooterSpacing}></div>
 <div id="loaded" class="h-0 w-0"></div>

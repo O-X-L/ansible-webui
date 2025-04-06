@@ -82,6 +82,8 @@ def main():
     if uname().system.lower() != 'linux':
         raise SystemError('Currently only linux systems are supported!')
 
+    environ.setdefault('DJANGO_SETTINGS_MODULE', 'aw.settings')
+
     _load_config_file()
     _check_for_bad_config()
 

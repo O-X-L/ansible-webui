@@ -9,7 +9,7 @@ from aw.api import urlpatterns_api
 from aw.views.main import urlpatterns_ui, catchall, logout, not_found, favicon
 from aw.config.environment import check_aw_env_var_true, auth_mode_saml
 from aw.utils.deployment import deployment_dev
-from aw.views.forms.auth import saml_sp_initiated_login, saml_sp_initiated_login_init
+from aw.views.auth import saml_sp_initiated_login, saml_sp_initiated_login_init
 from aw.settings import STATIC_URL
 
 urlpatterns = []

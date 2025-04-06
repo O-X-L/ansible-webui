@@ -1,8 +1,8 @@
+from time import tzname
 from os import environ, getcwd
 from pathlib import Path
 from secrets import choice as random_choice
 from string import digits, ascii_letters, punctuation
-from datetime import datetime
 
 
 def inside_docker() -> bool:
@@ -52,7 +52,7 @@ CONFIG_DEFAULTS = {
     'db_pwd': '',
     'db_host': '',
     'db_port': '',
-    'timezone': datetime.now().astimezone().tzname(),
+    'timezone': tzname[0],
     'secret': ''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(50)),
     'session_timeout': 12 * 60 * 60,  # 12h
     'path_ansible_config': _get_existing_ansible_config_file(),

@@ -1,18 +1,22 @@
+from os import system as shell
+from functools import cache
+from importlib import metadata
+
 from aw.utils.debug import log_error
 
 # pylint: disable=C0415
 
+INSTALLED_MODULES = []
+for m in metadata.packages_distributions().values():
+    INSTALLED_MODULES.extend(m)
 
+
+@cache
 def saml_installed() -> bool:
-    try:
-        from django_saml2_auth.user import create_jwt_token
-        del create_jwt_token
-        return True
-
-    except (ImportError, ModuleNotFoundError):
-        return False
+    return 'grafana-django-saml2-auth' in INSTALLED_MODULES and shell('which xmlsec1 >/dev/null') == 0
 
 
+@cache
 def mysql_installed() -> bool:
     try:
         from MySQLdb import connect
@@ -23,6 +27,7 @@ def mysql_installed() -> bool:
         return False
 
 
+@cache
 def psql_installed() -> bool:
     try:
         from psycopg import connect
