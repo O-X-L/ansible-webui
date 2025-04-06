@@ -7,8 +7,8 @@ from aw.utils.debug import log_error
 # pylint: disable=C0415
 
 INSTALLED_MODULES = []
-for m in metadata.packages_distributions().values():
-    INSTALLED_MODULES.extend(m)
+for p in metadata.packages_distributions().values():
+    INSTALLED_MODULES.extend(p)
 
 
 @cache

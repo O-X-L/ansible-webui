@@ -1,16 +1,18 @@
-from multiprocessing import cpu_count
-from string import ascii_letters
-from random import choice as random_choice
 from pathlib import Path
-from ssl import PROTOCOL_TLSv1_2
+from string import ascii_letters
+from multiprocessing import cpu_count
+from random import choice as random_choice
+from ssl import SSLContext, TLSVersion
+from ssl import CERT_NONE as VERIFY_CERT_NONE
 
 import gunicorn
 from gunicorn.app.wsgiapp import WSGIApplication
 
 from aw.utils.deployment import deployment_dev, deployment_docker
 from aw.utils.debug import log, warn_if_development
-from aw.config.environment import get_aw_env_var_or_default
+from aw.config.environment import get_aw_env_var_or_default, get_aw_env_var
 
+TLSv1_2 = TLSVersion(771)
 PORT_WEB = get_aw_env_var_or_default('port')
 LISTEN_ADDRESS = get_aw_env_var_or_default('address')
 
@@ -46,6 +48,14 @@ class StandaloneApplication(WSGIApplication):
             self.cfg.set(key.lower(), value)
 
 
+def ssl_context(conf, default_ssl_context_factory) -> SSLContext:
+    del conf
+    ctx = default_ssl_context_factory()
+    ctx.minimum_version = TLSv1_2
+    ctx.verify_mode = VERIFY_CERT_NONE
+    return ctx
+
+
 def init_webserver():
     gunicorn.SERVER = ''.join(random_choice(ascii_letters) for _ in range(10))
     opts = {
@@ -57,8 +67,8 @@ def init_webserver():
         opts = {**opts, **OPTIONS_DEV}
 
     scheme = 'http'
-    ssl_cert = get_aw_env_var_or_default('ssl_file_crt')
-    ssl_key = get_aw_env_var_or_default('ssl_file_key')
+    ssl_cert = get_aw_env_var('ssl_file_crt')
+    ssl_key = get_aw_env_var('ssl_file_key')
     if ssl_cert is not None and ssl_key is not None:
         if not Path(ssl_cert).is_file() or not Path(ssl_key).is_file():
             log(
@@ -71,7 +81,7 @@ def init_webserver():
                 **opts,
                 'keyfile': ssl_key,
                 'certfile': ssl_cert,
-                'ssl_version': PROTOCOL_TLSv1_2,
+                'ssl_context': ssl_context,
                 'do_handshake_on_connect': True,
             }
             scheme = 'https'

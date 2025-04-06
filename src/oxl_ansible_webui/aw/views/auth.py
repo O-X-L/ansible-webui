@@ -62,4 +62,5 @@ def user_logged_out_callback(sender, request, user, **kwargs):
 
 @receiver(user_login_failed)
 def user_login_failed_callback(sender, credentials, **kwargs):
+    del sender
     log_error(f"Login failed: User '{credentials['username']}'")
