@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# docker run --detach --name aw-psql --env POSTGRES_USER=aw --env POSTGRES_PASSWORD=test --env POSTGRES_DB=aw -p 5432:5432 postgres:latest
-# docker exec -u postgres -it aw-psql /usr/bin/psql
+# docker run --detach --name aw-psql --env POSTGRES_PASSWORD=test --env POSTGRES_DB=aw -p 5432:5432 postgres:latest
+# docker exec -u postgres -it aw-psql /bin/sh -c '/usr/bin/psql -d aw'
 
 set -e
 

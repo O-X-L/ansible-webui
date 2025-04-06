@@ -15,8 +15,8 @@ def saml_installed() -> bool:
 
 def mysql_installed() -> bool:
     try:
-        from MySQLdb import _mysql
-        del _mysql
+        from MySQLdb import connect
+        del connect
         return True
 
     except (ImportError, ModuleNotFoundError):

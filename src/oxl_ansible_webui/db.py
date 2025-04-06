@@ -1,13 +1,14 @@
+from time import time
 from pathlib import Path
 from shutil import copy, move
+from os import listdir, remove
 from datetime import datetime
 from sys import exit as sys_exit
 from secrets import choice as random_choice
 from string import digits, ascii_letters
-from os import listdir, remove
-from time import time
 from sqlite3 import connect as db_connect
-from sqlite3 import OperationalError, DatabaseError
+from sqlite3 import OperationalError as SQLiteOperationalError
+from sqlite3 import DatabaseError as SQLiteDatabaseError
 
 from aw.config.main import VERSION
 from aw.settings import DB_FILE
@@ -16,6 +17,7 @@ from aw.utils.debug import log, log_error, log_warn
 from aw.utils.deployment import deployment_prod
 from aw.config.hardcoded import FILE_TIME_FORMAT, GRP_MANAGER
 from aw.config.environment import check_aw_env_var_true, get_aw_env_var, check_aw_env_var_is_set
+from aw.dependencies import log_dependency_error
 
 # pylint: disable=C0415
 
@@ -29,6 +31,85 @@ DB_BACKUP_RETENTION = DB_BACKUP_RETENTION_DAYS * 24 * 60 * 60
 DB_TYPE = get_aw_env_var('db_type')
 if DB_TYPE is None or DB_TYPE not in ['mysql', 'psql', 'sqlite']:
     DB_TYPE = 'sqlite'
+
+try:
+    from MySQLdb import connect as mysql_connect
+    from MySQLdb._exceptions import MySQLError
+
+except (ImportError, ModuleNotFoundError):
+    if DB_TYPE == 'mysql':
+        log_dependency_error('MySQL', 'mysql')
+        raise EnvironmentError('Database-client dependencies are missing!')
+
+try:
+    from psycopg import connect as psql_connect
+    from psycopg.errors import Error as PSQLError
+
+except (ImportError, ModuleNotFoundError):
+    if DB_TYPE == 'psql':
+        log_dependency_error('PostgreSQL', 'psql')
+        raise EnvironmentError('Database-client dependencies are missing!')
+
+
+class AbstractDBConnection:
+    def __init__(self):
+        self.connection = None
+        self.cursor = None
+
+    def __enter__(self):
+        if DB_TYPE == 'sqlite':
+            self.connection = db_connect(DB_FILE)
+
+        elif DB_TYPE == 'mysql':
+            port = get_aw_env_var('db_port')
+            if port is not None:
+                port = int(port)
+
+            # pylint: disable=I1101
+            self.connection = mysql_connect(
+                host=get_aw_env_var('db_host'),
+                port=port,
+                user=get_aw_env_var('db_user'),
+                password=get_aw_env_var('db_pwd'),
+                database=get_aw_env_var('db'),
+            )
+            self.cursor = self.connection.cursor()
+
+        elif DB_TYPE == 'psql':
+            self.connection = psql_connect(
+                host=get_aw_env_var('db_host'),
+                port=get_aw_env_var('db_port'),
+                user=get_aw_env_var('db_user'),
+                password=get_aw_env_var('db_pwd'),
+                dbname=get_aw_env_var('db'),
+            )
+            self.cursor = self.connection.cursor()
+
+        else:
+            raise ValueError(f"Got unsupported DB-Type: '{DB_TYPE}'")
+
+        return self
+
+    def __exit__(self, a, b, c):
+        del a, b, c
+        self.cursor.close()
+        self.connection.close()
+
+    def execute(self, cmd: str) -> None:
+        if DB_TYPE == 'sqlite':
+            self.connection.execute(cmd)
+
+        else:
+            self.cursor.execute(cmd)
+
+        self.connection.commit()
+
+    def query(self, cmd: str) -> tuple:
+        if DB_TYPE == 'sqlite':
+            return self.connection.execute(cmd).fetchone()
+
+        self.cursor.execute(cmd)
+        return self.cursor.fetchone()
 
 
 def _sqlite_check_if_writable():
@@ -45,78 +126,75 @@ def _sqlite_check_if_writable():
 
 
 def _schema_up_to_date_base() -> bool:
-    if DB_TYPE == 'sqlite':
+    with AbstractDBConnection() as db:
         try:
-            with db_connect(DB_FILE) as conn:
-                return conn.execute('SELECT schema_version FROM aw_schemametadata').fetchall()[0][0] == VERSION
+            return db.query('SELECT schema_version FROM aw_schemametadata')[0] == VERSION
 
-        except (IndexError, OperationalError):
+        except (IndexError, SQLiteOperationalError, MySQLError, PSQLError):
             return False
-
-    return False
 
 
 def _schema_up_to_date() -> bool:
-    if DB_TYPE == 'sqlite':
-        if not Path(DB_FILE).is_file():
-            return False
+    if DB_TYPE == 'sqlite' and not Path(DB_FILE).is_file():
+        return False
 
-        try:
-            return _schema_up_to_date_base()
+    try:
+        return _schema_up_to_date_base()
 
-        except DatabaseError as err:
-            # this may happen if WAL or SHM got corrupted (p.e. connection was not closed gracefully)
-            log_warn(msg=f"Trying to fix database error: '{err}'", _stderr=True)
-            backup_ext = f".{datetime.now().strftime(FILE_TIME_FORMAT)}{DB_BACKUP_EXT}"
-            db_shm = f'{DB_FILE}-shm'
-            db_wal = f'{DB_FILE}-wal'
+    except SQLiteDatabaseError as err:
+        # this may happen if WAL or SHM got corrupted (p.e. connection was not closed gracefully)
+        log_warn(msg=f"Trying to fix database error: '{err}'", _stderr=True)
+        backup_ext = f".{datetime.now().strftime(FILE_TIME_FORMAT)}{DB_BACKUP_EXT}"
+        db_shm = f'{DB_FILE}-shm'
+        db_wal = f'{DB_FILE}-wal'
 
-            if Path(db_shm).is_file():
-                move(db_shm, f'{db_shm}{backup_ext}')
+        if Path(db_shm).is_file():
+            move(db_shm, f'{db_shm}{backup_ext}')
 
-            if Path(db_wal).is_file():
-                move(db_wal, f'{db_wal}{backup_ext}')
+        if Path(db_wal).is_file():
+            move(db_wal, f'{db_wal}{backup_ext}')
 
-            return _schema_up_to_date_base()
-
-    return _schema_up_to_date_base()
+        return _schema_up_to_date_base()
 
 
-def _get_current_schema_version() -> (str, None):
-    if DB_TYPE == 'sqlite':
-        try:
-            with db_connect(DB_FILE) as conn:
-                return conn.execute('SELECT schema_version FROM aw_schemametadata').fetchall()[0][0]
+# NOTE: we have to do this manually as django is not initialized yet
+def _get_schema_insert() -> str:
+    if DB_TYPE in ['mysql', 'psql']:
+        return ("INSERT INTO aw_schemametadata (created, updated, schema_version) VALUES "
+                f"(NOW(), NOW(), '{VERSION}')")
 
-        except (IndexError, OperationalError):
-            return None
+    return ("INSERT INTO aw_schemametadata (created, updated, schema_version) VALUES "
+            f"(DATETIME('now'), DATETIME('now'), '{VERSION}')")
 
-    return None
+
+def _get_schema_update(prev: str) -> str:
+    if DB_TYPE in ['mysql', 'psql']:
+        return ("UPDATE aw_schemametadata SET "
+                f"schema_version = '{VERSION}', schema_version_prev = '{prev}', "
+                "updated = NOW() WHERE id = 1")
+
+    return ("UPDATE aw_schemametadata SET "
+            f"schema_version = '{VERSION}', schema_version_prev = '{prev}', "
+            "updated = DATETIME('now') WHERE id = 1")
 
 
 def _update_schema_version() -> None:
-    previous = _get_current_schema_version()
+    with AbstractDBConnection() as db:
+        try:
+            previous = db.query('SELECT schema_version FROM aw_schemametadata')[0]
 
-    if DB_TYPE == 'sqlite':
-        with db_connect(DB_FILE) as conn:
-            try:
-                if previous is None:
-                    conn.execute(
-                        "INSERT INTO aw_schemametadata (created, updated, schema_version) VALUES "
-                        f"(DATETIME('now'), DATETIME('now'), '{VERSION}')",
-                    )
+        except (IndexError, SQLiteOperationalError, MySQLError, PSQLError):
+            previous = None
 
-                else:
-                    conn.execute(
-                        "UPDATE aw_schemametadata SET "
-                        f"schema_version = '{VERSION}', schema_version_prev = '{previous}', "
-                        "updated = DATETIME('now') WHERE id = 1"
-                    )
+        try:
+            if previous is not None:
+                db.execute(_get_schema_update(previous))
 
-                conn.commit()
+            else:
+                db.execute(_get_schema_insert())
 
-            except (IndexError, OperationalError) as err:
-                log(msg=f"Unable to update database schema version: '{err}'", level=3)
+        except (IndexError, SQLiteOperationalError, MySQLError, PSQLError) as err:
+            log(msg=f"Unable to update database schema version: '{err}'", level=3)
 
 
 def install_or_migrate_db():
@@ -176,7 +254,7 @@ def sqlite_install():
 def sqlite_migrate():
     _sqlite_clean_old_db_backups()
 
-    if _migration_needed() and check_aw_env_var_true(var='db_migrate', fallback=True):
+    if not _schema_up_to_date() and check_aw_env_var_true(var='db_migrate', fallback=True):
         backup = f"{DB_FILE}.{datetime.now().strftime(FILE_TIME_FORMAT)}{DB_BACKUP_EXT}"
         log(msg=f"Creating database backup: '{backup}'", level=6)
         copy(src=DB_FILE, dst=backup)
@@ -212,10 +290,6 @@ def net_install_migrate():
     log(msg=f"Using DB: {db}", level=4)
     _manage_db(action='migration', cmd=['migrate'])
     _update_schema_version()
-
-
-def _migration_needed() -> bool:
-    return not _schema_up_to_date()
 
 
 def _get_random_pwd() -> str:
@@ -267,7 +341,7 @@ def create_schedule_user():
         )
 
 
-def cleanup_job_stati():
+def cleanup_executions():
     from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED
     from aw.model.job import JobExecution
     from aw.model.job_credential import JobUserTMPCredentials

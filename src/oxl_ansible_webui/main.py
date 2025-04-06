@@ -93,7 +93,7 @@ def main():
     django_setup()
     environ['AW_INIT'] = '0'
 
-    from db import create_first_superuser, create_manager_groups, cleanup_job_stati, create_schedule_user
+    from db import create_first_superuser, create_manager_groups, cleanup_executions, create_schedule_user
     from handle_signals import handle_signals
     from webserver import init_webserver
     from aw.execute.scheduler import init_scheduler
@@ -104,6 +104,6 @@ def main():
     create_first_superuser()
     create_manager_groups()
     create_schedule_user()
-    cleanup_job_stati()
+    cleanup_executions()
     init_scheduler(handle_signals)
     init_webserver()

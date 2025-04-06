@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # docker run --detach --name aw-mariadb --env MARIADB_ROOT_PASSWORD=test --env MARIADB_DATABASE=aw -p 3306:3306 mariadb:latest
+# docker exec -it aw-mariadb /bin/sh -c '/usr/bin/mariadb -D aw -p'
 
 set -e
 
