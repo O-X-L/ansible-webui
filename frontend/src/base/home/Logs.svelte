@@ -23,11 +23,12 @@
 
     let apiResponseHandler: APIResponseHandler = $state();
     let jobList: jobType[] = $state([]);
-    let executionList = $state({});
+    let executionList: executionType[] = $state([]);
     let entryActions = $state({});
     let apiErrorMsg = $state('');
     let apiSuccessMsg = $state('');
-    let apiDataHash = $state('');
+    let apiDataHashJobs = $state('');
+    let apiDataHashExecs = $state('');
     let updateLoop: number = $state(0);
     let openJob: number|null = $state(null);
     let executionCount: number = $state(20);
@@ -60,7 +61,7 @@
     }
 
     function loadJobList(j: any, h: string) {
-        if (j === null || h == apiDataHash) {
+        if (j === null || h == apiDataHashJobs) {
             return;
         }
         for (let job of j) {
@@ -69,15 +70,15 @@
             }
         }
         jobList = j;
-        apiDataHash = h;
+        apiDataHashJobs = h;
         if (!loaded) {
             loaded = true;
             openLogsByURL();
         }
     }
 
-    function loadExecutionList(j: any) {
-        if (j === null) {
+    function loadExecutionList(j: any, h: string) {
+        if (j === null || h == apiDataHashExecs) {
             return;
         }
         for (let exec of j) {
@@ -85,7 +86,8 @@
                 entryActions[openJob][exec.id] = false;
             }
         }
-        executionList[openJob] = j;
+        executionList = j;
+        apiDataHashExecs = h;
     }
 
     function buildUpdateJobList() {
@@ -93,30 +95,19 @@
             // tab in background
             return;
         }
-        apiGet(`job?hash=${apiDataHash}`, loadJobList);
+        apiGet(`job?hash=${apiDataHashJobs}`, loadJobList);
     }
 
-    function buildUpdateExecutionList(actions: any) {
-        let anyOpen = false;
-        let openJobID = 0;
-        for (let [j, v] of Object.entries(actions)) {
-            if (v.open) {
-                anyOpen = true;
-                openJobID = j;
-                break;
-            }
-        }
-        if (!anyOpen || openJobID == openJob) {
+    function buildUpdateExecutionList() {
+        if (!openJob) {
             return;
         }
-        openJob = openJobID;
-        executionList[openJob] = [];
 
         if (!open || typeof(document.hidden) !== undefined && document['hidden']) {
             // tab in background
             return;
         }
-        apiGet(`job_exec/${openJob}?execution_count=${executionCount}`, loadExecutionList);
+        apiGet(`job_exec/${openJob}?execution_count=${executionCount}&hash=${apiDataHashExecs}`, loadExecutionList);
     }
 
     function openLogsByURL() {
@@ -136,8 +127,21 @@
         }
     }
 
+    function updateOpenJob(actions: any = ''){
+        for (let [j, v] of Object.entries(actions)) {
+            if (v.open) {
+                openJob = j;
+                return;
+            }
+        }
+        openJob = null;
+    }
+
     $effect(() => {
-        buildUpdateExecutionList(entryActions);
+        updateOpenJob(entryActions);
+        if (!openJob) {
+            executionList = [];
+        }
     });
 
     onMount(() => {
@@ -147,6 +151,7 @@
         clearInterval(updateLoop);
         updateLoop = setInterval(() => {
             buildUpdateJobList();
+            buildUpdateExecutionList();
         }, $share.updateInterval);
     });
 
@@ -161,7 +166,7 @@
     {#each jobList as job (job.id)}
         <AccordionItem bind:open={entryActions[job.id]['open']} defaultClass="{classSpoilerItem} logs-job-{job.id}">
             <span slot="header">{job.name}</span>
-            {#if !executionList[job.id] || !executionList[job.id].length}
+            {#if !executionList.length}
                 <div class={classSpinnerDiv}><Spinner/></div>
             {:else}
             <Table striped={true} id="logs-{job.id}" shadow>
@@ -172,7 +177,7 @@
                     <TableHeadCell>{t('common.actions')}</TableHeadCell>
                 </TableHead>
                 <TableBody tableBodyClass="divide-y">
-                    {#each executionList[job.id] as exec, execIdx (exec.id)}
+                    {#each executionList as exec, execIdx (exec.id)}
                     <TableBodyRow>
                         <TableBodyCell tdClass={classListContent}>
                             <div>{t('logs.time_start_short')}: {exec.time_start}</div>
@@ -204,7 +209,7 @@
                         </TableBodyCell>
                         <TableBodyCell tdClass={classListContent}>
                             <LogsView bind:open={entryActions[job.id][exec.id]}
-                                jobID={job.id} jobName={job.name} bind:exec={executionList[job.id][execIdx]} />
+                                jobID={job.id} jobName={job.name} bind:exec={executionList[execIdx]} />
                             <Button size="xs" on:click={() => {entryActions[job.id][exec.id] = true}}
                                 id="logs-job-{job.id}-show">
                                 <BookOpenSolid/>

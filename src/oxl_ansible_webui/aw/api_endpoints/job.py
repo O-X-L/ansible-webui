@@ -526,6 +526,7 @@ class APIJobExecution(APIView):
                 description='Maximum count of job-executions to return',
                 required=False,
             ),
+            API_PARAM_HASH,
         ],
     )
     def get(self, request):
@@ -538,7 +539,7 @@ class APIJobExecution(APIView):
         for execution in JobExecution.objects.filter(job__in=jobs).order_by('-updated')[:exec_count]:
             serialized.append(get_job_execution_serialized(execution))
 
-        return Response(data=serialized, status=200)
+        return response_data_if_changed(request, data=serialized)
 
 
 class APIJobExecutionSingleJob(APIView):
@@ -561,6 +562,7 @@ class APIJobExecutionSingleJob(APIView):
                 description='Maximum count of job-executions to return',
                 required=False,
             ),
+            API_PARAM_HASH,
         ],
     )
     def get(self, request, job_id: int):
@@ -581,4 +583,4 @@ class APIJobExecutionSingleJob(APIView):
         for execution in JobExecution.objects.filter(job=job).order_by('-updated')[:exec_count]:
             serialized.append(get_job_execution_serialized(execution))
 
-        return Response(data=serialized, status=200)
+        return response_data_if_changed(request, data=serialized)

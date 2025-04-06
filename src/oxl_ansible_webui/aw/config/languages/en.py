@@ -16,6 +16,7 @@ EN = {
     'btn.delete': 'Delete',
     'btn.stop': 'Stop',
     'btn.logs': 'Logs',
+    'btn.pause': 'Pause',
     'btn.download': 'Download',
     'nav.home': 'Home',
     'nav.system': 'System',

@@ -1,15 +1,16 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
 
-    import { InfoCircleSolid, CloseCircleSolid } from 'flowbite-svelte-icons';
-    import { Spinner, Modal, Heading, Button, Tooltip } from 'flowbite-svelte';
+    import { InfoCircleSolid, CloseCircleSolid, StopSolid } from 'flowbite-svelte-icons';
+    import { Spinner, Modal, Heading, Button, Tooltip, Toggle } from 'flowbite-svelte';
 
     import { share } from '../../Share.js';
-    import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
     // import { type executionType } from '../Types.js';
+    import { apiGet, apiEdit } from '../../../util/api.js';
+    import { JOB_EXEC_STATI_ACTIVE } from '../../Config.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
-    import { classModalBackdrop, classSpinnerDiv, classCenterChildDiv, classModalBtns } from '../../Style.js';
+    import { classModalBackdrop, classSpinnerDiv, classCenterChildDiv } from '../../Style.js';
 
     let {
         open = $bindable(false),
@@ -33,12 +34,17 @@
     let logLines: logLineType[] = $state([]);
     let finished = $state(false);
     let lineNr = $state(1);
+    let apiSuccessMsg = $state('');
+    let followLogsToggle = $state(true);
 
     function t(code: string) : string {
         return tq($share, code);
     }
 
     function followLogs() {
+        if (!followLogsToggle) {
+            return;
+        }
         let e = document.getElementById(endDiv);
         if (e) {
             e.scrollIntoView({behavior: "smooth", block: "end", inline: "end"});
@@ -60,6 +66,15 @@
         if (lastLogLine >= j.count && j.finished) {
             finished = true;
         }
+    }
+
+    function stopJob() {
+        apiSuccessMsg = 'jobs.action.stop';
+        apiEdit('delete', `job/${jobID}/${exec.id}`, null, apiResponseHandler.handleRes);
+    }
+
+    function isExecActive() : boolean {
+        return JOB_EXEC_STATI_ACTIVE.includes(exec.status);
     }
 
     function buildUpdateLogsList() {
@@ -88,7 +103,7 @@
     });
 </script>
 
-<APIResponseHandler bind:this={apiResponseHandler} />
+<APIResponseHandler bind:this={apiResponseHandler} bind:successMsg={apiSuccessMsg} />
 
 <Modal bind:open={open} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
     <Heading tag="h2">{t('logs.job_logs')} "{jobName}"</Heading>
@@ -163,11 +178,27 @@
                 <InfoCircleSolid class="inline-block mr-2" /> {t('logs.exec_finished')}
             </div>
         {/if}
-        <div class={classModalBtns}>
-            <Button id="logs-btn-close" on:click={() => (open = false)} class="inline-block ml-2"><CloseCircleSolid/></Button>
-            <Tooltip>{t('btn.close')}</Tooltip>
-        </div>
         <div class="h-28"></div>
         <div id={endDiv} class="w-0 h-0"></div>
     {/if}
+    <div class="fixed bottom-10 right-96">
+        <div class={classCenterChildDiv}>
+            <Button id="logs-btn-close" on:click={() => (open = false)}>
+                <CloseCircleSolid/>
+            </Button>
+            <Tooltip>{t('btn.close')}</Tooltip>
+
+            {#if isExecActive()}
+                <div class="inline-block ml-2 {classCenterChildDiv}">
+                    <Toggle id="logs-btn-pause" bind:checked={followLogsToggle} />
+                    <Tooltip>{t('btn.pause')}</Tooltip>
+                </div>
+
+                <Button id="logs-btn-stop" on:click={() => {stopJob()}} class="ml-2">
+                    <StopSolid/>
+                </Button>
+                <Tooltip>{t('btn.stop')}</Tooltip>
+            {/if}
+        </div>
+    </div>
 </Modal>

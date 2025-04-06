@@ -1,7 +1,5 @@
 from pathlib import Path
-from string import ascii_letters
 from multiprocessing import cpu_count
-from random import choice as random_choice
 from ssl import SSLContext, TLSVersion
 from ssl import CERT_NONE as VERIFY_CERT_NONE
 
@@ -57,7 +55,7 @@ def ssl_context(conf, default_ssl_context_factory) -> SSLContext:
 
 
 def init_webserver():
-    gunicorn.SERVER = ''.join(random_choice(ascii_letters) for _ in range(10))
+    gunicorn.SERVER = 'Ansible WebUI'
     opts = {
         'workers': (cpu_count() * 2) + 1,
         **OPTIONS_PROD
