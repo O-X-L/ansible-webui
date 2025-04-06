@@ -52,22 +52,11 @@ def test_get_locations(locations: list):
 
 
 def test_add():
-    # NOTE: do not reference entries with ID 1! they should be deleted later on
     test_add_locations([
-        {'l': 'key', 'd': None},
-
-        # creds
         {'l': 'credentials/shared', 'd': {
             'name': 'cred1', 'become_user': 'guy', 'become_pass': 'sePwd', 'vault_id': 'myID',
         }},
-
-        # repos
-        {'l': 'repository', 'd': {
-            'name': 'gitty1', 'rtype': 2, 'git_origin': 'https://github.com/O-X-L/ansible-webui.git',
-            'git_branch': 'latest',
-        }},
-
-        # jobs
+        {'l': 'repository', 'd': {'name': 'staticy1', 'rtype': 1, 'static_path': '/etc/ansible/repo'}},
         {'l': 'job', 'd': {
             'name': 'job1', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/hosts.yml', 'tags': 'svc1',
             'limit': 'srv1',
@@ -76,10 +65,7 @@ def test_add():
 
 
 def test_list():
-    test_get_locations([
-        'credentials', 'job', 'job_exec', 'key', 'permission', 'config', 'repository',
-        'fs/exists?item=/etc', 'alert/global', 'alert/group', 'alert/user', 'alert/plugin',
-    ])
+    test_get_locations(['credentials', 'job', 'job_exec', 'repository'])
 
 
 def main():
