@@ -13,11 +13,16 @@ tbd
 Fixes:
 
 * Quote value of prompted extra vars [#23](https://github.com/O-X-L/ansible-webui/issues/23)
+* SAML Authentication fixes [#4](https://github.com/O-X-L/ansible-webui/issues/4)
 
 Features:
 
 * Ability to supply one-off credentials at execution [#18](https://github.com/O-X-L/ansible-webui/issues/18)
 * MariaDB, MySQL and PostgreSQL Support [#24](https://github.com/O-X-L/ansible-webui/issues/24)
+
+Chore:
+
+* Cleaned-up Credentials-API
 
 ### 0.8.1
 

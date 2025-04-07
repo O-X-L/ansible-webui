@@ -9,7 +9,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 import chromedriver_autoinstaller
 
-# pylint: disable=R0801
+# pylint: disable=R0801,R0916
 
 BASE_URL = 'http://127.0.0.1:8000'
 options = webdriver.ChromeOptions()

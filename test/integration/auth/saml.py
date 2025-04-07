@@ -6,10 +6,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException
 import chromedriver_autoinstaller
 
-# pylint: disable=R0801
+# pylint: disable=R0801,R0916
 
 BASE_URL = 'http://127.0.0.1:8000'
 options = webdriver.ChromeOptions()
@@ -162,6 +161,7 @@ def login_failure():
     assert reqs['main'] is not None
     assert reqs['main'].response.status_code == 403
 
+    # pylint: disable=W0212
     res_body = reqs['main'].response._body.decode('utf-8')
     error_msg = 'You are not allowed to access this app'
     error_code = 'Error code: 1124 (USER_MISMATCH)'
