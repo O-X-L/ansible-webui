@@ -142,7 +142,7 @@ def _login_base() -> bool:
     DRIVER.find_element(By.ID, 'password').send_keys(Keys.RETURN)
 
     # wait for IDP to redirect us
-    sleep(1)
+    sleep(3)
     return True
 
 
