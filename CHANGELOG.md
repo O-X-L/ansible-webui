@@ -14,6 +14,7 @@ Fixes:
 
 * Quote value of prompted extra vars [#23](https://github.com/O-X-L/ansible-webui/issues/23)
 * SAML Authentication fixes [#4](https://github.com/O-X-L/ansible-webui/issues/4)
+* Execution-issues from cli [#25](https://github.com/O-X-L/ansible-webui/issues/25)
 
 Features:
 

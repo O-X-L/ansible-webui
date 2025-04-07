@@ -271,6 +271,7 @@ def logout():
 
     url = f'{BASE_URL}/o/'
     try:
+        sleep(3)
         _click_on('nav-btn-logout')
 
     except NoSuchElementException:
