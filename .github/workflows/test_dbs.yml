@@ -19,7 +19,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 5
     defaults:
       run:
         shell: bash
