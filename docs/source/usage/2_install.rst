@@ -102,3 +102,33 @@ Enabling & starting the service:
     systemctl start ansible-webui.service
 
 For production usage you should use a proxy like nginx in from of the Ansible-WebUI webservice!
+
+----
+
+Migration from ansibleguy-webui
+*******************************
+
+* If running => stop the service
+* Make a backup-copy of your database-file:
+
+  .. code-block:: bash
+
+      cp ${HOME}/.config/ansible-webui/aw.db ${HOME}/.config/ansible-webui/aw.db.upgrade.bak
+
+* Uninstall
+
+  .. code-block:: bash
+
+      pip uninstall ansibleguy-webui
+
+* Install
+
+  .. code-block:: bash
+
+      pip install oxl-ansible-webui
+
+* Try to run
+
+  .. code-block:: bash
+
+      oxl-ansible-webui
