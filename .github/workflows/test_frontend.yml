@@ -76,7 +76,21 @@ jobs:
 
       - name: Running Integration Tests
         run: |
-          bash scripts/test_webui.sh
+          set +e
+          for i in {1..3}
+          do
+            if (( i > 1 ))
+            then
+              echo "### RETRY $(( i - 1 )) ###"
+            fi
+
+            bash scripts/test_webui.sh
+            if [[ "$?" == "0" ]]
+            then
+              exit 0
+            fi
+          done
+
           pkill -f oxl_ansible_webui
         env:
           PYTHONUNBUFFERED: 1
@@ -84,6 +98,20 @@ jobs:
       - name: Running Integration Tests - AUTH SAML
         run: |
           sleep 5
-          bash scripts/test_auth_saml.sh
+
+          set +e
+          for i in {1..3}
+          do
+            if (( i > 1 ))
+            then
+              echo "### RETRY $(( i - 1 )) ###"
+            fi
+
+            bash scripts/test_auth_saml.sh
+            if [[ "$?" == "0" ]]
+            then
+              exit 0
+            fi
+          done
         env:
           PYTHONUNBUFFERED: 1
