@@ -20,6 +20,7 @@ Features:
 
 * Ability to supply one-off credentials at execution [#18](https://github.com/O-X-L/ansible-webui/issues/18)
 * MariaDB, MySQL and PostgreSQL Support [#24](https://github.com/O-X-L/ansible-webui/issues/24)
+* Passing AW username & email as env-vars to Ansible [#5](https://github.com/O-X-L/ansible-webui/issues/5)
 
 Chore:
 
