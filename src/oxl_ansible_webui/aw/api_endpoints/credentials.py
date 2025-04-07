@@ -178,7 +178,9 @@ def _validate_create_creds(serializer: serializers.BaseSerializer) -> (None, Res
     return None
 
 
-def _update_creds(credentials: BaseJobCredentials, serializer: serializers.BaseSerializer) -> (None, Response):
+def _update_creds(
+        credentials: BaseJobCredentials, serializer: serializers.BaseSerializer,
+    ) -> (None, Response):
     if not serializer.is_valid():
         return Response(
             data={'error': f"Provided credentials data is not valid: '{serializer.errors}'"},
@@ -326,7 +328,7 @@ class APIJobTMPCredentials(APIView):
     permission_classes = API_PERMISSION
 
     @extend_schema(
-        request=JobSharedCredentialsWriteRequest,
+        request=JobTMPCredentialsWriteRequest,
         responses=api_docs_post('Credentials'),
         summary='Create temporary-credentials.',
         operation_id='credentials_tmp_create',
@@ -460,7 +462,7 @@ class APIJobSharedCredentialsItem(APIView):
                 status=403,
             )
 
-        serializer = self.serializer_class(data=request.data)
+        serializer = JobSharedCredentialsWriteRequest(data=request.data)
         update_error = _update_creds(credentials, serializer)
         if update_error is not None:
             return update_error
@@ -537,7 +539,7 @@ class APIJobUserCredentialsItem(APIView):
         }, status=200)
 
     @extend_schema(
-        request=JobSharedCredentialsWriteRequest,
+        request=JobUserCredentialsWriteRequest,
         responses=api_docs_put('Credentials'),
         summary='Modify user-credentials.',
         operation_id='credentials_user_edit',
@@ -552,8 +554,8 @@ class APIJobUserCredentialsItem(APIView):
                 status=404,
             )
 
-        serializer = self.serializer_class(data=request.data)
-        update_error = _update_creds(credentials, serializer)
+        serializer = JobUserCredentialsWriteRequest(data=request.data)
+        credentials, update_error = _update_creds(credentials, serializer)
         if update_error is not None:
             return update_error
 

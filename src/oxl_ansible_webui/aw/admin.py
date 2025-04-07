@@ -6,7 +6,7 @@ from aw.base import USERS
 from aw.model.api import AwAPIKey
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobError, JobExecutionResultHost
 from aw.model.permission import JobPermission, JobPermissionMemberUser, JobPermissionMemberGroup, \
-    JobPermissionMapping
+    JobPermissionMapping, JobCredentialsPermissionMapping, JobRepositoryPermissionMapping
 from aw.model.job_credential import JobSharedCredentials, JobUserCredentials
 from aw.model.repository import Repository
 from aw.model.system import SystemConfig, UserExtended
@@ -32,6 +32,8 @@ admin.site.register(JobPermission)
 admin.site.register(JobPermissionMemberUser)
 admin.site.register(JobPermissionMemberGroup)
 admin.site.register(JobPermissionMapping)
+admin.site.register(JobCredentialsPermissionMapping)
+admin.site.register(JobRepositoryPermissionMapping)
 admin.site.register(JobExecutionResult)
 admin.site.register(JobExecutionResultHost)
 admin.site.register(JobError)
