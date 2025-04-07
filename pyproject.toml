@@ -50,6 +50,6 @@ where = ["src"]
 "*" = ["*.html", "*.js", "*.css", "*.svg", "*.txt"]
 
 [project.scripts]
-oxl-ansible-webui = "oxl_ansible_webui:main"
-oxl-ansible-webui-cli = "oxl_ansible_webui:cli"
-oxl-ansible-webui-manage = "oxl_ansible_webui:manage"
+oxl-ansible-webui = "oxl_ansible_webui.__script__:main"
+oxl-ansible-webui-cli = "oxl_ansible_webui.__script__:cli"
+oxl-ansible-webui-manage = "oxl_ansible_webui.__script__:manage"

@@ -22,3 +22,6 @@ PyYAML
 
 # email
 premailer
+
+# environment (get versions of other modules)
+setuptools

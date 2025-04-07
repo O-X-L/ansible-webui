@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
+from os import environ
+from os import path as os_path
+from sys import argv as sys_argv
+from sys import exit as sys_exit
+from sys import path as sys_path
+
 
 def entrypoint():
     # pylint: disable=C0415,E0401
-    from sys import argv as sys_argv
-    from sys import exit as sys_exit
-    from sys import path as sys_path
-    from os import path as os_path
-    from os import environ
-
     try:
         from main import main
 
