@@ -34,7 +34,7 @@ oxl-ansible-webui
 
 ### Docker
 
-Images: [ansible-webui](https://hub.docker.com/r/oxlorg/ansible-webui), [ansible-webui-unprivileged](https://hub.docker.com/r/oxlorg/ansible-webui-unprivileged), [ansible-webui-aws](https://hub.docker.com/r/oxlorg/ansible-webui-aws)
+Images: [ansible-webui](https://hub.docker.com/r/oxlorg/ansible-webui), [ansible-webui-unprivileged](https://hub.docker.com/r/oxlorg/ansible-webui-unprivileged), [ansible-webui-mysql](https://hub.docker.com/r/oxlorg/ansible-webui-mysql), [ansible-webui-psql](https://hub.docker.com/r/oxlorg/ansible-webui-psql), [ansible-webui-aws](https://hub.docker.com/r/oxlorg/ansible-webui-aws)
 
 ```bash
 docker image pull oxlorg/ansible-webui:latest

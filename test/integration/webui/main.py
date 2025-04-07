@@ -32,6 +32,7 @@ def _get_requests(url: str) -> dict:
     for r in DRIVER.requests:
         if not r.response or r.url.endswith('favicon.ico') or \
                 r.url.find('google') != -1 or \
+                r.url.find('gvt1.com') != -1 or \
                 r.url.find('chrome_component') != -1 or \
                 r.url.find('chromewebstore') != -1:
             continue

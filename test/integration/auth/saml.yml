@@ -8,9 +8,9 @@
 AUTH: 'saml'
 SAML:
     METADATA_AUTO_CONF_URL: 'https://mocksaml.com/api/saml/metadata'
-    ASSERTION_URL: 'http://localhost:8000'
-    ENTITY_ID: 'http://localhost:8000/a/saml/acs/'
-    DEFAULT_NEXT_URL: 'http://localhost:8000/'
+    ASSERTION_URL: 'http://127.0.0.1:8000'
+    ENTITY_ID: 'http://127.0.0.1:8000/a/saml/acs/'
+    DEFAULT_NEXT_URL: 'http://127.0.0.1:8000/'
 
     CREATE_USER: true
     NEW_USER_PROFILE:
