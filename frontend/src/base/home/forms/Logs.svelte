@@ -2,7 +2,7 @@
     import { onMount, onDestroy } from 'svelte';
 
     import { InfoCircleSolid, CloseCircleSolid, StopSolid } from 'flowbite-svelte-icons';
-    import { Spinner, Modal, Heading, Button, Tooltip, Toggle } from 'flowbite-svelte';
+    import { Spinner, Modal, Heading, Button, Tooltip, Toggle, Alert } from 'flowbite-svelte';
 
     import { share } from '../../Share.js';
     import { tq } from '../../../util/translate.js';
@@ -10,7 +10,7 @@
     import { apiGet, apiEdit } from '../../../util/api.js';
     import { JOB_EXEC_STATI_ACTIVE } from '../../Config.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
-    import { classModalBackdrop, classSpinnerDiv, classCenterChildDiv } from '../../Style.js';
+    import { classModalBackdrop, classSpinnerDiv, classCenterChildDiv, classModalLabel } from '../../Style.js';
 
     let {
         open = $bindable(false),
@@ -82,7 +82,7 @@
             // tab in background
             return;
         }
-        if (finished) {
+        if (finished || !isExecActive) {
             return;
         }
         apiGet(`job/${jobID}/${exec.id}/log/${lastLogLine}`, loadLogLines);
@@ -107,7 +107,23 @@
 
 <Modal bind:open={open} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
     <Heading tag="h2">{t('logs.job_logs')} "{jobName}"</Heading>
-    {#if !logLines.length}
+    {#if exec.failed}
+        <div class="mt-20 mb-10 font-bold text-lg {classCenterChildDiv}">
+            <CloseCircleSolid class="inline-block mr-2" /> {t('logs.exec_failed')}
+        </div>
+        {#if exec.error_s}
+            <Alert color="red" class="mx-20 my-10">
+                <div class="font-bold">{t('logs.error_short')}</div>
+                <div>{exec.error_s}</div>
+            </Alert>
+        {/if}
+        {#if exec.error_m}
+            <Alert color="red" class="mx-20 my-10">
+                <div class="font-bold">{t('logs.error_medium')}</div>
+                <div>{exec.error_m}</div>
+            </Alert>
+        {/if}
+    {:else if !logLines.length}
         <div class={classSpinnerDiv}><Spinner/></div>
     {:else}
         <table>

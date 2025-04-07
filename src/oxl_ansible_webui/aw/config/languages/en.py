@@ -255,6 +255,9 @@ EN = {
     'logs.repo_log_file': 'Repository log file',
     'logs.repo_error_log_file': 'Repository error-log file',
     'logs.exec_finished': 'Execution finished!',
+    'logs.exec_failed': 'Execution failed!',
+    'logs.error_short': 'Error Summary',
+    'logs.error_medium': 'Error',
 
     # system
     'system.settings': 'Settings',
