@@ -227,6 +227,7 @@ def logout():
     _open_and_wait_for_load(url)
     DRIVER.refresh()
     _wait_for_load()
+    sleep(3)
 
     url = f'{BASE_URL}/o/'
     _click_on('nav-btn-logout')
