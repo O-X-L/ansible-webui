@@ -74,6 +74,8 @@ jobs:
           then
             exit 1
           fi
+        env:
+          PYTHONUNBUFFERED: 1
 
       - name: Extract tag name
         id: version
@@ -86,6 +88,8 @@ jobs:
 
           echo "${{ steps.version.outputs.TAG_NAME }}" > VERSION
           python3 -m build
+        env:
+          PYTHONUNBUFFERED: 1
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

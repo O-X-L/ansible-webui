@@ -18,6 +18,7 @@ IMAGE_REPO="oxlorg/ansible-webui"
 IMAGE_REPO_UNPRIV="${IMAGE_REPO}-unprivileged"
 IMAGE_REPO_AWS="${IMAGE_REPO}-aws"
 IMAGE_REPO_MYSQL="${IMAGE_REPO}-mysql"
+IMAGE_REPO_PSQL="${IMAGE_REPO}-psql"
 
 # todo: allow for multi-platform builds
 # RELEASE_ARCHS="linux/arm/v7,linux/arm64/v8,linux/amd64"
@@ -33,6 +34,9 @@ image_aws_latest="${IMAGE_REPO_AWS}:latest"
 
 image_mysql="${IMAGE_REPO_MYSQL}:${VERSION}"
 image_mysql_latest="${IMAGE_REPO_MYSQL}:latest"
+
+image_psql="${IMAGE_REPO_PSQL}:${VERSION}"
+image_psql_latest="${IMAGE_REPO_PSQL}:latest"
 
 container="ansible-webui-${VERSION}"
 
@@ -66,6 +70,7 @@ then
     docker image rm "$image_unpriv_latest" || true
     docker image rm "$image_aws_latest" || true
     docker image rm "$image_mysql_latest" || true
+    docker image rm "$image_psql_latest" || true
   fi
 fi
 
@@ -103,4 +108,13 @@ docker build -f Dockerfile_production_mysql -t "$image_mysql" --network host --b
 if [[ "$REPLY" =~ ^[Yy]$ ]]
 then
   docker build -f Dockerfile_production_mysql -t "$image_mysql_latest" --network host --build-arg "AW_VERSION=${VERSION}" .
+fi
+
+echo ''
+echo "### BUILDING IMAGE ${image_psql} ###"
+docker build -f Dockerfile_production_psql -t "$image_psql" --network host --build-arg "AW_VERSION=${VERSION}" --no-cache --progress=plain .
+
+if [[ "$REPLY" =~ ^[Yy]$ ]]
+then
+  docker build -f Dockerfile_production_psql -t "$image_psql_latest" --network host --build-arg "AW_VERSION=${VERSION}" .
 fi

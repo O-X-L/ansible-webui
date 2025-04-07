@@ -1,0 +1,9 @@
+ARG AW_VERSION=0.0
+
+FROM oxlorg/ansible-webui-unprivileged:${AW_VERSION}
+ARG AW_USER=aw
+
+USER root
+RUN pip install --no-cache-dir "oxl-ansible-webui[psql] @ git+https://github.com/O-X-L/ansible-webui.git@${AW_VERSION}"
+
+USER ${AW_USER}
