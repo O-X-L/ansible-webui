@@ -90,13 +90,18 @@ jobs:
               exit 0
             fi
           done
-
-          pkill -f oxl_ansible_webui
+          exit 1
         env:
           PYTHONUNBUFFERED: 1
 
+      - name: Install AUTH SAML dependencies
+        run: |
+          sudo apt install xmlsec1
+          pip install grafana-django-saml2-auth
+
       - name: Running Integration Tests - AUTH SAML
         run: |
+          pkill -f oxl_ansible_webui
           sleep 5
 
           set +e
@@ -113,5 +118,6 @@ jobs:
               exit 0
             fi
           done
+          exit 1
         env:
           PYTHONUNBUFFERED: 1
