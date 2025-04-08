@@ -75,6 +75,70 @@ You can find a nginx config example here: `Nginx config example <https://github.
 
 ----
 
+Databases
+*********
+
+.. _usage_install_db:
+
+Migrate Data
+============
+
+You can migrate data between database-types.
+
+Make sure to use the same AW-version on dump and load!
+
+.. code-block:: mysql
+
+    # dump to file
+    oxl-ansible-webui-manage dumpdata > aw-dump.json
+
+    # change db config
+
+    # load from file
+    oxl-ansible-webui-manage loaddata aw-dump.json
+
+MariaDB / MySQL
+===============
+
+* Install dependencies:
+
+    .. code-block:: bash
+
+        # debian-based
+        apt install default-libmysqlclient-dev pkg-config
+        pip install oxl-ansible-webui[mysql]
+
+        # alpine
+        apk add py3-mysqlclient
+
+* Setup DB & User:
+
+    .. code-block:: mysql
+
+        CREATE USER 'aw'@'%' IDENTIFIED BY '<PASSWORD>';
+        CREATE DATABASE aw CHARACTER SET utf8;
+        GRANT ALL PRIVILEGES ON aw.* TO 'aw'@'%';
+        FLUSH PRIVILEGES;
+
+PostgreSQL
+==========
+
+* Install dependencies:
+
+    .. code-block:: bash
+
+        pip install oxl-ansible-webui[psql]
+
+* Setup DB & User:
+
+    .. code-block:: psql
+
+        CREATE USER aw WITH PASSWORD '<PASSWORD>';
+        CREATE DATABASE aw;
+        GRANT ALL PRIVILEGES ON aw TO aw;
+
+----
+
 Ansible Role
 ************
 

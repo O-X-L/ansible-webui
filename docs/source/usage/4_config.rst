@@ -129,25 +129,8 @@ Some settings are only available as environmental variables.
 
    Choices: :code:`mysql`, :code:`postgresql`
 
-   * For non-SQLite you will have to install the dependencies: :code:`oxl-ansible-webui[mysql]` or :code:`oxl-ansible-webui[psql]`
+   See also: :ref:`Install Notes <usage_install_db>`
 
-     For MariaDB/MySQL you might also have to install a system dependency: :code:`apt install default-libmysqlclient-dev` or :code:`apk add mariadb-dev`
-
-   * **Tip**: You can migrate data between database-types like this:
-
-     Make sure to use the same AW-version on dump and load!
-
-     * Dump: :code:`oxl-ansible-webui-manage dumpdata > dump.json`
-     * Load: :code:`oxl-ansible-webui-manage loaddata dump.json`
-
-   * **MariaDB/MySQL setup**:
-
-     .. code-block:: mysql
-
-         CREATE DATABASE aw CHARACTER SET utf8;
-         CREATE USER 'aw'@'%' IDENTIFIED BY '<PASSWORD>';
-         GRANT ALL PRIVILEGES ON aw.* TO 'aw'@'%';
-         FLUSH PRIVILEGES;
 
 * **AW_DB**
 
@@ -161,6 +144,11 @@ Some settings are only available as environmental variables.
 * **AW_DB_HOST**
 
    Database hostname/DNS/IP.
+
+
+* **AW_DB_SOCKET**
+
+   Alternative to AW_DB_HOST when using MariaDB/MySQL
 
 
 * **AW_DB_PORT**

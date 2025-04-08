@@ -25,6 +25,11 @@ def init_cli():
         from aw.config.main import init_config
 
     init_config()
+
+    from aw.config.load_file import load_config_file, check_for_bad_config
+    load_config_file()
+    check_for_bad_config()
+
     from aw.utils.debug import warn_if_development
     warn_if_development()
 

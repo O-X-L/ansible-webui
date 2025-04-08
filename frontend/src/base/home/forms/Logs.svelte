@@ -10,7 +10,7 @@
     import { apiGet, apiEdit } from '../../../util/api.js';
     import { JOB_EXEC_STATI_ACTIVE } from '../../Config.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
-    import { classModalBackdrop, classSpinnerDiv, classCenterChildDiv, classModalLabel } from '../../Style.js';
+    import { classModalBackdrop, classSpinnerDiv, classCenterChildDiv } from '../../Style.js';
 
     let {
         open = $bindable(false),
@@ -82,7 +82,7 @@
             // tab in background
             return;
         }
-        if (finished || !isExecActive) {
+        if (finished || exec.failed || !isExecActive) {
             return;
         }
         apiGet(`job/${jobID}/${exec.id}/log/${lastLogLine}`, loadLogLines);
