@@ -401,9 +401,9 @@ class JobExecution(BaseJob):
     @property
     def failed(self) -> bool:
         if self.result is None:
-            return False
+            return True if self.status == JOB_EXEC_STATUS_FAILED else None
 
-        return self.result.failed
+        return self.status == JOB_EXEC_STATUS_FAILED or self.result.failed
 
     @property
     def user_id(self) -> (int, None):

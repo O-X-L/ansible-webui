@@ -9,6 +9,7 @@ from aw.model.job import Job, JobExecution
 from aw.utils.permission import get_viewable_jobs
 from aw.utils.util import get_next_cron_execution_str, is_set
 from aw.base import USERS
+from aw.model.base import JOB_EXEC_STATUS_FAILED
 
 
 class JobReadResponse(serializers.ModelSerializer):
@@ -54,7 +55,7 @@ def get_job_execution_serialized(execution: JobExecution) -> dict:
     serialized['user_name'] = execution.user_name
     serialized['time_start'] = execution.time_created_str
     serialized['time_fin'] = None
-    serialized['failed'] = None
+    serialized['failed'] = execution.failed
     serialized['error_s'] = None
     serialized['error_m'] = None
 
@@ -66,7 +67,6 @@ def get_job_execution_serialized(execution: JobExecution) -> dict:
     if execution.result is not None and is_set(execution.result.time_fin):
         serialized['time_fin'] = execution.result.time_fin_str
         serialized['time_duration'] = execution.result.time_duration_str
-        serialized['failed'] = execution.result.failed
         if execution.result.error is not None:
             serialized['error_s'] = execution.result.error.short
             serialized['error_m'] = execution.result.error.med
