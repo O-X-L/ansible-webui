@@ -139,6 +139,11 @@ AW_DB_ENGINES = {
 
 DATABASES = {'default': AW_DB_ENGINES[DB_TYPE]}
 
+if DB_TYPE == 'mysql' and get_aw_env_var('db_socket') is not None:
+    DATABASES['default']['OPTIONS'] = {
+        'unix_socket': get_aw_env_var('db_socket'),
+    }
+
 
 def debug_mode() -> bool:
     # NOTE: only gets checked on startup

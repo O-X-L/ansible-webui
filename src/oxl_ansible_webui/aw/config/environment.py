@@ -23,6 +23,7 @@ AW_ENV_VARS = {
     'db_user': ['AW_DB_USER'],
     'db_pwd': ['AW_DB_PWD'],
     'db_host': ['AW_DB_HOST'],
+    'db_socket': ['AW_DB_SOCKET'],
     'db_port': ['AW_DB_PORT'],
     'db_migrate': ['AW_DB_MIGRATE'],
     'run_timeout': ['AW_RUN_TIMEOUT'],

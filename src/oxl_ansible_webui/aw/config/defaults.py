@@ -51,6 +51,7 @@ CONFIG_DEFAULTS = {
     'db_user': '',
     'db_pwd': '',
     'db_host': '',
+    'db_socket': '',
     'db_port': '',
     'timezone': tzname[0],
     'secret': ''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(50)),
