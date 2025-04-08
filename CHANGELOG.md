@@ -8,6 +8,15 @@ tbd
 
 ## Version 0
 
+### 0.8.3
+
+Fixes:
+
+* Corrected Execution Failed-state
+* Scrolling on mobile/small screens [#21](https://github.com/O-X-L/ansible-webui/issues/21)
+* Show Execution errors on logs-view
+* Credentials update-issues
+
 ### 0.8.2
 
 Fixes:

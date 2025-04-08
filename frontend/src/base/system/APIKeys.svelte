@@ -7,7 +7,7 @@
         Table, TableHead, TableHeadCell, TableBody, TableBodyCell, TableBodyRow,  // Modal
     } from 'flowbite-svelte';
 
-    import Modal from '../../../flowbite-custom/Modal.svelte';
+    import Modal from '../../flowbite-custom/Modal.svelte';
 
     import { share } from '../Share.js';
     import { tq } from '../../util/translate.js';

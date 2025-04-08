@@ -9,7 +9,6 @@ from aw.model.job import Job, JobExecution
 from aw.utils.permission import get_viewable_jobs
 from aw.utils.util import get_next_cron_execution_str, is_set
 from aw.base import USERS
-from aw.model.base import JOB_EXEC_STATUS_FAILED
 
 
 class JobReadResponse(serializers.ModelSerializer):
