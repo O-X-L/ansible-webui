@@ -112,15 +112,15 @@
             <CloseCircleSolid class="inline-block mr-2" /> {t('logs.exec_failed')}
         </div>
         {#if exec.error_s}
-            <Alert color="red" class="mx-20 my-10">
-                <div class="font-bold">{t('logs.error_short')}</div>
+            <Alert color="red" class="mx-10 my-5">
+                <div class="font-bold text-lg mb-3">{t('logs.error_short')}</div>
                 <div>{exec.error_s}</div>
             </Alert>
         {/if}
         {#if exec.error_m}
-            <Alert color="red" class="mx-20 my-10">
-                <div class="font-bold">{t('logs.error_medium')}</div>
-                <div>{exec.error_m}</div>
+            <Alert color="red" class="mx-10 my-5">
+                <div class="font-bold text-lg mb-3">{t('logs.error_medium')}</div>
+                <pre class="whitespace-pre-wrap break-normal">{exec.error_m}</pre>
             </Alert>
         {/if}
     {:else if !logLines.length}
