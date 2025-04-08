@@ -53,3 +53,9 @@ where = ["src"]
 oxl-ansible-webui = "oxl_ansible_webui.__script__:main"
 oxl-ansible-webui-cli = "oxl_ansible_webui.__script__:cli"
 oxl-ansible-webui-manage = "oxl_ansible_webui.__script__:manage"
+
+[tool.pyproject-appimage]
+script = "oxl-ansible-webui"
+output = "OXL-Ansible-WebUI.AppImage"
+icon = "docs/source/_static/img/logo.svg"
+python-version = "3.11"
