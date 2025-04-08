@@ -2,7 +2,9 @@
     import { onMount, onDestroy } from 'svelte';
 
     import { InfoCircleSolid, CloseCircleSolid, StopSolid } from 'flowbite-svelte-icons';
-    import { Spinner, Modal, Heading, Button, Tooltip, Toggle, Alert } from 'flowbite-svelte';
+    import { Spinner, Heading, Button, Tooltip, Toggle, Alert } from 'flowbite-svelte';  // Modal
+
+    import Modal from '../../../flowbite-custom/Modal.svelte';
 
     import { share } from '../../Share.js';
     import { tq } from '../../../util/translate.js';

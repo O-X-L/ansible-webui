@@ -1,9 +1,11 @@
 <script lang="ts">
     import { CloseCircleSolid, FloppyDiskSolid } from 'flowbite-svelte-icons';
     import {
-        Heading, Button, Modal, Input, Label, Spinner, Tooltip, Helper, Select, Toggle,
-        AccordionItem, Accordion,
+        Heading, Button, Input, Label, Spinner, Tooltip, Helper, Select, Toggle,
+        AccordionItem, Accordion,  // Modal
     } from 'flowbite-svelte';
+
+    import Modal from '../../../flowbite-custom/Modal.svelte';
 
     import { share } from '../../Share.js';
     import { repoKindMap } from '../../Config.js';

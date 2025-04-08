@@ -6,10 +6,12 @@
         CloseCircleSolid,
     } from 'flowbite-svelte-icons';
     import {
-        Spinner, Button, Popover, Radio, Alert, Tooltip, Modal, Heading,
+        Spinner, Button, Popover, Radio, Alert, Tooltip, Heading,
         Table, TableHead, TableHeadCell, TableBody, TableBodyCell, TableBodyRow,
-        Input, Toggle, Label, Select,
+        Input, Toggle, Label, Select,  // Modal
     } from 'flowbite-svelte';
+
+    import Modal from '../../flowbite-custom/Modal.svelte';
 
     import { share } from '../Share.js';
     import JobForm from './forms/Job.svelte';

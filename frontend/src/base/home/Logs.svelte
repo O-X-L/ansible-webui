@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
 
-    import { BookOpenSolid, StopSolid, CogSolid } from 'flowbite-svelte-icons';
+    import { BookOpenSolid, StopSolid } from 'flowbite-svelte-icons';
     import {
         Spinner, Accordion, AccordionItem, Table, TableBody, TableBodyCell, TableBodyRow,
         TableHead, TableHeadCell, Radio, Button, Tooltip,

@@ -1,8 +1,10 @@
 <script lang="ts">
     import { FloppyDiskSolid } from 'flowbite-svelte-icons';
     import {
-        Button, Tooltip, Modal, Heading, Label, Input,
+        Button, Tooltip, Heading, Label, Input,  // Modal
     } from 'flowbite-svelte';
+
+    import Modal from '../../flowbite-custom/Modal.svelte';
 
     import { share } from '../Share.js';
     import { apiEdit } from '../../util/api.js';

@@ -5,10 +5,11 @@
         FolderSolid, FileSolid, CloseCircleSolid, TrashBinSolid, FloppyDiskSolid, CirclePlusSolid,
     } from 'flowbite-svelte-icons';
     import {
-        Heading, Button, Modal, Input, Label, Helper, Toggle, Select, Spinner, Tooltip,
-        AccordionItem, Accordion,
+        Heading, Button, Input, Label, Helper, Toggle, Select, Spinner, Tooltip,
+        AccordionItem, Accordion,  // Modal
     } from 'flowbite-svelte';
 
+    import Modal from '../../../flowbite-custom/Modal.svelte';
     import MultiInput from '../../../flowbite-custom/MultiInput.svelte';
 
     import { share } from '../../Share.js';

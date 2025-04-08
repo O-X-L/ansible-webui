@@ -3,9 +3,11 @@
 
     import { TrashBinSolid, CloseCircleSolid } from 'flowbite-svelte-icons';
     import {
-        Spinner, Button, Tooltip, Modal, Heading, Label, Input,
-        Table, TableHead, TableHeadCell, TableBody, TableBodyCell, TableBodyRow,
+        Spinner, Button, Tooltip, Heading, Label, Input,
+        Table, TableHead, TableHeadCell, TableBody, TableBodyCell, TableBodyRow,  // Modal
     } from 'flowbite-svelte';
+
+    import Modal from '../../../flowbite-custom/Modal.svelte';
 
     import { share } from '../Share.js';
     import { tq } from '../../util/translate.js';
