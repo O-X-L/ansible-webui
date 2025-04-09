@@ -8,6 +8,12 @@ tbd
 
 ## Version 0
 
+### 0.8.4
+
+Features:
+
+* Bumped [AWS-SSM to version 1.2.707.0](https://github.com/aws/session-manager-plugin/releases/tag/1.2.707.0) (*Docker image oxlorg-ansible-webui-aws*)
+
 ### 0.8.3
 
 Fixes:
