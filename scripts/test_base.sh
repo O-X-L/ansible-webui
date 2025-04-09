@@ -28,7 +28,6 @@ fi
 echo 'Starting Ansible-WebUI..'
 trap "pkill -f oxl_ansible_webui; exit" INT
 
-export AW_ENV='dev'
 # shellcheck disable=SC2155
 export AW_PATH_PLAY="$(pwd)/test"
 export AW_ADMIN='tester'
@@ -36,12 +35,14 @@ export AW_ADMIN_PWD='someSecret!Pwd'
 
 if [ -z "$AW_TEST_DB" ]
 then
+  export AW_ENV='dev'
   # shellcheck disable=SC2155
   export AW_DB="/tmp/$(date +%s).aw.db"
 
   bash scripts/migrate_db.sh >/dev/null
   python3 src/oxl_ansible_webui/ 2>&1 | grep -E 'ERROR|FATAL|Warning: operationId|Except'  &
 else
+  export AW_ENV='staging'
   bash scripts/migrate_db.sh
   python3 src/oxl_ansible_webui/ &
 fi

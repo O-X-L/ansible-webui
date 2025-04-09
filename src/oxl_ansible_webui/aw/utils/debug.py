@@ -40,7 +40,7 @@ def log(msg: str, level: int = 3, _stderr: bool = False):
 
     msg = f"{_log_prefix()} [{LEVEL_NAME_MAPPING[level]}] {prefix_caller}{msg}"
     if _stderr:
-        stderr.write(msg)
+        stderr.write(msg + '\n')
 
     else:
         print(msg)

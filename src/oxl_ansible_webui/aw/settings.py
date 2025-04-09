@@ -1,7 +1,5 @@
 from pathlib import Path
 from os import environ
-from sqlite3 import connect as db_connect
-from sqlite3 import OperationalError
 
 from yaml import safe_load as yaml_load
 from yaml import YAMLError
@@ -22,6 +20,7 @@ from aw.utils.deployment import deployment_dev, deployment_prod
 from aw.config.environment import get_aw_env_var_or_default, auth_mode_saml, get_aw_env_var
 from aw.utils.debug import log
 from aw.dependencies import saml_installed, mysql_installed, psql_installed, log_dependency_error
+from aw.utils.db import AbstractDBConnection, SQLiteOperationalError, MySQLError, PSQLError
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIRS = [
@@ -153,15 +152,12 @@ def debug_mode() -> bool:
     if get_aw_env_var_or_default('debug'):
         return True
 
-    try:
-        if Path(DB_FILE).is_file():
-            with db_connect(DB_FILE) as conn:
-                return conn.execute('SELECT debug FROM aw_systemconfig').fetchall()[0][0] == 1
+    with AbstractDBConnection(DB_FILE) as db:
+        try:
+            return db.query('SELECT debug FROM aw_systemconfig')[0] == 1
 
-    except (IndexError, OperationalError):
-        pass
-
-    return False
+        except (IndexError, TypeError, SQLiteOperationalError, MySQLError, PSQLError):
+            return False
 
 
 DEBUG = debug_mode()

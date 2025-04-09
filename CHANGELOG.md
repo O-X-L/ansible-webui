@@ -17,6 +17,7 @@ Fixes:
 * Show Execution errors on logs-view
 * Credentials update-issues
 * Load config-file before 'manage' actions
+* Startup-Errors when using MariaDB/PSQL [#27](https://github.com/O-X-L/ansible-webui/issues/27)
 
 ### 0.8.2
 
