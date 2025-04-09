@@ -12,7 +12,7 @@ then
   exit 1
 fi
 
-APPS=('main' 'login' 'home' 'system')
+APPS=('main' 'login' 'home' 'system' 'login_saml')
 for app in $APPS
 do
   if [ ! -f "${DST}/${app}.js" ]

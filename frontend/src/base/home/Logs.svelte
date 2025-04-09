@@ -24,7 +24,8 @@
     let apiResponseHandler: APIResponseHandler = $state();
     let jobList: jobType[] = $state([]);
     let executionList: executionType[] = $state([]);
-    let entryActions = $state({});
+    let entryJobActions = $state({});
+    let entryExecActions = $state({});
     let apiErrorMsg = $state('');
     let apiSuccessMsg = $state('');
     let apiDataHashJobs = $state('');
@@ -65,8 +66,8 @@
             return;
         }
         for (let job of j) {
-            if (!entryActions[job.id]) {
-                entryActions[job.id] = {open: false};
+            if (!entryJobActions[job.id]) {
+                entryJobActions[job.id] = false;
             }
         }
         jobList = j;
@@ -82,8 +83,8 @@
             return;
         }
         for (let exec of j) {
-            if (!entryActions[openJob][exec.id]) {
-                entryActions[openJob][exec.id] = false;
+            if (!entryExecActions[exec.id]) {
+                entryExecActions[exec.id] = false;
             }
         }
         executionList = j;
@@ -117,7 +118,7 @@
         }
         for (let job of jobList) {
             if (String(job.id) == String(params[PARAM_JOB])) {
-                entryActions[job.id]['open'] = true;
+                entryJobActions[job.id] = true;
                 let e = document.getElementById(`logs-${job.id}`);
                 if (e) {
                     e.scrollIntoView({behavior: "smooth", block: "start", inline: "start"});
@@ -129,19 +130,18 @@
 
     function updateOpenJob(actions: any = ''){
         for (let [j, v] of Object.entries(actions)) {
-            if (v.open) {
+            if (v) {
                 openJob = j;
                 return;
             }
         }
         openJob = null;
+        executionList = [];
+        apiDataHashExecs = '';
     }
 
     $effect(() => {
-        updateOpenJob(entryActions);
-        if (!openJob) {
-            executionList = [];
-        }
+        updateOpenJob(entryJobActions);
     });
 
     onMount(() => {
@@ -164,7 +164,7 @@
 
 <Accordion>
     {#each jobList as job (job.id)}
-        <AccordionItem bind:open={entryActions[job.id]['open']} defaultClass="{classSpoilerItem} logs-job-{job.id}">
+        <AccordionItem bind:open={entryJobActions[job.id]} defaultClass="{classSpoilerItem} logs-job-{job.id}">
             <span slot="header">{job.name}</span>
             {#if !executionList.length}
                 <div class={classSpinnerDiv}><Spinner/></div>
@@ -208,9 +208,9 @@
                             {/if}
                         </TableBodyCell>
                         <TableBodyCell tdClass={classListContent}>
-                            <LogsView bind:open={entryActions[job.id][exec.id]}
+                            <LogsView bind:open={entryExecActions[exec.id]}
                                 jobID={job.id} jobName={job.name} bind:exec={executionList[execIdx]} />
-                            <Button size="xs" on:click={() => {entryActions[job.id][exec.id] = true}}
+                            <Button size="xs" on:click={() => {entryExecActions[exec.id] = true}}
                                 id="logs-job-{job.id}-show">
                                 <BookOpenSolid/>
                             </Button>
