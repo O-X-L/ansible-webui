@@ -1,7 +1,10 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
 
-    import { Spinner, Heading, Span } from 'flowbite-svelte';
+    import {
+        Spinner, Heading, Span, Select, Label, Button, Tooltip as FlowbiteTooltip, Input,
+    } from 'flowbite-svelte';
+    import { RefreshOutline } from 'flowbite-svelte-icons';
 
     import {
         Chart,
@@ -14,9 +17,11 @@
 
     import { share } from '../Share.js';
     import { apiGet } from '../../util/api.js';
+    import { classModalLabel } from '../Style.js';
     import { tq } from '../../util/translate.js';
-    import { classFooterSpacing} from '../Style.js';
     import { arraysEqual } from '../../util/main.js';
+    import { type formChoiceType } from '../Types.js';
+    import { classFooterSpacing, classModalHelp, classModalInputDiv, classModalInput } from '../Style.js';
     import {
         getRandomTailwindColor, getRandomTailwindColorNegative, getRandomTailwindColorPositive,
     } from '../../util/colors.js';
@@ -30,9 +35,18 @@
 
     let { open = $bindable(false) } = $props();
 
-    const STATS_TIME_PERIOD = '1d';
     const CHART_TIME_MAX_DATAPOINTS = 200;
     let updateLoop: number = $state(0);
+
+    const PERIOD_CHOICES: formChoiceType[] = [
+        {name: t('db.time.minutes'), value: 'm'},
+        {name: t('db.time.hours'), value: 'h'},
+        {name: t('db.time.days'), value: 'd'},
+        {name: t('db.time.weeks'), value: 'w'},
+        {name: t('db.time.months'), value: 'M'},
+    ];
+    let statsPeriodValue: number = $state(1);
+    let statsPeriodKind: string = $state('d');
 
     interface statsJobsMapping {
         jobs: any
@@ -132,12 +146,12 @@
             labels: Object.keys(counters),
             datasets: [
                 {
-                    label: '✅Succeeded',
+                    label: `✅ ${t('jobs.info.succeeded')}`,
                     data: Object.values(counters).map((item) => item.success),
                     backgroundColor: new Array(len).fill(CHART_COLOR_SUCCESS),
                 },
                 {
-                    label: '❌ Failed',
+                    label: `❌ ${t('jobs.info.failed')}`,
                     data: Object.values(counters).map((item) => item.failed),
                     backgroundColor: new Array(len).fill(CHART_COLOR_FAILED),
                 },
@@ -163,7 +177,7 @@
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Execution results by Job',
+                        text: t('db.chart.exec_results_by_job'),
                     }
                 }
             }
@@ -175,7 +189,7 @@
         let data = {};
 
         for (let s of statsJobsData['stats']) {
-            let n = 'Scheduled';
+            let n = t('jobs.execute.scheduled');
             if (s[2] !== null) {
                 n = statsJobsData['mapping']['users'][s[2]];
             }
@@ -198,7 +212,7 @@
         return {
             labels: Object.keys(data),
             datasets: [{
-                label: 'Runs',
+                label: t('db.runs'),
                 data: Object.values(data),
                 backgroundColor: colors,
                 hoverOffset: 4,
@@ -220,7 +234,7 @@
                     */
                     title: {
                         display: true,
-                        text: 'Executions by User'
+                        text: t('db.chart.exec_by_user'),
                     }
                 }
             }
@@ -302,7 +316,7 @@
                 responsive: true,
                 plugins: {
                     title: {
-                        text: 'Executions over Time',
+                        text: t('db.chart.exec_over_time'),
                         display: true
                     },
                     tooltip: {
@@ -311,7 +325,7 @@
                                 return context.dataset.label
                             },
                             afterLabel: function(context) {
-                                return `Duration: ${context.parsed.y} s`;  // run time; todo: seconds to minutes
+                                return `${t('jobs.info.duration')}: ${context.parsed.y} s`;  // run time; todo: seconds to minutes
                             },
                         }
                     }
@@ -331,13 +345,13 @@
                         },
                         title: {
                             display: true,
-                            text: 'Time'
+                            text: t('logs.time')
                         }
                     },
                     y: {
                         title: {
                             display: true,
-                            text: 'Run Duration'
+                            text: t('jobs.info.duration')
                         },
                         min: -1,
                     }
@@ -346,22 +360,6 @@
         };
         chartDataExecOverTime = new Chart(document.getElementById('chart-exec-over-time'), c);
     }
-
-    /*
-    function combineJobAndResult(s: statsExecution, hs: statsExecutionHost) : string {
-        let n = '';
-        if (s['f']) {
-            n = '❌ ';
-        } else if (hs['u']) {
-            n = '⚫ ';
-        } else if (hs['tc'] > 0) {
-            n = '🔁 ';
-        } else {
-            n = '✅ ';
-        }
-        return n + statsJobsData['mapping']['jobs'][s['j']];
-    }
-    */
 
     function getExecHostChartData() : chartData {
         let counters = {};
@@ -389,22 +387,22 @@
             labels: Object.keys(counters),
             datasets: [
                 {
-                    label: '✅ Succeeded',
+                    label: `✅ ${t('jobs.info.succeeded')}`,
                     data: Object.values(counters).map((item) => item.success),
                     backgroundColor: new Array(len).fill(CHART_COLOR_SUCCESS),
                 },
                 {
-                    label: '🔁 Changed',
+                    label: `🔁 ${t('jobs.info.changed')}`,
                     data: Object.values(counters).map((item) => item.changed),
                     backgroundColor: new Array(len).fill(CHART_COLOR_CHANGED),
                 },
                 {
-                    label: '⚫ Unreachable',
+                    label: `⚫ ${t('jobs.info.unreachable')}`,
                     data: Object.values(counters).map((item) => item.unreachable),
                     backgroundColor: new Array(len).fill(CHART_COLOR_UNREACHABLE),
                 },
                 {
-                    label: '❌ Failed',
+                    label: `❌ ${t('jobs.info.failed')}`,
                     data: Object.values(counters).map((item) => item.failed),
                     backgroundColor: new Array(len).fill(CHART_COLOR_FAILED),
                 },
@@ -430,7 +428,7 @@
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Execution results by Job',
+                        text: t('db.chart.exec_results_by_host'),
                     }
                 }
             }
@@ -496,7 +494,7 @@
         return t;
     }
 
-    function loadJobStats(j: any, h: string) {
+    function loadJobStats(j: any) {
         if (j === null) {
             return;
         }
@@ -520,10 +518,16 @@
         let limit = '';
         if (loaded) {
             limit = `limit_time=${lastExecTime}`;
-        } else {
-            limit = `limit_time=${STATS_TIME_PERIOD}`;
+        } else if (statsPeriodValue != 0) {
+            limit = `limit_time=${statsPeriodValue}${statsPeriodKind}`;
         }
         apiGet(`stats/jobs?${limit}`, loadJobStats);
+    }
+
+    function updateStatsPeriod() {
+        statsJobsData.stats = [];
+        lastExecTime = 0;
+        buildJobStats();
     }
 
     onMount(() => {
@@ -551,17 +555,39 @@
     });
 </script>
 
-<Heading tag="h1" class="mb-4" customSize="text-3xl font-extrabold  md:text-5xl lg:text-6xl">
-    <Span gradient gradientClass="text-transparent bg-clip-text bg-gradient-to-r to-yellow-400 from-primary-600">
-        Daily Statistics
-    </Span>
-</Heading>
+<div class="flex justify-between max-sm:flex-wrap">
+    <div>
+        <Heading tag="h1" class="mb-4 mt-10 md:mt-8" customSize="text-5xl font-extrabold md:text-6xl">
+            <Span gradient gradientClass="text-transparent bg-clip-text bg-gradient-to-r to-yellow-400 from-primary-600">
+                {t('db.stats')}
+            </Span>
+        </Heading>
+    </div>
+    <div>
+        <div class="max-w-72">
+            <Label class="{classModalLabel} mb-2">{t('db.time.select')}</Label>
+            <div class="flex">
+                <div class="shrink">
+                    <Input type="number" bind:value={statsPeriodValue} />
+                </div>
+                <div class="shrink">
+                    <Select items={PERIOD_CHOICES} bind:value={statsPeriodKind} />
+                </div>
+                <div class="shrink ml-2">
+                    <Button on:click={() => {updateStatsPeriod()}}><RefreshOutline/></Button>
+                    <FlowbiteTooltip>{t('btn.update')}</FlowbiteTooltip>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {#if !loaded}
     <div class="text-center mt-20">
         <Spinner/>
     </div>
 {/if}
+
 <div class="flex justify-center mb-20 mt-10">
     <div class="w-full max-h-[30rem]">
         <canvas id="chart-exec-over-time"></canvas>
@@ -588,6 +614,9 @@
         * stats per host (allow user to select single host)
           * changed items
           * when did which playbook target the host; who executed it
+
+    todo: allow users to choose stats time (hours, days, weeks, months)
+        
 -->
 
 <div class={classFooterSpacing}></div>

@@ -18,6 +18,7 @@ EN = {
     'btn.logs': 'Logs',
     'btn.pause': 'Pause',
     'btn.download': 'Download',
+    'btn.update': 'Update',
     'nav.home': 'Home',
     'nav.system': 'System',
     'nav.lang': 'Language',
@@ -69,6 +70,20 @@ EN = {
     'alerts.global': 'Global',
     'alerts.plugin': 'Plugin',
 
+    # dashboard
+    'db.stats': 'Statistics',
+    'db.chart.exec_over_time': 'Executions over Time',
+    'db.chart.exec_by_user': 'Executions by User',
+    'db.chart.exec_results_by_job': 'Execution results by Job',
+    'db.chart.exec_results_by_host': 'Execution results by Host',
+    'db.runs': 'Runs',
+    'db.time.select': 'Time Period',
+    'db.time.minutes': 'Minutes',
+    'db.time.hours': 'Hours',
+    'db.time.days': 'Days',
+    'db.time.weeks': 'Weeks',
+    'db.time.months': 'Months',
+
     # jobs
     'jobs.new': 'New Job',
     'jobs.edit': 'Edit Job',
@@ -80,10 +95,15 @@ EN = {
     'jobs.info.last_run': 'Last Run',
     'jobs.info.duration': 'Duration',
     'jobs.info.failed': 'Failed',
+    'jobs.info.succeeded': 'Succeeded',
+    'jobs.info.scheduled': 'Scheduled',
+    'jobs.info.unreachable': 'Unreachable',
+    'jobs.info.changed': 'Changed',
     'jobs.execute.tmp_credentials': 'Provide Credentials',
     'jobs.execute.required_limit': 'A limit is required',
     'jobs.execute.required_var': 'Required variable missing',  # '<msg>: "<varname>"'
     'jobs.execute.required_credentials': 'Credentials are required',
+    'jobs.execute.regex_mismatch': 'Input does not satisfy the required pattern',
     ## form fields
     'jobs.action.start': 'Job queued',
     'jobs.action.stop': 'Job stop initiated',
