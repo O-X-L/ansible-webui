@@ -138,8 +138,14 @@
         }
 
         for (let v of executionPrompts.config.vars) {
-            if (v.required && !isSet(executionPrompts.var_values[v.varName])) {
+            let c = executionPrompts.var_values[v.varName];
+            if (v.required && !isSet(c)) {
                 apiErrorMsg = `${t('jobs.execute.required_var')}: "${v.name}"`;
+                apiError = true;
+                return;
+            }
+            if (isSet(executionPrompts.var_values[v.varName]) && isSet(v.regex) && !c.match(v.regex)) {
+                apiErrorMsg = `${t('jobs.execute.regex_mismatch')}: "${v.name}" - "${v.regex}"`;
                 apiError = true;
                 return;
             }
@@ -195,12 +201,32 @@
         redirectTo(`/ui#logs-job=${jobId}`);
     }
 
-    function updateExecutionPrompts(encodedPrompts: string|null) {
+    function updateExecutionPrompts(job: jobType) {
         executionPrompts = JSON.parse(JSON.stringify(executionPromptsDefault));
-        if (!encodedPrompts) {
+        if (!job.execution_prompts_json) {
             return;
         }
-        executionPrompts.config = JSON.parse(encodedPrompts);
+        executionPrompts.config = JSON.parse(job.execution_prompts_json);
+
+        // set default values as configured for job
+        executionPrompts.field_values.mode_check = job.mode_check;
+        executionPrompts.field_values.mode_diff = job.mode_diff;
+        executionPrompts.field_values.credentials_req = job.credentials_needed;
+        if (job.tags) {
+            executionPrompts.field_values.tags = job.tags;
+        }
+        if (job.tags_skip) {
+            executionPrompts.field_values.tags_skip = job.tags_skip;
+        }
+        if (job.limit) {
+            executionPrompts.field_values.limit = job.limit;
+        }
+        if (job.environment_vars) {
+            executionPrompts.field_values.environment_vars = job.environment_vars;
+        }
+        if (job.cmd_args) {
+            executionPrompts.field_values.cmd_args = job.cmd_args;
+        }
     }
 
     function handleExecutionCredentialsCreateResponse(s: number, j: any) {
@@ -349,7 +375,7 @@
             <TableBodyCell tdClass={classListContent}>
                 <div>
                     <Button size="xs" on:click={() => {
-                        entryActions[item.id].exec = true; updateExecutionPrompts(item.execution_prompts_json);
+                        entryActions[item.id].exec = true; updateExecutionPrompts(item);
                         }} disabled={isJobActive(item)} id="jobs-btn-exec-{item.id}">
                         <PlaySolid/>
                     </Button>
@@ -601,7 +627,6 @@
                     {#if v.kind == 'text'}
                         <Label for="job_prompt_{job.id}_var_{i}" class={classModalLabel}>{v.name}</Label>
                         <Input id="job_prompt_{job.id}_var_{i}" bind:value={executionPrompts.var_values[v.varName]} />
-                        <!-- todo: regex validation -->
                     {:else}
                         <Label for="job_prompt_{job.id}_var_{i}" class={classModalLabel}>{v.name}</Label>
                         <Select id="job_prompt_{job.id}_var_{i}" items={choicesFromArray(v.choices)}
