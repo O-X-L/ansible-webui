@@ -181,7 +181,7 @@ class APISystemEnvironment(APIView):
 
 
 class UserPasswordChangeRequest(BaseResponse):
-    settings = SystemConfigSettings()
+    password = serializers.CharField()
 
 
 class APIUserPasswordChange(APIView):
@@ -190,7 +190,7 @@ class APIUserPasswordChange(APIView):
     permission_classes = API_PERMISSION
 
     @extend_schema(
-        request=SystemConfigWriteRequest,
+        request=UserPasswordChangeRequest,
         responses={
             200: OpenApiResponse(response=GenericResponse, description='Password updated'),
             400: OpenApiResponse(response=GenericErrorResponse, description='Invalid password provided'),
