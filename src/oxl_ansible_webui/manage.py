@@ -8,7 +8,6 @@ from os import path as os_path
 
 
 def main():
-    # pylint: disable=E0401,C0415
     try:
         from cli_init import init_cli
 
@@ -17,6 +16,10 @@ def main():
         from cli_init import init_cli
 
     init_cli()
+    from db import get_db_string
+    from aw.utils.debug import log
+    log(msg=f"Using DB: {get_db_string()}", level=4, _stderr=True)
+
     from django.core.management import execute_from_command_line
     execute_from_command_line(sys_argv)
 

@@ -89,8 +89,12 @@ Make sure to use the same AW-version on dump and load!
 
 .. code-block:: mysql
 
+    export AW_DB=$HOME/.config/ansible-webui/aw.db
+    # OR
+    export AW_CONFIG=$HOME/.config/ansible-webui/config.yml
+
     # dump to file
-    oxl-ansible-webui-manage dumpdata > aw-dump.json
+    oxl-ansible-webui-manage dumpdata --indent=2 --natural-foreign --natural-primary --verbosity=1 > aw-dump.json
 
     # change db config
 

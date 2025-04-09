@@ -5,10 +5,11 @@ from django import setup as django_setup
 
 from aw.config.main import init_config
 
+# pylint: disable=C0413,C0415
+
 environ['AW_INIT'] = '1'
 init_config()
 
-# pylint: disable=C0413,C0415
 from aw.utils.debug import log
 
 

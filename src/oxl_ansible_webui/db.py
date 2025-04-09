@@ -208,11 +208,42 @@ def _update_schema_version() -> None:
             log(msg=f"Unable to update database schema version: '{err}'", level=3)
 
 
+def get_db_string() -> str:
+    if DB_TYPE in ['mysql', 'psql']:
+        # user@host:port/name
+        db_host = get_aw_env_var('db_host')
+        db_port = get_aw_env_var('db_port')
+        db_name = get_aw_env_var('db')
+        db_user = get_aw_env_var('db_user')
+        db = ''
+
+        if db_user is not None:
+            db += f'{db_user}@'
+
+        if db_host is not None:
+            db += db_host
+
+        if db_port is not None:
+            db += f':{db_port}'
+
+        if db_name is not None:
+            if db == '':
+                db = db_name
+
+            else:
+                db += f'/{db_name}'
+
+        return db
+
+    return DB_FILE
+
+
 def install_or_migrate_db():
+    log(msg=f"Using DB: {get_db_string()}", level=4)
+
     if DB_TYPE in ['mysql', 'psql']:
         return net_install_migrate()
 
-    log(msg=f"Using DB: {DB_FILE}", level=4)
     _sqlite_check_if_writable()
     if not Path(DB_FILE).is_file():
         return sqlite_install()
@@ -276,29 +307,6 @@ def sqlite_migrate():
 
 
 def net_install_migrate():
-    # user@host:port/name
-    db_host = get_aw_env_var('db_host')
-    db_port = get_aw_env_var('db_port')
-    db_name = get_aw_env_var('db')
-    db_user = get_aw_env_var('db_user')
-    db = ''
-
-    if db_user is not None:
-        db += f'{db_user}@'
-
-    if db_host is not None:
-        db += db_host
-
-    if db_port is not None:
-        db += f':{db_port}'
-
-    if db_name is not None:
-        if db == '':
-            db = db_name
-        else:
-            db += f'/{db_name}'
-
-    log(msg=f"Using DB: {db}", level=4)
     _manage_db(action='migration', cmd=['migrate'])
     _update_schema_version()
 
@@ -319,11 +327,12 @@ def create_first_superuser():
         if pwd is None:
             pwd = _get_random_pwd()
 
-        USERS.objects.create_superuser(
+        user = USERS.objects.create_superuser(
             username=name,
             email=f"{name}@localhost",
-            password=pwd
         )
+        user.set_password(pwd)
+        user.save()
 
         log_warn('No admin was found in the database!')
         if check_aw_env_var_is_set('init_admin_pwd'):
@@ -345,11 +354,12 @@ def create_schedule_user():
     # just to reserve the username as it is referenced internally
     from aw.base import USERS
     if len(USERS.objects.filter(username='schedule')) == 0:
-        USERS.objects.create(
+        user = USERS.objects.create(
             username='schedule',
             email='schedule@localhost',
-            password=_get_random_pwd(),
         )
+        user.set_password(_get_random_pwd())
+        user.save()
 
 
 def cleanup_executions():

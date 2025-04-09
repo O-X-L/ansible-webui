@@ -20,12 +20,13 @@ def load_config_file():
 
     if not Path(config_file).is_file():
         log_warn(
-            f"The provided config-file was not found or unreadable: {config_file}"
+            f"The provided config-file was not found or unreadable: {config_file}",
+            _stderr=True,
         )
         environ[ENV_KEY_CONFIG] = '0'
         return
 
-    log(msg=f"Using config-file: {config_file}", level=4)
+    log(msg=f"Using config-file: {config_file}", level=4, _stderr=True)
 
     with open(config_file, 'r', encoding='utf-8') as _config:
         try:
@@ -41,7 +42,7 @@ def load_config_file():
                     setting_env = f'AW_{setting.upper()}'
 
                 if setting_env not in AW_ENV_VARS_REV:
-                    log(msg=f"Provided setting is invalid: {setting}", level=3)
+                    log_warn(msg=f"Provided setting is invalid: {setting}", _stderr=True)
                     continue
 
                 if isinstance(value, dict):
@@ -54,14 +55,15 @@ def load_config_file():
                     environ[setting_env] = str(value)
 
         except (YAMLError, ValueError) as err:
-            log_warn(f"The provided config-file could not be loaded: {config_file} - {err}")
+            log_warn(f"The provided config-file could not be loaded: {config_file} - {err}", _stderr=True)
 
 
 def check_for_bad_config():
     if 'AW_SECRET' not in environ:
         log_warn(
             "The environmental variable 'AW_SECRET' was not supplied! "
-            "Job-secrets like passwords might not be loadable after restart."
+            "Job-secrets like passwords might not be loadable after restart.",
+            _stderr=True,
         )
 
     secret_len = len(config['secret'])

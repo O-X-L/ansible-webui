@@ -27,7 +27,7 @@ def _log_prefix() -> str:
     return f'[{datetime_w_tz().strftime(LOG_TIME_FORMAT)}] [{PID}]'
 
 
-def log(msg: str, level: int = 3):
+def log(msg: str, level: int = 3, _stderr: bool = False):
     debug = deployment_dev() or config['debug']
     prefix_caller = ''
 
@@ -38,7 +38,12 @@ def log(msg: str, level: int = 3):
         caller = inspect_getfile(inspect_stack()[1][0]).rsplit('/', 1)[1].rsplit('.', 1)[0]
         prefix_caller = f'[{caller}] '
 
-    print(f"{_log_prefix()} [{LEVEL_NAME_MAPPING[level]}] {prefix_caller}{msg}")
+    msg = f"{_log_prefix()} [{LEVEL_NAME_MAPPING[level]}] {prefix_caller}{msg}"
+    if _stderr:
+        stderr.write(msg)
+
+    else:
+        print(msg)
 
 
 def log_warn(msg: str, _stderr: bool = False):
@@ -55,7 +60,7 @@ def log_error(msg: str):
 
 def warn_if_development():
     if deployment_dev():
-        log_warn('Development mode!')
+        log_warn('Development mode!', _stderr=True)
 
     elif deployment_staging():
-        log_warn('Staging mode!')
+        log_warn('Staging mode!', _stderr=True)

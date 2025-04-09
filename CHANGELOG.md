@@ -16,6 +16,7 @@ Fixes:
 * Scrolling on mobile/small screens [#21](https://github.com/O-X-L/ansible-webui/issues/21)
 * Show Execution errors on logs-view
 * Credentials update-issues
+* Load config-file before 'manage' actions
 
 ### 0.8.2
 

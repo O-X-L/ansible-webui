@@ -5,6 +5,8 @@ from importlib.metadata import version, PackageNotFoundError
 
 from django import setup as django_setup
 
+# pylint: disable=C0415
+
 
 def init_cli():
     environ.setdefault('AW_INIT', '1')
@@ -16,7 +18,6 @@ def init_cli():
         except PackageNotFoundError:
             environ['AW_VERSION'] = '0.0.0'
 
-    # pylint: disable=E0401,C0415
     try:
         from aw.config.main import init_config
 
