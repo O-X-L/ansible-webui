@@ -83,7 +83,7 @@
         mapping: {jobs: {}, users: {}, status: {}, host_stats: {}, stats: {}},
     });
     let lastExecTime = $state(0);
-    let loaded = $derived(lastExecTime != 0);
+    let loaded = $state(false);
 
     interface chartDataset {
         label: string
@@ -189,7 +189,7 @@
         let data = {};
 
         for (let s of statsJobsData['stats']) {
-            let n = t('jobs.execute.scheduled');
+            let n = t('jobs.info.scheduled');
             if (s[2] !== null) {
                 n = statsJobsData['mapping']['users'][s[2]];
             }
@@ -505,6 +505,7 @@
         statsJobsData.mapping.host_stats = {...statsJobsData.mapping.host_stats, ...j.mapping.host_stats};
         statsJobsData.stats = [...statsJobsData.stats, ...j.stats];
         if (j.stats.length) {
+            loaded = true;
             createUpdateChartData();
             lastExecTime = getLastExecTime(j.stats);
         }
@@ -527,6 +528,7 @@
     function updateStatsPeriod() {
         statsJobsData.stats = [];
         lastExecTime = 0;
+        loaded = false;
         buildJobStats();
     }
 
