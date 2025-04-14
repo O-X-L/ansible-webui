@@ -87,7 +87,7 @@ You can migrate data between database-types.
 
 Make sure to use the same AW-version on dump and load!
 
-.. code-block:: mysql
+.. code-block:: bash
 
     export AW_DB=$HOME/.config/ansible-webui/aw.db
     # OR
@@ -97,6 +97,12 @@ Make sure to use the same AW-version on dump and load!
     oxl-ansible-webui-manage dumpdata --indent=2 --natural-foreign --natural-primary --verbosity=1 > aw-dump.json
 
     # change db config
+
+    # test db connection
+    oxl-ansible-webui-manage showmigrations
+
+    # create db schema
+    oxl-ansible-webui-manage migrate
 
     # load from file
     oxl-ansible-webui-manage loaddata aw-dump.json
