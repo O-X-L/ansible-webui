@@ -37,7 +37,7 @@ AW_ENV_VARS = {
     'auth_mode': ['AW_AUTH'],
     'saml_config': [ENV_KEY_SAML],
 }
-AW_ENV_VARS_SECRET = ['secret', 'init_admin', 'init_admin_pwd', 'saml_config']
+AW_ENV_VARS_SECRET = ['secret', 'init_admin', 'init_admin_pwd', 'saml_config', 'db_pwd']
 
 AW_ENV_VARS_REV = {}
 for key_config, keys_env in AW_ENV_VARS.items():

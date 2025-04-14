@@ -13,6 +13,11 @@ tbd
 Features:
 
 * Bumped [AWS-SSM to version 1.2.707.0](https://github.com/aws/session-manager-plugin/releases/tag/1.2.707.0) (*Docker image oxlorg-ansible-webui-aws*)
+* Issue when switching between Jobs in logs-list
+
+Fixes:
+
+* Hide DB-Password from System-Config view
 
 ### 0.8.3
 
@@ -24,6 +29,7 @@ Fixes:
 * Credentials update-issues
 * Load config-file before 'manage' actions
 * Startup-Errors when using MariaDB/PSQL [#27](https://github.com/O-X-L/ansible-webui/issues/27)
+* Regex-validation for Execution-prompts
 
 Features:
 
