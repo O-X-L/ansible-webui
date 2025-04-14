@@ -58,6 +58,10 @@ def log_error(msg: str):
     stderr.write(f'\033[01;{_log_prefix()} [{LEVEL_NAME_MAPPING[2]}] {msg}\x1b[0m\n')
 
 
+def log_security(msg: str):
+    stderr.write(f'\033[01;{_log_prefix()} [SECURITY ALERT] {msg}\x1b[0m\n')
+
+
 def warn_if_development():
     if deployment_dev():
         log_warn('Development mode!', _stderr=True)

@@ -417,3 +417,4 @@ class JobQueue(BareModel):
     execution = models.ForeignKey(
         JobExecution, on_delete=models.CASCADE, related_name='jobqueue_fk_jobexec', **DEFAULT_NONE,
     )
+    v = models.CharField(default='-', max_length=5000)

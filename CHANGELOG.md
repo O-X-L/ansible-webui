@@ -14,6 +14,9 @@ Features:
 
 * Bumped [AWS-SSM to version 1.2.707.0](https://github.com/aws/session-manager-plugin/releases/tag/1.2.707.0) (*Docker image oxlorg-ansible-webui-aws*)
 * Issue when switching between Jobs in logs-list
+* Security: Added job-queue validation
+
+  This lowers the danger of an attack-vector that would utilize DB-write-access to execute jobs.
 
 Fixes:
 

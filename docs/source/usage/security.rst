@@ -13,6 +13,16 @@ That's why it is very important to keep security in our mind.
 
 You are very welcome to search for security vulnerabilities and `report them <https://github.com/O-X-L/ansible-webui/issues>`_!
 
+.. warning::
+
+    The most secured application can be exploited if implemented incorrectly!
+
+    Make sure to heavily restrict access to your **SECRET** and database access.
+
+    If an attacker has those keys - they will be able to execute any job (*and thus code*) on any remote target with all saved credentials!
+
+    **Be aware of that risk!**
+
 ----
 
 .. _usage_security_issues:
@@ -43,6 +53,8 @@ Known Issues
 Features
 ********
 
+Security alerts are logged to stderr with the :code:`SECURITY ALERT` keyword.
+
 Security considerations this project does take into account:
 
 * The encryption key is randomized at startup by default - if none was provided by the user.
@@ -66,6 +78,10 @@ Security considerations this project does take into account:
   When executing jobs on a schedule - AW verifies that this job-owner is permitted to use the configured credentials.
 
   If a job-owner gets deleted - the linked scheduled jobs will get denied access to any credentials.
+
+* A basic job-queue validation that checks that the entries of the queue were actually created by the application.
+
+  This lowers the danger of an attack-vector that would utilize DB-write-access to execute jobs.
 
 ----
 
