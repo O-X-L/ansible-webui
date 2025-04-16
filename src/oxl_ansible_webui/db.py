@@ -1,9 +1,9 @@
 from time import time
 from pathlib import Path
 from shutil import copy, move
-from os import listdir, remove
 from datetime import datetime
 from sys import exit as sys_exit
+from os import listdir, remove
 from secrets import choice as random_choice
 from string import digits, ascii_letters
 
@@ -13,7 +13,8 @@ from aw.utils.subps import process
 from aw.utils.debug import log, log_error, log_warn
 from aw.utils.deployment import deployment_prod
 from aw.config.hardcoded import FILE_TIME_FORMAT, GRP_MANAGER
-from aw.config.environment import check_aw_env_var_true, get_aw_env_var, check_aw_env_var_is_set
+from aw.config.environment import check_aw_env_var_true, get_aw_env_var, check_aw_env_var_is_set, \
+    get_aw_env_var_or_default
 from aw.utils.db import DB_TYPE, AbstractDBConnection, \
     SQLiteOperationalError, SQLiteDatabaseError, PSQLError, MySQLError
 
@@ -116,20 +117,25 @@ def _update_schema_version() -> None:
 def get_db_string() -> str:
     if DB_TYPE in ['mysql', 'psql']:
         # user@host:port/name
-        db_host = get_aw_env_var('db_host')
-        db_port = get_aw_env_var('db_port')
+        db_host = get_aw_env_var_or_default('db_host')
+        db_port = get_aw_env_var_or_default('db_port')
         db_name = get_aw_env_var('db')
         db_user = get_aw_env_var('db_user')
+        db_socket = get_aw_env_var('db_socket')
         db = ''
 
         if db_user is not None:
             db += f'{db_user}@'
 
-        if db_host is not None:
-            db += db_host
+        if db_socket is not None:
+            db += db_socket
 
-        if db_port is not None:
-            db += f':{db_port}'
+        else:
+            if db_host is not None:
+                db += db_host
+
+            if db_port is not None:
+                db += f':{db_port}'
 
         if db_name is not None:
             if db == '':
@@ -160,7 +166,7 @@ def _manage_db(action: str, cmd: list, backup: str = None) -> dict:
     cmd2 = ['python3', 'manage.py']
     cmd2.extend(cmd)
 
-    result = process(cmd=cmd2)
+    result = process(cmd=cmd2, pass_env_secrets=True)
 
     if result['rc'] != 0:
         log_error(f'Database {action} failed!')

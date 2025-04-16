@@ -11,7 +11,7 @@ from aw.config.environment import AW_ENV_VARS_SECRET, AW_ENV_VARS
 # pylint: disable=R0914
 def process(
         cmd: (str, list), timeout_sec: int = None, shell: bool = False,
-        cwd: Path = BASE_DIR, env: dict = None,
+        cwd: Path = BASE_DIR, env: dict = None, pass_env_secrets: bool = False,
 ) -> dict:
     cmd_str = cmd
     if isinstance(cmd, list):
@@ -24,10 +24,11 @@ def process(
     if env is not None:
         env_full = {**env_full, **env}
 
-    for secret_var in AW_ENV_VARS_SECRET:
-        for secret_env_var in AW_ENV_VARS[secret_var]:
-            if secret_env_var in env_full:
-                env_full.pop(secret_env_var)
+    if not pass_env_secrets:
+        for secret_var in AW_ENV_VARS_SECRET:
+            for secret_env_var in AW_ENV_VARS[secret_var]:
+                if secret_env_var in env_full:
+                    env_full.pop(secret_env_var)
 
     try:
         with subprocess.Popen(

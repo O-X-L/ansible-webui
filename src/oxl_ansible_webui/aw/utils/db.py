@@ -4,7 +4,7 @@ from sqlite3 import connect as db_connect
 from sqlite3 import OperationalError as SQLiteOperationalError
 from sqlite3 import DatabaseError as SQLiteDatabaseError
 
-from aw.config.environment import get_aw_env_var
+from aw.config.environment import get_aw_env_var, get_aw_env_var_or_default
 from aw.dependencies import log_dependency_error
 
 DB_TYPE = get_aw_env_var('db_type')
@@ -50,24 +50,24 @@ class AbstractDBConnection:
             self.connection = db_connect(self.db_file)
 
         elif DB_TYPE == 'mysql':
-            port = get_aw_env_var('db_port')
+            port = get_aw_env_var_or_default('db_port')
             if port is not None:
                 port = int(port)
 
             # pylint: disable=I1101
             self.connection = mysql_connect(
-                host=get_aw_env_var('db_host'),
+                host=get_aw_env_var_or_default('db_host'),
                 port=port,
                 user=get_aw_env_var('db_user'),
-                password=get_aw_env_var('db_pwd'),
+                password=get_aw_env_var_or_default('db_pwd'),
                 database=get_aw_env_var('db'),
             )
             self.cursor = self.connection.cursor()
 
         elif DB_TYPE == 'psql':
             self.connection = psql_connect(
-                host=get_aw_env_var('db_host'),
-                port=get_aw_env_var('db_port'),
+                host=get_aw_env_var_or_default('db_host'),
+                port=get_aw_env_var_or_default('db_port'),
                 user=get_aw_env_var('db_user'),
                 password=get_aw_env_var('db_pwd'),
                 dbname=get_aw_env_var('db'),

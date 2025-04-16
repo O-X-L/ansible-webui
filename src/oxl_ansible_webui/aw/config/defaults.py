@@ -50,9 +50,9 @@ CONFIG_DEFAULTS = {
     'db_type': 'sqlite',
     'db_user': '',
     'db_pwd': '',
-    'db_host': '',
+    'db_host': '127.0.0.1',
     'db_socket': '',
-    'db_port': '',
+    'db_port': 5432 if environ.get('AW_DB_TYPE', None) == 'psql' else 3306,
     'timezone': tzname[0],
     'secret': ''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(50)),
     'session_timeout': 12 * 60 * 60,  # 12h
