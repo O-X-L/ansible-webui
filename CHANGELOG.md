@@ -21,6 +21,7 @@ Features:
 Fixes:
 
 * Hide DB-Password from System-Config view
+* Multiple MariaDB/MySQL/PSQL fixes
 
 ### 0.8.3
 

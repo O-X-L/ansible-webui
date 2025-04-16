@@ -4,6 +4,7 @@ from typing import Callable
 
 from django.core.validators import ValidationError
 from django.db.utils import OperationalError, IntegrityError
+from django.db import close_old_connections
 
 from aw.settings import DB_FILE
 from aw.execute.threader import ThreadManager
@@ -71,6 +72,10 @@ class Scheduler:
                         time_last_reload = time()
 
                     sleep(self.WAIT_TIME)
+
+                except OperationalError as err:
+                    log(msg=f'DB connection timeout: {err}', level=5)
+                    close_old_connections()  # "2006, 'Server has gone away'" when using mariadb/mysql
 
                 except ThreadError as err:
                     log(msg=f'Got thread error: {err}', level=2)
