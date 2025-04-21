@@ -155,12 +155,13 @@ class SystemEnvironmentReadResponse(BaseResponse):
     libyaml = serializers.CharField()
     python = serializers.CharField()
     user = serializers.CharField()
-    aws = serializers.CharField()
-    ara = serializers.CharField()
-    python_modules = serializers.CharField()
-    ansible_config = serializers.CharField()
+    aws_session_manager_plugin = serializers.CharField()
+    aws_cli = serializers.CharField()
+    ansible_ara = serializers.CharField()
     ansible_playbook = serializers.CharField()
-    ansible_collections = serializers.CharField()
+    python_modules = serializers.ListSerializer(child=serializers.DictField())
+    ansible_config = serializers.ListSerializer(child=serializers.DictField())
+    ansible_collections = serializers.ListSerializer(child=serializers.DictField())
 
 
 class APISystemEnvironment(APIView):

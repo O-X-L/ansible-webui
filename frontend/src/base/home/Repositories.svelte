@@ -277,7 +277,7 @@
                                         {#if repoKind == 'static'}
                                             <tr>
                                                 <td class={classPopoverColumn1}>
-                                                    {t('repos.form.static_path')}:
+                                                    {t('common.path')}:
                                                 </td>
                                                 <td class={classPopoverColumn2Text}>
                                                     {repo.static_path}

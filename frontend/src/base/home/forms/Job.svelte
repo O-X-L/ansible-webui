@@ -382,7 +382,7 @@
                             on:input={valideInput} on:blur={valideInput} required={form.name.required} />
                     </div>
                     <div class={classModalInput}>
-                        <Label for="job_cmt" class={classModalLabel}>{t('jobs.form.comment')}</Label>
+                        <Label for="job_cmt" class={classModalLabel}>{t('common.comment')}</Label>
                         <Input id="job_cmt" bind:value={form.comment.value} bind:color={form.comment.color} />
                     </div>
                     <div class={classModalInput}>
@@ -541,7 +541,7 @@
                     <div class={classModalInputDiv}>
                         <Heading tag="h3">{t('jobs.form.prompt_fields')}:</Heading>
                         <div>
-                            <Label for="job_exec_prompt_cmt" class={classModalLabel}>{t('jobs.form.comment')}</Label>
+                            <Label for="job_exec_prompt_cmt" class={classModalLabel}>{t('common.comment')}</Label>
                             <div class={classCenterChildDiv}>
                                 <Toggle id="job_exec_prompt_cmt" bind:checked={executionPromptsSimple.comment} />
                             </div>

@@ -18,6 +18,8 @@ Features:
 
   This lowers the danger of an attack-vector that would utilize DB-write-access to execute jobs.
 
+* Reimplemented `System - Environment` page
+
 Fixes:
 
 * Hide DB-Password from System-Config view

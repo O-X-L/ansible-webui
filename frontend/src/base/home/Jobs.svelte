@@ -433,7 +433,7 @@
                     <tbody>
                         <tr>
                             <td class={classPopoverColumn1}>
-                                {t('jobs.form.comment')}:
+                                {t('common.comment')}:
                             </td>
                             <td class={classPopoverColumn2Text}>
                                 {job.comment ? job.comment : '-'}
@@ -620,7 +620,7 @@
                         bind:value={executionPrompts.field_values.credentials} />
                 {/if}
                 {#if executionPrompts.config.fields.includes('comment')}
-                    <Label for="job_prompt_{job.id}_cmt" class={classModalLabel}>{t('jobs.form.comment')}</Label>
+                    <Label for="job_prompt_{job.id}_cmt" class={classModalLabel}>{t('common.comment')}</Label>
                     <Input id="job_prompt_{job.id}_cmt" bind:value={executionPrompts.field_values.comment} />
                 {/if}
                 {#each executionPrompts.config.vars as v, i (v.name)}

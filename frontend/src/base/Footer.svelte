@@ -66,7 +66,7 @@
         {#if $share.backend.authenticated}
         {t('footer.user')}: {$share.backend.user} |
         {/if}
-        {t('footer.version')}: {$share.backend.version}
+        {t('common.version')}: {$share.backend.version}
       {/if}
     </div>
   </FooterLinkGroup>

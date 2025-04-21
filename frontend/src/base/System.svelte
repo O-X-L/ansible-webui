@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
 
     import { Tabs, TabItem } from 'flowbite-svelte';
-    import { AdjustmentsHorizontalSolid, RocketSolid, DatabaseSolid, BookSolid } from 'flowbite-svelte-icons'
+    import { AdjustmentsHorizontalSolid, RocketSolid, DatabaseSolid, BookSolid, DrawSquareSolid } from 'flowbite-svelte-icons'
 
     import { share } from './Share.js';
     import { tq } from '../util/translate.js';
@@ -10,6 +10,7 @@
 
     import Settings from './system/Settings.svelte';
     import APIKeys from './system/APIKeys.svelte';
+    import Environment from './system/Environment.svelte';
 
     const classIFrameDiv = 'w-full h-full';
     const classIFrame = 'w-full h-full overflow-y-auto overflow-x-hidden border-none';
@@ -20,6 +21,7 @@
       api_keys: false,
       api_docs: false,
       admin: false,
+      environment: false,
     });
   
     $effect(() => {
@@ -35,6 +37,8 @@
         fragment = 'admin';
       } else if (openTab.api_keys) {
         fragment = 'api_docs';
+      } else if (openTab.environment) {
+        fragment = 'env';
       }
 
       window.location.hash = fragment;
@@ -57,6 +61,8 @@
         openTab.api_keys = true;
       } else if (f == '#api_docs') {
         openTab.api_keys = true;
+      } else if (f == '#env') {
+        openTab.environment = true;
       } else {
         openTab.settings = true;
       }
@@ -80,6 +86,13 @@
       <iframe src="/_admin/" title="Admin" class={classIFrame}
         frameborder=0 marginheight=0 marginwidth=0></iframe>
       <div id="loaded" class="h-0 w-0"></div>
+    </TabItem>
+
+    <TabItem bind:open={openTab.environment} divClass="h-full" defaultClass="{classTabButton} tab-env">
+      <div slot="title" class="flex items-center gap-2">
+        <DrawSquareSolid size="md" /> {t('system.environment')}
+      </div>
+      <Environment bind:open={openTab.environment}/>
     </TabItem>
 
     <TabItem bind:open={openTab.api_keys} defaultClass="{classTabButton} tab-api-keys">

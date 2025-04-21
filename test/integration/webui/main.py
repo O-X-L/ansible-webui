@@ -144,6 +144,7 @@ def test_main_pages():
             'tab-api-keys': '#api_keys',
             'tab-api-docs': '#api_docs',
             'tab-settings': '#settings',
+            'tab-env': '#env',
         },
     })
 

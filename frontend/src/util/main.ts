@@ -55,6 +55,10 @@ export function clickToCopy(event: MouseEvent) {
   navigator.clipboard.writeText(event.target.innerText);
 }
 
+export function saveToClipboard(o: any) {
+  navigator.clipboard.writeText(JSON.stringify(o, null, 2));
+}
+
 export function getURLHash() : string {
   let f = window.location.hash;
   if (f.includes('?')) {

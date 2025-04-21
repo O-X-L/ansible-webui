@@ -165,6 +165,7 @@ def test_list():
     test_get_locations([
         'credentials', 'job', 'job_exec', 'key', 'permission', 'config', 'repository',
         'fs/exists?item=/etc', 'alert/global', 'alert/group', 'alert/user', 'alert/plugin',
+        'environment',
     ])
 
 

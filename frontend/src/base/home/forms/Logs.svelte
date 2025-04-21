@@ -144,7 +144,7 @@
                 </tr>
                 {#if exec.comment}
                     <tr>
-                        <td class={classProp}>{t('jobs.form.comment')}:</td>
+                        <td class={classProp}>{t('common.comment')}:</td>
                         <td class={classText}>{exec.comment}</td>
                     </tr>
                 {/if}

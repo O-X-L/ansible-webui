@@ -29,7 +29,6 @@ EN = {
     'nav.user_settings': 'User Settings',
     'nav.logout': 'Log out',
     'footer.user': 'User',
-    'footer.version': 'Version',
     'footer.oss': 'Open Source Usage',
     'footer.oss.frontend': 'Frontend',
     'footer.oss.backend': 'Backend',
@@ -50,6 +49,10 @@ EN = {
     'common.comment': 'Comment',
     'common.invalid_value': 'Field has invalid value',  # '<msg>: "<field>"'
     'common.invalid_form': 'Invalid values detected',  # not field-specific..
+    'common.version': 'Version',
+    'common.path': 'Path',
+    'common.setting': 'Setting',
+    'common.value': 'Value',
 
     # auth
     'login.user': 'Username',
@@ -114,7 +117,6 @@ EN = {
     'jobs.form.repository': 'Repository',
     'jobs.form.playbook_file': 'Playbook File',
     'jobs.form.inventory_file': 'Inventory File',
-    'jobs.form.comment': 'Comment',
     'jobs.form.schedule': 'Schedule',
     'jobs.form.cron': 'Schedule Cron',
     'jobs.form.enabled': 'Schedule Enabled',
@@ -214,7 +216,7 @@ EN = {
     # repositories
     'repos.static': 'Static / Local',
     'repos.git': 'Git',
-    'repos.static.src': 'Path',
+    'repos.static.src': 'Path',  # common.path
     'repos.git.src': 'Origin',
     'repos.info': 'Repository Information',
     'repos.new': 'New Repository',
@@ -225,7 +227,6 @@ EN = {
     'repos.action.download': 'Repository download initiated',
 
     ## form fields
-    'repos.form.static_path': 'Path',
     'repos.form.git_origin': 'Origin',
     'repos.form.git_branch': 'Branch',
     'repos.form.git_credentials': 'Credentials',
@@ -281,6 +282,7 @@ EN = {
 
     # system
     'system.settings': 'Settings',
+    'system.environment': 'Environment',
     'system.api_keys': 'API Keys',
     'system.admin': 'Admin',
     'system.api_docs': 'API Docs',
@@ -366,7 +368,6 @@ EN = {
     'config.form.help.mail_transport': 'The default port mapping is: 25 = Unencrypted, 465 = SSL, 587 = StartTLS',
 
     # user settings
-    'user_settings': 'User Settings',
     'user_settings.action.pwd_change': 'Password updated',
     'user_settings.btn.change_pwd': 'Change Password',
 
@@ -375,4 +376,11 @@ EN = {
 
     ## form help
     'user_settings.form.help.pwd': 'Minimum requirements: 10 characters, letters, digits and special-characters',
+
+    # system-environment
+    'env.main': 'Main',
+    'env.component': 'Component',
+    'env.ansible.config': 'Ansible Config',
+    'env.ansible.collections': 'Ansible Collections',
+    'env.python_modules': 'Python Modules',
 }

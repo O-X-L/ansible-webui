@@ -68,7 +68,7 @@
 
 <Modal bind:open={open} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
     <div class={classModalForm}>
-        <Heading tag="h2">{t('user_settings')}</Heading>
+        <Heading tag="h2">{t('nav.user_settings')}</Heading>
 
 
         <div class={classModalInput}>

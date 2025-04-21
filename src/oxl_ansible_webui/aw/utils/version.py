@@ -8,7 +8,7 @@ from importlib import metadata
 
 from aw.config.main import VERSION
 from aw.utils.subps import process_cache
-from aw.utils.util import datetime_from_db_str
+from aw.utils.util import datetime_from_db_str, is_null
 from aw.config.hardcoded import LOG_TIME_FORMAT
 from aw.utils.deployment import deployment_docker
 from aw.model.system import get_schema_metadata
@@ -36,13 +36,21 @@ def parsed_ansible_version(python_modules) -> dict:
     versions = {'ansible': None, 'ansible_core': None, 'jinja': None, 'libyaml': None, 'ansible_runner': None}
     try:
         ansible_version = process_cache('ansible --version')['stdout'].split('\n')
-        versions['ansible_core'] = ansible_version[0].strip()
+        versions['ansible_core'] = ansible_version[0].strip().replace('ansible [core ', '').replace(']', '')
         versions['jinja'] = ansible_version[-2].split('=')[1].strip()
         versions['libyaml'] = ansible_version[-1].split('=')[1].strip()
 
         if 'ansible-runner' in python_modules:
-            # versions['ansible_runner'] = python_modules['ansible-runner']['version']
-            versions['ansible_runner'] = python_modules['ansibleguy-runner']['version']
+            versions['ansible_runner'] = None
+
+            if 'ansible-runner' in python_modules:
+                versions['ansible_runner'] = python_modules['ansible-runner']['version']
+
+            if is_null(versions['ansible_runner']) and 'oxl-ansible-runner' in python_modules:
+                versions['ansible_runner'] = python_modules['oxl-ansible-runner']['version']
+
+            if is_null(versions['ansible_runner']) and 'ansibleguy-runner' in python_modules:
+                versions['ansible_runner'] = python_modules['ansibleguy-runner']['version']
 
         if 'ansible' in python_modules:
             versions['ansible'] = python_modules['ansible']['version']
@@ -91,15 +99,15 @@ def get_system_versions(python_modules: dict = None, ansible_version: dict = Non
     db_schema = get_schema_metadata()
 
     return {
-        'linux': linux_versions,
-        'aw_db_schema': f'{db_schema.schema_version} (updated: {datetime_from_db_str(db_schema.updated)})',
-        'git': process_cache('git --version')['stdout'],
-        'ansible_core': ansible_version['ansible_core'],
-        'ansible_runner': ansible_version['ansible_runner'],
-        'django': python_modules['django']['version'],
-        'django_api': python_modules['djangorestframework']['version'],
-        'gunicorn': python_modules['gunicorn']['version'],
-        'jinja': ansible_version['jinja'],
-        'libyaml': ansible_version['libyaml'],
-        'python': f"{version_info.major}.{version_info.minor}.{version_info.micro}",
+        'OS / Linux': linux_versions,
+        'AW DB-Schema': f'{db_schema.schema_version} (updated: {datetime_from_db_str(db_schema.updated)})',
+        'Git': process_cache('git --version')['stdout'].replace('git version ', ''),
+        'Ansible Core': ansible_version['ansible_core'],
+        'Ansible Runner': ansible_version['ansible_runner'],
+        'Django': python_modules['django']['version'],
+        'Django API': python_modules['djangorestframework']['version'],
+        'Gunicorn': python_modules['gunicorn']['version'],
+        'Jinja': ansible_version['jinja'],
+        'LibYAML': ansible_version['libyaml'],
+        'Python': f"{version_info.major}.{version_info.minor}.{version_info.micro}",
     }

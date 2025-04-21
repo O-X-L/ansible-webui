@@ -8,12 +8,13 @@ from aw.utils.subps import process_cache
 from aw.utils.version import get_system_versions, parsed_ansible_version, parsed_python_modules, get_version
 
 
-def _parsed_ansible_collections() -> dict:
+def _parsed_ansible_collections() -> list[dict]:
     result = process_cache('ansible-galaxy collection list')
     if result['rc'] != 0:
-        return {}
+        return []
 
-    collections = {}
+    collections = []
+    processed = []
     col_counter = {}
     collection_path = ''
     for line in result['stdout'].split('\n'):
@@ -26,9 +27,8 @@ def _parsed_ansible_collections() -> dict:
 
         name, version = line.split(' ', 1)
         name, version = name.strip(), version.strip()
-        url = f"https://galaxy.ansible.com/ui/repo/published/{name.replace('.', '/')}"
 
-        if name in collections:
+        if name in processed:
             if name in col_counter:
                 col_counter[name] += 1
             else:
@@ -36,16 +36,17 @@ def _parsed_ansible_collections() -> dict:
 
             name = f'{name} ({col_counter[name]})'
 
-        collections[name] = {'version': version, 'path': collection_path, 'url': url}
+        collections.append({'name': name, 'version': version, 'path': collection_path})
+        processed.append(name)
 
-    return dict(sorted(collections.items()))
+    return collections
 
 
-def _parsed_ansible_config() -> dict:
+def _parsed_ansible_config() -> list[dict]:
     environ['ANSIBLE_FORCE_COLOR'] = '0'
     ansible_config_raw = get_ansible_config(action='dump', quiet=True)[0].split('\n')
     environ['ANSIBLE_FORCE_COLOR'] = '1'
-    ansible_config = {}
+    ansible_config = []
 
     for line in ansible_config_raw:
         try:
@@ -62,21 +63,18 @@ def _parsed_ansible_config() -> dict:
         except ValueError:
             setting, comment = setting_comment, '-'
 
-        url = ("https://docs.ansible.com/ansible/latest/reference_appendices/config.html#"
-               f"{setting.lower().replace('_', '-')}")
+        ansible_config.append({'setting': setting, 'value': value, 'comment': comment})
 
-        ansible_config[setting] = {'value': value, 'comment': comment, 'url': url}
-
-    return dict(sorted(ansible_config.items()))
+    return ansible_config
 
 
 def _parsed_aws_versions() -> dict:
-    versions = {}
+    versions = {'AWS Session-Manager-Plugin': None, 'AWS CLI': None}
     if Path('/usr/bin/session-manager-plugin').is_file():
-        versions['session-manager-plugin'] = process_cache('/usr/bin/session-manager-plugin --version')['stdout']
+        versions['AWS Session-Manager-Plugin'] = process_cache('/usr/bin/session-manager-plugin --version')['stdout']
 
     if Path('/usr/bin/aws').is_file():
-        versions['aws-cli'] = process_cache('/usr/bin/aws --version')['stdout']
+        versions['AWS CLI'] = process_cache('/usr/bin/aws --version')['stdout']
 
     return versions
 
@@ -104,13 +102,13 @@ def get_system_environment() -> dict:
 
     return {
         **env_system,
-        'aw': get_version(),
-        'user': getuser(),
-        'aws': _parsed_aws_versions(),
-        'ara': _parsed_ara_version(python_modules),
-        'python_modules': python_modules,
-        'ansible_config': _parsed_ansible_config(),
-        'ansible_playbook': _parsed_ansible_playbook(),
+        **_parsed_aws_versions(),
+        'Ansible WebUI': get_version(),
+        'User': getuser(),
+        'Ansible ARA': _parsed_ara_version(python_modules),
+        'Ansible Playbook': _parsed_ansible_playbook(),
         # 'ansible_roles': get_role_list(),
-        'ansible_collections': _parsed_ansible_collections(),
+        'Python Modules': list(python_modules.values()),
+        'Ansible Config': _parsed_ansible_config(),
+        'Ansible Collections': _parsed_ansible_collections(),
     }
