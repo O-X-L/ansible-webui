@@ -295,7 +295,7 @@ Database Migration Issues
 
 **Problem**:
 
-* This should never happen if you are running a release version (*AW_ENV=prod*) and did not already run migrations manually.
+* This should never happen if you are running a release version and did not already run migrations manually.
 
 * Make sure you set the :code:`AW_DB` env-var correctly before running the migrations.
 

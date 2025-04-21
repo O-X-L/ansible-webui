@@ -253,12 +253,17 @@ Advanced Settings
 
 Normal users will not have to use these.
 
+* **AW_DEBUG**
+
+    Enable debug output.
+
+    This debug mode **SHOULD ONLY BE ENABLED TEMPORARILY**! It could possibly open attack vectors.
+
+
 * **AW_SERVE_STATIC**
 
    If defined - the built-in static-file serving is disabled.
    Use this if in production and a `proxy like nginx <https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/>`_ is in front of the Ansible-WebUI webservice.
-
-   Path to serve: :code:`/static/ => ${PATH_VENV}/lib/python${PY_VERSION}/site-packages/oxl_ansible_webui/aw/static/`
 
 
 * **AW_DB_MIGRATE**
@@ -278,16 +283,9 @@ Normal users will not have to use these.
 
 * **AW_ENV**
 
-   Used in development.
-   If unset or value is neither 'dev' nor 'staging' the webservice will be in production mode.
-   'staging' mode is close to production behavior.
-
-
-* **AW_DEBUG**
-
-    Enable debug output.
-
-    This debug mode **SHOULD ONLY BE ENABLED TEMPORARILY**! It could possibly open attack vectors.
+   **Only in development**.
+   If unset or value is neither :code:`dev` nor :code:`staging` the webservice will be in production mode.
+   :code:`staging` mode is close to production behavior.
 
 
 * **AW_DOCKER**
