@@ -1,3 +1,4 @@
+{% load util %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -24,6 +25,6 @@
         <div id="footer-bg"></div>
         <div id="footer"></div>
         {% csrf_token %}
-        <script type="module" src="/static/dist/main.js"></script>
+        <script type="module" src="/static/dist/main.js?v={% get_version %}"></script>
     </body>
 </html>

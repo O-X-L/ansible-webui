@@ -8,10 +8,10 @@
     import Modal from '../../../flowbite-custom/Modal.svelte';
 
     import { share } from '../../Share.js';
-    import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
     import { type formInfoType } from '../../Types.js';
     import { SECRET_PLACEHOLDER } from '../../Config.js';
+    import { apiGet, cacheKey } from '../../../util/api.js';
     import { type credentialsUserType, type credentialsSharedType  } from '../Types.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
     import {
@@ -144,15 +144,19 @@
         loaded = true;
     }
 
-    $effect(() => {
-        if (!open || loaded) {
-            return;
-        }
-        apiGet('frontend/form/credentials', setFormInfos);
+    function fetchBuild() {
+        apiGet(`frontend/form/credentials?${cacheKey($share)}`, setFormInfos);
 
         if (action != 'add' && existingID) {
             apiGet(urlExisting, loadExisting);
         }
+    }
+
+    $effect(() => {
+        if (!open || loaded) {
+            return;
+        }
+        setTimeout(fetchBuild, 500);  // wait to fetch version
     })
 </script>
 

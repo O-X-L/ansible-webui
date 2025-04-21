@@ -16,6 +16,7 @@ cd "$SRC_DIR"
 npm run build >/dev/null
 
 APPS=$(ls "${SRC_DIR}/dist/"*.js | rev | cut -d '/' -f 1 | rev | cut -d '-' -f1)
+ts="$(date '+%s')"
 
 for app in $APPS
 do
@@ -28,8 +29,8 @@ do
     then
       if [ -f "${DST_DIR}/${app}.js" ]
       then
-        sed -i "s|from\"./${ref}-[^\.]*\.js\"|from\"./${ref}.js\"|g" "${DST_DIR}/${app}.js"
-        sed -i "s|import\"./${ref}-[^\.]*\.js\"|import\"./${ref}.js\"|g" "${DST_DIR}/${app}.js"
+        sed -i "s|from\"./${ref}-[^\.]*\.js\"|from\"./${ref}.js?v=${ts}\"|g" "${DST_DIR}/${app}.js"
+        sed -i "s|import\"./${ref}-[^\.]*\.js\"|import\"./${ref}.js?v=${ts}\"|g" "${DST_DIR}/${app}.js"
       fi
     fi
   done

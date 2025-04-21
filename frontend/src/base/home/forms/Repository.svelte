@@ -9,9 +9,9 @@
 
     import { share } from '../../Share.js';
     import { repoKindMap } from '../../Config.js';
-    import { apiGet } from '../../../util/api.js';
     import { tq } from '../../../util/translate.js';
     import { type formInfoType } from '../../Types.js';
+    import { apiGet, cacheKey } from '../../../util/api.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
     import {
         inputBaseColor, valideInputBase, submitFormBase, getMethod,
@@ -136,15 +136,19 @@
         loaded = true;
     }
 
-    $effect(() => {
-        if (!open || loaded) {
-            return;
-        }
-        apiGet('frontend/form/repository', setFormInfos);
+    function fetchBuild() {
+        apiGet(`frontend/form/repository?${cacheKey($share)}`, setFormInfos);
 
         if (action != 'add' && existingID) {
             apiGet(urlExisting, loadExisting);
         }
+    }
+
+    $effect(() => {
+        if (!open || loaded) {
+            return;
+        }
+        setTimeout(fetchBuild, 500);  // wait to fetch version
     })
 </script>
 

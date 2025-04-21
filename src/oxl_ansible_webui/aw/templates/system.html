@@ -1,5 +1,6 @@
 {% extends "./base.html" %}
+{% load util %}
 {% block content %}
 <div id="system" class="h-full"></div>
-<script type="module" src="/static/dist/system.js"></script>
+<script type="module" src="/static/dist/system.js?v={% get_version %}"></script>
 {% endblock %}

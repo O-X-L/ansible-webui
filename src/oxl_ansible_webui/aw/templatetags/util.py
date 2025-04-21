@@ -2,12 +2,19 @@ from pathlib import Path
 
 from django import template
 
+from aw.utils.version import get_version as get_aw_version
+
 register = template.Library()
 
 
 @register.simple_tag
 def set_var(val):
     return val
+
+
+@register.simple_tag
+def get_version():
+    return get_aw_version()
 
 
 @register.filter

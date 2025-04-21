@@ -8,10 +8,10 @@
     } from 'flowbite-svelte';
 
     import { share } from '../Share.js';
-    import { apiGet } from '../../util/api.js';
     import { tq } from '../../util/translate.js';
     import { type formInfoType } from '../Types.js';
     import { SECRET_PLACEHOLDER } from '../Config.js';
+    import { apiGet, cacheKey } from '../../util/api.js';
     import { choicesFromArray } from '../../util/form.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import { valideInputBase, inputBaseColor, submitFormBase } from '../../util/form.js';
@@ -150,9 +150,13 @@
         apiGet(`config?hash=${apiDataHash}`, loadSettings);
     }
 
+    function fetchInfos() {
+        apiGet(`frontend/form/config?${cacheKey($share)}`, setFormInfos)
+    }
+
     onMount(() => {
         if (!loaded) {
-            apiGet('frontend/form/config', setFormInfos);
+            setTimeout(fetchInfos, 500);  // wait to fetch version
         }
     
         // todo: refresh data over websockets
@@ -172,7 +176,7 @@
 
 <div>
 {#if !loaded}
-<div class={classSpinnerDiv}><Spinner/></div>
+    <div class={classSpinnerDiv}><Spinner/></div>
 {:else}
 <Accordion>
     <AccordionItem defaultClass="{classSpoilerItem} settings-exec">

@@ -1,5 +1,6 @@
 {% extends "./base.html" %}
+{% load util %}
 {% block content %}
 <div id="home" class="h-full"></div>
-<script type="module" src="/static/dist/home.js"></script>
+<script type="module" src="/static/dist/home.js?v={% get_version %}"></script>
 {% endblock %}

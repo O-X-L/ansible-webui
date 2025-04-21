@@ -11,7 +11,7 @@
     import { share } from './Share.js';
     import { setDarkLightMode } from './DarkLightMode.js';
     import UserSettings from './system/UserSettings.svelte';
-    import { apiGet, getCSRFFormTokenHTML } from '../util/api.js';
+    import { apiGet, getCSRFFormTokenHTML, cacheKey } from '../util/api.js';
     import { classNavFooter, classBtnBase, classBtnLink } from './Style.js';
     import { tq, flagIcon, getTranslationStore } from '../util/translate.js';
 
@@ -40,7 +40,6 @@
 
     function setBackendStates(j: any) {
       $share.backend = j;
-      loaded = true;
     }
 
     function setTranslations(j: any) {
@@ -50,19 +49,23 @@
         cache[language] = j[language];
       }
       localStorage.languageCache = JSON.stringify(cache);
+
+      loaded = true;
     }
 
     function t(code: string) : string {
       return tq($share, code);
     }
 
-    onMount(() => {
-      languageStoreExists = getTranslationStore($share) != null
-      apiGet('frontend/lang', setTranslations);
+    function fetchBackendInfos() {
+      apiGet('frontend/info', setBackendStates);
+    }
+
+    function fetchTranslations() {
+      apiGet(`frontend/lang?${cacheKey($share)}`, setTranslations);
       if (!getTranslationStore($share)) {
         setTimeout(location.reload, 2000);
       }
-      setDarkLightMode(document);
       if (localStorage.languageCache) {
         $share.lang = JSON.parse(localStorage.languageCache);
       }
@@ -71,7 +74,13 @@
       } else {
         localStorage.language = language;
       }
-      apiGet('frontend/info', setBackendStates);
+    }
+
+    onMount(() => {
+      fetchBackendInfos();
+      languageStoreExists = getTranslationStore($share) != null
+      setTimeout(fetchTranslations, 500);  // wait to fetch version
+      setDarkLightMode(document);
     });
 </script>
   

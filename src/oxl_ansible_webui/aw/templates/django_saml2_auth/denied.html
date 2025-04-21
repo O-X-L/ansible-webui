@@ -1,6 +1,7 @@
 {% extends "../base.html" %}
+{% load util %}
 {% block content %}
     <div class="aw-backend-form-alert" hidden="hidden">You are not allowed to access this app</div>
     <div id="login-saml"></div>
-    <script type="module" src="/static/dist/login_saml.js"></script>
+    <script type="module" src="/static/dist/login_saml.js?v={% get_version %}"></script>
 {% endblock %}

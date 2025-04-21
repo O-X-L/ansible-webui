@@ -110,7 +110,7 @@ class APIBackendTranslations(GenericAPIView):
     @extend_schema(
         request=None,
         responses={200: GenericResponse},
-        summary='Return text-translations in needed for frontend rendering',
+        summary='Return text-translations needed for frontend rendering',
         operation_id='backend_translations',
     )
     def get(request):

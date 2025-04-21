@@ -15,7 +15,7 @@
     import { share } from '../../Share.js';
     import { isSet, rsplit } from '../../../util/main.js';
     import { tq } from '../../../util/translate.js';
-    import { apiGet, apiEdit } from '../../../util/api.js';
+    import { apiGet, apiEdit, cacheKey } from '../../../util/api.js';
     import { type formInfoType, type inputColorType } from '../../Types.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
     import { type executionPromptsType, type executionPromptVarType } from '../Types.js';
@@ -134,15 +134,19 @@
         loaded = true;
     }
 
-    $effect(() => {
-        if (!open || loaded) {
-            return;
-        }
-        apiGet('frontend/form/job', setFormInfos);
+    function fetchBuild() {
+        apiGet(`frontend/form/job?${cacheKey($share)}`, setFormInfos);
 
         if (action != 'add' && existingID) {
             apiGet(urlExisting, loadExisting);
         }
+    }
+
+    $effect(() => {
+        if (!open || loaded) {
+            return;
+        }
+        setTimeout(fetchBuild, 500);  // wait to fetch version
     })
 
     // autocomplete via api filesystem-browsing (playbook/inventory)

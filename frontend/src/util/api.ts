@@ -1,3 +1,6 @@
+import { type shareObject } from '../base/Share.js';
+
+
 function getCookie(name: string) : string|null {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -103,4 +106,14 @@ export function showAPIErrors(status: number, json: any, v: string, scroll: bool
             }    
         }
     }
+}
+
+export function cacheKey(share: shareObject): string {
+    if (share.backend.version) {
+        if (share.backend.version.includes('dev')) {
+            return `v=dev${Math.round(Date.now())}`;
+        }
+        return `v=${share.backend.version}`;
+    }
+    return `v=${Math.round(Date.now())}`;
 }

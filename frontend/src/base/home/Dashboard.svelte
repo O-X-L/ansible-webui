@@ -257,7 +257,7 @@
                 jobs_failed[n] = [];
             }
             if (!s[4] || s[4] == 0) {
-                console.log("INVALID TIME:", s);
+                // console.log("INVALID TIME:", s);
                 continue;
             }
             if (s[5] == 1) {

@@ -70,7 +70,7 @@ export function submitFormBase(
         payload[k] = v.value;
     }
     if (valid) {
-        console.log("SUBMITTING FORM", payload);
+        console.log("SUBMITTING FORM");  // payload
         apiEdit(method, url, payload, callback);
     }
     return [valid, validationErrors];

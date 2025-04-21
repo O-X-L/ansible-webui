@@ -22,6 +22,7 @@ Fixes:
 
 * Hide DB-Password from System-Config view
 * Multiple MariaDB/MySQL/PSQL fixes
+* Frontend Cache-Invalidation on Version-Change
 
 ### 0.8.3
 
