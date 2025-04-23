@@ -15,7 +15,12 @@ from aw.config.defaults import CONFIG_DEFAULTS
 from aw.api_endpoints.base import get_api_user, HDR_CACHE_1W, GenericResponse, API_PERMISSION
 from aw.model.job import Job, JobUserCredentials, Repository
 from aw.model.base import get_model_field_default, get_model_field_choices
-from aw.views.base import choices_global_credentials, choices_repositories
+from aw.views.base import choices_global_credentials, choices_repositories, choices_group
+from aw.model.alert import AlertGlobal, AlertGroup, AlertUser, AlertPlugin
+
+
+def _choices_alert_plugins() -> list[tuple]:
+    return [(p.id, p.name) for p in AlertPlugin.objects.all()]
 
 
 FK_CHOICES = {
@@ -25,6 +30,16 @@ FK_CHOICES = {
     },
     Repository: {
         'git_credentials': choices_global_credentials,
+    },
+    AlertGlobal: {
+        'plugin': _choices_alert_plugins,
+    },
+    AlertGroup: {
+        'group': choices_group,
+        'plugin': _choices_alert_plugins,
+    },
+    AlertUser: {
+        'plugin': _choices_alert_plugins,
     },
 }
 
@@ -195,3 +210,54 @@ class APIFormInfosConfig(GenericAPIView):
         data['env_vars'] = AW_ENV_VARS
 
         return Response(data=data, status=200, headers=HDR_CACHE_1W)
+
+
+class APIFormInfosGlobalAlerts(GenericAPIView):
+    http_method_names = ['get']
+    serializer_class = GenericResponse
+    permission_classes = API_PERMISSION
+
+    @staticmethod
+    @extend_schema(
+        request=None,
+        responses={200: GenericResponse},
+        summary='Return global-alert-form-choices & -defaults needed for frontend rendering',
+        operation_id='form_choices_global_alerts',
+    )
+    def get(request):
+        del request
+        return Response(data=_build_model_defaults_choices(AlertGlobal), status=200)
+
+
+class APIFormInfosGroupAlerts(GenericAPIView):
+    http_method_names = ['get']
+    serializer_class = GenericResponse
+    permission_classes = API_PERMISSION
+
+    @staticmethod
+    @extend_schema(
+        request=None,
+        responses={200: GenericResponse},
+        summary='Return group-alert-form-choices & -defaults needed for frontend rendering',
+        operation_id='form_choices_group_alerts',
+    )
+    def get(request):
+        del request
+        return Response(data=_build_model_defaults_choices(AlertGroup), status=200)
+
+
+class APIFormInfosUserAlerts(GenericAPIView):
+    http_method_names = ['get']
+    serializer_class = GenericResponse
+    permission_classes = API_PERMISSION
+
+    @staticmethod
+    @extend_schema(
+        request=None,
+        responses={200: GenericResponse},
+        summary='Return user-alert-form-choices & -defaults needed for frontend rendering',
+        operation_id='form_choices_user_alerts',
+    )
+    def get(request):
+        del request
+        return Response(data=_build_model_defaults_choices(AlertUser), status=200)

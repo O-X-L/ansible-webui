@@ -53,6 +53,7 @@ EN = {
     'common.path': 'Path',
     'common.setting': 'Setting',
     'common.value': 'Value',
+    'common.kind': 'Kind',
 
     # auth
     'login.user': 'Username',
@@ -68,10 +69,6 @@ EN = {
     'home.repos': 'Repositories',
     'home.alerts': 'Alerts',
     'home.creds': 'Credentials',
-    'alerts.user': 'Personal',
-    'alerts.group': 'Group',
-    'alerts.global': 'Global',
-    'alerts.plugin': 'Plugin',
 
     # dashboard
     'db.stats': 'Statistics',
@@ -141,7 +138,6 @@ EN = {
     'jobs.form.prompt_vars': 'Variables to prompt',
     'jobs.form.prompt_name': 'Display Name',
     'jobs.form.prompt_varname': 'Variable Name',
-    'jobs.form.prompt_kind': 'Kind',
     'jobs.form.prompt_regex': 'Validation Regex',
     'jobs.form.prompt_choice_text': 'Text',
     ## form help
@@ -383,4 +379,34 @@ EN = {
     'env.ansible.config': 'Ansible Config',
     'env.ansible.collections': 'Ansible Collections',
     'env.python_modules': 'Python Modules',
+
+    # alerts
+    'alerts.user': 'Personal',
+    'alerts.group': 'Group',
+    'alerts.global': 'Global',
+    'alerts.plugin': 'Plugin',
+    'alerts.info': 'Alert Information',
+    'alerts.action.create': 'Alert created',
+    'alerts.action.update': 'Alert updated',
+    'alerts.new': 'New Alert',
+    'alerts.edit': 'Edit Alert',
+    'alerts.plugin.new': 'New Plugin',
+    'alerts.plugin.edit': 'Edit Plugin',
+    'alerts.plugin.action.create': 'Plugin created',
+    'alerts.plugin.action.update': 'Plugin updated',
+
+    'alerts.type.email': 'E-Mail',
+    'alerts.condition.failure': 'Failure',
+    'alerts.condition.success': 'Success',
+    'alerts.condition.always': 'Always',
+
+    ## form
+    'alerts.form.jobs_all': 'All Jobs',
+    'alerts.form.condition': 'Condition',
+    'alerts.form.plugin.executable': 'Executable',
+
+    ## form help
+    'alerts.form.help.plugin.executable': 'Path to the plugin-script to execute. For details see: '
+                                          '<a href="https://ansible-webui.oxl.app/usage/alerts.html#plugins">'
+                                          'Documentation</a>',
 }

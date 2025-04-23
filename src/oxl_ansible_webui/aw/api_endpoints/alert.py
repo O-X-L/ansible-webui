@@ -2,12 +2,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
 from rest_framework.generics import GenericAPIView
 from rest_framework import serializers
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
+from aw.base import USERS
 from aw.model.job import Job
 from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user, api_docs_put, api_docs_delete, \
-    api_docs_post, validate_no_xss, GenericErrorResponse
+    api_docs_post, validate_no_xss, GenericErrorResponse, response_data_if_changed, API_PARAM_HASH, BaseResponse
 from aw.utils.permission import has_manager_privileges
 from aw.model.alert import BaseAlert, AlertPlugin, AlertGlobal, AlertGroup, AlertUser
 
@@ -30,6 +32,10 @@ class AlertPluginReadWrite(serializers.ModelSerializer):
         fields = AlertPlugin.api_fields
 
 
+def _get_alert_plugins() -> list[AlertPlugin]:
+    return [AlertPluginReadWrite(instance=plugin).data for plugin in AlertPlugin.objects.all()]
+
+
 class APIAlertPlugin(GenericAPIView):
     http_method_names = ['get', 'post']
     serializer_class = AlertPluginReadWrite
@@ -44,7 +50,7 @@ class APIAlertPlugin(GenericAPIView):
     )
     def get(request):
         del request
-        return Response([AlertPluginReadWrite(instance=plugin).data for plugin in AlertPlugin.objects.all()])
+        return Response(_get_alert_plugins())
 
     @extend_schema(
         request=AlertPluginReadWrite,
@@ -207,6 +213,10 @@ class AlertUserWriteRequest(BaseAlertWriteRequest):
         return attrs
 
 
+def _get_user_alerts(user: USERS) -> list[AlertUser]:
+    return [AlertUserReadResponse(instance=alert).data for alert in AlertUser.objects.filter(user=user)]
+
+
 class APIAlertUser(GenericAPIView):
     http_method_names = ['get', 'post']
     serializer_class = AlertUserReadResponse
@@ -220,10 +230,7 @@ class APIAlertUser(GenericAPIView):
         operation_id='alert_user_list',
     )
     def get(request):
-        user = get_api_user(request)
-        return Response(
-            [AlertUserReadResponse(instance=alert).data for alert in AlertUser.objects.filter(user=user)]
-        )
+        return Response(_get_user_alerts(get_api_user(request)))
 
     @extend_schema(
         request=AlertUserWriteRequest,
@@ -368,6 +375,10 @@ class AlertGlobalWriteRequest(BaseAlertWriteRequest):
         return attrs
 
 
+def _get_global_alerts() -> list[AlertGlobal]:
+    return [AlertGlobalReadResponse(instance=alert).data for alert in AlertGlobal.objects.all()]
+
+
 class APIAlertGlobal(GenericAPIView):
     http_method_names = ['get', 'post']
     serializer_class = AlertGlobalReadResponse
@@ -382,7 +393,7 @@ class APIAlertGlobal(GenericAPIView):
     )
     def get(request):
         del request
-        return Response([AlertGlobalReadResponse(instance=alert).data for alert in AlertGlobal.objects.all()])
+        return Response(_get_global_alerts())
 
     @extend_schema(
         request=AlertGlobalWriteRequest,
@@ -535,6 +546,10 @@ class AlertGroupWriteRequest(BaseAlertWriteRequest):
         return attrs
 
 
+def _get_group_alerts() -> list[AlertGroup]:
+    return [AlertGroupReadResponse(instance=alert).data for alert in AlertGroup.objects.filter()]
+
+
 class APIAlertGroup(GenericAPIView):
     http_method_names = ['get', 'post']
     serializer_class = AlertGroupReadResponse
@@ -549,9 +564,7 @@ class APIAlertGroup(GenericAPIView):
     )
     def get(request):
         del request
-        return Response(
-            [AlertGroupReadResponse(instance=alert).data for alert in AlertGroup.objects.filter()]
-        )
+        return Response(_get_group_alerts())
 
     @extend_schema(
         request=AlertGroupWriteRequest,
@@ -685,4 +698,36 @@ class APIAlertGroupItem(GenericAPIView):
         return Response(
             data={'error': f"Alert with ID {alert_id} does not exist"},
             status=404,
+        )
+
+
+class AlertAllReadResponse(BaseResponse):
+    glob = serializers.ListSerializer(child=serializers.DictField())  # todo: rename to 'global'
+    group = serializers.ListSerializer(child=serializers.DictField())
+    user = serializers.ListSerializer(child=serializers.DictField())
+    plugins = serializers.ListSerializer(child=serializers.DictField())
+
+
+class APIAlertAll(APIView):
+    http_method_names = ['get']
+    serializer_class = AlertAllReadResponse
+    permission_classes = API_PERMISSION
+
+    @staticmethod
+    @extend_schema(
+        request=None,
+        responses={200: AlertAllReadResponse},
+        summary='Return list of Alerts',
+        operation_id='alert_list',
+        parameters=[API_PARAM_HASH],
+    )
+    def get(request):
+        return response_data_if_changed(
+            request,
+            data={
+                'global': _get_global_alerts(),
+                'group': _get_group_alerts(),
+                'user': _get_user_alerts(get_api_user(request)),
+                'plugins': _get_alert_plugins(),
+            },
         )

@@ -638,7 +638,7 @@
                                         bind:value={p.varName.value} bind:color={p.varName.color} />
                                 </div>
                                 <div>
-                                    <Label for="job_prompt_{p.id}_kind" class={classModalLabel}>{t('jobs.form.prompt_kind')}</Label>
+                                    <Label for="job_prompt_{p.id}_kind" class={classModalLabel}>{t('common.kind')}</Label>
                                     <Select id="job_prompt_{p.id}_kind" items={PROMPT_KIND_CHOICES} bind:value={p.kind.value} />
                                 </div>
                                 <div>

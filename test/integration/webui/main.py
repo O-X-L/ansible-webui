@@ -225,6 +225,16 @@ def test_js_actions():
                     '#repo-btn-discard',
                 ],
             ],
+            'tab-alerts': [
+                ['.alerts-kind-global'],
+                ['.alerts-kind-group'],
+                ['.alerts-kind-user'],
+                ['.alerts-kind-plugin'],
+                ['#alerts-btn-add-dd', '#alerts-btn-add-global', '#alert-btn-discard'],
+                ['#alerts-btn-add-dd', '#alerts-btn-add-group', '#alert-btn-discard'],
+                ['#alerts-btn-add-dd', '#alerts-btn-add-user', '#alert-btn-discard'],
+                ['#alerts-btn-add-dd', '#alerts-btn-add-plugin', '#plugin-btn-discard'],
+            ],
             # .logs-job-{job.id}, #logs-job-{job.id}-show
         },
         'ui/system': {

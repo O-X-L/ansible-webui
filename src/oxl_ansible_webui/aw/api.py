@@ -11,9 +11,10 @@ from aw.api_endpoints.filesystem import APIFsBrowse, APIFsExists
 from aw.api_endpoints.system import APISystemConfig, APISystemEnvironment, APIUserPasswordChange
 from aw.api_endpoints.repository import APIRepository, APIRepositoryItem, APIRepositoryLogFile
 from aw.api_endpoints.alert import APIAlertPlugin, APIAlertPluginItem, APIAlertUser, APIAlertUserItem, \
-    APIAlertGlobal, APIAlertGlobalItem, APIAlertGroup, APIAlertGroupItem
+    APIAlertGlobal, APIAlertGlobalItem, APIAlertGroup, APIAlertGroupItem, APIAlertAll
 from aw.api_endpoints.frontend import APIBackendInfo, APIBackendTranslations, APIFormInfosJob, \
-    APIFormInfosCredentials, APIFormInfosRepositories, APIFormInfosConfig
+    APIFormInfosCredentials, APIFormInfosRepositories, APIFormInfosConfig, APIFormInfosGlobalAlerts, \
+    APIFormInfosGroupAlerts, APIFormInfosUserAlerts
 from aw.api_endpoints.stats import APIStatsJobs
 # from aw.api_endpoints.base import not_implemented
 
@@ -38,6 +39,7 @@ urlpatterns_api = [
     path('api/repository/log/<int:repo_id>', APIRepositoryLogFile.as_view()),
     path('api/repository/<int:repo_id>', APIRepositoryItem.as_view()),
     path('api/repository', APIRepository.as_view()),
+    path('api/alert', APIAlertAll.as_view()),
     path('api/alert/plugin/<int:plugin_id>', APIAlertPluginItem.as_view()),
     path('api/alert/plugin', APIAlertPlugin.as_view()),
     path('api/alert/global/<int:alert_id>', APIAlertGlobalItem.as_view()),
@@ -59,5 +61,8 @@ urlpatterns_api = [
     path('api/frontend/form/credentials', APIFormInfosCredentials.as_view()),
     path('api/frontend/form/repository', APIFormInfosRepositories.as_view()),
     path('api/frontend/form/config', APIFormInfosConfig.as_view()),
+    path('api/frontend/form/alert/global', APIFormInfosGlobalAlerts.as_view()),
+    path('api/frontend/form/alert/group', APIFormInfosGroupAlerts.as_view()),
+    path('api/frontend/form/alert/user', APIFormInfosUserAlerts.as_view()),
     path('api/stats/jobs', APIStatsJobs.as_view()),
 ]
