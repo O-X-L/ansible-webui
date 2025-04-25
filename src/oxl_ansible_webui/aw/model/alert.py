@@ -31,7 +31,7 @@ class AlertPlugin(BaseModel):
     api_fields.extend(form_fields)
 
     name = models.CharField(max_length=100)
-    executable = models.CharField(max_length=300)
+    executable = models.TextField(max_length=300)
 
 
 class BaseAlert(BaseModel):

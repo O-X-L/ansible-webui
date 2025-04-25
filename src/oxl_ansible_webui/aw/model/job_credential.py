@@ -26,13 +26,13 @@ class BaseJobCredentials(BaseModel):
     connect_user = models.CharField(max_length=100, **DEFAULT_NONE)
     become_user = models.CharField(max_length=100, default='root', null=True, blank=True)
     # default become_user according to ansible-playbook docs
-    vault_file = models.CharField(max_length=300, **DEFAULT_NONE)
+    vault_file = models.TextField(max_length=300, **DEFAULT_NONE)
     vault_id = models.CharField(max_length=50, **DEFAULT_NONE)
 
-    _enc_vault_pass = models.CharField(max_length=500, **DEFAULT_NONE)
-    _enc_become_pass = models.CharField(max_length=500, **DEFAULT_NONE)
-    _enc_connect_pass = models.CharField(max_length=500, **DEFAULT_NONE)
-    _enc_ssh_key = models.CharField(max_length=5000, **DEFAULT_NONE)
+    _enc_vault_pass = models.TextField(max_length=500, **DEFAULT_NONE)
+    _enc_become_pass = models.TextField(max_length=500, **DEFAULT_NONE)
+    _enc_connect_pass = models.TextField(max_length=500, **DEFAULT_NONE)
+    _enc_ssh_key = models.TextField(max_length=5000, **DEFAULT_NONE)
 
     @property
     def vault_pass(self) -> str:

@@ -8,12 +8,19 @@ tbd
 
 ## Version 0
 
+### 0.8.5
+
+Fixes:
+
+* Migrate long VARCHAR fields to TEXT
+
+----
+
 ### 0.8.4
 
 Features:
 
 * Bumped [AWS-SSM to version 1.2.707.0](https://github.com/aws/session-manager-plugin/releases/tag/1.2.707.0) (*Docker image oxlorg-ansible-webui-aws*)
-* Issue when switching between Jobs in logs-list
 * Security: Added job-queue validation
 
   This lowers the danger of an attack-vector that would utilize DB-write-access to execute jobs.
@@ -26,9 +33,12 @@ Features:
 
 Fixes:
 
-* Hide DB-Password from System-Config view
-* Multiple MariaDB/MySQL/PSQL fixes
+* Security: Hide DB-Password from System-Config view
+* Issue when switching between Jobs in logs-list
+* Multiple MariaDB/MySQL/PSQL fixes [#27](https://github.com/O-X-L/ansible-webui/issues/27)
 * Frontend Cache-Invalidation on Version-Change
+
+----
 
 ### 0.8.3
 
@@ -45,6 +55,8 @@ Fixes:
 Features:
 
 * Ability to change Dashboard Stats-Time-Period
+
+----
 
 ### 0.8.2
 
@@ -63,6 +75,8 @@ Features:
 Chore:
 
 * Cleaned-up Credentials-API
+
+----
 
 ### 0.8.1
 

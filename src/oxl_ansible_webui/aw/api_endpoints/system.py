@@ -201,6 +201,9 @@ class APIUserPasswordChange(APIView):
     )
     def put(self, request):
         user = get_api_user(request)
+        if user.username == 'demo':
+            return Response({'error': 'The demo-user is not allowed to change password'}, status=403)
+
         pwd = request.data['password']
 
         if len(pwd) < 10:

@@ -41,18 +41,18 @@ class BaseJob(BaseModel):
         'step', 'ask-vault-password', 'ask-vault-pass', 'k', 'ask-pass',
     ]
 
-    limit = models.CharField(max_length=500, **DEFAULT_NONE)
+    limit = models.TextField(max_length=500, **DEFAULT_NONE)
     verbosity = models.PositiveSmallIntegerField(choices=CHOICES_JOB_VERBOSITY, default=0)
-    comment = models.CharField(max_length=300, **DEFAULT_NONE)
+    comment = models.TextField(max_length=300, **DEFAULT_NONE)
     mode_diff = models.BooleanField(choices=CHOICES_BOOL, default=False)
     mode_check = models.BooleanField(choices=CHOICES_BOOL, default=False)
 
     # NOTE: one or multiple comma-separated vars
-    environment_vars = models.CharField(max_length=1000, **DEFAULT_NONE)
+    environment_vars = models.TextField(max_length=1000, **DEFAULT_NONE)
 
-    tags = models.CharField(max_length=500, **DEFAULT_NONE)
-    tags_skip = models.CharField(max_length=500, **DEFAULT_NONE)
-    cmd_args = models.CharField(max_length=1000, **DEFAULT_NONE)
+    tags = models.TextField(max_length=500, **DEFAULT_NONE)
+    tags_skip = models.TextField(max_length=500, **DEFAULT_NONE)
+    cmd_args = models.TextField(max_length=1000, **DEFAULT_NONE)
 
     class Meta:
         abstract = True
@@ -96,7 +96,7 @@ class Job(BaseJob):
     name = models.CharField(max_length=150, null=False, blank=False)
     playbook_file = models.CharField(max_length=150)
     # NOTE: one or multiple comma-separated inventories
-    inventory_file = models.CharField(max_length=300, **DEFAULT_NONE)
+    inventory_file = models.TextField(max_length=300, **DEFAULT_NONE)
     schedule_max_len = 50
     schedule = models.CharField(max_length=schedule_max_len, validators=[validate_cronjob], **DEFAULT_NONE)
     enabled = models.BooleanField(choices=CHOICES_BOOL, default=True)
@@ -109,8 +109,8 @@ class Job(BaseJob):
     repository = models.ForeignKey(Repository, on_delete=models.SET_NULL, related_name='job_fk_repo', **DEFAULT_NONE)
 
     execution_prompts_max_len = 5000
-    execution_prompts = models.CharField(max_length=execution_prompts_max_len, **DEFAULT_NONE)  # todo: remove later
-    execution_prompts_json = models.CharField(max_length=execution_prompts_max_len, default='')
+    execution_prompts = models.TextField(max_length=execution_prompts_max_len, **DEFAULT_NONE)  # todo: remove later
+    execution_prompts_json = models.TextField(max_length=execution_prompts_max_len, default='')
 
     owner = models.ForeignKey(
         USERS, on_delete=models.SET_NULL, null=True, default=1,
@@ -200,7 +200,7 @@ class JobExecutionResultHost(BareModel):
         'tasks_changed',
     ]
     # ansible_runner.runner.Runner.stats
-    hostname = models.CharField(max_length=300, null=False)
+    hostname = models.TextField(max_length=300, null=False)
     unreachable = models.BooleanField(choices=CHOICES_BOOL, default=False)
 
     tasks_skipped = models.PositiveSmallIntegerField(default=0)
@@ -249,11 +249,11 @@ class JobExecution(BaseJob):
         **DEFAULT_NONE,  # execution is created before result is available
     )
     status = models.PositiveSmallIntegerField(default=0, choices=CHOICES_JOB_EXEC_STATUS)
-    log_stdout = models.CharField(max_length=300, **DEFAULT_NONE)
-    log_stderr = models.CharField(max_length=300, **DEFAULT_NONE)
-    log_stdout_repo = models.CharField(max_length=300, **DEFAULT_NONE)
-    log_stderr_repo = models.CharField(max_length=300, **DEFAULT_NONE)
-    command = models.CharField(max_length=2000, **DEFAULT_NONE)
+    log_stdout = models.TextField(max_length=300, **DEFAULT_NONE)
+    log_stderr = models.TextField(max_length=300, **DEFAULT_NONE)
+    log_stdout_repo = models.TextField(max_length=300, **DEFAULT_NONE)
+    log_stderr_repo = models.TextField(max_length=300, **DEFAULT_NONE)
+    command = models.TextField(max_length=2000, **DEFAULT_NONE)
 
     credentials_shared = models.ForeignKey(
         JobSharedCredentials, on_delete=models.SET_NULL, related_name='jobexec_fk_credglob', null=True,
@@ -417,4 +417,4 @@ class JobQueue(BareModel):
     execution = models.ForeignKey(
         JobExecution, on_delete=models.CASCADE, related_name='jobqueue_fk_jobexec', **DEFAULT_NONE,
     )
-    v = models.CharField(default='-', max_length=5000)
+    v = models.TextField(default='-', max_length=5000)

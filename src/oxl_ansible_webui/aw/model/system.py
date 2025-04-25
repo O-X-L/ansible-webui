@@ -39,27 +39,27 @@ class SystemConfig(BaseModel):
     form_fields = api_fields_read.copy()
     api_fields_read_only = ['db', 'db_migrate', 'serve_static', 'deployment', 'version']
 
-    path_run = models.CharField(max_length=500, default='/tmp/ansible-webui')
-    path_play = models.CharField(max_length=500, default=None)
-    path_log = models.CharField(max_length=500, default=None)
-    path_template = models.CharField(max_length=500, **DEFAULT_NONE)
-    timezone = models.CharField(max_length=300, default='UTC')  # UTC to keep model migrations static
+    path_run = models.TextField(max_length=500, default='/tmp/ansible-webui')
+    path_play = models.TextField(max_length=500, default=None)
+    path_log = models.TextField(max_length=500, default=None)
+    path_template = models.TextField(max_length=500, **DEFAULT_NONE)
+    timezone = models.TextField(max_length=300, default='UTC')  # UTC to keep model migrations static
     run_timeout = models.PositiveIntegerField(default=CONFIG_DEFAULTS['run_timeout'])
     session_timeout = models.PositiveIntegerField(default=CONFIG_DEFAULTS['session_timeout'])
-    path_ansible_config = models.CharField(max_length=500, **DEFAULT_NONE)
-    path_ssh_known_hosts = models.CharField(max_length=500, **DEFAULT_NONE)
+    path_ansible_config = models.TextField(max_length=500, **DEFAULT_NONE)
+    path_ssh_known_hosts = models.TextField(max_length=500, **DEFAULT_NONE)
     debug = models.BooleanField(default=False, choices=CHOICES_BOOL)
-    logo_url = models.CharField(max_length=500, **DEFAULT_NONE)
-    ara_server = models.CharField(max_length=300, **DEFAULT_NONE)
-    global_environment_vars = models.CharField(max_length=1000, **DEFAULT_NONE)
-    mail_server = models.CharField(max_length=300, default='127.0.0.1:25', blank=True, null=True)
+    logo_url = models.TextField(max_length=500, **DEFAULT_NONE)
+    ara_server = models.TextField(max_length=300, **DEFAULT_NONE)
+    global_environment_vars = models.TextField(max_length=1000, **DEFAULT_NONE)
+    mail_server = models.TextField(max_length=300, default='127.0.0.1:25', blank=True, null=True)
     mail_transport = models.PositiveSmallIntegerField(
         choices=MAIL_TRANSPORT_TYPE_CHOICES, default=MAIL_TRANSPORT_TYPE_PLAIN,
     )
     mail_ssl_verify = models.BooleanField(default=True, choices=CHOICES_BOOL)
-    mail_sender = models.CharField(max_length=300, **DEFAULT_NONE)
-    mail_user = models.CharField(max_length=300, **DEFAULT_NONE)
-    _enc_mail_pass = models.CharField(max_length=500, **DEFAULT_NONE)
+    mail_sender = models.TextField(max_length=300, **DEFAULT_NONE)
+    mail_user = models.TextField(max_length=300, **DEFAULT_NONE)
+    _enc_mail_pass = models.TextField(max_length=500, **DEFAULT_NONE)
 
     @classmethod
     def get_set_public_env_vars(cls) -> list:
@@ -141,7 +141,7 @@ def get_schema_metadata() -> SchemaMetadata:
 class UserExtended(models.Model):
     user = models.OneToOneField(USERS, on_delete=models.CASCADE)
     phone = models.CharField(max_length=100, **DEFAULT_NONE)
-    description = models.CharField(max_length=1000, **DEFAULT_NONE)
+    description = models.TextField(max_length=1000, **DEFAULT_NONE)
 
     class Meta:
         constraints = [
