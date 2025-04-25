@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { onMount, onDestroy } from 'svelte';
+    
     import { CloseCircleSolid, FloppyDiskSolid } from 'flowbite-svelte-icons';
     import {
         Heading, Button, Input, Label, Spinner, Tooltip, Helper, Select, Toggle,
@@ -23,6 +25,7 @@
         classModalDialog, classSpoilerPad,
     } from '../../Style.js';
 
+    let componentRoot;
     let {
         open = $bindable(false),
         successMsg = $bindable(''),
@@ -59,6 +62,8 @@
     let url = $derived(actionNew ? 'repository' : urlExisting);
     let title = $derived(actionNew ? t('repos.new') : t('repos.edit'));
     let formWarningMsgs: string[] = $state([]);
+    let pressedKeyAlt = $state(false);
+    let pressedKeyS = $state(false);
 
     let form = $state({
         name: {value: '', color: inputBaseColor, required: true, regex: /^.{1,100}/},
@@ -151,8 +156,64 @@
         }
         setTimeout(fetchBuild, 500);  // wait to fetch version
     })
+
+    // ALT+S quick-save
+    function handleKeyUp(e: KeyboardEvent) {
+        switch (e.key) {
+        case 'Alt':
+            pressedKeyAlt = false;
+            break;
+        case 's':
+        case 'S':
+            pressedKeyS = false;
+            break;
+        default:
+            return;
+        }
+    }
+    
+    function handleKeyDown(e: KeyboardEvent) {
+        switch (e.key) {
+        case 'Alt':
+            pressedKeyAlt = true;
+            break;
+        case 's':
+        case 'S':
+            pressedKeyS = true;
+            break;
+        default:
+            return;
+        }
+    }
+
+    $effect(() => {
+        if (open && componentRoot) {
+            componentRoot.focus();
+        }
+    });
+
+    $effect(() => {
+        if (pressedKeyAlt && pressedKeyS) {
+            submitForm();
+        }
+    });
+
+    onMount(() => {
+        if (componentRoot) {
+            componentRoot.addEventListener('keyup', handleKeyUp);
+            componentRoot.addEventListener('keydown', handleKeyDown);
+        }
+    });
+
+    onDestroy(()=>{
+        if (componentRoot) {
+            componentRoot.removeEventListener('keyup', handleKeyUp);
+            componentRoot.removeEventListener('keydown', handleKeyDown);
+        }
+    });
 </script>
 
+<div bind:this={componentRoot} tabindex="-1" class="inline-block">
 <Modal bind:open={open} size="lg" autoclose={false} placement="top-center"
     backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
     <Heading tag="h2">{title}</Heading>
@@ -168,7 +229,7 @@
                     on:input={valideInput} on:blur={valideInput} required={form.name.required} />
                 </div>
                     <div class={classModalInput}>
-                        <Label for="repo_path" class={classModalLabel}>{t('repos.form.static_path')}</Label>
+                        <Label for="repo_path" class={classModalLabel}>{t('common.path')}</Label>
                         <Input id="repo_path" bind:value={form.static_path.value} bind:color={form.static_path.color}
                         on:input={valideInput} on:blur={valideInput} required={form.static_path.required} />
                         <Helper class={classModalHelp}>{@html t('repos.form.help.static_path')}</Helper>
@@ -276,3 +337,4 @@
         </div>
     {/if}
 </Modal>
+</div>

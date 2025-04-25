@@ -222,8 +222,10 @@
                                         <b>{t('common.updated_at')}:</b> {item.time_update ? item.time_update : '-'}
                                     </div>
                                     <div>
-                                        <!-- todo: status color green/red/blue -->
-                                        <b>{t('common.status')}:</b> <span>{item.status_name}</span>
+                                        <b>{t('common.status')}:</b>
+                                        <span class={item.status_name == 'Failed' ? 'text-red-600' : 'text-green-600'}>
+                                            {item.status_name}
+                                        </span>
                                     </div>
                                     {#if item.log_stderr_url || item.log_stderr_url}
                                         <div>
@@ -241,27 +243,29 @@
                             <TableBodyCell tdClass={classListContent}>
                                 {#if repoKind == 'git'}
                                     <div class="mb-2">
-                                        <Button size="xs" on:click={() => (downloadGitRepo(item.id))}
-                                            disabled={isDownloadActive(item) || item.git_isolate}>
+                                        <Button size="xs" on:click={() => (downloadGitRepo(item.id))} disabled={isDownloadActive(item)}>
                                             <DownloadSolid/>
                                         </Button>
                                         <Tooltip>{t('btn.download')}</Tooltip>
                                     </div>
                                 {/if}
                                 <div>
-                                    <RepositoryForm bind:open={entryActions[item.id].edit} action='edit' rtypeName={repoKind}
-                                        existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                                     <Button size="xs" on:click={() => {entryActions[item.id].edit = true}}><EditSolid/></Button>
                                     <Tooltip>{t('btn.edit')}</Tooltip>
                 
-                                    <RepositoryForm bind:open={entryActions[item.id].clone} action='clone' rtypeName={repoKind}
-                                        existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                                     <Button size="xs" on:click={() => {entryActions[item.id].clone = true}}><FileCloneSolid/></Button>
                                     <Tooltip>{t('btn.clone')}</Tooltip>
                 
                                     <Button size="xs" on:click={() => {deleteRepository(item.id)}}><TrashBinSolid/></Button>
                                     <Tooltip>{t('btn.delete')}</Tooltip>
                                 </div>
+
+                                <RepositoryForm bind:open={entryActions[item.id].edit} action='edit' rtypeName={repoKind}
+                                existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+
+                                <RepositoryForm bind:open={entryActions[item.id].clone} action='clone' rtypeName={repoKind}
+                                existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+
                             </TableBodyCell>
                         </TableBodyRow>
                     </TableBody>

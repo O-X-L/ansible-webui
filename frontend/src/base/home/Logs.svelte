@@ -210,9 +210,6 @@
                             {/if}
                         </TableBodyCell>
                         <TableBodyCell tdClass={classListContent}>
-                            <LogsView bind:open={entryExecActions[exec.id]}
-                                jobID={job.id} jobName={job.name} bind:exec={executionList[execIdx]} />
-
                             <Button size="xs" on:click={() => {entryExecActions[exec.id] = true}} id="logs-job-{job.id}-show">
                                 <BookOpenSolid/>
                             </Button>
@@ -228,6 +225,10 @@
                             <Button size="xs" on:click={() => {redirectJob(job.id)}}><CogSolid/></Button>
                             <Tooltip>{t('jobs.job')}</Tooltip>
                             -->
+
+                            <LogsView bind:open={entryExecActions[exec.id]}
+                            jobID={job.id} jobName={job.name} bind:exec={executionList[execIdx]} />
+
                         </TableBodyCell>
                     </TableBodyRow>
                     {/each}

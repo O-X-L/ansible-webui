@@ -357,19 +357,22 @@
                                 <Tooltip>{t('btn.execute')}</Tooltip>
                             </div>
                             <div>
-                                <AlertPluginForm bind:open={entryActions.plugins[item.id].edit} action='edit'
-                                    existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                                 <Button size="xs" on:click={() => {entryActions.plugins[item.id].edit = true}}><EditSolid/></Button>
                                 <Tooltip>{t('btn.edit')}</Tooltip>
             
-                                <AlertPluginForm bind:open={entryActions.plugins[item.id].clone} action='clone'
-                                    existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                                 <Button size="xs" on:click={() => {entryActions.plugins[item.id].clone = true}}><FileCloneSolid/></Button>
                                 <Tooltip>{t('btn.clone')}</Tooltip>
             
                                 <Button size="xs" on:click={() => {deleteAlert(item.id, 'plugin')}}><TrashBinSolid/></Button>
                                 <Tooltip>{t('btn.delete')}</Tooltip>
                             </div>
+
+                            <AlertPluginForm bind:open={entryActions.plugins[item.id].edit} action='edit'
+                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+
+                            <AlertPluginForm bind:open={entryActions.plugins[item.id].clone} action='clone'
+                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+
                         </TableBodyCell>
                     </TableBodyRow>
                 </TableBody>

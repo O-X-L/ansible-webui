@@ -17,8 +17,9 @@
     import {
         classSpinnerDiv, classListHeader, classListContent, classFooterSpacing, classModalBackdrop,
         classModalLabel, classModalForm, classModalInput, classModalBtns, classModalBody, classModalDialog,
-     } from '../Style.js';
+    } from '../Style.js';
  
+    let componentRoot;
     let { open = $bindable(false) } = $props();
 
     let apiResponseHandler: APIResponseHandler = $state();
@@ -28,6 +29,8 @@
     let updatedAt = $state(0);
     let newModal = $state(false);
     let newLoad = $state(false);
+    let pressedKeyAlt = $state(false);
+    let pressedKeyS = $state(false);
 
     interface apiToken {
         token: string
@@ -99,8 +102,54 @@
         }
     });
 
+   // ALT+S quick-save
+   function handleKeyUp(e: KeyboardEvent) {
+        switch (e.key) {
+        case 'Alt':
+            pressedKeyAlt = false;
+            break;
+        case 's':
+        case 'S':
+            pressedKeyS = false;
+            break;
+        default:
+            return;
+        }
+    }
+    
+    function handleKeyDown(e: KeyboardEvent) {
+        switch (e.key) {
+        case 'Alt':
+            pressedKeyAlt = true;
+            break;
+        case 's':
+        case 'S':
+            pressedKeyS = true;
+            break;
+        default:
+            return;
+        }
+    }
+
+    $effect(() => {
+        if (open && componentRoot) {
+            componentRoot.focus();
+        }
+    });
+
+    $effect(() => {
+        if (pressedKeyAlt && pressedKeyS) {
+            addAPIKey();
+        }
+    });
+
     onMount(() => {
         buildUpdateAPIKeyList();
+
+        if (componentRoot) {
+            componentRoot.addEventListener('keyup', handleKeyUp);
+            componentRoot.addEventListener('keydown', handleKeyDown);
+        }
     
         // todo: refresh data over websockets
         clearInterval(updateLoop);
@@ -111,6 +160,10 @@
 
     onDestroy(()=>{
     	clearInterval(updateLoop);
+        if (componentRoot) {
+            componentRoot.removeEventListener('keyup', handleKeyUp);
+            componentRoot.removeEventListener('keydown', handleKeyDown);
+        }
     });
 </script>
 
@@ -153,6 +206,7 @@
     </div>
 </div>
 
+<div bind:this={componentRoot} tabindex="-1" class="inline-block">
 <Modal bind:open={newModal} size="lg" autoclose={false} placement="top-center"
     backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
     <div class={classModalForm}>
@@ -192,6 +246,7 @@
         {/if}
     </div>
 </Modal>
+</div>
 
 <div class={classFooterSpacing}></div>
 <div id="loaded" class="h-0 w-0"></div>

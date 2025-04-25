@@ -22,6 +22,7 @@ Features:
 * Reimplemented `Alerts` page
 * Frontend optimizations for mobile devices/small screens
 * Improved logs-view
+* Quick-save by pressing `Alt + S`
 
 Fixes:
 

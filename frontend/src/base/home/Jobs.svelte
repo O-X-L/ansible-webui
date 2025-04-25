@@ -393,15 +393,11 @@
                     <Tooltip>{t('btn.logs')}</Tooltip>
                 </div>
                 <div class="mt-2">
-                    <JobForm bind:open={entryActions[item.id].edit} action='edit' existingID={item.id}
-                        bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                     <Button size="xs" on:click={() => {entryActions[item.id].edit = true}} id="jobs-btn-edit-{item.id}">
                         <EditSolid/>
                     </Button>
                     <Tooltip>{t('btn.edit')}</Tooltip>
 
-                    <JobForm bind:open={entryActions[item.id].clone} action='clone' existingID={item.id}
-                        bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                     <Button size="xs" on:click={() => {entryActions[item.id].clone = true}} id="jobs-btn-clone-{item.id}">
                         <FileCloneSolid/>
                     </Button>
@@ -412,6 +408,13 @@
                     </Button>
                     <Tooltip>{t('btn.delete')}</Tooltip>
                 </div>
+
+                <JobForm bind:open={entryActions[item.id].edit} action='edit' existingID={item.id}
+                bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+
+                <JobForm bind:open={entryActions[item.id].clone} action='clone' existingID={item.id}
+                bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+
             </TableBodyCell>
         </TableBodyRow>
     </TableBody>  
@@ -529,10 +532,10 @@
                             </tr>
                             {#if job.executions.length}
                                 <tr>
-                                    <td class={classPopoverColumn1}>
+                                    <td class="{classPopoverColumn1} pt-3">
                                         {t('jobs.info.last_run')}:
                                     </td>
-                                    <td class={classPopoverColumn2Text}>
+                                    <td class="{classPopoverColumn2Text} pt-3">
                                         {job.executions[0].time_start}
                                     </td>
                                 </tr>
@@ -540,7 +543,7 @@
                                     <td class={classPopoverColumn1}>
                                         {t('common.status')}:
                                     </td>
-                                    <td class={classPopoverColumn2Text}>
+                                    <td class="{classPopoverColumn2Text} {job.executions[0].status_name == 'Failed' ? 'text-red-600' : 'text-green-600'}">
                                         {job.executions[0].status_name}
                                     </td>
                                 </tr>

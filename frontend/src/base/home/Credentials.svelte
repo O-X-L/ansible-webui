@@ -264,20 +264,23 @@
                                 {/if}
                             </TableBodyCell>
                             <TableBodyCell tdClass={classListContent}>
-                                <CredentialsForm bind:open={entryActions[credsKind][item.id].edit} action='edit'
-                                    existingID={item.id} kind={credsKind}
-                                    bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                                 <Button size="xs" on:click={() => {entryActions[credsKind][item.id].edit = true}}><EditSolid/></Button>
                                 <Tooltip>{t('btn.edit')}</Tooltip>
             
-                                <CredentialsForm bind:open={entryActions[credsKind][item.id].clone} action='clone'
-                                    existingID={item.id} kind={credsKind}
-                                    bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                                 <Button size="xs" on:click={() => {entryActions[credsKind][item.id].clone = true}}><FileCloneSolid/></Button>
                                 <Tooltip>{t('btn.clone')}</Tooltip>
             
                                 <Button size="xs" on:click={() => {deleteCredentials(item.id, credsKind)}}><TrashBinSolid/></Button>
                                 <Tooltip>{t('btn.delete')}</Tooltip>
+
+                                <CredentialsForm bind:open={entryActions[credsKind][item.id].edit} action='edit'
+                                    existingID={item.id} kind={credsKind}
+                                    bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+
+                                <CredentialsForm bind:open={entryActions[credsKind][item.id].clone} action='clone'
+                                    existingID={item.id} kind={credsKind}
+                                    bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+
                             </TableBodyCell>
                         </TableBodyRow>
                     </TableBody>

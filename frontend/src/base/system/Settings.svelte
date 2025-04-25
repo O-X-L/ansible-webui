@@ -20,6 +20,7 @@
         classFooterSpacing, classSpoilerItem, classSpoilerPad,
     } from '../Style.js';
 
+    let componentRoot;
     let { open = $bindable(false) } = $props();
 
     let apiResponseHandler: APIResponseHandler = $state();
@@ -28,6 +29,8 @@
     let apiDataHash = $state('');
     let updateLoop: number = $state(0);
     let loaded = $state(false);
+    let pressedKeyAlt = $state(false);
+    let pressedKeyS = $state(false);
 
     interface formInfoExtType extends formInfoType {
         env_vars: any
@@ -166,15 +169,77 @@
         }, $share.updateInterval);
     });
 
+    // ALT+S quick-save
+    function handleKeyUp(e: KeyboardEvent) {
+        switch (e.key) {
+        case 'Alt':
+            pressedKeyAlt = false;
+            break;
+        case 's':
+        case 'S':
+            pressedKeyS = false;
+            break;
+        default:
+            return;
+        }
+    }
+    
+    function handleKeyDown(e: KeyboardEvent) {
+        switch (e.key) {
+        case 'Alt':
+            pressedKeyAlt = true;
+            break;
+        case 's':
+        case 'S':
+            pressedKeyS = true;
+            break;
+        default:
+            return;
+        }
+    }
+
+    $effect(() => {
+        if (open && componentRoot) {
+            componentRoot.focus();
+        }
+    });
+
+    $effect(() => {
+        if (pressedKeyAlt && pressedKeyS) {
+            submitForm();
+        }
+    });
+
+    onMount(() => {
+        if (!loaded) {
+            setTimeout(fetchInfos, 500);  // wait to fetch version
+        }
+
+        if (componentRoot) {
+            componentRoot.addEventListener('keyup', handleKeyUp);
+            componentRoot.addEventListener('keydown', handleKeyDown);
+        }
+
+        // todo: refresh data over websockets
+        clearInterval(updateLoop);
+        updateLoop = setInterval(() => {
+            buildUpdateSettings();
+        }, $share.updateInterval);
+    });
+
     onDestroy(()=>{
-    	clearInterval(updateLoop);
+        clearInterval(updateLoop);
+        if (componentRoot) {
+            componentRoot.removeEventListener('keyup', handleKeyUp);
+            componentRoot.removeEventListener('keydown', handleKeyDown);
+        }
     });
 </script>
 
 <APIResponseHandler bind:this={apiResponseHandler} bind:successMsg={apiSuccessMsg}
     bind:warningMsgs={formWarningMsgs} />
 
-<div>
+<div bind:this={componentRoot} tabindex="-1" class="w-full">
 {#if !loaded}
     <div class={classSpinnerDiv}><Spinner/></div>
 {:else}
