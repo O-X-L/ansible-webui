@@ -6,14 +6,13 @@ from django.utils import timezone
 
 from aw.config.main import config
 from aw.config.hardcoded import REPO_CLONE_TIMEOUT
-from aw.model.job import Job, JobExecution
+from aw.model.job import  JobExecution
 from aw.utils.util import is_null, is_set, write_file_0640
 from aw.utils.subps import process
 from aw.execute.play_credentials import write_pwd_file, get_pwd_file
-from aw.execute.util import update_status, get_path_run, job_logs, create_dirs
+from aw.execute.util import update_status, create_dirs
 from aw.utils.handlers import AnsibleRepositoryError
 from aw.model.repository import Repository
-from aw.base import USERS
 from aw.model.base import JOB_EXEC_STATUS_FAILED
 
 
