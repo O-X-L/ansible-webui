@@ -21,6 +21,7 @@ Features:
 * Reimplemented `System - Environment` page
 * Reimplemented `Alerts` page
 * Frontend optimizations for mobile devices/small screens
+* Improved logs-view
 
 Fixes:
 

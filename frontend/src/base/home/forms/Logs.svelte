@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
 
-    import { InfoCircleSolid, CloseCircleSolid, StopSolid } from 'flowbite-svelte-icons';
+    import { InfoCircleSolid, CloseCircleSolid, StopSolid, CaretDownSolid } from 'flowbite-svelte-icons';
     import { Spinner, Heading, Button, Tooltip, Toggle, Alert } from 'flowbite-svelte';  // Modal
 
     import Modal from '../../../flowbite-custom/Modal.svelte';
@@ -32,11 +32,13 @@
     const classProp = 'sm:text-base max-sm:text-xs font-bold pr-3';
     const endDiv = `logs-end-${jobID}-${exec.id}`;
 
+    let componentRoot;
     let apiResponseHandler: APIResponseHandler = $state();
     let updateLoop: number = $state(0);
     let lastLogLine: number = $state(0);
     let logLines: logLineType[] = $state([]);
     let finished = $state(false);
+    let lastScroll = $state(false);
     let lineNr = $state(1);
     let apiSuccessMsg = $state('');
     let followLogsToggle = $state(true);
@@ -62,14 +64,16 @@
         let newLogLines = [...logLines];
         for (let l of j.lines) {
             newLogLines.push({nr: lineNr, content: l});
+            logLines = newLogLines;
+            followLogs();
             lineNr += 1;
         }
         lastLogLine = lineNr;
-        logLines = newLogLines;
-        followLogs();
         if (lastLogLine >= j.count && j.finished) {
             finished = true;
+            lastScroll = true;
         }
+        followLogs();
     }
 
     function stopJob() {
@@ -81,18 +85,45 @@
         return JOB_EXEC_STATI_ACTIVE.includes(exec.status);
     }
 
+    function isInactive() : boolean {
+        return finished || exec.failed || !isExecActive;
+    }
+    
     function buildUpdateLogsList() {
         if (!open || typeof(document.hidden) !== undefined && document['hidden']) {
             // tab in background
             return;
         }
-        if (finished || exec.failed || !isExecActive) {
+        if (isInactive()) {
+            if (lastScroll) {
+                followLogs();
+                lastScroll = false;
+            }
             return;
         }
         apiGet(`job/${jobID}/${exec.id}/log/${lastLogLine}`, loadLogLines);
     }
 
+	function handleKeyDown(e: KeyboardEvent) {
+        if (isInactive()) {
+            return;
+        }
+        if (open && e.key == ' ') {
+            followLogsToggle = !followLogsToggle;
+        }
+	}
+
+    $effect(() => {
+        if (open && componentRoot) {
+            componentRoot.focus();
+        }
+    })
+
     onMount(() => {
+        if (componentRoot) {
+            componentRoot.addEventListener('keydown', handleKeyDown);
+        }
+
         buildUpdateLogsList();
 
         // todo: refresh data over websockets
@@ -104,11 +135,15 @@
 
     onDestroy(()=>{
     	clearInterval(updateLoop);
+        if (componentRoot) {
+            componentRoot.removeEventListener('keydown', handleKeyDown);
+        }
     });
 </script>
 
 <APIResponseHandler bind:this={apiResponseHandler} bind:successMsg={apiSuccessMsg} />
 
+<div bind:this={componentRoot} tabindex="-1">
 <Modal bind:open={open} size="lg" autoclose={false} placement="top-center"
     backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
     <Heading tag="h2">{t('logs.job_logs')} "{jobName}"</Heading>
@@ -194,19 +229,24 @@
             </tbody>
         </table>
         {#if finished}
-            <div class="mt-20 mb-10 font-bold text-lg {classCenterChildDiv} text-green-600">
+            <div class="pt-10 mb-10 font-bold text-lg {classCenterChildDiv} text-green-600">
                 <InfoCircleSolid class="inline-block mr-2" /> {t('logs.exec_finished')}
             </div>
         {/if}
-        <div class="h-28"></div>
+        <div class="h-48"></div>
         <div id={endDiv} class="w-0 h-0"></div>
     {/if}
-    <div class="fixed bottom-10 right-96">
-        <div class={classCenterChildDiv}>
+    <div class="fixed bottom-10 left-[50%] translate-x-[-50%]">
+        <div class="{classCenterChildDiv} opacity-30 hover:opacity-95">
             <Button id="logs-btn-close" on:click={() => (open = false)}>
                 <CloseCircleSolid/>
             </Button>
             <Tooltip>{t('btn.close')}</Tooltip>
+
+            <Button id="logs-btn-down" on:click={() => {followLogs()}} class="ml-2">
+                <CaretDownSolid/>
+            </Button>
+            <Tooltip>{t('btn.update')}</Tooltip>
 
             {#if isExecActive()}
                 <div class="inline-block ml-2 {classCenterChildDiv}">
@@ -222,3 +262,4 @@
         </div>
     </div>
 </Modal>
+</div>

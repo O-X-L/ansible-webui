@@ -27,6 +27,6 @@ export const classFooterSpacing = 'pb-32';
 export const classTabButton = 'inline-block text-sm font-medium text-center disabled:cursor-not-allowed';
 export const classTabTitle = 'flex items-center sm:gap-2';
 export const classTab = 'px-1 sm:px-5 h-full';
-export const classTabButtonDiv = 'flex flex-row overflow-scroll space-x-2 rtl:space-x-reverse';
+export const classTabButtonDiv = 'flex flex-row overflow-auto space-x-2 rtl:space-x-reverse';
 export const classTabDiv = 'p-1 sm:p-4 rounded-lg mt-4 mb-10 h-full';
 const bg = 'w-full h-full';
