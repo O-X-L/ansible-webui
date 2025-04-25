@@ -8,8 +8,8 @@
 
     import { share } from './Share.js';
     import { tq } from '../util/translate.js';
-    import { classTabButton } from './Style.js';
     import { getURLHashPage } from '../util/main.js';
+    import { classTabButton, classTabTitle, classTab, classTabDiv, classTabButtonDiv } from './Style.js';
 
     import Jobs from './home/Jobs.svelte';
     import Logs from './home/Logs.svelte';
@@ -78,45 +78,45 @@
     })
 </script>
 
-<div class="pl-5 pr-5 h-full">
-  <Tabs tabStyle="underline" contentClass="p-4 rounded-lg mt-4 mb-10 h-full">
+<div class={classTab}>
+  <Tabs tabStyle="underline" contentClass={classTabDiv} defaultClass={classTabButtonDiv}>
     <TabItem bind:open={openTab.dashboard} divClass="h-full" defaultClass="{classTabButton} tab-dashboard">
-      <div slot="title" class="flex items-center gap-2">
+      <div slot="title" class="flex items-center sm:gap-2">
         <GridSolid size="md" /> {t('home.dashboard')}
       </div>
       <Dashboard bind:open={openTab.dashboard}/>
     </TabItem>
 
     <TabItem bind:open={openTab.jobs} defaultClass="{classTabButton} tab-jobs">
-      <div slot="title" class="flex items-center gap-2">
+      <div slot="title" class="{classTabTitle} gap-1">
         <CogSolid size="md" /> {t('home.jobs')}
       </div>
       <Jobs bind:open={openTab.jobs}/>
     </TabItem>
 
     <TabItem bind:open={openTab.logs} defaultClass="{classTabButton} tab-logs">
-      <div slot="title" class="flex items-center gap-2">
+      <div slot="title" class={classTabTitle}>
         <BookOpenSolid size="md" /> {t('home.logs')}
       </div>
       <Logs bind:open={openTab.logs}/>
     </TabItem>
 
     <TabItem bind:open={openTab.repositories} defaultClass="{classTabButton} tab-repositories">
-      <div slot="title" class="flex items-center gap-2">
+      <div slot="title" class={classTabTitle}>
         <CodeBranchSolid size="md" /> {t('home.repos')}
       </div>
       <Repositories bind:open={openTab.repositories}/>
     </TabItem>
 
     <TabItem bind:open={openTab.credentials} defaultClass="{classTabButton} tab-credentials">
-      <div slot="title" class="flex items-center gap-2">
+      <div slot="title" class={classTabTitle}>
         <UsersSolid size="md" /> {t('home.creds')}
       </div>
       <Credentials bind:open={openTab.credentials}/>
     </TabItem>
 
     <TabItem bind:open={openTab.alerts} defaultClass="{classTabButton} tab-alerts">
-      <div slot="title" class="flex items-center gap-2">
+      <div slot="title" class={classTabTitle}>
         <BellActiveSolid size="md" /> {t('home.alerts')}
       </div>
       <Alerts bind:open={openTab.alerts}/>

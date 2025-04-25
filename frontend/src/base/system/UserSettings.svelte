@@ -12,6 +12,7 @@
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
         classModalBackdrop, classModalLabel, classModalForm, classModalInput, classModalBtns,
+        classModalBody, classModalDialog,
      } from '../Style.js';
  
     let { open = $bindable(false) } = $props();
@@ -66,7 +67,8 @@
 <APIResponseHandler bind:this={apiResponseHandler} bind:successMsg={apiSuccessMsg}
     bind:errorMsg={apiErrorMsg} bind:showError={showError} />
 
-<Modal bind:open={open} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
+<Modal bind:open={open} size="lg" autoclose={false} placement="top-center"
+    backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
     <div class={classModalForm}>
         <Heading tag="h2">{t('nav.user_settings')}</Heading>
 

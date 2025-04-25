@@ -6,7 +6,7 @@
 
     import { share } from './Share.js';
     import { tq } from '../util/translate.js';
-    import { classTabButton } from './Style.js';
+    import { classTabButton, classTabTitle, classTab, classTabDiv, classTabButtonDiv } from './Style.js';
 
     import Settings from './system/Settings.svelte';
     import APIKeys from './system/APIKeys.svelte';
@@ -70,17 +70,17 @@
     })
 </script>
 
-<div class="pl-5 pr-5 h-full">
-  <Tabs tabStyle="underline" contentClass="p-4 rounded-lg mt-4 mb-10 h-full">
+<div class={classTab}>
+  <Tabs tabStyle="underline" contentClass={classTabDiv} defaultClass={classTabButtonDiv}>
     <TabItem bind:open={openTab.settings} divClass="h-full" defaultClass="{classTabButton} tab-settings">
-      <div slot="title" class="flex items-center gap-2">
+      <div slot="title" class={classTabTitle}>
         <AdjustmentsHorizontalSolid size="md" /> {t('system.settings')}
       </div>
       <Settings bind:open={openTab.settings}/>
     </TabItem>
 
     <TabItem bind:open={openTab.admin} divClass={classIFrameDiv} defaultClass="{classTabButton} tab-admin">
-      <div slot="title" class="flex items-center gap-2">
+      <div slot="title" class={classTabTitle}>
         <DatabaseSolid size="md" /> {t('system.admin')}
       </div>
       <iframe src="/_admin/" title="Admin" class={classIFrame}
@@ -89,21 +89,21 @@
     </TabItem>
 
     <TabItem bind:open={openTab.environment} divClass="h-full" defaultClass="{classTabButton} tab-env">
-      <div slot="title" class="flex items-center gap-2">
+      <div slot="title" class={classTabTitle}>
         <DrawSquareSolid size="md" /> {t('system.environment')}
       </div>
       <Environment bind:open={openTab.environment}/>
     </TabItem>
 
     <TabItem bind:open={openTab.api_keys} defaultClass="{classTabButton} tab-api-keys">
-      <div slot="title" class="flex items-center gap-2">
+      <div slot="title" class={classTabTitle}>
         <RocketSolid size="md" /> {t('system.api_keys')}
       </div>
       <APIKeys bind:open={openTab.api_keys}/>
     </TabItem>
 
     <TabItem bind:open={openTab.api_docs} divClass={classIFrameDiv} defaultClass="{classTabButton} tab-api-docs">
-      <div slot="title" class="flex items-center gap-2">
+      <div slot="title" class={classTabTitle}>
         <BookSolid size="md" /> {t('system.api_docs')}
       </div>
       <iframe src="/api/_docs" title="API Docs" class={classIFrame}

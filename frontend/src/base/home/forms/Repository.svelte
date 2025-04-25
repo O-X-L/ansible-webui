@@ -19,7 +19,8 @@
     } from '../../../util/form.js';
     import {
         classModalBackdrop, classModalLabel, classModalBtns, classModalForm, classModalInputDiv,
-        classModalInput, classModalHelp, classSpinnerDiv, classSpoilerItem,
+        classModalInput, classModalHelp, classSpinnerDiv, classSpoilerItem, classModalBody,
+        classModalDialog, classSpoilerPad,
     } from '../../Style.js';
 
     let {
@@ -152,7 +153,8 @@
     })
 </script>
 
-<Modal bind:open={open} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
+<Modal bind:open={open} size="lg" autoclose={false} placement="top-center"
+    backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
     <Heading tag="h2">{title}</Heading>
     {#if !loaded}
         <div class={classSpinnerDiv}><Spinner/></div>
@@ -200,7 +202,7 @@
                 </div>
             </div>
             <Accordion class={classModalForm}>
-                <AccordionItem defaultClass="{classSpoilerItem} repo-form-git-opts">
+                <AccordionItem defaultClass="{classSpoilerItem} repo-form-git-opts" paddingDefault={classSpoilerPad}>
                     <span slot="header">{t('repos.form.git_options')}</span>
                     <div class={classModalInputDiv}>
                         <div class={classModalInput}>
@@ -228,7 +230,7 @@
                         </div>
                     </div>
                 </AccordionItem>
-                <AccordionItem defaultClass="{classSpoilerItem} repo-form-git-hooks">
+                <AccordionItem defaultClass="{classSpoilerItem} repo-form-git-hooks" paddingDefault={classSpoilerPad}>
                     <span slot="header">{t('repos.form.git_hooks')}</span>
                     <div class={classModalInputDiv}>
                         <div class={classModalInput}>

@@ -19,7 +19,6 @@
 
     let loaded: boolean = $state(false);
     let language: string = $state(DEFAULT_LANG);
-    let languageStoreExists = $state(false);
     let userSettingsOpen = $state(false);
 
     $effect(() => {
@@ -78,7 +77,6 @@
 
     onMount(() => {
       fetchBackendInfos();
-      languageStoreExists = getTranslationStore($share) != null
       setTimeout(fetchTranslations, 500);  // wait to fetch version
       setDarkLightMode(document);
     });
@@ -134,26 +132,26 @@
     </Dropdown>
     <Tooltip placement="bottom" triggeredBy="#nav-btn-lang">{t('nav.lang')}</Tooltip>
 
-    <DarkMode id="nav-btn-darkmode" size="sm" btnClass="{classBtnBase} px-4 py-2 ml-2"></DarkMode>
+    <DarkMode id="nav-btn-darkmode" size="sm" btnClass="{classBtnBase} px-4 py-2 ml-1 sm:ml-2"></DarkMode>
     <Tooltip placement="bottom">{t('nav.darkLight')}</Tooltip>
 
-    <Button id="nav-btn-docs" size="xs" class="ml-2 max-sm:hidden {classBtnLink}"
+    <Button id="nav-btn-docs" size="xs" class="ml-1 sm:ml-2 max-[390px]:hidden {classBtnLink}"
       href="https://ansible-webui.OXL.app"><BookSolid /></Button>
     <Tooltip placement="bottom">{t('nav.docs')}</Tooltip>
-    <Button id="nav-btn-repo" size="xs" class="ml-2 max-sm:hidden {classBtnLink}"
+    <Button id="nav-btn-repo" size="xs" class="ml-1 sm:ml-2 max-sm:hidden {classBtnLink}"
       href="https://github.com/O-X-L/ansible-webui"><GithubSolid /></Button>
     <Tooltip placement="bottom">{t('nav.repo')}</Tooltip>
-    <Button id="nav-btn-bugs" size="xs" class="ml-2 max-sm:hidden {classBtnLink}"
+    <Button id="nav-btn-bugs" size="xs" class="ml-1 sm:ml-2 max-sm:hidden {classBtnLink}"
       href="https://github.com/O-X-L/ansible-webui/issues"><BugSolid /></Button>
     <Tooltip placement="bottom">{t('nav.bugs')}</Tooltip>
 
     {#if $share.backend.authenticated}
-      <Button id="nav-btn-user-settings" size="xs" class="ml-2 {classBtnLink}"
+      <Button id="nav-btn-user-settings" size="xs" class="ml-1 sm:ml-2 {classBtnLink}"
         on:click={() => {userSettingsOpen=true}}><UserSettingsSolid/></Button>
       <Tooltip placement="bottom">{t('nav.user_settings')}</Tooltip>
 
       <form method="post" action="/o/">
-        <Button id="nav-btn-logout" size="xs" class="ml-2 h-full" type="submit"><LockSolid /></Button>
+        <Button id="nav-btn-logout" size="xs" class="ml-1 sm:ml-2 h-full" type="submit"><LockSolid /></Button>
         <Tooltip placement="bottom">{t('nav.logout')}</Tooltip>
         {@html getCSRFFormTokenHTML()}
       </form>

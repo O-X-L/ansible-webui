@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
 
-    import { FileCloneSolid } from 'flowbite-svelte-icons';
+    import { FileCloneSolid, FileCodeSolid, LayersSolid, CogSolid, FolderDuplicateSolid } from 'flowbite-svelte-icons';
     import {
         Spinner, Accordion, AccordionItem, Button, Tooltip,
         Table, TableHead, TableHeadCell, TableBody, TableBodyCell, TableBodyRow,
@@ -13,7 +13,7 @@
     import { apiGet, cacheKey } from '../../util/api.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
-        classSpinnerDiv, classListHeader, classListContent, classFooterSpacing, classSpoilerItem,
+        classSpinnerDiv, classListHeader, classListContent, classFooterSpacing, classSpoilerItem, classSpoilerPad,
     } from '../Style.js';
      
     let { open = $bindable(false) } = $props();
@@ -163,8 +163,10 @@
     <div class={classSpinnerDiv}><Spinner/></div>
 {:else}
     <Accordion>
-        <AccordionItem open defaultClass="{classSpoilerItem} env-main">
-            <span slot="header">{t('env.main')}</span>
+        <AccordionItem open defaultClass="{classSpoilerItem} env-main" paddingDefault={classSpoilerPad}>
+            <span slot="header">
+                <LayersSolid class="inline-block"/> {t('env.main')}
+            </span>
 
             <Table striped={true} bind:items={envInfosMain} hoverable={true} shadow
                 placeholder={t('common.search')} filter={(item, searchTerm) => (searchFilterMain(item, searchTerm))}>
@@ -190,31 +192,10 @@
                 </TableBody>
             </Table>
         </AccordionItem>
-        <AccordionItem defaultClass="{classSpoilerItem} env-pymod">
-            <span slot="header">{t('env.python_modules')}</span>
-
-            <Table striped={true} bind:items={envInfos['Python Modules']} hoverable={true} shadow
-                placeholder={t('common.search')} filter={(item, searchTerm) => (searchFilterMain(item, searchTerm))}>
-                <TableHead theadClass={classListHeader}>
-                    <TableHeadCell sort={(a, b) => a.name.localeCompare(b.name)} defaultSort>
-                        {t('common.name')}
-                    </TableHeadCell>
-                    <TableHeadCell sort={(a, b) => a.version.localeCompare(b.version)}>
-                        {t('common.version')}
-                    </TableHeadCell>
-                </TableHead>
-                <TableBody tableBodyClass="divide-y">
-                    <TableBodyRow slot="row" let:item>
-                        <TableBodyCell tdClass={classListContent}>
-                            <a href="https://pypi.org/project/{item.name}/">{item.name}</a>
-                        </TableBodyCell>
-                        <TableBodyCell tdClass={classListContent}>{item.version ? item.version : '-'}</TableBodyCell>
-                    </TableBodyRow>
-                </TableBody>
-            </Table>
-        </AccordionItem>
-        <AccordionItem defaultClass="{classSpoilerItem} env-anscnf">
-            <span slot="header">{t('env.ansible.config')}</span>
+        <AccordionItem defaultClass="{classSpoilerItem} env-anscnf" paddingDefault={classSpoilerPad}>
+            <span slot="header">
+                <CogSolid class="inline-block"/> {t('env.ansible.config')}
+            </span>
 
             <Table striped={true} bind:items={envInfos['Ansible Config']} hoverable={true} shadow
                 placeholder={t('common.search')} filter={(item, searchTerm) => (searchFilterAnsCnf(item, searchTerm))}>
@@ -240,8 +221,10 @@
                 </TableBody>
             </Table>
         </AccordionItem>
-        <AccordionItem defaultClass="{classSpoilerItem} env-anscol">
-            <span slot="header">{t('env.ansible.collections')}</span>
+        <AccordionItem defaultClass="{classSpoilerItem} env-anscol" paddingDefault={classSpoilerPad}>
+            <span slot="header">
+                <FolderDuplicateSolid class="inline-block"/> {t('env.ansible.collections')}
+            </span>
 
             <Table striped={true} bind:items={envInfos['Ansible Collections']} hoverable={true} shadow
                 placeholder={t('common.search')} filter={(item, searchTerm) => (searchFilterAnsCol(item, searchTerm))}>
@@ -263,6 +246,31 @@
                         </TableBodyCell>
                         <TableBodyCell tdClass={classListContent}>{item.version}</TableBodyCell>
                         <TableBodyCell tdClass={classListContent}>{item.path}</TableBodyCell>
+                    </TableBodyRow>
+                </TableBody>
+            </Table>
+        </AccordionItem>
+        <AccordionItem defaultClass="{classSpoilerItem} env-pymod" paddingDefault={classSpoilerPad}>
+            <span slot="header">
+                <FileCodeSolid class="inline-block"/> {t('env.python_modules')}
+            </span>
+
+            <Table striped={true} bind:items={envInfos['Python Modules']} hoverable={true} shadow
+                placeholder={t('common.search')} filter={(item, searchTerm) => (searchFilterMain(item, searchTerm))}>
+                <TableHead theadClass={classListHeader}>
+                    <TableHeadCell sort={(a, b) => a.name.localeCompare(b.name)} defaultSort>
+                        {t('common.name')}
+                    </TableHeadCell>
+                    <TableHeadCell sort={(a, b) => a.version.localeCompare(b.version)}>
+                        {t('common.version')}
+                    </TableHeadCell>
+                </TableHead>
+                <TableBody tableBodyClass="divide-y">
+                    <TableBodyRow slot="row" let:item>
+                        <TableBodyCell tdClass={classListContent}>
+                            <a href="https://pypi.org/project/{item.name}/">{item.name}</a>
+                        </TableBodyCell>
+                        <TableBodyCell tdClass={classListContent}>{item.version ? item.version : '-'}</TableBodyCell>
                     </TableBodyRow>
                 </TableBody>
             </Table>

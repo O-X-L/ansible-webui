@@ -28,7 +28,7 @@
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
         classPopoverColumn2Text, classPopoverColumn2Div, classCenterChildDiv, classSpinnerDiv,
-        classListContent, classListHeader, classFooterSpacing,
+        classListContent, classListHeader, classFooterSpacing, classModalDialog, classModalBody,
     } from '../Style.js';
 
     let { open = $bindable(false) } = $props();
@@ -577,7 +577,8 @@
                     </table>
                 </div>
             </Popover>
-            <Modal bind:open={entryActions[job.id].exec} size="sm" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
+            <Modal bind:open={entryActions[job.id].exec} size="sm" autoclose={false} placement="top-center"
+                backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
                 <Heading tag="h2">{t('jobs.execute')}</Heading>
 
                 {#if executionPrompts.config.fields.includes('limit')}

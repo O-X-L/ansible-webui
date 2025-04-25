@@ -21,7 +21,7 @@
     import { tq } from '../../util/translate.js';
     import { arraysEqual } from '../../util/main.js';
     import { type formChoiceType } from '../Types.js';
-    import { classFooterSpacing, classModalHelp, classModalInputDiv, classModalInput } from '../Style.js';
+    import { classFooterSpacing } from '../Style.js';
     import {
         getRandomTailwindColor, getRandomTailwindColorNegative, getRandomTailwindColorPositive,
     } from '../../util/colors.js';
@@ -174,6 +174,7 @@
                     }
                 },
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     title: {
                         display: true,
@@ -226,6 +227,7 @@
             data: getExecByUserChartData(),
             options: {
                 responsive: true,
+                // maintainAspectRatio: false,
                 plugins: {
                     /*
                     legend: {
@@ -314,6 +316,7 @@
             data: data,
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     title: {
                         text: t('db.chart.exec_over_time'),
@@ -425,6 +428,7 @@
                     }
                 },
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     title: {
                         display: true,
@@ -591,21 +595,23 @@
 {/if}
 
 <div class="flex justify-center mb-20 mt-10">
-    <div class="w-full max-h-[30rem]">
+    <div class="w-full min-h-[300px] sm:max-h-[30rem]">
         <canvas id="chart-exec-over-time"></canvas>
     </div>
 </div>
-<div class="flex justify-between flex-wrap mb-20">
-    <div class="grow max-h-[30rem]">
+<div class="flex justify-center mb-20 mt-10">
+    <div class="w-full grow min-h-[300px] sm:max-h-[30rem]">
         <canvas id="chart-exec-results"></canvas>
     </div>
-    <div class="my-auto w-80">
-        <canvas id="chart-exec-by-user"></canvas>
+</div>
+<div class="flex justify-center mb-20 mt-10">
+    <div class="w-full grow min-h-[300px] sm:max-h-[30rem]">
+        <canvas id="chart-exec-host-results"></canvas>
     </div>
 </div>
-<div class="flex justify-center flex-wrap mb-20">
-    <div class="grow max-h-[30rem]">
-        <canvas id="chart-exec-host-results"></canvas>
+<div class="flex justify-center mb-20 mt-10">
+    <div class="my-auto max-w-[70%] sm:w-80">
+        <canvas id="chart-exec-by-user"></canvas>
     </div>
 </div>
 

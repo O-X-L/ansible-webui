@@ -20,7 +20,7 @@
     import {
         classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
         classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle, classFooterSpacing,
-        classSpoilerItem,
+        classSpoilerItem, classSpoilerPad,
     } from '../Style.js';
  
     const alertKinds = ['global', 'group', 'user'];
@@ -181,8 +181,17 @@
 <div>
     <Accordion>
         {#each alertKinds as alertKind (alertKind) }
-            <AccordionItem defaultClass="{classSpoilerItem} alerts-kind-{alertKind}">
-                <span slot="header">{t(`alerts.${alertKind}`)}</span>
+            <AccordionItem defaultClass="{classSpoilerItem} alerts-kind-{alertKind}" paddingDefault={classSpoilerPad}>
+                <span slot="header">
+                    {#if alertKind == 'global'}
+                        <DribbbleSolid class="inline-block"/>
+                    {:else if alertKind == 'group'}
+                        <UsersGroupSolid class="inline-block"/>
+                    {:else}
+                        <UserSolid class="inline-block"/>
+                    {/if}
+                    {t(`alerts.${alertKind}`)}
+                </span>
                 <div>
                     <Table striped={true} bind:items={entryLists[alertKind]} hoverable={true} shadow
                         placeholder={t('common.search')} filter={(item, searchTerm) => {return searchAlertFilter(item, searchTerm)}}>
@@ -190,7 +199,7 @@
                         <TableHeadCell sort={(a, b) => a.name.localeCompare(b.name)} defaultSort>
                             {t('common.name')}
                         </TableHeadCell>
-                        <TableHeadCell sort={(a, b) => a.condition.localeCompare(b.condition)}>
+                        <TableHeadCell class="max-sm:hidden" sort={(a, b) => a.condition.localeCompare(b.condition)}>
                             {t('alerts.form.condition')}
                         </TableHeadCell>
                         <TableHeadCell class="max-lg:hidden"
@@ -209,7 +218,7 @@
                                     <span class="sr-only">{t('alerts.info')}</span>
                                 </button>
                             </TableBodyCell>
-                            <TableBodyCell tdClass={classListContent}>
+                            <TableBodyCell tdClass="{classListContent} max-sm:hidden">
                                 {ALERT_CONDITION_CHOICES[item.condition]}
                             </TableBodyCell>
                             <TableBodyCell tdClass="{classListContent} max-lg:hidden">
@@ -282,7 +291,7 @@
                                         {/if}
                                         <tr>
                                             <td class={classPopoverColumn1}>
-                                                {t('alert.form.condition')}:
+                                                {t('alerts.form.condition')}:
                                             </td>
                                             <td class={classPopoverColumn2Text}>
                                                 {ALERT_CONDITION_CHOICES[alert.condition]}
@@ -290,7 +299,7 @@
                                         </tr>
                                         <tr>
                                             <td class={classPopoverColumn1}>
-                                                {t('alert.form.jobs_all')}:
+                                                {t('alerts.form.jobs_all')}:
                                             </td>
                                             <td class={classPopoverColumn2Div}>
                                                 <button class="cursor-default">
@@ -315,8 +324,10 @@
                 </div>
             </AccordionItem>
         {/each}
-        <AccordionItem defaultClass="{classSpoilerItem} alerts-kind-plugin">
-            <span slot="header">{t('alerts.plugin')}</span>
+        <AccordionItem defaultClass="{classSpoilerItem} alerts-kind-plugin" paddingDefault={classSpoilerPad}>
+            <span slot="header">
+                <FileCodeSolid class="inline-block"/> {t('alerts.plugin')}
+            </span>
             <div>
                 <Table striped={true} bind:items={entryLists.plugins} hoverable={true} shadow
                     placeholder={t('common.search')} filter={(item, searchTerm) => {return searchPluginFilter(item, searchTerm)}}>
@@ -324,7 +335,7 @@
                     <TableHeadCell sort={(a, b) => a.name.localeCompare(b.name)} defaultSort>
                         {t('common.name')}
                     </TableHeadCell>
-                    <TableHeadCell sort={(a, b) => a.executable.localeCompare(b.executable)}>
+                    <TableHeadCell class="max-sm:hidden" sort={(a, b) => a.executable.localeCompare(b.executable)}>
                         {t('alerts.form.plugin.executable')}
                     </TableHeadCell>
                     <TableHeadCell>{t('common.actions')}</TableHeadCell>
@@ -335,7 +346,7 @@
                         <TableBodyCell tdClass={classListContent}>
                             {item.name}
                         </TableBodyCell>
-                        <TableBodyCell tdClass={classListContent}>
+                        <TableBodyCell tdClass="{classListContent} max-sm:hidden">
                             {item.executable}
                         </TableBodyCell>
                         <TableBodyCell tdClass={classListContent}>

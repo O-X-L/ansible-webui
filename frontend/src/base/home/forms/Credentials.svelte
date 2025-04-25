@@ -20,7 +20,8 @@
     } from '../../../util/form.js';
     import {
         classModalBackdrop, classModalLabel, classModalBtns, classModalForm, classModalInputDiv,
-        classModalInput, classModalHelp, classSpinnerDiv, classSpoilerItem,
+        classModalInput, classModalHelp, classSpinnerDiv, classSpoilerItem, classSpoilerPad,
+        classModalBody, classModalDialog,
     } from '../../Style.js';
 
     let {
@@ -160,7 +161,8 @@
     })
 </script>
 
-<Modal bind:open={open} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
+<Modal bind:open={open} size="lg" autoclose={false} placement="top-center"
+    backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
     <Heading tag="h2">{title}</Heading>
     {#if !loaded}
         <div class={classSpinnerDiv}><Spinner/></div>
@@ -186,7 +188,7 @@
         {/if}
 
         <Accordion class={classModalForm}>
-            <AccordionItem defaultClass="{classSpoilerItem} creds-form-accounts">
+            <AccordionItem defaultClass="{classSpoilerItem} creds-form-accounts" paddingDefault={classSpoilerPad}>
                 <span slot="header">{t('creds.form.accounts')}</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
@@ -218,7 +220,7 @@
                     </div>
                 </div>
             </AccordionItem>
-            <AccordionItem defaultClass="{classSpoilerItem} creds-form-vault">
+            <AccordionItem defaultClass="{classSpoilerItem} creds-form-vault" paddingDefault={classSpoilerPad}>
                 <span slot="header">{t('creds.form.vault')}</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>

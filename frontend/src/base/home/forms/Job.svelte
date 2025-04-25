@@ -26,6 +26,7 @@
     import {
         classModalBackdrop, classModalLabel, classModalHelp, classModalBtns, classModalForm,
         classModalInputDiv, classCenterChildDiv, classModalInput, classSpinnerDiv, classSpoilerItem,
+        classModalDialog, classModalBody, classSpoilerPad,
     } from '../../Style.js';
 
     let {
@@ -365,7 +366,8 @@
     })
 </script>
 
-<Modal bind:open={open} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
+<Modal bind:open={open} size="lg" autoclose={false} placement="top-center"
+    backdropClass={classModalBackdrop} dialogClass={classModalDialog} bodyClass={classModalBody}>
     <Heading tag="h2">{title}</Heading>
     {#if !loaded}
         <div class={classSpinnerDiv}><Spinner/></div>
@@ -373,7 +375,7 @@
         <APIResponseHandler bind:this={apiResponseHandler} bind:warningMsgs={formWarningMsgs} />
 
         <Accordion class={classModalForm}>
-            <AccordionItem defaultClass="{classSpoilerItem} job-form-main">
+            <AccordionItem defaultClass="{classSpoilerItem} job-form-main" paddingDefault={classSpoilerPad}>
                 <span slot="header">Main</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
@@ -447,7 +449,7 @@
                     </div>
                 </div>
             </AccordionItem>
-            <AccordionItem defaultClass="{classSpoilerItem} job-form-exec">
+            <AccordionItem defaultClass="{classSpoilerItem} job-form-exec" paddingDefault={classSpoilerPad}>
                 <span slot="header">Execution</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
@@ -482,7 +484,7 @@
                     </div>
                 </div>
             </AccordionItem>
-            <AccordionItem defaultClass="{classSpoilerItem} job-form-creds">
+            <AccordionItem defaultClass="{classSpoilerItem} job-form-creds" paddingDefault={classSpoilerPad}>
                 <span slot="header">Credentials</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
@@ -504,7 +506,7 @@
                     </div>
                 </div>
             </AccordionItem>
-            <AccordionItem defaultClass="{classSpoilerItem} job-form-schedule">
+            <AccordionItem defaultClass="{classSpoilerItem} job-form-schedule" paddingDefault={classSpoilerPad}>
                 <span slot="header">Scheduling</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
@@ -520,7 +522,7 @@
                     </div>
                 </div>
             </AccordionItem>
-            <AccordionItem defaultClass="{classSpoilerItem} job-form-misc">
+            <AccordionItem defaultClass="{classSpoilerItem} job-form-misc" paddingDefault={classSpoilerPad}>
                 <span slot="header">Additional</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
@@ -535,7 +537,7 @@
                     </div>
                 </div>
             </AccordionItem>
-            <AccordionItem defaultClass="{classSpoilerItem} job-form-prompts">
+            <AccordionItem defaultClass="{classSpoilerItem} job-form-prompts" paddingDefault={classSpoilerPad}>
                 <span slot="header">{t('jobs.form.execution_prompts')}</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInputDiv}>

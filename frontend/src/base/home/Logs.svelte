@@ -17,6 +17,7 @@
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
         classSpinnerDiv, classListContent, classListHeader, classFooterSpacing, classSpoilerItem,
+        classModalBody, classSpoilerPad,
     } from '../Style.js';
 
     let { open = $bindable(false) } = $props();
@@ -164,14 +165,15 @@
 
 <Accordion>
     {#each jobList as job (job.id)}
-        <AccordionItem bind:open={entryJobActions[job.id]} defaultClass="{classSpoilerItem} logs-job-{job.id}">
+        <AccordionItem bind:open={entryJobActions[job.id]} defaultClass="{classSpoilerItem} logs-job-{job.id}"
+            paddingDefault={classSpoilerPad}>
             <span slot="header">{job.name}</span>
             {#if !executionList.length}
                 <div class={classSpinnerDiv}><Spinner/></div>
             {:else}
             <Table striped={true} id="logs-{job.id}" shadow>
                 <TableHead theadClass={classListHeader}>
-                    <TableHeadCell>{t('logs.time')}</TableHeadCell>
+                    <TableHeadCell class="max-sm:hidden">{t('logs.time')}</TableHeadCell>
                     <TableHeadCell>{t('common.status')}</TableHeadCell>
                     <TableHeadCell class="max-lg:hidden">{t('btn.download')}</TableHeadCell>
                     <TableHeadCell>{t('common.actions')}</TableHeadCell>
@@ -179,7 +181,7 @@
                 <TableBody tableBodyClass="divide-y">
                     {#each executionList as exec, execIdx (exec.id)}
                     <TableBodyRow>
-                        <TableBodyCell tdClass={classListContent}>
+                        <TableBodyCell tdClass="{classListContent} max-sm:hidden">
                             <div>{t('logs.time_start_short')}: {exec.time_start}</div>
                             <div>{t('logs.time_fin_short')}: {exec.time_fin}</div>
                             <div>{t('jobs.info.duration')}: {exec.time_duration}</div>
@@ -210,8 +212,8 @@
                         <TableBodyCell tdClass={classListContent}>
                             <LogsView bind:open={entryExecActions[exec.id]}
                                 jobID={job.id} jobName={job.name} bind:exec={executionList[execIdx]} />
-                            <Button size="xs" on:click={() => {entryExecActions[exec.id] = true}}
-                                id="logs-job-{job.id}-show">
+
+                            <Button size="xs" on:click={() => {entryExecActions[exec.id] = true}} id="logs-job-{job.id}-show">
                                 <BookOpenSolid/>
                             </Button>
                             <Tooltip>{t('btn.logs')}</Tooltip>

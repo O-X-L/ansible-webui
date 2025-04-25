@@ -1,10 +1,10 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
 
-    import { FloppyDiskSolid } from 'flowbite-svelte-icons';
+    import { FloppyDiskSolid, EnvelopeSolid, LayersSolid, TerminalSolid, FolderDuplicateSolid } from 'flowbite-svelte-icons';
     import {
         Button, Tooltip, Accordion, AccordionItem, Label, Input, Toggle, Select, Helper, Spinner,
-        Heading,
+        Heading, Hr,
     } from 'flowbite-svelte';
 
     import { share } from '../Share.js';
@@ -17,7 +17,7 @@
     import { valideInputBase, inputBaseColor, submitFormBase } from '../../util/form.js';
     import {
         classModalBtns, classModalLabel, classModalInput, classModalHelp, classModalInputDiv, classSpinnerDiv,
-        classFooterSpacing, classSpoilerItem,
+        classFooterSpacing, classSpoilerItem, classSpoilerPad,
     } from '../Style.js';
 
     let { open = $bindable(false) } = $props();
@@ -179,8 +179,10 @@
     <div class={classSpinnerDiv}><Spinner/></div>
 {:else}
 <Accordion>
-    <AccordionItem defaultClass="{classSpoilerItem} settings-exec">
-        <span slot="header">{t('config.execution')}</span>
+    <AccordionItem defaultClass="{classSpoilerItem} settings-exec" paddingDefault={classSpoilerPad}>
+        <span slot="header">
+            <TerminalSolid class="inline-block"/> {t('config.execution')}
+        </span>
 
         <div class={classModalInputDiv}>
             <div class={classModalInput}>
@@ -216,8 +218,10 @@
             </div>
         </div>
     </AccordionItem>
-    <AccordionItem defaultClass="{classSpoilerItem} settings-paths">
-        <span slot="header">{t('config.paths')}</span>
+    <AccordionItem defaultClass="{classSpoilerItem} settings-paths" paddingDefault={classSpoilerPad}>
+        <span slot="header">
+            <FolderDuplicateSolid class="inline-block"/> {t('config.paths')}
+        </span>
 
         <div class={classModalInputDiv}>
             <div class={classModalInput}>
@@ -287,8 +291,10 @@
             </div>
         </div>
     </AccordionItem>
-    <AccordionItem defaultClass="{classSpoilerItem} settings-mailing">
-        <span slot="header">{t('config.mailing')}</span>
+    <AccordionItem defaultClass="{classSpoilerItem} settings-mailing" paddingDefault={classSpoilerPad}>
+        <span slot="header">
+            <EnvelopeSolid class="inline-block"/> {t('config.mailing')}
+        </span>
 
         <div class={classModalInputDiv}>
             <div class={classModalInput}>
@@ -356,8 +362,10 @@
             </div>
         </div>
     </AccordionItem>
-    <AccordionItem defaultClass="{classSpoilerItem} settings-internal">
-        <span slot="header">{t('config.internal')}</span>
+    <AccordionItem defaultClass="{classSpoilerItem} settings-internal" paddingDefault={classSpoilerPad}>
+        <span slot="header">
+            <LayersSolid class="inline-block"/> {t('config.internal')}
+        </span>
 
         <div class={classModalInputDiv}>
             <div class={classModalInput}>
@@ -409,6 +417,8 @@
 
 {/if}
 </div>
+
+<Hr/>
 
 <div>
     <div class="h-20"></div>

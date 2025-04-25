@@ -18,7 +18,7 @@
     } from '../../../util/form.js';
     import {
         classModalBackdrop, classModalLabel, classModalBtns, classModalInputDiv,
-        classModalInput, classSpinnerDiv,
+        classModalInput, classSpinnerDiv, classModalBody, classModalDialog,
     } from '../../Style.js';
 
     const ALERT_TYPE_PLUGIN = 1;
@@ -143,7 +143,8 @@
     })
 </script>
 
-<Modal bind:open={open} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
+<Modal bind:open={open} size="lg" autoclose={false} placement="top-center"
+    backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
     <Heading tag="h2">{title}</Heading>
     {#if !loaded}
         <div class={classSpinnerDiv}><Spinner/></div>

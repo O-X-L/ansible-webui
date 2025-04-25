@@ -21,7 +21,7 @@
     import {
         classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
         classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle, classFooterSpacing,
-        classSpoilerItem,
+        classSpoilerItem, classModalBody, classSpoilerPad,
     } from '../Style.js';
  
     let { open = $bindable(false) } = $props();
@@ -169,8 +169,15 @@
 <div>
     <Accordion>
         {#each Object.keys(repoKindMap) as repoKind (repoKind) }
-            <AccordionItem defaultClass="{classSpoilerItem} repos-kind-{repoKind}">
-                <span slot="header">{t(`repos.${repoKind}`)}</span>
+            <AccordionItem defaultClass="{classSpoilerItem} repos-kind-{repoKind}" paddingDefault={classSpoilerPad}>
+                <span slot="header">
+                    {#if repoKind == 'static'}
+                        <FolderOpenSolid class="inline-block"/>
+                    {:else}
+                        <CodeBranchSolid class="inline-block"/>
+                    {/if}
+                    {t(`repos.${repoKind}`)}
+                </span>
                 <div>
                   <Table striped={true} bind:items={entryLists[repoKind]} hoverable={true} shadow
                       placeholder={t('common.search')} filter={(item, searchTerm) => {return searchFilter(item, searchTerm)}}>
@@ -182,7 +189,7 @@
                             {t(`repos.${repoKind}.src`)}
                         </TableHeadCell>
                         {#if repoKind == 'git'}
-                            <TableHeadCell sort={(a, b) => {
+                            <TableHeadCell class="max-sm:hidden" sort={(a, b) => {
                                 let aUpdatedAt = a.time_update ? a.time_update : 'z';
                                 let bUpdatedAt = b.time_update ? b.time_update : 'z';
                                 return aUpdatedAt.name.localeCompare(bUpdatedAt);
@@ -210,7 +217,7 @@
                                 {/if}
                             </TableBodyCell>
                             {#if repoKind == 'git'}
-                                <TableBodyCell class={classListContent}>
+                                <TableBodyCell class="{classListContent} max-sm:hidden">
                                     <div>
                                         <b>{t('common.updated_at')}:</b> {item.time_update ? item.time_update : '-'}
                                     </div>

@@ -19,6 +19,8 @@ Features:
   This lowers the danger of an attack-vector that would utilize DB-write-access to execute jobs.
 
 * Reimplemented `System - Environment` page
+* Reimplemented `Alerts` page
+* Frontend optimizations for mobile devices/small screens
 
 Fixes:
 

@@ -12,7 +12,9 @@
     import { apiGet, apiEdit } from '../../../util/api.js';
     import { JOB_EXEC_STATI_ACTIVE } from '../../Config.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
-    import { classModalBackdrop, classSpinnerDiv, classCenterChildDiv } from '../../Style.js';
+    import {
+        classModalBackdrop, classSpinnerDiv, classCenterChildDiv, classModalBody, classModalDialog,
+    } from '../../Style.js';
 
     let {
         open = $bindable(false),
@@ -26,8 +28,8 @@
         content: string,
     }
 
-    const classText = 'text-base text-wrap';
-    const classProp = 'font-bold text-base pr-3';
+    const classText = 'sm:text-base max-sm:text-xs text-wrap';
+    const classProp = 'sm:text-base max-sm:text-xs font-bold pr-3';
     const endDiv = `logs-end-${jobID}-${exec.id}`;
 
     let apiResponseHandler: APIResponseHandler = $state();
@@ -107,10 +109,11 @@
 
 <APIResponseHandler bind:this={apiResponseHandler} bind:successMsg={apiSuccessMsg} />
 
-<Modal bind:open={open} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
+<Modal bind:open={open} size="lg" autoclose={false} placement="top-center"
+    backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
     <Heading tag="h2">{t('logs.job_logs')} "{jobName}"</Heading>
     {#if exec.failed}
-        <div class="mt-20 mb-10 font-bold text-lg {classCenterChildDiv}">
+        <div class="mt-20 mb-10 font-bold text-lg {classCenterChildDiv} text-red-600">
             <CloseCircleSolid class="inline-block mr-2" /> {t('logs.exec_failed')}
         </div>
         {#if exec.error_s}
@@ -182,7 +185,6 @@
         </table>
         <table>
             <tbody>
-                <!-- todo: add internal error messages -->
                 {#each logLines as line (line.nr)}
                     <tr>
                         <td class="pr-3">{line.nr}</td>
@@ -192,7 +194,7 @@
             </tbody>
         </table>
         {#if finished}
-            <div class="mt-20 mb-10 font-bold text-lg {classCenterChildDiv}">
+            <div class="mt-20 mb-10 font-bold text-lg {classCenterChildDiv} text-green-600">
                 <InfoCircleSolid class="inline-block mr-2" /> {t('logs.exec_finished')}
             </div>
         {/if}

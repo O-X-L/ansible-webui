@@ -20,7 +20,7 @@
     import {
         classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
         classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle, classFooterSpacing,
-        classSpoilerItem,
+        classSpoilerItem, classModalBody, classSpoilerPad,
     } from '../Style.js';
  
     const credentialsKind = ['user', 'shared'];
@@ -128,8 +128,15 @@
 <div>
     <Accordion>
         {#each credentialsKind as credsKind (credsKind) }
-            <AccordionItem defaultClass="{classSpoilerItem} creds-kind-{credsKind}">
-                <span slot="header">{t(`creds.${credsKind}`)}</span>
+            <AccordionItem defaultClass="{classSpoilerItem} creds-kind-{credsKind}" paddingDefault={classSpoilerPad}>
+                <span slot="header">
+                    {#if credsKind == 'user'}
+                        <UserSolid class="inline-block"/>
+                    {:else}
+                        <UsersGroupSolid class="inline-block"/>
+                    {/if}
+                    {t(`creds.${credsKind}`)}
+                </span>
         
                 <div>
                   <Table striped={true} bind:items={entryList[credsKind]} hoverable={true} shadow
@@ -138,7 +145,7 @@
                         <TableHeadCell sort={(a, b) => a.name.localeCompare(b.name)} defaultSort>
                             {t('common.name')}
                         </TableHeadCell>
-                        <TableHeadCell sort={(a, b) => {
+                        <TableHeadCell class="max-sm:hidden" sort={(a, b) => {
                             let [aU, bU] = ['', ''];
                             if (a.connect_user) {
                                 aU += a.connect_user;
@@ -201,7 +208,7 @@
                                     <span class="sr-only">{t('creds.info')}</span>
                                 </button>
                             </TableBodyCell>
-                            <TableBodyCell tdClass={classListContent}>
+                            <TableBodyCell tdClass="{classListContent} max-sm:hidden">
                                 {#if item.connect_user}
                                     <div>
                                         <b>{t('creds.form.connect_user')}</b>: {item.connect_user}

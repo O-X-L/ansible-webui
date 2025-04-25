@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
 
-    import { TrashBinSolid, CloseCircleSolid } from 'flowbite-svelte-icons';
+    import { TrashBinSolid, CloseCircleSolid, CirclePlusSolid } from 'flowbite-svelte-icons';
     import {
         Spinner, Button, Tooltip, Heading, Label, Input,
         Table, TableHead, TableHeadCell, TableBody, TableBodyCell, TableBodyRow,  // Modal
@@ -16,7 +16,7 @@
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
         classSpinnerDiv, classListHeader, classListContent, classFooterSpacing, classModalBackdrop,
-        classModalLabel, classModalForm, classModalInput, classModalBtns,
+        classModalLabel, classModalForm, classModalInput, classModalBtns, classModalBody, classModalDialog,
      } from '../Style.js';
  
     let { open = $bindable(false) } = $props();
@@ -120,10 +120,10 @@
     <Table striped={true} bind:items={entryList} hoverable={true} shadow placeholder={t('common.search')}
         filter={(item, searchTerm) => (searchFilter(item, searchTerm))}>
     <TableHead theadClass={classListHeader}>
-        <TableHeadCell sort={(a, b) => a.token.localeCompare(b.token)} defaultSort>
+        <TableHeadCell class="max-sm:hidden" sort={(a, b) => a.token.localeCompare(b.token)}>
             {t('api_keys.token')}
         </TableHeadCell>
-        <TableHeadCell sort={(a, b) => a.comment.localeCompare(b.comment)}>
+        <TableHeadCell sort={(a, b) => a.comment.localeCompare(b.comment)} defaultSort>
             {t('common.comment')}
         </TableHeadCell>
         <TableHeadCell>{t('common.actions')}</TableHeadCell>
@@ -131,7 +131,7 @@
     {#key updatedAt}
     <TableBody tableBodyClass="divide-y">
         <TableBodyRow slot="row" let:item>
-            <TableBodyCell tdClass={classListContent}>{item.token}</TableBodyCell>
+            <TableBodyCell tdClass="{classListContent} max-sm:hidden">{item.token}</TableBodyCell>
             <TableBodyCell tdClass={classListContent}>{item.comment ? item.comment : '-'}</TableBodyCell>
             <TableBodyCell tdClass={classListContent}>
                 <Button size="xs" on:click={() => {deleteAPIKey(item.token)}}><TrashBinSolid/></Button>
@@ -153,7 +153,8 @@
     </div>
 </div>
 
-<Modal bind:open={newModal} size="lg" autoclose={false} placement="top-center" backdropClass={classModalBackdrop}>
+<Modal bind:open={newModal} size="lg" autoclose={false} placement="top-center"
+    backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
     <div class={classModalForm}>
         <Heading tag="h2">{t('api_keys.new')}</Heading>
 
@@ -164,11 +165,14 @@
                 <Label for="api_key_cmt" class={classModalLabel}>{t('common.comment')}</Label>
                 <Input id="api_key_cmt" bind:value={newKeyPair.comment} />
             </div>
-            <div class="flex justify-between">
-                <div></div>
-                <div class="mr-5 mt-10">
-                    <Button id="apikeys-btn-add-submit" on:click={() => {addAPIKey()}}>{t('btn.add')}</Button>
-                </div>
+            <div class={classModalBtns}>
+                <Button id="apikeys-btn-add-submit" on:click={() => {addAPIKey()}}><CirclePlusSolid/></Button>
+                <Tooltip>{t('btn.add')}</Tooltip>
+
+                <Button id="apikeys-btn-add-close" on:click={() => (newModal = false)} class="inline-block ml-2">
+                    <CloseCircleSolid/>
+                </Button>
+                <Tooltip>{t('btn.close')}</Tooltip>
             </div>
         {:else}
             <Label class={classModalLabel}>{t('api_keys.token')}</Label>
@@ -178,14 +182,14 @@
             <Label class={classModalLabel}>{t('api_keys.key')}</Label>
             <button onclick={clickToCopy}>{newKeyPair.key}</button>
             <Tooltip>{t('common.click_to_copy')}</Tooltip>
-        {/if}
 
-        <div class={classModalBtns}>
-            <Button id="apikeys-btn-add-close" on:click={() => (newModal = false)} class="inline-block ml-2">
-                <CloseCircleSolid/>
-            </Button>
-            <Tooltip>{t('btn.close')}</Tooltip>
-        </div>
+            <div class={classModalBtns}>
+                <Button id="apikeys-btn-add-close" on:click={() => (newModal = false)} class="inline-block ml-2">
+                    <CloseCircleSolid/>
+                </Button>
+                <Tooltip>{t('btn.close')}</Tooltip>
+            </div>
+        {/if}
     </div>
 </Modal>
 
