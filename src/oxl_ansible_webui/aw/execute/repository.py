@@ -99,7 +99,7 @@ class ExecuteRepository:
 
             self._run_repo_config_cmds(cmds=self.repository.git_hook_pre, env=env)
 
-            if self.repository.git_isolate or not (Path(path_repo) / '.git/HEAD').is_file():
+            if not (Path(path_repo) / '.git/HEAD').is_file():
                 self.create_repository(env=env)
 
             else:
@@ -246,20 +246,3 @@ def get_path_repo_wo_isolate(repository: Repository) -> Path:
     path_repo = Path(config['path_run']) / 'repositories' / safe_repo_name
     path_repo.mkdir(mode=0o750, parents=True, exist_ok=True)
     return path_repo
-
-
-def api_update_repository(repository: Repository, user: USERS):
-    if is_null(repository) or repository.rtype_name == 'Static' or repository.git_isolate:
-        return
-
-    job = Job(name='RepoUpdate')
-    execution = JobExecution(user=user, job=job)
-    job_logs(job=job, execution=execution)
-
-    repository.log_stderr = execution.log_stderr_repo
-    repository.log_stdout = execution.log_stdout_repo
-    repository.save()
-
-    ExecuteRepository(
-        repository=repository, path_run=get_path_run(),
-    ).create_or_update_repository()

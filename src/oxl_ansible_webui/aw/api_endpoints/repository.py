@@ -14,10 +14,9 @@ from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user,
     api_docs_delete, api_docs_post, validate_no_xss, GenericErrorResponse, response_data_if_changed, API_PARAM_HASH
 from aw.utils.permission import has_manager_privileges, has_repository_permission, get_viewable_repositories
 from aw.model.job import Job
-from aw.utils.util import unset_or_null, is_set
+from aw.utils.util import unset_or_null, is_set, is_null
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE, \
     CHOICE_PERMISSION_EXECUTE
-from aw.execute.repository import api_update_repository
 from aw.api_endpoints.job_util import get_log_file_content
 from aw.execute.repository import ExecuteRepository
 
@@ -53,41 +52,54 @@ class RepositoryReadResponse(RepositoryWriteRequest):
     log_stderr_url = serializers.CharField()
 
 
-def repository_in_use(repository: Repository) -> bool:
-    return Job.objects.filter(repository=repository).exists()
+def repository_in_use(repo: Repository) -> bool:
+    return Job.objects.filter(repository=repo).exists()
 
 
-def validate_repository_types(repository: dict) -> (bool, str):
-    rtype_name = Repository.rtype_name_from_id(repository['rtype'])
+def validate_repository_types(repo: dict) -> (bool, str):
+    rtype_name = Repository.rtype_name_from_id(repo['rtype'])
     if rtype_name == 'Git':
         try:
-            if is_set(repository['git_override_initialize']) and is_set(repository['git_override_update']):
+            if is_set(repo['git_override_initialize']) and is_set(repo['git_override_update']):
                 return True, ''
 
         except KeyError:
             pass
 
-        if unset_or_null(repository, 'git_origin'):
+        if unset_or_null(repo, 'git_origin'):
             return False, 'Git Origin is required'
 
-        if unset_or_null(repository, 'git_branch'):
+        if unset_or_null(repo, 'git_branch'):
             return False, 'Git Branch is required'
 
     else:
-        if unset_or_null(repository, 'static_path'):
+        if unset_or_null(repo, 'static_path'):
             return False, 'Static Path is required'
 
     return True, ''
 
 
-def build_repository(repository: Repository) -> dict:
-    data = RepositoryReadResponse(instance=repository).data
-    data['time_update'] = repository.time_update_str
+def build_repository(repo: Repository) -> dict:
+    data = RepositoryReadResponse(instance=repo).data
+    data['time_update'] = repo.time_update_str
     if data['log_stderr'] is None or not Path(data['log_stderr']).is_file():
         data['log_stderr'] = None
         data['log_stderr_url'] = None
 
     return data
+
+
+def create_update_git_repo(repo: Repository):
+    if is_null(repo) or repo.rtype != 2:
+        return
+
+    def _create_update(r: Repository):
+        ExecuteRepository(r).create_or_update_repository()
+
+    Thread(
+        target=_create_update,
+        kwargs={'r': repo}
+    ).start()
 
 
 class APIRepository(APIView):
@@ -108,8 +120,8 @@ class APIRepository(APIView):
         user = get_api_user(request)
         repositories = []
 
-        for repository in get_viewable_repositories(user=user):
-            repositories.append(build_repository(repository))
+        for repo in get_viewable_repositories(user=user):
+            repositories.append(build_repository(repo))
 
         return response_data_if_changed(request, data=repositories)
 
@@ -135,10 +147,7 @@ class APIRepository(APIView):
 
         try:
             repo = serializer.save()
-
-            # init git-repo
-            if repo.rtype == 2:
-                ExecuteRepository(repo).create_or_update_repository()
+            create_update_git_repo(repo)
 
             return Response({
                 'msg': f"Repository '{serializer.validated_data['name']}' created successfully",
@@ -168,18 +177,18 @@ class APIRepositoryItem(GenericAPIView):
         user = get_api_user(request)
 
         try:
-            repository = Repository.objects.get(id=repo_id)
+            repo = Repository.objects.get(id=repo_id)
             if not has_repository_permission(
-                    user=user,
-                    repository=repository,
-                    permission_needed=CHOICE_PERMISSION_READ
+                user=user,
+                repository=repo,
+                permission_needed=CHOICE_PERMISSION_READ
             ):
                 return Response(
-                    data={'error': f"Not privileged to view the repository '{repository.name}'"},
+                    data={'error': f"Not privileged to view the repository '{repo.name}'"},
                     status=403,
                 )
 
-            return Response(data=build_repository(repository), status=200)
+            return Response(data=build_repository(repo), status=200)
 
         except ObjectDoesNotExist:
             return Response(data={'error': f"Repository with ID {repo_id} does not exist"}, status=404)
@@ -202,27 +211,27 @@ class APIRepositoryItem(GenericAPIView):
             return Response(data={'error': f"Provided repository data is not valid: '{rtype_error}'"}, status=400)
 
         try:
-            repository = Repository.objects.get(id=repo_id)
+            repo = Repository.objects.get(id=repo_id)
 
         except ObjectDoesNotExist:
-            repository = None
+            repo = None
 
-        if repository is None:
+        if repo is None:
             return Response(data={'error': f"Repository with ID {repo_id} does not exist"}, status=404)
 
         if not has_repository_permission(
-                user=user,
-                repository=repository,
-                permission_needed=CHOICE_PERMISSION_WRITE
+            user=user,
+            repository=repo,
+            permission_needed=CHOICE_PERMISSION_WRITE
         ):
             return Response(
-                data={'error': f"Not privileged to modify the repository '{repository.name}'"},
+                data={'error': f"Not privileged to modify the repository '{repo.name}'"},
                 status=403,
             )
 
         try:
             Repository.objects.filter(id=repo_id).update(**serializer.validated_data)
-            return Response(data={'msg': f"Repository '{repository.name}' updated", 'id': repo_id}, status=200)
+            return Response(data={'msg': f"Repository '{repo.name}' updated", 'id': repo_id}, status=200)
 
         except IntegrityError as err:
             return Response(data={'error': f"Provided repository data is not valid: '{err}'"}, status=400)
@@ -237,26 +246,26 @@ class APIRepositoryItem(GenericAPIView):
         user = get_api_user(request)
 
         try:
-            repository = Repository.objects.get(id=repo_id)
-            if repository is not None:
+            repo = Repository.objects.get(id=repo_id)
+            if repo is not None:
                 if not has_repository_permission(
-                        user=user,
-                        repository=repository,
-                        permission_needed=CHOICE_PERMISSION_DELETE
+                    user=user,
+                    repository=repo,
+                    permission_needed=CHOICE_PERMISSION_DELETE
                 ):
                     return Response(
-                        data={'error': f"Not privileged to delete the repository '{repository.name}'"},
+                        data={'error': f"Not privileged to delete the repository '{repo.name}'"},
                         status=403,
                     )
 
-                if repository_in_use(repository):
+                if repository_in_use(repo):
                     return Response(
-                        data={'error': f"Repository '{repository.name}' cannot be deleted as it is still in use"},
+                        data={'error': f"Repository '{repo.name}' cannot be deleted as it is still in use"},
                         status=400,
                     )
 
-                repository.delete()
-                return Response(data={'msg': f"Repository '{repository.name}' deleted", 'id': repo_id}, status=200)
+                repo.delete()
+                return Response(data={'msg': f"Repository '{repo.name}' deleted", 'id': repo_id}, status=200)
 
         except ObjectDoesNotExist:
             pass
@@ -277,26 +286,22 @@ class APIRepositoryItem(GenericAPIView):
         user = get_api_user(request)
 
         try:
-            repository = Repository.objects.get(id=repo_id)
-            if repository is not None:
+            repo = Repository.objects.get(id=repo_id)
+            if repo is not None:
                 if not has_repository_permission(
-                        user=user,
-                        repository=repository,
-                        permission_needed=CHOICE_PERMISSION_EXECUTE,
+                    user=user,
+                    repository=repo,
+                    permission_needed=CHOICE_PERMISSION_EXECUTE,
                 ):
                     return Response(
-                        data={'error': f"Not privileged to update the repository '{repository.name}'"},
+                        data={'error': f"Not privileged to update the repository '{repo.name}'"},
                         status=403,
                     )
 
-                repository_update_thread = Thread(
-                    target=api_update_repository,
-                    kwargs={'repository': repository, 'user': user}
-                )
-                repository_update_thread.start()
+                create_update_git_repo(repo)
 
                 return Response(
-                    data={'msg': f"Repository '{repository.name}' update initiated", 'id': repo_id},
+                    data={'msg': f"Repository '{repo.name}' update initiated", 'id': repo_id},
                     status=200,
                 )
 
@@ -332,25 +337,25 @@ class APIRepositoryLogFile(GenericAPIView):
     def get(self, request, repo_id: int):
         user = get_api_user(request)
         try:
-            repository = Repository.objects.get(id=repo_id)
-            if repository is not None:
+            repo = Repository.objects.get(id=repo_id)
+            if repo is not None:
                 if not has_repository_permission(
-                        user=user,
-                        repository=repository,
-                        permission_needed=CHOICE_PERMISSION_READ,
+                    user=user,
+                    repository=repo,
+                    permission_needed=CHOICE_PERMISSION_READ,
                 ):
                     return Response(
-                        data={'error': f"Not privileged to view logs of the repository '{repository.name}'"},
+                        data={'error': f"Not privileged to view logs of the repository '{repo.name}'"},
                         status=403,
                     )
 
-                logfile = repository.log_stdout
+                logfile = repo.log_stdout
                 if 'type' in request.GET:
                     logfile_type = request.GET['type'] if request.GET['type'] in self.valid_logfile_type else 'stdout'
-                    logfile = getattr(repository, f'log_{logfile_type}')
+                    logfile = getattr(repo, f'log_{logfile_type}')
 
                 if logfile is None:
-                    return Response(data={'error': f"No logs found for repository '{repository.name}'"}, status=404)
+                    return Response(data={'error': f"No logs found for repository '{repo.name}'"}, status=404)
 
                 return get_log_file_content(logfile)
 
