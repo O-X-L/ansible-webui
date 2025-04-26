@@ -141,6 +141,7 @@ def test_main_pages():
         },
         'ui/system': {
             'tab-admin': '#admin',
+            'tab-perm': '#permission',
             'tab-api-keys': '#api_keys',
             'tab-api-docs': '#api_docs',
             'tab-settings': '#settings',
@@ -243,7 +244,10 @@ def test_js_actions():
             ],
             'tab-settings': [
                 ['.settings-exec', '.settings-paths', '.settings-mailing', '.settings-internal', '#settings-btn-save'],
-            ]
+            ],
+            'tab-perm': [
+                ['#perms-btn-add', '#perm-btn-discard'],
+            ],
         }
     }
 

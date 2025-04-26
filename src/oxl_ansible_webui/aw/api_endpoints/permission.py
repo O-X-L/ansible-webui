@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
-from rest_framework.generics import GenericAPIView
+from rest_framework.views import APIView
 from rest_framework import serializers
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
@@ -10,7 +10,7 @@ from aw.model.job_credential import JobSharedCredentials
 from aw.model.permission import JobPermission, JobPermissionMapping, JobPermissionMemberUser, \
     JobPermissionMemberGroup, JobCredentialsPermissionMapping, JobRepositoryPermissionMapping
 from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user, api_docs_put, api_docs_delete, \
-    api_docs_post, validate_no_xss
+    api_docs_post, validate_no_xss, API_PARAM_HASH, response_data_if_changed
 from aw.utils.permission import has_manager_privileges
 from aw.utils.util import is_set
 from aw.base import USERS, GROUPS
@@ -29,6 +29,7 @@ class PermissionReadResponse(serializers.ModelSerializer):
     groups_name = serializers.ListSerializer(child=serializers.CharField(), required=False)
     jobs_name = serializers.ListSerializer(child=serializers.CharField(), required=False)
     credentials_name = serializers.ListSerializer(child=serializers.CharField(), required=False)
+    repositories_name = serializers.ListSerializer(child=serializers.CharField(), required=False)
 
 
 class JobSerializer(serializers.ModelSerializer):
@@ -201,17 +202,17 @@ def build_permissions(perm_id_filter: int = None) -> (list, dict):
             'permission': permission.permission,
             'permission_name': permission.permission_name,
             'jobs': permission_jobs_id[permission.id],
+            'jobs_name': permission_jobs_name[permission.id],
             'jobs_all': permission.jobs_all,
             'credentials': permission_credentials_id[permission.id],
+            'credentials_name': permission_credentials_name[permission.id],
             'credentials_all': permission.credentials_all,
             'repositories': permission_repositories_id[permission.id],
+            'repositories_name': permission_repositories_name[permission.id],
             'repositories_all': permission.repositories_all,
             'users': permission_users_id[permission.id],
-            'groups': permission_groups_id[permission.id],
-            'jobs_name': permission_jobs_name[permission.id],
-            'credentials_name': permission_credentials_name[permission.id],
-            'repositories_name': permission_repositories_name[permission.id],
             'users_name': permission_users_name[permission.id],
+            'groups': permission_groups_id[permission.id],
             'groups_name': permission_groups_name[permission.id],
         })
 
@@ -231,7 +232,7 @@ def permission_in_use(permission: JobPermission) -> bool:
     return in_use_jobs or in_use_creds
 
 
-class APIPermission(GenericAPIView):
+class APIPermission(APIView):
     http_method_names = ['get', 'post']
     serializer_class = PermissionReadResponse
     permission_classes = API_PERMISSION
@@ -242,10 +243,10 @@ class APIPermission(GenericAPIView):
         responses={200: PermissionReadResponse},
         summary='Return list of permissions',
         operation_id='permission_list',
+        parameters=[API_PARAM_HASH],
     )
     def get(request):
-        del request
-        return Response(build_permissions())
+        return response_data_if_changed(request, data=build_permissions())
 
     @extend_schema(
         request=PermissionWriteRequest,
@@ -283,7 +284,7 @@ class APIPermission(GenericAPIView):
             )
 
 
-class APIPermissionItem(GenericAPIView):
+class APIPermissionItem(APIView):
     http_method_names = ['get', 'put', 'delete']
     serializer_class = GenericResponse
     permission_classes = API_PERMISSION

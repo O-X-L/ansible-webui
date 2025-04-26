@@ -27,7 +27,11 @@ class JobPermission(BaseModel):
         'repositories', 'repositories_all',
     ]
     api_fields_write = form_fields
-    api_fields_read = ['permission_name', 'jobs_name', 'credentials_name', 'users_name', 'groups_name']
+    api_fields_read = [
+        'permission_name',
+        'jobs_name', 'credentials_name', 'repositories_name',
+        'users_name', 'groups_name',
+    ]
     api_fields_read.extend(form_fields)
 
     name = models.CharField(max_length=100, null=False, blank=False)

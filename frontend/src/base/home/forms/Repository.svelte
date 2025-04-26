@@ -226,12 +226,12 @@
                 <div class={classModalInput}>
                     <Label for="repo_name" class={classModalLabel}>{t('common.name')}</Label>
                     <Input id="repo_name" bind:value={form.name.value} bind:color={form.name.color}
-                    on:input={valideInput} on:blur={valideInput} required={form.name.required} />
+                        on:input={valideInput} on:blur={valideInput} required={form.name.required} />
                 </div>
                     <div class={classModalInput}>
                         <Label for="repo_path" class={classModalLabel}>{t('common.path')}</Label>
                         <Input id="repo_path" bind:value={form.static_path.value} bind:color={form.static_path.color}
-                        on:input={valideInput} on:blur={valideInput} required={form.static_path.required} />
+                            on:input={valideInput} on:blur={valideInput} required={form.static_path.required} />
                         <Helper class={classModalHelp}>{@html t('repos.form.help.static_path')}</Helper>
                     </div>
                 </div>
@@ -240,7 +240,7 @@
                 <div class={classModalInput}>
                     <Label for="repo_name" class={classModalLabel}>{t('common.name')}</Label>
                     <Input id="repo_name" bind:value={form.name.value} bind:color={form.name.color}
-                    on:input={valideInput} on:blur={valideInput} required={form.name.required} />
+                        on:input={valideInput} on:blur={valideInput} required={form.name.required} />
                 </div>
                 <div class={classModalInput}>
                     <Label for="repos_git_origin" class={classModalLabel}>{t('repos.form.git_origin')}</Label>
@@ -258,7 +258,7 @@
                 <div class={classModalInput}>
                     <Label for="repos_git_creds" class={classModalLabel}>{t('repos.form.git_credentials')}</Label>
                     <Select id="repos_git_creds" items={formInfos.choices.git_credentials}
-                    bind:value={form.git_credentials.value} bind:color={form.git_credentials.color} />
+                        bind:value={form.git_credentials.value} bind:color={form.git_credentials.color} />
                     <Helper class={classModalHelp}>{t('repos.form.help.git_credentials')}</Helper>
                 </div>
             </div>

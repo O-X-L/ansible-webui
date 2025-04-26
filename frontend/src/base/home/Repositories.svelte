@@ -15,8 +15,8 @@
     import { tq } from '../../util/translate.js';
     import { isSet } from '../../util/main.js';
     import { apiEdit, apiGet } from '../../util/api.js';
-    import { REPO_EXEC_STATI_ACTIVE, repoKindMap } from '../Config.js';
     import RepositoryForm from './forms/Repository.svelte';
+    import { REPO_EXEC_STATI_ACTIVE, repoKindMap } from '../Config.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
         classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
@@ -204,7 +204,7 @@
                         <TableBodyRow slot="row" let:item>
                             <TableBodyCell tdClass={classListContent}>
                                 {item.name}
-                                <button id="repo-name-{item.id}" class="ml-1">
+                                <button id="repos-name-{item.id}" class="ml-1">
                                     <InfoCircleSolid size="sm"/>
                                     <span class="sr-only">{t('repos.info')}</span>
                                 </button>
@@ -278,8 +278,8 @@
                 <div>
                     {#each entryLists[repoKind] as repo (repo.id)}
                         {#if repoKind == repo.rtype_name.toLowerCase()}
-                        <div id="repo-infos-{repo.id}">
-                            <Popover triggeredBy="#repo-name-{repo.id}" class={classPopover} placement="bottom-start">
+                        <div id="repos-infos-{repo.id}">
+                            <Popover triggeredBy="#repos-name-{repo.id}" class={classPopover} placement="bottom-start">
                                 <div class="p-3 space-y-2">
                                     <h3 class={classPopoverTitle}>{t('repos.info')}</h3>
                                 </div>

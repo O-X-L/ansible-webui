@@ -2,7 +2,9 @@
     import { onMount } from 'svelte';
 
     import { Tabs, TabItem } from 'flowbite-svelte';
-    import { AdjustmentsHorizontalSolid, RocketSolid, DatabaseSolid, BookSolid, DrawSquareSolid } from 'flowbite-svelte-icons'
+    import {
+      AdjustmentsHorizontalSolid, RocketSolid, DatabaseSolid, BookSolid, DrawSquareSolid, LockSolid,
+    } from 'flowbite-svelte-icons'
 
     import { share } from './Share.js';
     import { tq } from '../util/translate.js';
@@ -11,6 +13,7 @@
     import Settings from './system/Settings.svelte';
     import APIKeys from './system/APIKeys.svelte';
     import Environment from './system/Environment.svelte';
+    import Permissions from './system/Permissions.svelte';
 
     const classIFrameDiv = 'w-full h-full';
     const classIFrame = 'w-full h-full overflow-y-auto overflow-x-hidden border-none';
@@ -22,6 +25,7 @@
       api_docs: false,
       admin: false,
       environment: false,
+      permission: false,
     });
   
     $effect(() => {
@@ -39,6 +43,8 @@
         fragment = 'api_docs';
       } else if (openTab.environment) {
         fragment = 'env';
+      } else if (openTab.permission) {
+        fragment = 'permission';
       }
 
       window.location.hash = fragment;
@@ -63,6 +69,8 @@
         openTab.api_keys = true;
       } else if (f == '#env') {
         openTab.environment = true;
+      } else if (f == '#permission') {
+        openTab.permission = true;
       } else {
         openTab.settings = true;
       }
@@ -77,6 +85,13 @@
         <AdjustmentsHorizontalSolid size="md" /> {t('system.settings')}
       </div>
       <Settings bind:open={openTab.settings}/>
+    </TabItem>
+
+    <TabItem bind:open={openTab.permission} defaultClass="{classTabButton} tab-perm">
+      <div slot="title" class={classTabTitle}>
+        <LockSolid size="md" /> {t('system.permission')}
+      </div>
+      <Permissions bind:open={openTab.permission}/>
     </TabItem>
 
     <TabItem bind:open={openTab.admin} divClass={classIFrameDiv} defaultClass="{classTabButton} tab-admin">

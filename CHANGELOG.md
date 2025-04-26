@@ -8,6 +8,14 @@ tbd
 
 ## Version 0
 
+### 0.8.6
+
+Features:
+
+* Reimplemented `System - Permissions` page
+
+----
+
 ### 0.8.5
 
 Fixes:

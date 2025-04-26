@@ -30,7 +30,7 @@ def choices_repositories() -> list[tuple]:
 
 
 def choices_user() -> list[tuple]:
-    return [(user.id, user.username) for user in USERS.objects.all()]
+    return [(user.id, user.username) for user in USERS.objects.all() if user.username != 'schedule']
 
 
 def choices_group() -> list[tuple]:

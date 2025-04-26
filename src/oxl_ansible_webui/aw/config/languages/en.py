@@ -278,6 +278,7 @@ EN = {
 
     # system
     'system.settings': 'Settings',
+    'system.permission': 'Permissions',
     'system.environment': 'Environment',
     'system.api_keys': 'API Keys',
     'system.admin': 'Admin',
@@ -388,12 +389,14 @@ EN = {
     'alerts.info': 'Alert Information',
     'alerts.action.create': 'Alert created',
     'alerts.action.update': 'Alert updated',
+    'alerts.action.delete': 'Alert deleted',
     'alerts.new': 'New Alert',
     'alerts.edit': 'Edit Alert',
     'alerts.plugin.new': 'New Plugin',
     'alerts.plugin.edit': 'Edit Plugin',
     'alerts.plugin.action.create': 'Plugin created',
     'alerts.plugin.action.update': 'Plugin updated',
+    'alerts.plugin.action.delete': 'Plugin deleted',
 
     'alerts.type.email': 'E-Mail',
     'alerts.condition.failure': 'Failure',
@@ -409,4 +412,19 @@ EN = {
     'alerts.form.help.plugin.executable': 'Path to the plugin-script to execute. For details see: '
                                           '<a href="https://ansible-webui.oxl.app/usage/alerts.html#plugins">'
                                           'Documentation</a>',
+
+    # permissions
+    'permission.new': 'New Permission',
+    'permission.edit': 'Edit Permission',
+    'permission.action.create': 'Permission created',
+    'permission.action.update': 'Permission updated',
+    'permission.action.delete': 'Permission deleted',
+    'permission.members': 'Members',
+    'permission.permitted': 'Permitted',
+    'permission.users': 'Users',
+    'permission.groups': 'Groups',
+    'permission.level': 'Level',
+    'permission.jobs_all': 'All Jobs',
+    'permission.credentials_all': 'All Credentials',
+    'permission.repositories_all': 'All Repositories',
 }
