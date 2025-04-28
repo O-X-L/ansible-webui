@@ -107,6 +107,10 @@ Make sure to use the same AW-version on dump and load!
     # load from file
     oxl-ansible-webui-manage loaddata aw-dump.json
 
+    # if you encounter issues while importing data into mysql/mariadb - try to set 'AW_DEBUG' beforehand
+    AW_DEBUG=1 oxl-ansible-webui-manage loaddata aw-dump.json
+
+
 MariaDB / MySQL
 ===============
 

@@ -127,9 +127,7 @@ AW_DB_ENGINES = {
         'PORT': get_aw_env_var_or_default('db_port'),
         'CONN_HEALTH_CHECKS': True,
         'CONN_MAX_AGE': 0,
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
+        'OPTIONS': {},
     },
     'psql': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -143,8 +141,12 @@ AW_DB_ENGINES = {
 
 DATABASES = {'default': AW_DB_ENGINES[DB_TYPE]}
 
-if DB_TYPE == 'mysql' and get_aw_env_var('db_socket') is not None:
-    DATABASES['default']['OPTIONS']['unix_socket'] = get_aw_env_var('db_socket')
+if DB_TYPE == 'mysql':
+    if get_aw_env_var('db_socket') is not None:
+        DATABASES['default']['OPTIONS']['unix_socket'] = get_aw_env_var('db_socket')
+
+    if not get_aw_env_var_or_default('debug'):
+        DATABASES['default']['OPTIONS']['init_command'] = "SET sql_mode='STRICT_TRANS_TABLES'"
 
 
 def debug_mode() -> bool:
