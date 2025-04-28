@@ -227,11 +227,14 @@
                                             {item.status_name}
                                         </span>
                                     </div>
-                                    {#if item.log_stderr_url || item.log_stderr_url}
+                                    {#if item.log_stdout_url || item.log_stderr_url}
                                         <div>
                                             <b>{t('home.logs')}:</b> 
-                                            {#if item.log_stderr_url}
+                                            {#if item.log_stdout_url}
                                                 <a href={item.log_stdout_url}>{t('logs.repo_log_file')}</a>
+                                            {/if}
+                                            {#if item.log_stdout_url && item.log_stderr_url}
+                                            |
                                             {/if}
                                             {#if item.log_stderr_url}
                                                 <a href={item.log_stderr_url}>{t('logs.repo_error_log_file')}</a>
