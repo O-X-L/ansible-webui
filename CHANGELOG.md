@@ -13,6 +13,7 @@ tbd
 Features:
 
 * Reimplemented `System - Permissions` page
+* Permission-audit logging 
 
 Fixes:
 

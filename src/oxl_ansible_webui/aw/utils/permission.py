@@ -47,13 +47,13 @@ def _evaluate_permission(permission: JobPermission, user: USERS, permission_need
 def _has_permission(
         permission_links: (JobPermissionMapping, JobCredentialsPermissionMapping, JobRepositoryPermissionMapping),
         permission_needed: int,
-        user: USERS, permission_attr_all: str, manager: str = None,
+        user: USERS, permission_attr_all: str, manager: str = None, what: str = '',
 ) -> bool:
     if user.is_superuser or has_manager_privileges(user=user, kind='full'):
         log(
-            msg=f"User '{user}' privileged ({get_permission_name(permission_needed)}) because of "
+            msg=f"User '{user}' privileged ({get_permission_name(permission_needed)} {what}) because of "
                 f"superuser of manager-group '{GRP_MANAGER['full']}'",
-            level=7,
+            level=8,
         )
         return True
 
@@ -61,9 +61,9 @@ def _has_permission(
             permission_needed in [CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE] and \
             has_manager_privileges(user=user, kind=manager):
         log(
-            msg=f"User '{user}' privileged ({get_permission_name(permission_needed)}) because of "
+            msg=f"User '{user}' privileged ({get_permission_name(permission_needed)} {what}) because of "
                 f"manager-group '{GRP_MANAGER[manager]}'",
-            level=7,
+            level=8,
         )
         return True
 
@@ -72,9 +72,9 @@ def _has_permission(
     for permission in JobPermission.objects.filter(**{permission_attr_all: True}):
         if _evaluate_permission(permission=permission, user=user, permission_needed=permission_needed):
             log(
-                msg=f"User '{user}' privileged ({get_permission_name(permission_needed)}) "
+                msg=f"User '{user}' privileged ({get_permission_name(permission_needed)} {what}) "
                     f"through permission \"{permission}\"",
-                level=7,
+                level=8,
             )
             return True
 
@@ -82,9 +82,9 @@ def _has_permission(
     for link in permission_links:
         if _evaluate_permission(permission=link.permission, user=user, permission_needed=permission_needed):
             log(
-                msg=f"User '{user}' privileged ({get_permission_name(permission_needed)}) "
+                msg=f"User '{user}' privileged ({get_permission_name(permission_needed)} {what}) "
                     f"through permission \"{link.permission}\"",
-                level=7,
+                level=8,
             )
             return True
 
@@ -100,7 +100,7 @@ def has_job_permission(user: USERS, job: Job, permission_needed: int) -> bool:
         log(
             msg=f"User '{user}' privileged ({get_permission_name(permission_needed)}) because of "
                 f"manager-group '{GRP_MANAGER['exec']}'",
-            level=7,
+            level=8,
         )
         return True
 
@@ -111,6 +111,7 @@ def has_job_permission(user: USERS, job: Job, permission_needed: int) -> bool:
         permission_attr_all='jobs_all',
         user=user,
         manager='job',
+        what=f"Job: '{job.name}'",
     )
 
 
@@ -124,6 +125,7 @@ def has_credentials_permission(
         permission_attr_all='credentials_all',
         user=user,
         manager='credentials',
+        what=f"Credentials: '{credentials.name}'",
     )
 
 
@@ -137,6 +139,7 @@ def has_repository_permission(
         permission_attr_all='repositories_all',
         user=user,
         manager='repository',
+        what=f"Repository: '{repository.name}'",
     )
 
 

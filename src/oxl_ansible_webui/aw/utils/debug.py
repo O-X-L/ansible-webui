@@ -7,8 +7,10 @@ from aw.config.main import config
 from aw.utils.util import datetime_w_tz
 from aw.utils.deployment import deployment_dev, deployment_staging
 from aw.config.hardcoded import LOG_TIME_FORMAT
+from aw.config.environment import get_aw_env_var_or_default
 
 PID = getpid()
+AUDIT = get_aw_env_var_or_default('audit')
 
 LEVEL_NAME_MAPPING = {
     1: 'FATAL',
@@ -18,6 +20,7 @@ LEVEL_NAME_MAPPING = {
     5: 'INFO',
     6: 'DEBUG',
     7: 'DEBUG',
+    8: 'AUDIT',
 }
 
 
@@ -31,7 +34,14 @@ def log(msg: str, level: int = 3, _stderr: bool = False):
     debug = deployment_dev() or config['debug']
     prefix_caller = ''
 
-    if level > 5 and not debug:
+    if level == 8:
+        if AUDIT:
+            pass
+
+        else:
+            return
+
+    elif level > 5 and not debug:
         return
 
     if debug:

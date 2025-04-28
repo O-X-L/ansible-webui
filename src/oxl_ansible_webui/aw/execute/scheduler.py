@@ -13,6 +13,7 @@ from aw.config.hardcoded import INTERVAL_CHECK, INTERVAL_RELOAD
 from aw.model.job import Job, JobExecution, validate_cronjob
 from aw.execute.queue import queue_get
 from aw.utils.db_handler import close_old_mysql_connections
+from aw.utils.deployment import deployment_dev
 
 
 class Scheduler:
@@ -88,7 +89,9 @@ class Scheduler:
         log(msg=f"Running job-threads: {self.thread_manager.list_pretty()}", level=4)
 
     def check(self):
-        # log('Checking for queued jobs', level=7)
+        if not deployment_dev():
+            log('Checking for queued jobs', level=7)
+
         while True:
             execution = queue_get()
             if execution is None:
@@ -115,7 +118,9 @@ class Scheduler:
     def _reload_action(self, added: list, removed: list, changed: list):
         any_changed = False
 
-        # log('Checking jobs for config-changes', level=7)
+        if deployment_dev():
+            log('Checking jobs for config-changes', level=7)
+
         if len(added) > 0:
             any_changed = True
             log(f"Adding job-threads: {[job.name for job in added]}", level=4)
@@ -149,11 +154,15 @@ class Scheduler:
         for job in configured:
             if job.id not in running_ids:
                 if is_null(job.schedule):
-                    log(f"Ignoring job '{job.name}' because it has no schedule", level=6)
+                    if not deployment_dev():
+                        log(f"Ignoring job '{job.name}' because it has no schedule", level=6)
+
                     continue
 
                 if not job.enabled:
-                    log(f"Ignoring job '{job.name}' because it is disabled", level=6)
+                    if not deployment_dev():
+                        log(f"Ignoring job '{job.name}' because it is disabled", level=6)
+
                     continue
 
                 try:

@@ -260,6 +260,13 @@ Normal users will not have to use these.
     This debug mode **SHOULD ONLY BE ENABLED TEMPORARILY**! It could possibly open attack vectors.
 
 
+* **AW_AUDIT**
+
+    Enable permission-audit output.
+
+    If you are scheduling jobs, it will write many logs.
+
+
 * **AW_SERVE_STATIC**
 
    If defined - the built-in static-file serving is disabled.

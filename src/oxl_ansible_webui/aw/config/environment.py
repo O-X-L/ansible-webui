@@ -34,6 +34,7 @@ AW_ENV_VARS = {
     'ssl_file_crt': ['AW_SSL_CERT'],
     'ssl_file_key': ['AW_SSL_KEY'],
     'debug': ['AW_DEBUG'],
+    'audit': ['AW_AUDIT'],
     'auth_mode': ['AW_AUTH'],
     'saml_config': [ENV_KEY_SAML],
 }
