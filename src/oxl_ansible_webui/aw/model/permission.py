@@ -21,6 +21,10 @@ CHOICES_PERMISSION = [
 ]
 
 
+def get_permission_name(permission: int) -> str:
+    return get_choice_value_by_key(choices=CHOICES_PERMISSION, find=permission)
+
+
 class JobPermission(BaseModel):
     form_fields = [
         'name', 'permission', 'users', 'groups', 'jobs', 'jobs_all', 'credentials', 'credentials_all',
@@ -68,11 +72,7 @@ class JobPermission(BaseModel):
 
     @property
     def permission_name(self) -> str:
-        return self.permission_name_from_id(self.permission)
-
-    @staticmethod
-    def permission_name_from_id(permission) -> str:
-        return get_choice_value_by_key(choices=CHOICES_PERMISSION, find=permission)
+        return get_permission_name(self.permission)
 
     def __str__(self) -> str:
         return f"Permission '{self.name}' - {self.permission_name}"

@@ -4,7 +4,6 @@ from typing import Callable
 
 from django.core.validators import ValidationError
 from django.db.utils import OperationalError, IntegrityError
-from django.db import close_old_connections
 
 from aw.settings import DB_FILE
 from aw.execute.threader import ThreadManager
@@ -13,6 +12,7 @@ from aw.utils.util import is_null
 from aw.config.hardcoded import INTERVAL_CHECK, INTERVAL_RELOAD
 from aw.model.job import Job, JobExecution, validate_cronjob
 from aw.execute.queue import queue_get
+from aw.utils.db_handler import close_old_mysql_connections
 
 
 class Scheduler:
@@ -74,8 +74,8 @@ class Scheduler:
                     sleep(self.WAIT_TIME)
 
                 except OperationalError as err:
-                    log(msg=f'DB connection timeout: {err}', level=5)
-                    close_old_connections()  # "2006, 'Server has gone away'" when using mariadb/mysql
+                    log(msg=f'DB connection timeout: {err}', level=2)
+                    close_old_mysql_connections()  # "2006, 'Server has gone away'" when using mariadb/mysql
 
                 except ThreadError as err:
                     log(msg=f'Got thread error: {err}', level=2)
@@ -88,7 +88,7 @@ class Scheduler:
         log(msg=f"Running job-threads: {self.thread_manager.list_pretty()}", level=4)
 
     def check(self):
-        log('Checking for queued jobs', level=7)
+        # log('Checking for queued jobs', level=7)
         while True:
             execution = queue_get()
             if execution is None:
@@ -115,7 +115,7 @@ class Scheduler:
     def _reload_action(self, added: list, removed: list, changed: list):
         any_changed = False
 
-        log('Checking jobs for config-changes', level=7)
+        # log('Checking jobs for config-changes', level=7)
         if len(added) > 0:
             any_changed = True
             log(f"Adding job-threads: {[job.name for job in added]}", level=4)
@@ -142,6 +142,7 @@ class Scheduler:
         result = {'added': [], 'removed': [], 'changed': []}
         running = self.thread_manager.list()
         running_ids = [job.id for job in running]
+        close_old_mysql_connections()
         configured = Job.objects.all()
         configured_ids = [job.id for job in configured]
 

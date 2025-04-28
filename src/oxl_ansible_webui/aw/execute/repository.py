@@ -14,6 +14,7 @@ from aw.execute.util import update_status, create_dirs
 from aw.utils.handlers import AnsibleRepositoryError
 from aw.model.repository import Repository
 from aw.model.base import JOB_EXEC_STATUS_FAILED
+from aw.utils.db_handler import close_old_mysql_connections
 
 
 class ExecuteRepository:
@@ -86,6 +87,7 @@ class ExecuteRepository:
         if self.execution is not None:
             self.repository.log_stderr = self.execution.log_stderr_repo
             self.repository.log_stdout = self.execution.log_stdout_repo
+            close_old_mysql_connections()
             self.repository.save()
 
         try:

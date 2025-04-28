@@ -15,6 +15,7 @@ from aw.model.repository import Repository
 from aw.utils.util import get_choice_key_by_value, get_choice_value_by_key, datetime_from_db_str, is_null, \
     datetime_from_db, pretty_timedelta_str
 from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED
+from aw.utils.db_handler import close_old_mysql_connections
 
 
 class JobError(BareModel):
@@ -322,6 +323,7 @@ class JobExecution(BaseJob):
     def get_stats(self) -> dict:
         stats = {}
         if self.result is not None:
+            close_old_mysql_connections()
             for result in JobExecutionResultHost.objects.filter(result=self.result):
                 stats[result.hostname] = {
                       attr: getattr(result, attr) for attr in JobExecutionResultHost.STATS
@@ -332,6 +334,7 @@ class JobExecution(BaseJob):
     def get_stats_short(self) -> list:
         stats = []
         if self.result is not None:
+            close_old_mysql_connections()
             for result in JobExecutionResultHost.objects.filter(result=self.result):
                 hs = [
                     result.hostname,

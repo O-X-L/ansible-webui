@@ -10,6 +10,7 @@ from aw.utils.handlers import AnsibleConfigError
 from aw.model.job import JobExecution, Job
 from aw.model.repository import Repository
 from aw.utils.util import datetime_w_tz
+from aw.utils.db_handler import close_old_mysql_connections
 
 
 def config_error(msg: str):
@@ -38,10 +39,12 @@ def update_status(obj: (JobExecution, Repository), status: (str, int)):
         status = obj.status_id_from_name(status)
 
     obj.status = status
+    close_old_mysql_connections()
     obj.save()
 
 
 def is_execution_status(execution: JobExecution, status: str) -> bool:
+    close_old_mysql_connections()
     is_status = JobExecution.objects.get(id=execution.id).status
     check_status = execution.status_id_from_name(status)
     return is_status == check_status

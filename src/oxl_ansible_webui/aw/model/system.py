@@ -8,6 +8,7 @@ from aw.config.environment import check_aw_env_var_is_set, AW_ENV_VARS, AW_ENV_V
 from aw.config.main import VERSION
 from aw.utils.util import is_null, is_set
 from aw.utils.crypto import decrypt, encrypt
+from aw.utils.db_handler import close_old_mysql_connections
 
 MAIL_TRANSPORT_TYPE_PLAIN = 0
 MAIL_TRANSPORT_TYPE_SSL = 1
@@ -102,6 +103,7 @@ class SystemConfig(BaseModel):
 
 def get_config_from_db() -> SystemConfig:
     try:
+        close_old_mysql_connections()
         config_db = SystemConfig.objects.all().first()
         if config_db is None:
             raise ObjectDoesNotExist()
@@ -125,6 +127,7 @@ class SchemaMetadata(BaseModel):
 
 def get_schema_metadata() -> SchemaMetadata:
     try:
+        close_old_mysql_connections()
         metadata = SchemaMetadata.objects.all().first()
         if metadata is None:
             raise ObjectDoesNotExist()

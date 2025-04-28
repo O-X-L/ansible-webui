@@ -4,12 +4,12 @@ from sqlite3 import connect as db_connect
 from sqlite3 import OperationalError as SQLiteOperationalError
 from sqlite3 import DatabaseError as SQLiteDatabaseError
 
-from aw.config.environment import get_aw_env_var, get_aw_env_var_or_default
+from aw.config.environment import get_aw_env_var, get_aw_env_var_or_default, CONFIG_DEFAULTS
 from aw.dependencies import log_dependency_error
 
-DB_TYPE = get_aw_env_var('db_type')
+DB_TYPE = get_aw_env_var_or_default('db_type')
 if DB_TYPE is None or DB_TYPE not in ['mysql', 'psql', 'sqlite']:
-    DB_TYPE = 'sqlite'
+    DB_TYPE = CONFIG_DEFAULTS['db_type']
 
 
 class DummyException(BaseException):

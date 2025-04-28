@@ -21,6 +21,7 @@ from aw.utils.debug import log
 from aw.execute.repository import ExecuteRepository
 from aw.execute.play_credentials import get_runner_credentials_args, get_credentials_to_use
 from aw.model.base import JOB_EXEC_STATUS_FAILED
+from aw.utils.db_handler import close_old_mysql_connections
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
 
@@ -260,6 +261,7 @@ def _run_stats(runner: Runner, result: JobExecutionResult) -> bool:
             # todo: create errors
 
         result_host.result = result
+        close_old_mysql_connections()
         result_host.save()
 
     return any_task_failed
@@ -268,6 +270,7 @@ def _run_stats(runner: Runner, result: JobExecutionResult) -> bool:
 def parse_run_result(execution: JobExecution, result: JobExecutionResult, runner: Runner):
     result.time_fin = datetime_w_tz()
     result.failed = runner.errored
+    close_old_mysql_connections()
     result.save()
 
     any_task_failed = False
@@ -294,11 +297,14 @@ def failure(
         short=error_s,
         med=error_m,
     )
+    close_old_mysql_connections()
     job_error.save()
     result.time_fin = datetime_w_tz()
     result.failed = True
     result.error = job_error
+    close_old_mysql_connections()
     result.save()
+    close_old_mysql_connections()
     execution.save()
 
     runner_cleanup(execution=execution, path_run=path_run, exec_repo=exec_repo)

@@ -9,6 +9,7 @@ from aw.base import USERS
 from aw.utils.debug import log  # log_warn
 from aw.utils.util import is_set, is_null, write_file_0600
 from aw.execute.util import config_error
+from aw.utils.db_handler import close_old_mysql_connections
 
 
 def get_pwd_file(path_run: (str, Path), attr: str) -> str:
@@ -84,6 +85,7 @@ def get_credentials_to_use(job: Job, execution: JobExecution) -> (BaseJobCredent
     elif job.credentials_needed and is_set(execution.user):
         # get user credentials that match the job credential-category
         if is_set(job.credentials_category):
+            close_old_mysql_connections()
             for user_creds in JobUserCredentials.objects.filter(user=execution.user):
                 if user_creds.category == job.credentials_category:
                     credentials = user_creds
@@ -92,6 +94,7 @@ def get_credentials_to_use(job: Job, execution: JobExecution) -> (BaseJobCredent
         if credentials is None:
             # try to get default user-credentials as a last-resort if the job needs some credentials
             try:
+                close_old_mysql_connections()
                 credentials = JobUserCredentials.objects.filter(user=execution.user).first()
 
             except ObjectDoesNotExist:

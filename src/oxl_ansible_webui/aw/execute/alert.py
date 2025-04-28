@@ -11,6 +11,7 @@ from aw.model.alert import BaseAlert, AlertUser, AlertGroup, AlertGlobal, \
     ALERT_TYPE_PLUGIN
 from aw.execute.alert_plugin.plugin_email import alert_plugin_email
 from aw.execute.alert_plugin.plugin_wrapper import alert_plugin_wrapper
+from aw.utils.db_handler import close_old_mysql_connections
 
 
 class Alert:
@@ -19,6 +20,7 @@ class Alert:
         self.execution = execution
         self.failed = execution.has_failed
         self.privileged_users = []
+        close_old_mysql_connections()
         for user in USERS.objects.all():
             if has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_READ):
                 self.privileged_users.append(user)
@@ -37,6 +39,7 @@ class Alert:
                         self.error_msgs['text'].append(line_text)
 
     def _job_filter(self, model: type):
+        close_old_mysql_connections()
         return model.objects.filter(Q(jobs=self.job) | Q(jobs_all=True))
 
     def _condition_filter(self, alerts: list[BaseAlert]):

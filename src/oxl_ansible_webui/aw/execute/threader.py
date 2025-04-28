@@ -13,6 +13,7 @@ from aw.utils.handlers import AnsibleConfigError, AnsibleRepositoryError
 from aw.utils.util import get_next_cron_execution_sec, get_next_cron_execution_str, is_set
 from aw.execute.util import update_status
 from aw.model.base import JOB_EXEC_STATUS_FAILED, JOB_EXEC_STATUS_RETRY
+from aw.utils.db_handler import close_old_mysql_connections
 
 
 class Workload(Thread):
@@ -74,6 +75,7 @@ class Workload(Thread):
         if self.config_invalid >= self.MAX_CONFIG_INVALID:
             self.next_execution_time = None
             self.job.enabled = False
+            close_old_mysql_connections()
             self.job.save()
             log(msg=f"Disabling job {self.log_name} because of invalid config! Please fix it", level=2)
             # exit loop because it will always fail; fixing the config will replace this threat instance

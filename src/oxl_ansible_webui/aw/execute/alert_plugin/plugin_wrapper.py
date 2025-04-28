@@ -15,6 +15,7 @@ from aw.model.system import UserExtended
 from aw.settings import get_main_web_address
 from aw.model.job import JobExecution
 from aw.model.alert import BaseAlert, AlertUser, AlertGroup
+from aw.utils.db_handler import close_old_mysql_connections
 
 
 def alert_plugin_wrapper(
@@ -68,6 +69,7 @@ def alert_plugin_wrapper(
     }
 
     try:
+        close_old_mysql_connections()
         user_extended = UserExtended.objects.get(user=user)
         data['user']['phone'] = user_extended.phone
         data['user']['description'] = user_extended.description

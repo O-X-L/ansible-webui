@@ -1,5 +1,6 @@
 import traceback
 
+from django.db.utils import OperationalError, IntegrityError
 from ansibleguy_runner import RunnerConfig, Runner
 
 from aw.config.main import config
@@ -11,6 +12,7 @@ from aw.execute.alert import Alert
 from aw.utils.util import datetime_w_tz, is_null, timed_lru_cache  # get_ansible_versions
 from aw.utils.handlers import AnsibleConfigError, AnsibleRepositoryError
 from aw.utils.debug import log
+from aw.utils.db_handler import close_old_mysql_connections
 
 
 class AwRunnerConfig(RunnerConfig):
@@ -25,8 +27,11 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
         execution = JobExecution(user=None, job=job, comment='Scheduled')
 
     result = JobExecutionResult(time_start=time_start)
+    close_old_mysql_connections()
     result.save()
+
     execution.result = result
+    close_old_mysql_connections()
     execution.save()
 
     log_files = job_logs(job=job, execution=execution)
@@ -40,14 +45,15 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
         exec_repo.create_or_update_repository()
         project_dir = exec_repo.get_project_dir()
         opts = runner_prep(job=job, execution=execution, path_run=path_run, project_dir=project_dir)
+        close_old_mysql_connections()
         execution.save()
-
         runner_cfg = AwRunnerConfig(**opts)
         runner_logs(cfg=runner_cfg, log_files=log_files)
         runner_cfg.prepare()
         command = ' '.join(runner_cfg.command)
         log(msg=f"Running job '{job.name}': '{command}'", level=5)
         execution.command = command[command.find('ansible-playbook'):]
+        close_old_mysql_connections()
         execution.save()
 
         runner = Runner(config=runner_cfg, cancel_callback=_cancel_job)
@@ -66,6 +72,7 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
     except (
             AnsibleConfigError, AnsibleRepositoryError,
             OSError, ValueError, AttributeError, IndexError, KeyError,
+            OperationalError, IntegrityError,
     ) as err:
         tb = traceback.format_exc(limit=1024)
         failure(

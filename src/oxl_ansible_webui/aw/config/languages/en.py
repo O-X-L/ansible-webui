@@ -19,6 +19,7 @@ EN = {
     'btn.pause': 'Pause',
     'btn.download': 'Download',
     'btn.update': 'Update',
+    'btn.scroll_down': 'Scroll down',
     'nav.home': 'Home',
     'nav.system': 'System',
     'nav.lang': 'Language',
