@@ -17,6 +17,7 @@ Features:
 Fixes:
 
 * Better handling for execution-errors in logs-view
+* MariaDB/MySQL connection-timeout fixes [#27](https://github.com/O-X-L/ansible-webui/issues/27)
 
 ----
 
