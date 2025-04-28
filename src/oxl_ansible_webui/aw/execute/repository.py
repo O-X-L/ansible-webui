@@ -5,9 +5,9 @@ from re import sub as regex_replace
 from django.utils import timezone
 
 from aw.config.main import config
-from aw.config.hardcoded import REPO_CLONE_TIMEOUT
+from aw.config.hardcoded import REPO_CLONE_TIMEOUT, FILE_TIME_FORMAT
 from aw.model.job import  JobExecution
-from aw.utils.util import is_null, is_set, write_file_0640
+from aw.utils.util import is_null, is_set, write_file_0640, datetime_w_tz
 from aw.utils.subps import process
 from aw.execute.play_credentials import write_pwd_file, get_pwd_file
 from aw.execute.util import update_status, create_dirs
@@ -87,8 +87,12 @@ class ExecuteRepository:
         if self.execution is not None:
             self.repository.log_stderr = self.execution.log_stderr_repo
             self.repository.log_stdout = self.execution.log_stdout_repo
-            close_old_mysql_connections()
-            self.repository.save()
+
+        else:
+            self._logs_init()
+
+        close_old_mysql_connections()
+        self.repository.save()
 
         try:
             update_status(self.repository, status='Running')
@@ -202,7 +206,6 @@ class ExecuteRepository:
     def _run_repo_config_cmds(self, cmds: str, env: dict):
         if is_set(cmds):
             for cmd in cmds.split(','):
-                cmd = cmd.replace("''", '"')
                 self._repo_process(cmd=cmd, env=env)
 
     def _git_origin_with_credentials(self) -> str:
@@ -237,6 +240,13 @@ class ExecuteRepository:
             file=self.repository.log_stdout,
             content=f"{content}\n"
         )
+
+    def _logs_init(self):
+        safe_repo_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=self.repository.name)
+        timestamp = datetime_w_tz().strftime(FILE_TIME_FORMAT)
+        log_file = f"{config['path_log']}/repo_{safe_repo_name}_{timestamp}"
+        self.repository.log_stdout = f'{log_file}_stdout_repo.log'
+        self.repository.log_stderr = f'{log_file}_stderr_repo.log'
 
 
 def get_path_repo_wo_isolate(repository: Repository) -> Path:

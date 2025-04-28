@@ -117,6 +117,7 @@ def validate_no_xss(value: str, field: str, shell_cmd: bool = False, single_quot
 
         if shell_cmd:
             value = value.replace('&', '')
+            value = value.replace('"', '')
 
         if value != escape_html(value):
             raise ValidationError(f"Found illegal characters in field '{field}'")

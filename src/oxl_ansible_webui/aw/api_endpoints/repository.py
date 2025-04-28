@@ -32,7 +32,6 @@ class RepositoryWriteRequest(serializers.ModelSerializer):
         for field in Repository.api_fields_write:
             if field in attrs:
                 if field in Repository.fields_shell_cmds and attrs[field] is not None:
-                    attrs[field] = attrs[field].replace('"', "''")
                     validate_no_xss(value=attrs[field], field=field, shell_cmd=True)
 
                 else:
@@ -350,9 +349,8 @@ class APIRepositoryLogFile(GenericAPIView):
                     )
 
                 logfile = repo.log_stdout
-                if 'type' in request.GET:
-                    logfile_type = request.GET['type'] if request.GET['type'] in self.valid_logfile_type else 'stdout'
-                    logfile = getattr(repo, f'log_{logfile_type}')
+                if 'type' in request.GET and request.GET['type'] == 'stderr':
+                    logfile = repo.log_stderr
 
                 if logfile is None:
                     return Response(data={'error': f"No logs found for repository '{repo.name}'"}, status=404)

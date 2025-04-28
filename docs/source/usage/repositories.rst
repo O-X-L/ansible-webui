@@ -77,6 +77,13 @@ The cleanup-hook can be used to commit files that were created by the job-execut
 
 **Note**: For security reasons (XSS) these characters are currently not allowed: :code:`< >`
 
+You can also run inline scripts like this example:
+
+.. code-block:: bash
+
+    /bin/sh -c "if ! git diff-index --quiet HEAD --; then git add . && git commit -m
+'Modification from $(whoami) on $(hostname)' && git push; else echo 'No changes found'; fi"
+
 ----
 
 Clone via SSH
