@@ -28,6 +28,7 @@
         content: string,
     }
 
+    const MAX_ERROR_CNT = 10;
     const classText = 'sm:text-base max-sm:text-xs text-wrap';
     const classProp = 'sm:text-base max-sm:text-xs font-bold pr-3';
     const endDiv = `logs-end-${jobID}-${exec.id}`;
@@ -42,6 +43,7 @@
     let lineNr = $state(1);
     let apiSuccessMsg = $state('');
     let followLogsToggle = $state(true);
+    let errorCnt = $state(0);
 
     function t(code: string) : string {
         return tq($share, code);
@@ -59,6 +61,9 @@
 
     function loadLogLines(j: any) {
         if (!j || !j.lines) {
+            if (j.error) {
+                errorCnt += 1;
+            }
             return;
         }
         let newLogLines = [...logLines];
@@ -86,7 +91,7 @@
     }
 
     function isInactive() : boolean {
-        return finished || exec.failed || !isExecActive;
+        return finished || !isExecActive || errorCnt > MAX_ERROR_CNT;
     }
     
     function buildUpdateLogsList() {
@@ -147,49 +152,37 @@
 <Modal bind:open={open} size="lg" autoclose={false} placement="top-center"
     backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
     <Heading tag="h2">{t('logs.job_logs')} "{jobName}"</Heading>
-    {#if exec.failed}
-        <div class="mt-20 mb-10 font-bold text-lg {classCenterChildDiv} text-red-600">
-            <CloseCircleSolid class="inline-block mr-2" /> {t('logs.exec_failed')}
-        </div>
-        {#if exec.error_s}
-            <Alert color="red" class="mx-10 my-5">
-                <div class="font-bold text-lg mb-3">{t('logs.error_short')}</div>
-                <div>{exec.error_s}</div>
-            </Alert>
-        {/if}
-        {#if exec.error_m}
-            <Alert color="red" class="mx-10 my-5">
-                <div class="font-bold text-lg mb-3">{t('logs.error_medium')}</div>
-                <pre class="whitespace-pre-wrap break-normal">{exec.error_m}</pre>
-            </Alert>
-        {/if}
-    {:else if !logLines.length}
+    {#if !logLines.length && !exec.error_s && errorCnt < MAX_ERROR_CNT}
         <div class={classSpinnerDiv}><Spinner/></div>
     {:else}
         <table>
             <tbody>
                 <tr>
                     <td class={classProp}>{t('logs.command')}:</td>
-                    <td class={classText}>{exec.command}</td>
+                    <td class={classText}>{exec.command ? exec.command : '-'}</td>
                 </tr>
                 <tr>
                     <td class={classProp}>{t('logs.time_start')}:</td>
-                    <td class={classText}>{exec.time_start}</td>
+                    <td class={classText}>{exec.time_start ? exec.time_start : '-'}</td>
                 </tr>
                 <tr>
                     <td class={classProp}>{t('logs.executed_by')}:</td>
-                    <td class={classText}>{exec.user_name}</td>
+                    <td class={classText}>{exec.user_name ? exec.user_name : '-'}</td>
                 </tr>
                 {#if exec.comment}
                     <tr>
                         <td class={classProp}>{t('common.comment')}:</td>
-                        <td class={classText}>{exec.comment}</td>
+                        <td class={classText}>{exec.comment ? exec.comment : '-'}</td>
                     </tr>
                 {/if}
                 <tr>
                     <td class={classProp}>{t('logs.exec_log_file')}:</td>
                     <td class={classText}>
-                        <a href="{exec.log_stdout_url}">{exec.log_stdout}</a>
+                        {#if exec.log_stdout}
+                            <a href="{exec.log_stdout_url}">{exec.log_stdout}</a>
+                        {:else}
+                            -
+                        {/if}
                     </td>
                 </tr>
                 {#if exec.log_sderr}
@@ -228,14 +221,32 @@
                 {/each}
             </tbody>
         </table>
-        {#if finished}
-            <div class="pt-10 mb-10 font-bold text-lg {classCenterChildDiv} text-green-600">
-                <InfoCircleSolid class="inline-block mr-2" /> {t('logs.exec_finished')}
-            </div>
-        {/if}
-        <div class="h-48"></div>
-        <div id={endDiv} class="w-0 h-0"></div>
     {/if}
+    {#if exec.failed}
+        {#if exec.error_s}
+            <Alert color="red" class="mx-10 my-5">
+                <div class="font-bold text-lg mb-3">{t('logs.error_short')}</div>
+                <div>{exec.error_s}</div>
+            </Alert>
+        {/if}
+        {#if exec.error_m}
+            <Alert color="red" class="mx-10 my-5">
+                <div class="font-bold text-lg mb-3">{t('logs.error_medium')}</div>
+                <pre class="whitespace-pre-wrap break-normal">{exec.error_m}</pre>
+            </Alert>
+        {/if}
+        <div class="mt-20 mb-10 font-bold text-lg {classCenterChildDiv} text-red-600">
+            <CloseCircleSolid class="inline-block mr-2" /> {t('logs.exec_failed')}
+        </div>
+    {:else if finished}
+        <div class="mt-20 mb-10 font-bold text-lg {classCenterChildDiv} text-green-600">
+            <InfoCircleSolid class="inline-block mr-2" /> {t('logs.exec_finished')}
+        </div>
+    {/if}
+
+    <div class="h-48"></div>
+    <div id={endDiv} class="w-0 h-0"></div>
+
     <div class="fixed bottom-10 left-[50%] translate-x-[-50%]">
         <div class="{classCenterChildDiv} opacity-30 hover:opacity-95">
             <Button id="logs-btn-close" on:click={() => (open = false)}>
@@ -246,7 +257,7 @@
             <Button id="logs-btn-down" on:click={() => {followLogs()}} class="ml-2">
                 <CaretDownSolid/>
             </Button>
-            <Tooltip>{t('btn.update')}</Tooltip>
+            <Tooltip>{t('btn.scroll_down')}</Tooltip>
 
             {#if isExecActive()}
                 <div class="inline-block ml-2 {classCenterChildDiv}">

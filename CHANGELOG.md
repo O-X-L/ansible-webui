@@ -14,6 +14,10 @@ Features:
 
 * Reimplemented `System - Permissions` page
 
+Fixes:
+
+* Better handling for execution-errors in logs-view
+
 ----
 
 ### 0.8.5
