@@ -30,7 +30,7 @@ class ExecuteRepository:
 
     def create_repository(self, env: dict):
         if is_set(self.repository.git_override_initialize):
-            self._run_repo_config_cmds(
+            self._run_repo_hooks(
                 cmds=self.repository.git_override_initialize,
                 env=env,
             )
@@ -57,7 +57,7 @@ class ExecuteRepository:
 
     def update_repository(self, env: dict):
         if is_set(self.repository.git_override_update):
-            self._run_repo_config_cmds(
+            self._run_repo_hooks(
                 cmds=self.repository.git_override_update,
                 env=env,
             )
@@ -102,7 +102,7 @@ class ExecuteRepository:
             if len(env) > 0:
                 self._log_file_write(f"USING ENVIRONMENT: {env}")
 
-            self._run_repo_config_cmds(cmds=self.repository.git_hook_pre, env=env)
+            self._run_repo_hooks(cmds=self.repository.git_hook_pre, env=env)
 
             if not (Path(path_repo) / '.git/HEAD').is_file():
                 self.create_repository(env=env)
@@ -112,7 +112,7 @@ class ExecuteRepository:
 
             self.repository.time_update = timezone.now()
 
-            self._run_repo_config_cmds(cmds=self.repository.git_hook_post, env=env)
+            self._run_repo_hooks(cmds=self.repository.git_hook_post, env=env)
 
             update_status(self.repository, status='Finished')
 
@@ -169,7 +169,7 @@ class ExecuteRepository:
         if is_null(self.repository) or self.repository.rtype_name == 'Static':
             return
 
-        self._run_repo_config_cmds(cmds=self.repository.git_hook_cleanup, env=self._git_env())
+        self._run_repo_hooks(cmds=self.repository.git_hook_cleanup, env=self._git_env())
         if self.repository.git_isolate and self.isolate_subdir != self.ISOLATE_BROWSABLE:
             rmtree(self.get_path_repo(), ignore_errors=True)
 
@@ -189,11 +189,13 @@ class ExecuteRepository:
 
         return path_repo
 
-    def _repo_process(self, cmd: str, env: dict):
+    def _repo_process(self, cmd: str, env: dict, hook: bool = False):
         if self.path_repo is None:
             self.path_repo = self.get_path_repo()
 
-        cmd = f'timeout {self.repository.git_timeout} {cmd}'
+        if not hook:
+            cmd = f'timeout {self.repository.git_timeout} {cmd}'
+
         result = process(cmd=cmd, cwd=self.path_repo, env=env, shell=True, timeout_sec=REPO_CLONE_TIMEOUT)
         self._log_file_write(f"COMMAND: {cmd}\n{result['stdout']}")
         if result['rc'] != 0:
@@ -203,10 +205,10 @@ class ExecuteRepository:
                 f"Got output: '{result['stdout']}'"
             )
 
-    def _run_repo_config_cmds(self, cmds: str, env: dict):
+    def _run_repo_hooks(self, cmds: str, env: dict):
         if is_set(cmds):
             for cmd in cmds.split(','):
-                self._repo_process(cmd=cmd, env=env)
+                self._repo_process(cmd=cmd, env=env, hook=True)
 
     def _git_origin_with_credentials(self) -> str:
         origin = self.repository.git_origin

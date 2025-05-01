@@ -204,6 +204,7 @@ def test_js_actions():
                 # #jobs-btn-exec-{id}, #jobs-btn-stop-{id}, #jobs-btn-logs-{id},
                 # #jobs-btn-edit-{id}, #jobs-btn-clone-{id}, #jobs-btn-delete-{id}
                 # #jobs-btn-exec-start, #jobs-btn-exec-close
+                # todo: test open logs-view (success, failure & exception handling) - check for valid content
             ],
             'tab-credentials': [
                 ['.creds-kind-user'],

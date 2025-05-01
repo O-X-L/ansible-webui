@@ -8,6 +8,12 @@ tbd
 
 ## Version 0
 
+### 0.8.7
+
+Fixes:
+
+* Git-Repository hooks [#31](https://github.com/O-X-L/ansible-webui/issues/31)
+
 ### 0.8.6
 
 Features:
@@ -19,6 +25,7 @@ Fixes:
 
 * Better handling for execution-errors in logs-view
 * MariaDB/MySQL connection-timeout fixes [#27](https://github.com/O-X-L/ansible-webui/issues/27)
+* Git-Repository hooks & log-files [#31](https://github.com/O-X-L/ansible-webui/issues/31)
 
 ----
 
