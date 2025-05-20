@@ -224,7 +224,7 @@
                             <TableBodyCell tdClass="{classListContent} max-lg:hidden">
                                 {ALERT_TYPE_CHOICES[item.alert_type]}
                             </TableBodyCell>
-                            <TableBodyCell tdClass={classListContent}>
+                            <TableBodyCell tdClass="{classListContent} action-btns">
                                 <div class="mb-2">
                                     <Button size="xs" on:click={() => (testAlert(item.id, alertKind))} disabled>
                                         <PlaySolid/>
@@ -232,20 +232,23 @@
                                     <Tooltip>{t('btn.execute')}</Tooltip>
                                 </div>
                                 <div>
-                                    <AlertForm bind:open={entryActions[alertKind][item.id].edit} action='edit' kind={alertKind}
-                                        existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                                     <Button size="xs" on:click={() => {entryActions[alertKind][item.id].edit = true}}><EditSolid/></Button>
                                     <Tooltip>{t('btn.edit')}</Tooltip>
                 
-                                    <AlertForm bind:open={entryActions[alertKind][item.id].clone} action='clone' kind={alertKind}
-                                        existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
                                     <Button size="xs" on:click={() => {entryActions[alertKind][item.id].clone = true}}><FileCloneSolid/></Button>
                                     <Tooltip>{t('btn.clone')}</Tooltip>
                 
                                     <Button size="xs" on:click={() => {deleteAlert(item.id, alertKind)}}><TrashBinSolid/></Button>
                                     <Tooltip>{t('btn.delete')}</Tooltip>
                                 </div>
-                            </TableBodyCell>
+    
+                                <AlertForm bind:open={entryActions[alertKind][item.id].edit} action='edit' kind={alertKind}
+                                    existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+
+                                <AlertForm bind:open={entryActions[alertKind][item.id].clone} action='clone' kind={alertKind}
+                                    existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+    
+                                </TableBodyCell>
                         </TableBodyRow>
                     </TableBody>
                     {/key}

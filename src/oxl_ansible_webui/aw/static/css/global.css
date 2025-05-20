@@ -39,3 +39,9 @@ html, body, #main {
 .aw-log-debug {
     color: #326fa7;
 }
+
+/* CUSTOM OVERRIDES */
+
+.action-btns button:not(.group *):not(.modal-btns *) {
+    padding: 4px 8px !important;
+}

@@ -187,13 +187,16 @@
                             <div>{t('jobs.info.duration')}: {exec.time_duration}</div>
                         </TableBodyCell>
                         <TableBodyCell tdClass={classListContent}>
-                            <div>{t('common.status')}: {exec.status_name}</div>
-                            <div>{t('logs.executed_by')}: {exec.user_name}</div>
-                            <div>{t('jobs.info.failed')}: 
-                                <button class="cursor-default">
-                                    <Radio class="inline-block" checked={exec.failed}></Radio>
-                                </button>
+                            <div>{t('common.status')}:
+                                {#if isJobExecutionActive(exec)}
+                                    <span class="text-blue-600">{t('jobs.info.running')}</span>
+                                {:else if exec.failed}
+                                    <span class="text-red-600">{t('jobs.info.failed')}</span>
+                                {:else}
+                                    <span class="text-green-600">{t('jobs.info.succeeded')}</span>
+                                {/if}
                             </div>
+                            <div>{t('logs.executed_by')}: {exec.user_name}</div>
                         </TableBodyCell>
                         <TableBodyCell tdClass="{classListContent} max-lg:hidden">
                             {#if exec.log_stdout_url}
@@ -209,26 +212,27 @@
                                 <div><a href="{exec.log_stderr_repo_url}">{t('logs.repo_error_log_file')}</a></div>
                             {/if}
                         </TableBodyCell>
-                        <TableBodyCell tdClass={classListContent}>
-                            <Button size="xs" on:click={() => {entryExecActions[exec.id] = true}} id="logs-job-{job.id}-show">
-                                <BookOpenSolid/>
-                            </Button>
-                            <Tooltip>{t('btn.logs')}</Tooltip>
-
-                            <Button size="xs" on:click={() => {stopJob(job.id, exec.id)}}
-                                disabled={!isJobExecutionActive(exec)} id="logs-job-{job.id}-stop">
-                                <StopSolid/>
-                            </Button>
-                            <Tooltip>{t('btn.stop')}</Tooltip>
-                            
-                            <!--
-                            <Button size="xs" on:click={() => {redirectJob(job.id)}}><CogSolid/></Button>
-                            <Tooltip>{t('jobs.job')}</Tooltip>
-                            -->
-
-                            <LogsView bind:open={entryExecActions[exec.id]}
-                            jobID={job.id} jobName={job.name} bind:exec={executionList[execIdx]} />
-
+                        <TableBodyCell tdClass="{classListContent} action-btns">
+                            <div class="mt-2">
+                                <Button size="xs" on:click={() => {entryExecActions[exec.id] = true}} id="logs-job-{job.id}-show">
+                                    <BookOpenSolid/>
+                                </Button>
+                                <Tooltip>{t('btn.logs')}</Tooltip>
+    
+                                <Button size="xs" on:click={() => {stopJob(job.id, exec.id)}}
+                                    disabled={!isJobExecutionActive(exec)} id="logs-job-{job.id}-stop">
+                                    <StopSolid/>
+                                </Button>
+                                <Tooltip>{t('btn.stop')}</Tooltip>
+                                
+                                <!--
+                                <Button size="xs" on:click={() => {redirectJob(job.id)}}><CogSolid/></Button>
+                                <Tooltip>{t('jobs.job')}</Tooltip>
+                                -->
+    
+                                <LogsView bind:open={entryExecActions[exec.id]}
+                                jobID={job.id} jobName={job.name} bind:exec={executionList[execIdx]} />
+                            </div>
                         </TableBodyCell>
                     </TableBodyRow>
                     {/each}

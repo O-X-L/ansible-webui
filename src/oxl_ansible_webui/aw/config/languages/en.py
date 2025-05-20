@@ -95,6 +95,7 @@ EN = {
     'jobs.info.next_run': 'Next Run',
     'jobs.info.last_run': 'Last Run',
     'jobs.info.duration': 'Duration',
+    'jobs.info.running': 'Running',
     'jobs.info.failed': 'Failed',
     'jobs.info.succeeded': 'Succeeded',
     'jobs.info.scheduled': 'Scheduled',

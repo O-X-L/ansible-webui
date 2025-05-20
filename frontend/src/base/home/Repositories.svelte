@@ -243,23 +243,32 @@
                                     {/if}
                                 </TableBodyCell>
                             {/if}
-                            <TableBodyCell tdClass={classListContent}>
+                            <TableBodyCell tdClass="{classListContent} action-btns">
                                 {#if repoKind == 'git'}
-                                    <div class="mb-2">
-                                        <Button size="xs" on:click={() => (downloadGitRepo(item.id))} disabled={isDownloadActive(item)}>
+                                    <div class="mt-4 mb-2">
+                                        <Button size="xs" on:click={() => (downloadGitRepo(item.id))} disabled={isDownloadActive(item)}
+                                            id="repos-btn-dl-{item.id}">
                                             <DownloadSolid/>
                                         </Button>
                                         <Tooltip>{t('btn.download')}</Tooltip>
                                     </div>
+                                {:else}
+                                <div class="mt-4 mb-2"></div>
                                 {/if}
                                 <div>
-                                    <Button size="xs" on:click={() => {entryActions[item.id].edit = true}}><EditSolid/></Button>
+                                    <Button size="xs" on:click={() => {entryActions[item.id].edit = true}} id="repos-btn-edit-{item.id}">
+                                        <EditSolid/>
+                                    </Button>
                                     <Tooltip>{t('btn.edit')}</Tooltip>
                 
-                                    <Button size="xs" on:click={() => {entryActions[item.id].clone = true}}><FileCloneSolid/></Button>
+                                    <Button size="xs" on:click={() => {entryActions[item.id].clone = true}} id="repos-btn-clone-{item.id}">
+                                        <FileCloneSolid/>
+                                    </Button>
                                     <Tooltip>{t('btn.clone')}</Tooltip>
                 
-                                    <Button size="xs" on:click={() => {deleteRepository(item.id)}}><TrashBinSolid/></Button>
+                                    <Button size="xs" on:click={() => {deleteRepository(item.id)}} id="repos-btn-delete-{item.id}">
+                                        <TrashBinSolid/>
+                                    </Button>
                                     <Tooltip>{t('btn.delete')}</Tooltip>
                                 </div>
 

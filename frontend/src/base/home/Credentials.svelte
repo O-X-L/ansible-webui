@@ -263,7 +263,7 @@
                                     -
                                 {/if}
                             </TableBodyCell>
-                            <TableBodyCell tdClass={classListContent}>
+                            <TableBodyCell tdClass="{classListContent} action-btns">
                                 <Button size="xs" on:click={() => {entryActions[credsKind][item.id].edit = true}}><EditSolid/></Button>
                                 <Tooltip>{t('btn.edit')}</Tooltip>
             

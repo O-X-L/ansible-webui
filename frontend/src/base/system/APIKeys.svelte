@@ -186,7 +186,7 @@
         <TableBodyRow slot="row" let:item>
             <TableBodyCell tdClass="{classListContent} max-sm:hidden">{item.token}</TableBodyCell>
             <TableBodyCell tdClass={classListContent}>{item.comment ? item.comment : '-'}</TableBodyCell>
-            <TableBodyCell tdClass={classListContent}>
+            <TableBodyCell tdClass="{classListContent} action-btns">
                 <Button size="xs" on:click={() => {deleteAPIKey(item.token)}}><TrashBinSolid/></Button>
                 <Tooltip>{t('btn.delete')}</Tooltip>
             </TableBodyCell>

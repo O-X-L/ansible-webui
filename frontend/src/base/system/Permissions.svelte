@@ -180,7 +180,7 @@
             <TableBodyCell tdClass="{classListContent} max-sm:hidden">
                 {getPermittedSummary(item).join(' & ')}
             </TableBodyCell>
-            <TableBodyCell tdClass={classListContent}>
+            <TableBodyCell tdClass="{classListContent} action-btns">
                 <Button size="xs" on:click={() => {entryActions[item.id].edit = true}}><EditSolid/></Button>
                 <Tooltip>{t('btn.edit')}</Tooltip>
 

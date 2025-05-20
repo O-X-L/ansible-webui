@@ -372,8 +372,8 @@
                     <span class="sr-only">{t('jobs.info.execution')}</span>
                 </button>
             </TableBodyCell>
-            <TableBodyCell tdClass={classListContent}>
-                <div>
+            <TableBodyCell tdClass="{classListContent} action-btns">
+                <div class="mt-4">
                     <Button size="xs" on:click={() => {
                         entryActions[item.id].exec = true; updateExecutionPrompts(item);
                         }} disabled={isJobActive(item)} id="jobs-btn-exec-{item.id}">
