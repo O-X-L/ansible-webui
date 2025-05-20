@@ -231,7 +231,7 @@
                                 -->
     
                                 <LogsView bind:open={entryExecActions[exec.id]}
-                                jobID={job.id} jobName={job.name} bind:exec={executionList[execIdx]} />
+                                    jobID={job.id} jobName={job.name} bind:exec={executionList[execIdx]} />
                             </div>
                         </TableBodyCell>
                     </TableBodyRow>

@@ -248,7 +248,7 @@
     <div id={endDiv} class="w-0 h-0"></div>
 
     <div class="fixed bottom-10 left-[50%] translate-x-[-50%]">
-        <div class="{classCenterChildDiv} opacity-30 hover:opacity-95">
+        <div class="{classCenterChildDiv} opacity-30 hover:opacity-95 modal-btns">
             <Button id="logs-btn-close" on:click={() => (open = false)}>
                 <CloseCircleSolid/>
             </Button>
