@@ -109,7 +109,7 @@
     function setFormInfos(j: any) {
         formInfos = j;
         for (let [k, v] of Object.entries(formInfos.defaults)) {
-            if (form[k]) {
+            if (k in form) {
                 form[k].value = v;
             }
         }
@@ -135,7 +135,7 @@
         }
         settingsRead = j;
         for (let [k, v] of Object.entries(settingsRead.settings)) {
-            if (form[k]) {
+            if (k in form) {
                 form[k].value = v;
             }
         }

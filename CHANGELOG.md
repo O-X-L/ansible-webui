@@ -8,6 +8,12 @@ tbd
 
 ## Version 0
 
+### 0.8.8
+
+Fixes:
+
+* Job-Edit execution-prompt-toggles always reset [#34](https://github.com/O-X-L/ansible-webui/issues/34)
+
 ### 0.8.7
 
 Fixes:

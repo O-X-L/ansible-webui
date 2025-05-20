@@ -116,7 +116,7 @@
         formInfos = j;
         if (action == 'add') {
             for (let [k, v] of Object.entries(formInfos.defaults)) {
-                if (form[k]) {
+                if (k in form) {
                     form[k].value = v;
                 }
             }
@@ -130,7 +130,7 @@
             existing.name = `${existing.name} - Copy`;
         }
         for (let [k, v] of Object.entries(existing)) {
-            if (form[k]) {
+            if (k in form) {
                 form[k].value = v;
             }
         }
@@ -274,15 +274,13 @@
     let executionPromptId = 0;
 
     function execPromptsDecode() {
-        if (!form.execution_prompts_json.value) {
+        if (!existing.execution_prompts_json) {
             return;
         }
-        let promptsJSON: executionPromptsType = JSON.parse(form.execution_prompts_json.value);
+        let promptsJSON: executionPromptsType = JSON.parse(existing.execution_prompts_json);
 
         for (let k of Object.keys(executionPromptsSimple)) {
-            if (promptsJSON.fields.includes(k)) {
-                executionPromptsSimple[k] = true;
-            }
+            executionPromptsSimple[k] = promptsJSON.fields.includes(k);
         }
 
         for (let prompt of promptsJSON.vars) {

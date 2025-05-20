@@ -118,7 +118,7 @@
         formInfos = j;
         if (action == 'add') {
             for (let [k, v] of Object.entries(formInfos.defaults)) {
-                if (form[k]) {
+                if (k in form) {
                     form[k].value = v;
                 }
             }
@@ -132,7 +132,7 @@
             existing.name = `${existing.name} - Copy`;
         }
         for (let [k, v] of Object.entries(existing)) {
-            if (form[k]) {
+            if (k in form) {
                 form[k].value = v;
             }
         }
