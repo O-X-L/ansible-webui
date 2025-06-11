@@ -81,7 +81,7 @@
 <div class={classTab}>
   <Tabs tabStyle="underline" contentClass={classTabDiv} defaultClass={classTabButtonDiv}>
     <TabItem bind:open={openTab.dashboard} divClass="h-full" defaultClass="{classTabButton} tab-dashboard">
-      <div slot="title" class="flex items-center sm:gap-2">
+      <div slot="title" class={classTabTitle}>
         <GridSolid size="md" /> {t('home.dashboard')}
       </div>
       <Dashboard bind:open={openTab.dashboard}/>

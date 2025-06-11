@@ -4,6 +4,7 @@ FROM oxlorg/ansible-webui-unprivileged:${AW_VERSION}
 ARG AW_USER=aw
 
 USER root
-RUN apk add --update --no-cache py3-mysqlclient
+RUN apk add --update --no-cache gcc musl-dev mariadb-connector-c mariadb-dev
+RUN pip install --no-cache-dir "oxl-ansible-webui[mysql] @ git+https://github.com/O-X-L/ansible-webui.git@${AW_VERSION}"
 
 USER ${AW_USER}
