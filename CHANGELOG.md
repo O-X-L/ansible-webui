@@ -10,6 +10,10 @@ tbd
 
 ### 0.8.9
 
+Fixes:
+
+* Git-Origin not accepting long URLs (100 => 500 characters)
+
 ----
 
 ### 0.8.8
