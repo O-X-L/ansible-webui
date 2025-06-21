@@ -45,7 +45,7 @@ class Repository(BaseModel):
 
     static_path = models.TextField(max_length=500, **DEFAULT_NONE)
 
-    git_origin = models.CharField(max_length=100, **DEFAULT_NONE)
+    git_origin = models.CharField(max_length=500, **DEFAULT_NONE)
     git_branch = models.CharField(max_length=100, **DEFAULT_NONE)
     git_isolate = models.BooleanField(choices=CHOICES_BOOL, default=False)
     git_lfs = models.BooleanField(choices=CHOICES_BOOL, default=False)
