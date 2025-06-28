@@ -160,12 +160,15 @@
         files: string[],
     }
     const classFsBrowse = 'bg-gray-100 dark:bg-gray-600 text-gray-800 p-2 dark:text-gray-50 text-sm ml-5 mt-1 mb-3 max-h-80 overflow-y-scroll rounded-b';
-    const classFsBrowseItem = 'block hover:bg-primary-200 dark:hover:bg-primary-600 w-full text-left py-1 round';
+    const classFsBrowseRow = 'block w-full text-left py-1 round';
+    const classFsBrowseItem = `${classFsBrowseRow} hover:bg-primary-200 dark:hover:bg-primary-600`;
+
     const fsBrowseNone = {dirs: [], files: []};
     let fsBrowseActive: string = $state('');
     let fsBrowseChoices: browseResponse = $state(fsBrowseNone);
 
     function fsBrowseClick(f: string) {
+        fsBrowseClear();
         if (fsBrowseActive == f) {
             return;
         }
@@ -410,6 +413,7 @@
             componentRoot.removeEventListener('keyup', handleKeyUp);
             componentRoot.removeEventListener('keydown', handleKeyDown);
         }
+        fsBrowseClear();
     });
 
     $effect(() => {
@@ -457,18 +461,20 @@
                             <div class={classFsBrowse}>
                                 {#each fsBrowseChoices.files as c}
                                     <button type="button" class={classFsBrowseItem}
-                                    onclick={(e) => {fsBrowseSelect('playbook_file', c)}}>
+                                        onclick={(e) => {fsBrowseSelect('playbook_file', c)}}>
                                         <FileSolid class="inline-block" /> {c}
                                     </button>
                                 {/each}
                                 {#each fsBrowseChoices.dirs as c}
                                     <button type="button" class={classFsBrowseItem}
-                                    onclick={(e) => {fsBrowseSelect('playbook_file', c)}}>
+                                        onclick={(e) => {fsBrowseSelect('playbook_file', c)}}>
                                         <FolderSolid class="inline-block" /> {c}
                                     </button>
                                 {/each}
                                 {#if !fsBrowseChoices.dirs.length && !fsBrowseChoices.files.length}
-                                    <div class={classSpinnerDiv}><Spinner size="sm"/></div>
+                                    <div class="{classFsBrowseRow} cursor-wait">
+                                        - {t('jobs.form.file_browse.empty')} -
+                                    </div>
                                 {/if}
                             </div>
                         {/if}
@@ -484,18 +490,20 @@
                             <div class={classFsBrowse}>
                                 {#each fsBrowseChoices.files as c}
                                     <button type="button" class={classFsBrowseItem}
-                                    onclick={(e) => {fsBrowseSelect('inventory_file', c)}}>
+                                        onclick={(e) => {fsBrowseSelect('inventory_file', c)}}>
                                         <FileSolid class="inline-block" /> {c}
                                     </button>
                                 {/each}
                                 {#each fsBrowseChoices.dirs as c}
                                     <button type="button" class={classFsBrowseItem}
-                                    onclick={(e) => {fsBrowseSelect('inventory_file', c)}}>
+                                        onclick={(e) => {fsBrowseSelect('inventory_file', c)}}>
                                         <FolderSolid class="inline-block" /> {c}
                                     </button>
                                 {/each}
                                 {#if !fsBrowseChoices.dirs.length && !fsBrowseChoices.files.length}
-                                    <Spinner size="sm"/>
+                                    <div class="{classFsBrowseRow} cursor-wait">
+                                        - {t('jobs.form.file_browse.empty')} -
+                                    </div>
                                 {/if}
                             </div>
                         {/if}

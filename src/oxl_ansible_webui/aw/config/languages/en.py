@@ -117,6 +117,7 @@ EN = {
     'jobs.form.repository': 'Repository',
     'jobs.form.playbook_file': 'Playbook File',
     'jobs.form.inventory_file': 'Inventory File',
+    'jobs.form.file_browse.empty': 'Empty',
     'jobs.form.schedule': 'Schedule',
     'jobs.form.cron': 'Schedule Cron',
     'jobs.form.enabled': 'Schedule Enabled',
