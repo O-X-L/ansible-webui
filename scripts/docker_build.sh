@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# NOTE: remove all existing images: "docker rmi -f $(docker images -aq)"
+
 set -e
 
 if [ -z "$1" ]

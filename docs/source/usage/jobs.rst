@@ -182,7 +182,7 @@ Execution Prompts
 Metadata
 ********
 
-AW will pass some meta-data about it's execution-context to Ansible:
+AW will pass some meta-data about it's execution-context to Ansible via environmental-variables:
 
 * :code:`AW_OWNER_USER` => Username of the job owner
 * :code:`AW_OWNER_EMAIL` => E-Mail Address of the job owner

@@ -39,6 +39,9 @@ then
 fi
 
 echo ''
+read -r -p "Release version ${VERSION} as latest? [y/N] " -n 1
+
+echo ''
 echo "### RELEASING IMAGES WITH TAG ${VERSION} ###"
 docker push "$image"
 docker push "$image_unpriv"
@@ -46,8 +49,6 @@ docker push "$image_aws"
 docker push "$image_mysql"
 docker push "$image_psql"
 
-echo ''
-read -r -p "Release version ${VERSION} as latest? [y/N] " -n 1
 if [[ "$REPLY" =~ ^[Yy]$ ]]
 then
   if ! docker image ls | grep "$IMAGE_REPO" | grep -q 'latest'
