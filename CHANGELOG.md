@@ -13,6 +13,7 @@ tbd
 Fixes:
 
 * Git-Origin not accepting long URLs (100 => 500 characters)
+* Verbosity missing from Execution-Dialogue [#47](https://github.com/O-X-L/ansible-webui/issues/47)
 
 ----
 

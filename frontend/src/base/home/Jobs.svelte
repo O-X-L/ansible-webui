@@ -17,14 +17,14 @@
     import JobForm from './forms/Job.svelte';
     import { tq } from '../../util/translate.js';
     import { classModalLabel } from '../Style.js';
-    import { type formChoiceType } from '../Types.js';
-    import { apiEdit, apiGet } from '../../util/api.js';
     import { choicesFromArray } from '../../util/form.js';
     import { redirectTo, isSet } from '../../util/main.js';
     import CredentialsForm from './forms/Credentials.svelte';
+    import { apiEdit, apiGet, cacheKey } from '../../util/api.js';
     import { JOB_EXEC_STATI_ACTIVE, PARAM_SEARCH } from '../Config.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
-    import { type jobType, type executionPromptsType} from './Types.js';
+    import { type jobType, type executionPromptsType,} from './Types.js';
+    import { type formChoiceType, type formInfoType } from '../Types.js';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
         classPopoverColumn2Text, classPopoverColumn2Div, classCenterChildDiv, classSpinnerDiv,
@@ -60,6 +60,7 @@
         credentials: string|null,  // credential_user / credential_global / credentials_tmp
         credentials_req: boolean,
         comment: string|null,
+        verbosity: number,
     }
     interface executionPromptsFullType {
         config: executionPromptsType,
@@ -75,6 +76,7 @@
         user: credentialType[],
     }
 
+    let formInfos: formInfoType = $state({defaults: {}, choices: {}});
     const executionPromptsDefault: executionPromptsFullType = {
         config: {fields: [], vars: []},
         field_values: {
@@ -93,6 +95,10 @@
 
     function t(code: string) : string {
       return tq($share, code);
+    }
+
+    function setFormInfos(j: any) {
+        formInfos = j;
     }
 
     function isJobActive(job: jobType) : boolean {
@@ -221,6 +227,9 @@
         if (job.limit) {
             executionPrompts.field_values.limit = job.limit;
         }
+        if (job.verbosity) {
+            executionPrompts.field_values.verbosity = job.verbosity;
+        }
         if (job.environment_vars) {
             executionPrompts.field_values.environment_vars = job.environment_vars;
         }
@@ -315,6 +324,7 @@
     onMount(() => {
         buildUpdateJobList();
         apiGet('credentials', loadCredentialInfos);
+        apiGet(`frontend/form/job?${cacheKey($share)}`, setFormInfos);
 
         // todo: refresh data over websockets
         clearInterval(updateLoop);
@@ -626,6 +636,11 @@
                 {#if executionPrompts.config.fields.includes('comment')}
                     <Label for="job_prompt_{job.id}_cmt" class={classModalLabel}>{t('common.comment')}</Label>
                     <Input id="job_prompt_{job.id}_cmt" bind:value={executionPrompts.field_values.comment} />
+                {/if}
+                {#if executionPrompts.config.fields.includes('verbosity')}
+                    <Label for="job_prompt_{job.id}_verb" class={classModalLabel}>{t('jobs.form.verbosity')}</Label>
+                    <Select id="job_prompt_{job.id}_verb" items={formInfos.choices.verbosity}
+                        bind:value={executionPrompts.field_values.verbosity} />
                 {/if}
                 {#each executionPrompts.config.vars as v, i (v.name)}
                     {#if v.kind == 'text'}
