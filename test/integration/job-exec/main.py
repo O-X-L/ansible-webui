@@ -245,11 +245,26 @@ def test_repo_git(jid: int = 4):
     # todo: execute with isolation
 
 
+def test_execution_cleanup(jid: int = 1, exec_id: int = 1):
+    print('EXEC CLEANUP | DELETE')
+    _api_request(f'job/{jid}/{exec_id}/cleanup', 'delete')
+
+    print('EXEC CLEANUP | CHECK')
+    sleep(1)
+    res = _api_request(f'job/{jid}?executions=true', 'get')
+    assert 'executions' in res
+    e = res['executions']
+    print(' =>', e)
+    assert len(e) == 0
+
+
+
 def main():
     test_simple()
     test_params()
     test_creds()
     test_repo_git()
+    test_execution_cleanup()
 
 
 if __name__ == '__main__':

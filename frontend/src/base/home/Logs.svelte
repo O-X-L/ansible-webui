@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
 
-    import { BookOpenSolid, StopSolid } from 'flowbite-svelte-icons';
+    import { BookOpenSolid, StopSolid, TrashBinSolid } from 'flowbite-svelte-icons';
     import {
         Spinner, Accordion, AccordionItem, Table, TableBody, TableBodyCell, TableBodyRow,
         TableHead, TableHeadCell, Input, Button, Tooltip, Label,
@@ -55,6 +55,14 @@
         }
         apiSuccessMsg = 'jobs.action.stop';
         apiEdit('delete', `job/${jobId}/${executionId}`, null, apiResponseHandler.handleRes);
+    }
+
+    function cleanupJobExecution(jobId: number, executionId: number) {
+        if (!jobId || !executionId) {
+            return;
+        }
+        apiSuccessMsg = 'jobs.action.exec_delete';
+        apiEdit('delete', `job/${jobId}/${executionId}/cleanup`, null, apiResponseHandler.handleRes);
     }
 
     function redirectJob(jobId: number) {
@@ -193,7 +201,7 @@
             {:else}
             <Table striped={true} id="logs-{ALL_JOBS_ID}" shadow>
                 <TableHead theadClass={classListHeader}>
-                    <TableHeadCell class="max-sm:hidden">ID</TableHeadCell>
+                    <TableHeadCell class="max-sm:hidden">#</TableHeadCell>
                     <TableHeadCell>{t('common.name')}</TableHeadCell>
                     <TableHeadCell class="max-sm:hidden">{t('logs.time')}</TableHeadCell>
                     <TableHeadCell>{t('common.status')}</TableHeadCell>
@@ -242,17 +250,23 @@
                         </TableBodyCell>
                         <TableBodyCell tdClass="{classListContent} action-btns">
                             <div class="mt-2">
-                                <Button size="xs" on:click={() => {entryExecActions[exec.id] = true}} id="logs-job-{exec.job}-show">
+                                <Button size="xs" on:click={() => {entryExecActions[exec.id] = true}} id="logs-job-{exec.job}-{exec.id}-show">
                                     <BookOpenSolid/>
                                 </Button>
                                 <Tooltip>{t('btn.logs')}</Tooltip>
     
                                 <Button size="xs" on:click={() => {stopJob(exec.job, exec.id)}}
-                                    disabled={!isJobExecutionActive(exec)} id="logs-job-{exec.job}-stop">
+                                    disabled={!isJobExecutionActive(exec)} id="logs-job-{exec.job}-{exec.id}-stop">
                                     <StopSolid/>
                                 </Button>
                                 <Tooltip>{t('btn.stop')}</Tooltip>
-                                
+
+                                <Button size="xs" on:click={() => {cleanupJobExecution(exec.job, exec.id)}}
+                                    disabled={isJobExecutionActive(exec)} id="logs-job-{exec.job}-{exec.id}-cleanup">
+                                    <TrashBinSolid/>
+                                </Button>
+                                <Tooltip>{t('btn.delete')}</Tooltip>
+
                                 <!--
                                 <Button size="xs" on:click={() => {redirectJob(job.id)}}><CogSolid/></Button>
                                 <Tooltip>{t('jobs.job')}</Tooltip>
@@ -278,7 +292,7 @@
             {:else}
             <Table striped={true} id="logs-{job.id}" shadow>
                 <TableHead theadClass={classListHeader}>
-                    <TableHeadCell class="max-sm:hidden">ID</TableHeadCell>
+                    <TableHeadCell class="max-sm:hidden">#</TableHeadCell>
                     <TableHeadCell class="max-sm:hidden">{t('logs.time')}</TableHeadCell>
                     <TableHeadCell>{t('common.status')}</TableHeadCell>
                     <TableHeadCell class="max-lg:hidden">{t('btn.download')}</TableHeadCell>
@@ -323,17 +337,23 @@
                         </TableBodyCell>
                         <TableBodyCell tdClass="{classListContent} action-btns">
                             <div class="mt-2">
-                                <Button size="xs" on:click={() => {entryExecActions[exec.id] = true}} id="logs-job-{job.id}-show">
+                                <Button size="xs" on:click={() => {entryExecActions[exec.id] = true}} id="logs-job-{job.id}-{exec.id}-show">
                                     <BookOpenSolid/>
                                 </Button>
                                 <Tooltip>{t('btn.logs')}</Tooltip>
     
                                 <Button size="xs" on:click={() => {stopJob(job.id, exec.id)}}
-                                    disabled={!isJobExecutionActive(exec)} id="logs-job-{job.id}-stop">
+                                    disabled={!isJobExecutionActive(exec)} id="logs-job-{job.id}-{exec.id}-stop">
                                     <StopSolid/>
                                 </Button>
                                 <Tooltip>{t('btn.stop')}</Tooltip>
-                                
+
+                                <Button size="xs" on:click={() => {cleanupJobExecution(job.id, exec.id)}}
+                                    disabled={isJobExecutionActive(exec)} id="logs-job-{job.id}-{exec.id}-cleanup">
+                                    <TrashBinSolid/>
+                                </Button>
+                                <Tooltip>{t('btn.delete')}</Tooltip>
+
                                 <!--
                                 <Button size="xs" on:click={() => {redirectJob(job.id)}}><CogSolid/></Button>
                                 <Tooltip>{t('jobs.job')}</Tooltip>

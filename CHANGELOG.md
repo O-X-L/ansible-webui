@@ -19,6 +19,7 @@ Features:
 
 * Add overview over all jobs to logs-view
 * Enable users to set the number of execution-logs to fetch
+* Enable users to delete existing job-executions and their logs
 
 ----
 

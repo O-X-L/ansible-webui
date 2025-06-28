@@ -112,6 +112,7 @@ EN = {
     'jobs.action.delete': 'Job deleted',
     'jobs.action.create': 'Job created',
     'jobs.action.update': 'Job updated',
+    'jobs.action.exec_delete': 'Execution deleted',
     'jobs.form.name': 'Name',
     'jobs.form.repository': 'Repository',
     'jobs.form.playbook_file': 'Playbook File',

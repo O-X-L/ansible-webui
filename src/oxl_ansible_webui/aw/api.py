@@ -3,7 +3,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from aw.api_endpoints.key import APIKey, APIKeyItem
 from aw.api_endpoints.job import APIJob, APIJobItem, APIJobExecutionItem, APIJobExecutionLogs, \
-    APIJobExecutionLogFile, APIJobExecution, APIJobExecutionSingleJob
+    APIJobExecutionLogFile, APIJobExecution, APIJobExecutionSingleJob, APIJobExecutionCleanup
 from aw.api_endpoints.permission import APIPermission, APIPermissionItem
 from aw.api_endpoints.credentials import APIJobCredentials, APIJobSharedCredentials, \
     APIJobSharedCredentialsItem, APIJobUserCredentialsItem, APIJobUserCredentials, APIJobTMPCredentials
@@ -21,6 +21,7 @@ from aw.api_endpoints.stats import APIStatsJobs
 urlpatterns_api = [
     path('api/key/<str:token>', APIKeyItem.as_view()),
     path('api/key', APIKey.as_view()),
+    path('api/job/<int:job_id>/<int:exec_id>/cleanup', APIJobExecutionCleanup.as_view()),
     path('api/job/<int:job_id>/<int:exec_id>/log/<int:line_start>', APIJobExecutionLogs.as_view()),
     path('api/job/<int:job_id>/<int:exec_id>/log', APIJobExecutionLogFile.as_view()),
     path('api/job/<int:job_id>/<int:exec_id>', APIJobExecutionItem.as_view()),

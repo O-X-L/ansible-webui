@@ -1,3 +1,6 @@
+from pathlib import Path
+from os import remove as remove_file
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
 from rest_framework.views import APIView
@@ -378,6 +381,53 @@ class APIJobExecutionItem(APIView):
 
                 update_status(execution, 'Stopping')
                 return Response(data={'msg': f"Job execution '{job.name}' stopping", 'id': exec_id}, status=200)
+
+        except ObjectDoesNotExist:
+            pass
+
+        return Response(data={'error': f"Job with ID '{job_id}' or execution does not exist"}, status=404)
+
+
+class APIJobExecutionCleanup(APIView):
+    http_method_names = ['delete']
+    serializer_class = GenericErrorResponse
+    permission_classes = API_PERMISSION
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(JobReadResponse, description='Job execution deleted'),
+            400: OpenApiResponse(JobReadResponse, description='Cannot delete active execution'),
+            403: OpenApiResponse(JobReadResponse, description='Not privileged to remove the job'),
+            404: OpenApiResponse(JobReadResponse, description='Job or execution does not exist'),
+        },
+        summary='Cleanup a job execution and its logs.',
+        operation_id='job_exec_delete'
+    )
+    def delete(self, request, job_id: int, exec_id: int):
+        user = get_api_user(request)
+        try:
+            job, execution = _find_job_and_execution(job_id, exec_id)
+
+            if job is not None and execution is not None:
+                if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_DELETE):
+                    return Response(data={
+                        'error': f"Not privileged to delete executions of job '{job.name}'"},
+                        status=403,
+                    )
+
+                if execution.is_active:
+                    return Response(data={'error': 'Cannot delete active execution!'}, status=400)
+
+                for log_file in [
+                    execution.log_stdout, execution.log_stderr,
+                    execution.log_stdout_repo, execution.log_stderr_repo
+                ]:
+                    if is_set(log_file) and Path(log_file).is_file():
+                        remove_file(log_file)
+
+                execution.delete()
+                return Response(data={'msg': f"Job execution of job '{job.name}' deleted", 'id': exec_id}, status=200)
 
         except ObjectDoesNotExist:
             pass
