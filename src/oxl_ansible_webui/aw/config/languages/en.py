@@ -262,6 +262,8 @@ EN = {
                                            '(pull) the repository',
 
     # logs
+    'logs.all_jobs': 'All Jobs',
+    'logs.exec_count': 'Number of Executions',
     'logs.job_logs': 'Logs of job',
     'logs.time': 'Time',
     'logs.time_start': 'Start time',

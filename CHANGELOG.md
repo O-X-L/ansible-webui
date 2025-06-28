@@ -15,6 +15,11 @@ Fixes:
 * Git-Origin not accepting long URLs (100 => 500 characters)
 * Verbosity missing from Execution-Dialogue [#47](https://github.com/O-X-L/ansible-webui/issues/47)
 
+Features:
+
+* Add overview over all jobs to logs-view
+* Enable users to set the number of execution-logs to fetch
+
 ----
 
 ### 0.8.8

@@ -4,7 +4,7 @@
     import { BookOpenSolid, StopSolid } from 'flowbite-svelte-icons';
     import {
         Spinner, Accordion, AccordionItem, Table, TableBody, TableBodyCell, TableBodyRow,
-        TableHead, TableHeadCell, Radio, Button, Tooltip,
+        TableHead, TableHeadCell, Input, Button, Tooltip, Label,
     } from 'flowbite-svelte';
 
     import { share } from '../Share.js';
@@ -22,10 +22,12 @@
 
     let { open = $bindable(false) } = $props();
 
+    const ALL_JOBS_ID = 0;
+
     let apiResponseHandler: APIResponseHandler = $state();
     let jobList: jobType[] = $state([]);
     let executionList: executionType[] = $state([]);
-    let entryJobActions = $state({});
+    let entryJobActions = $state({ALL_JOBS_ID: false});
     let entryExecActions = $state({});
     let apiErrorMsg = $state('');
     let apiSuccessMsg = $state('');
@@ -109,7 +111,14 @@
             // tab in background
             return;
         }
+        if (openJob == ALL_JOBS_ID) {
+            return buildUpdateExecutionListAllJobs();
+        }
         apiGet(`job_exec/${openJob}?execution_count=${executionCount}&hash=${apiDataHashExecs}`, loadExecutionList);
+    }
+
+    function buildUpdateExecutionListAllJobs() {
+        apiGet(`job_exec?execution_count=${executionCount}&hash=${apiDataHashExecs}`, loadExecutionList);
     }
 
     function openLogsByURL() {
@@ -132,6 +141,9 @@
     function updateOpenJob(actions: any = ''){
         for (let [j, v] of Object.entries(actions)) {
             if (v) {
+                if (j != openJob) {
+                    executionList = [];
+                }
                 openJob = j;
                 return;
             }
@@ -163,7 +175,100 @@
 
 <APIResponseHandler bind:this={apiResponseHandler} bind:errorMsg={apiErrorMsg} bind:successMsg={apiSuccessMsg} />
 
+<div class="flex justify-between">
+    <div></div>
+    <div class="mr-5 mb-10">
+        <Label>{t('logs.exec_count')}</Label>
+        <Input type="number" bind:value={executionCount}
+            on:input={() => {executionCount = Math.max(Math.min(executionCount, 1000), 1)}} />
+    </div>
+</div>
+
 <Accordion>
+    <AccordionItem bind:open={entryJobActions[ALL_JOBS_ID]} defaultClass="{classSpoilerItem} logs-job-{ALL_JOBS_ID}"
+        paddingDefault={classSpoilerPad}>
+            <span slot="header">{t('logs.all_jobs')}</span>
+            {#if !executionList.length}
+                <div class={classSpinnerDiv}><Spinner/></div>
+            {:else}
+            <Table striped={true} id="logs-{ALL_JOBS_ID}" shadow>
+                <TableHead theadClass={classListHeader}>
+                    <TableHeadCell class="max-sm:hidden">ID</TableHeadCell>
+                    <TableHeadCell>{t('common.name')}</TableHeadCell>
+                    <TableHeadCell class="max-sm:hidden">{t('logs.time')}</TableHeadCell>
+                    <TableHeadCell>{t('common.status')}</TableHeadCell>
+                    <TableHeadCell class="max-lg:hidden">{t('btn.download')}</TableHeadCell>
+                    <TableHeadCell>{t('common.actions')}</TableHeadCell>
+                </TableHead>
+                <TableBody tableBodyClass="divide-y">
+                    {#each executionList as exec, execIdx (exec.id)}
+                    <TableBodyRow>
+                        <TableBodyCell tdClass="{classListContent} text-center max-sm:hidden">
+                            {exec.id}
+                        </TableBodyCell>
+                        <TableBodyCell tdClass="{classListContent} text-center">
+                            {exec.job_name}
+                        </TableBodyCell>
+                        <TableBodyCell tdClass="{classListContent} max-sm:hidden">
+                            <div>{t('logs.time_start_short')}: {exec.time_start}</div>
+                            <div>{t('logs.time_fin_short')}: {exec.time_fin}</div>
+                            <div>{t('jobs.info.duration')}: {exec.time_duration}</div>
+                        </TableBodyCell>
+                        <TableBodyCell tdClass={classListContent}>
+                            <div>{t('common.status')}:
+                                {#if isJobExecutionActive(exec)}
+                                    <span class="text-blue-600">{t('jobs.info.running')}</span>
+                                {:else if exec.failed}
+                                    <span class="text-red-600">{t('jobs.info.failed')}</span>
+                                {:else}
+                                    <span class="text-green-600">{t('jobs.info.succeeded')}</span>
+                                {/if}
+                            </div>
+                            <div>{t('logs.executed_by')}: {exec.user_name}</div>
+                        </TableBodyCell>
+                        <TableBodyCell tdClass="{classListContent} max-lg:hidden">
+                            {#if exec.log_stdout_url}
+                                <div><a href="{exec.log_stdout_url}">{t('logs.exec_log_file')}</a></div>
+                            {/if}
+                            {#if exec.log_stderr_url}
+                                <div><a href="{exec.log_stderr_url}">{t('logs.exec_error_log_file')}</a></div>
+                            {/if}
+                            {#if exec.log_stdout_repo_url}
+                                <div><a href="{exec.log_stdout_repo_url}">{t('logs.repo_log_file')}</a></div>
+                            {/if}
+                            {#if exec.log_stderr_repo_url}
+                                <div><a href="{exec.log_stderr_repo_url}">{t('logs.repo_error_log_file')}</a></div>
+                            {/if}
+                        </TableBodyCell>
+                        <TableBodyCell tdClass="{classListContent} action-btns">
+                            <div class="mt-2">
+                                <Button size="xs" on:click={() => {entryExecActions[exec.id] = true}} id="logs-job-{exec.job}-show">
+                                    <BookOpenSolid/>
+                                </Button>
+                                <Tooltip>{t('btn.logs')}</Tooltip>
+    
+                                <Button size="xs" on:click={() => {stopJob(exec.job, exec.id)}}
+                                    disabled={!isJobExecutionActive(exec)} id="logs-job-{exec.job}-stop">
+                                    <StopSolid/>
+                                </Button>
+                                <Tooltip>{t('btn.stop')}</Tooltip>
+                                
+                                <!--
+                                <Button size="xs" on:click={() => {redirectJob(job.id)}}><CogSolid/></Button>
+                                <Tooltip>{t('jobs.job')}</Tooltip>
+                                -->
+    
+                                <LogsView bind:open={entryExecActions[exec.id]}
+                                    jobID={exec.job} jobName={exec.job_name} bind:exec={executionList[execIdx]} />
+                            </div>
+                        </TableBodyCell>
+                    </TableBodyRow>
+                    {/each}
+                </TableBody>
+            </Table>
+            {/if}
+        </AccordionItem>
+
     {#each jobList as job (job.id)}
         <AccordionItem bind:open={entryJobActions[job.id]} defaultClass="{classSpoilerItem} logs-job-{job.id}"
             paddingDefault={classSpoilerPad}>
@@ -173,6 +278,7 @@
             {:else}
             <Table striped={true} id="logs-{job.id}" shadow>
                 <TableHead theadClass={classListHeader}>
+                    <TableHeadCell class="max-sm:hidden">ID</TableHeadCell>
                     <TableHeadCell class="max-sm:hidden">{t('logs.time')}</TableHeadCell>
                     <TableHeadCell>{t('common.status')}</TableHeadCell>
                     <TableHeadCell class="max-lg:hidden">{t('btn.download')}</TableHeadCell>
@@ -181,6 +287,9 @@
                 <TableBody tableBodyClass="divide-y">
                     {#each executionList as exec, execIdx (exec.id)}
                     <TableBodyRow>
+                        <TableBodyCell tdClass="{classListContent} text-center max-sm:hidden">
+                            {exec.id}
+                        </TableBodyCell>
                         <TableBodyCell tdClass="{classListContent} max-sm:hidden">
                             <div>{t('logs.time_start_short')}: {exec.time_start}</div>
                             <div>{t('logs.time_fin_short')}: {exec.time_fin}</div>
