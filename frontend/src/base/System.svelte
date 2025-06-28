@@ -37,9 +37,9 @@
       let fragment = 'settings';
       if (openTab.api_keys) {
         fragment = 'api_keys';
-      } else if (openTab.api_keys) {
+      } else if (openTab.admin) {
         fragment = 'admin';
-      } else if (openTab.api_keys) {
+      } else if (openTab.api_docs) {
         fragment = 'api_docs';
       } else if (openTab.environment) {
         fragment = 'env';
@@ -64,9 +64,9 @@
       if (f == '#api_keys') {
         openTab.api_keys = true;
       } else if (f == '#admin') {
-        openTab.api_keys = true;
+        openTab.admin = true;
       } else if (f == '#api_docs') {
-        openTab.api_keys = true;
+        openTab.api_docs = true;
       } else if (f == '#env') {
         openTab.environment = true;
       } else if (f == '#permission') {
