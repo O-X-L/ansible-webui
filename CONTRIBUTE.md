@@ -119,10 +119,13 @@ make lint
 make test
 
 # or run single tests:
-bash ${REPO}/scripts/test_api.sh
-bash ${REPO}/scripts/test_job_exec.sh
-bash ${REPO}/scripts/test_webui.sh
-bash ${REPO}/scripts/test_webui_auth_saml.sh
+make test-api
+make test-job-exec
+
+make test-webui  # NOTE: you can enable screenshots via env-var 'AW_DEBUG=1'
+make test-auth
+
+make test-db
 ```
 
 ----

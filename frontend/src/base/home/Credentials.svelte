@@ -3,16 +3,20 @@
 
     import {
         InfoCircleSolid, UserSolid, UsersGroupSolid, ChevronDownOutline, TrashBinSolid,
-        EditSolid, FileCloneSolid,
+        EditSolid, FileCloneSolid, LockSolid, CloseCircleSolid, PlaySolid,
     } from 'flowbite-svelte-icons';
     import {
         Spinner, Button, Tooltip, Popover, Radio,
         Table, TableHead, TableHeadCell, TableBody, TableBodyCell, TableBodyRow,
         Dropdown, DropdownItem, Accordion, AccordionItem,
+        Heading, Label, Input, Helper,
     } from 'flowbite-svelte';
+
+    import Modal from '../../flowbite-custom/Modal.svelte';
 
     import { share } from '../Share.js';
     import { tq } from '../../util/translate.js';
+    import { clickToCopy } from '../../util/main.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import CredentialsForm from './forms/Credentials.svelte';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
@@ -20,7 +24,9 @@
     import {
         classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
         classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle, classFooterSpacing,
-        classSpoilerItem, classModalBody, classSpoilerPad,
+        classSpoilerItem, classSpoilerPad, classSpoilerBtn,
+        classModalBackdrop, classModalBody, classModalForm, classModalInput, classModalHelp, classModalBtns,
+        classModalLabel, classModalDialog,
     } from '../Style.js';
  
     const credentialsKind = ['user', 'shared'];
@@ -39,6 +45,12 @@
     let entryActions = $state({'shared': {}, 'user': {}});
     let updateLoop: number = $state(0);
     let updatedAt = $state(0);
+    let newVaultCredentialsID = $state(0);
+    let newVaultCredentialsKind = $state('');
+    let newVaultPlaintext = $state('');
+    let newVaultCiphertext = $state('');
+    let newVaultLoad = $state(false);
+    let newVaultModal = $state(false);
 
     interface credentialsFullType {
         shared: credentialsSharedType[],
@@ -107,6 +119,40 @@
         apiGet(`credentials?hash=${apiDataHash}`, loadCredentialsList);
     }
 
+    function handleVaultEncryptSubmitResponse(s: number, j: any) {
+        if (s == 200 && j.error === undefined) {
+            newVaultCiphertext = j.ciphertext;
+            newVaultLoad = false;
+        }
+        apiResponseHandler.handleRes(s, j);
+    }
+
+    function vaultEncryptPlaintext() {
+        newVaultLoad = true;
+        apiSuccessMsg = 'creds.action.vault_encrypt';
+        apiEdit(
+            'post',
+            `credentials/${newVaultCredentialsKind}/${newVaultCredentialsID}/vault_encrypt`,
+            {plaintext: newVaultPlaintext},
+            handleVaultEncryptSubmitResponse,
+        );
+    }
+
+    function showVaultEncryptModal(credentialsID: number, kind: string) {
+        newVaultCredentialsKind = kind;
+        newVaultCredentialsID = credentialsID;
+        newVaultModal = true;
+    }
+
+    function clearVaultEncryptModal(_: boolean) {
+        newVaultCiphertext = '';
+        newVaultPlaintext = '';
+    }
+
+    $effect(() => {
+        clearVaultEncryptModal(newVaultModal);
+    });
+
     onMount(() => {
         buildUpdateCredsList();
 
@@ -128,7 +174,8 @@
 <div>
     <Accordion>
         {#each credentialsKind as credsKind (credsKind) }
-            <AccordionItem defaultClass="{classSpoilerItem} creds-kind-{credsKind}" paddingDefault={classSpoilerPad}>
+            <AccordionItem defaultClass="{classSpoilerItem} creds-kind-{credsKind}" paddingDefault={classSpoilerPad}
+                borderBottomClass={classSpoilerBtn}>
                 <span slot="header">
                     {#if credsKind == 'user'}
                         <UserSolid class="inline-block"/>
@@ -264,13 +311,29 @@
                                 {/if}
                             </TableBodyCell>
                             <TableBodyCell tdClass="{classListContent} action-btns">
-                                <Button size="xs" on:click={() => {entryActions[credsKind][item.id].edit = true}}><EditSolid/></Button>
+                                <Button size="xs" on:click={() => {showVaultEncryptModal(item.id, credsKind)}}
+                                    id="creds-btn-vaultencrypt-{credsKind}-{item.id}"
+                                    disabled={!item.vault_pass_is_set && !item.vault_file && !item.vault_id}>
+                                    <LockSolid/>
+                                </Button>
+                                <Tooltip>{t('btn.encrypt')}</Tooltip>
+
+                                <Button size="xs" on:click={() => {entryActions[credsKind][item.id].edit = true}}
+                                    id="creds-btn-edit-{credsKind}-{item.id}">
+                                    <EditSolid/>
+                                </Button>
                                 <Tooltip>{t('btn.edit')}</Tooltip>
             
-                                <Button size="xs" on:click={() => {entryActions[credsKind][item.id].clone = true}}><FileCloneSolid/></Button>
+                                <Button size="xs" on:click={() => {entryActions[credsKind][item.id].clone = true}}
+                                    id="creds-btn-clone-{credsKind}-{item.id}">
+                                    <FileCloneSolid/>
+                                </Button>
                                 <Tooltip>{t('btn.clone')}</Tooltip>
             
-                                <Button size="xs" on:click={() => {deleteCredentials(item.id, credsKind)}}><TrashBinSolid/></Button>
+                                <Button size="xs" on:click={() => {deleteCredentials(item.id, credsKind)}}
+                                    id="creds-btn-delete-{credsKind}-{item.id}">
+                                    <TrashBinSolid/>
+                                </Button>
                                 <Tooltip>{t('btn.delete')}</Tooltip>
 
                                 <CredentialsForm bind:open={entryActions[credsKind][item.id].edit} action='edit'
@@ -415,6 +478,47 @@
     <CredentialsForm bind:open={addSharedModal} action='add' kind='shared'
         bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 {/key}
+
+<Modal bind:open={newVaultModal} size="lg" autoclose={false} placement="top-center"
+    backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
+    <div class={classModalForm}>
+        <Heading tag="h2">{t('creds.vault_encrypt')}</Heading>
+
+        {#if newVaultLoad}
+            <div class={classSpinnerDiv}><Spinner/></div>
+        {:else if !newVaultCiphertext}
+            <div class={classModalInput}>
+                <Label for="creds_vaultencrypt_plaintext" class={classModalLabel}>{t('creds.form.vault_encrypt')}</Label>
+                <Input id="creds_vaultencrypt_plaintext" bind:value={newVaultPlaintext} />
+                <Helper class={classModalHelp}>{@html t('creds.form.help.vault_encrypt')}</Helper>
+            </div>
+            <div class={classModalBtns}>
+                <Button id="creds-btn-vaultencrypt-submit" on:click={() => {vaultEncryptPlaintext()}}><PlaySolid/></Button>
+                <Tooltip>{t('btn.encrypt')}</Tooltip>
+
+                <Button id="creds-btn-vaultencrypt-close" on:click={() => (newVaultModal = false)} class="inline-block ml-2">
+                    <CloseCircleSolid/>
+                </Button>
+                <Tooltip>{t('btn.close')}</Tooltip>
+            </div>
+        {:else}
+            <Label class={classModalLabel}>{t('api_keys.token')}</Label>
+            <button onclick={clickToCopy} class="mr-10">
+<pre class="whitespace-pre-wrap break-normal text-xs">
+{newVaultCiphertext}
+</pre>
+            </button>
+            <Tooltip>{t('common.click_to_copy')}</Tooltip>
+
+            <div class={classModalBtns}>
+                <Button id="creds-btn-vaultencrypt-close" on:click={() => (newVaultModal = false)} class="inline-block ml-2">
+                    <CloseCircleSolid/>
+                </Button>
+                <Tooltip>{t('btn.close')}</Tooltip>
+            </div>
+        {/if}
+    </div>
+</Modal>
 
 <div class={classFooterSpacing}></div>
 <div id="loaded" class="h-0 w-0"></div>

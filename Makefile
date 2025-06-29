@@ -17,6 +17,7 @@ test:
 	bash scripts/test.sh
 
 test-webui:
+	bash scripts/frontend/build.sh
 	bash scripts/test_webui.sh
 
 test-api:

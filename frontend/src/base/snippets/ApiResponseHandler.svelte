@@ -52,7 +52,7 @@
 
     $effect(() => {
         // if we set a language-code as error/success message - we want to translate it
-        // todo: pull language-code from api-error and show user the translation
+        // todo: api-error translations and show user the translation
         if (!errorMsg && !successMsg && !warningMsgs.length) {
             return;
         }

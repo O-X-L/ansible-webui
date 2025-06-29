@@ -385,7 +385,7 @@ class JobExecution(BaseJob):
         if self.result is None or self.result.time_fin is None:
             return None
 
-        return int(datetime.timestamp(self.result.time_fin))
+        return int(datetime.timestamp(self.result.time_fin_dt))
 
     @property
     def time_duration(self) -> timedelta:

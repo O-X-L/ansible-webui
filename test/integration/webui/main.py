@@ -1,5 +1,6 @@
 from os import environ
 from time import sleep
+from pathlib import Path
 
 from seleniumwire import webdriver
 from selenium.webdriver.common.by import By
@@ -21,6 +22,12 @@ options.add_argument('--remote-debugging-port=9222')
 options.add_argument('--enable-javascript')
 chromedriver_autoinstaller.install()
 DRIVER = webdriver.Chrome(options=options)
+DRIVER.set_window_size(1920, 1080)
+
+DEBUG = 'AW_DEBUG' in environ
+SCREENSHOT_DIR = Path('/tmp/aw-test-webui')
+SCREENSHOT_DIR.mkdir(exist_ok=True)
+QUERY_SELECTOR = 'QS|'
 
 
 def _get_requests(url: str) -> dict:
@@ -121,7 +128,8 @@ def test_get_locations(to_check: dict):
 
         for tab_class, fragment in tab_fragment.items():
             print(f'TESTING GET /{location}{fragment}')
-            _click_on(tab_class, cls=True)
+            tab_class, kind = _check_kind(tab_class)
+            _click_on(tab_class, kind=kind)
             _wait_for_load()
             sleep(2)  # wait for JS async fetches (in case they would fail)
 
@@ -132,20 +140,20 @@ def test_get_locations(to_check: dict):
 def test_main_pages():
     test_get_locations({
         'ui': {
-            'tab-jobs': '#jobs',
-            'tab-logs': '#logs',
-            'tab-repositories': '#repositories',
-            'tab-credentials': '#credentials',
-            'tab-alerts': '#alerts',
-            'tab-dashboard': '#dashboard',
+            '.tab-jobs': '#jobs',
+            '.tab-logs': '#logs',
+            '.tab-repositories': '#repositories',
+            '.tab-credentials': '#credentials',
+            '.tab-alerts': '#alerts',
+            '.tab-dashboard': '#dashboard',
         },
         'ui/system': {
-            'tab-admin': '#admin',
-            'tab-perm': '#permission',
-            'tab-api-keys': '#api_keys',
-            'tab-api-docs': '#api_docs',
-            'tab-settings': '#settings',
-            'tab-env': '#env',
+            '.tab-admin': '#admin',
+            '.tab-perm': '#permission',
+            '.tab-api-keys': '#api_keys',
+            '.tab-api-docs': '#api_docs',
+            '.tab-settings': '#settings',
+            '.tab-env': '#env',
         },
     })
 
@@ -174,24 +182,59 @@ def test_existence():
                 print(f"ERROR: Element '{elementID}' not found @ '{url}'")
 
 
-def _click_on(element: str, cls: bool = False):
-    if cls:
-        DRIVER.execute_script(
-            'arguments[0].click()',
-            DRIVER.find_element(By.CLASS_NAME, element),
-        )
-
-    else:
+def _click_on(element: str, kind: str = 'id'):
+    if kind == 'id':
         DRIVER.execute_script(
             'arguments[0].click()',
             DRIVER.find_element(By.ID, element),
         )
 
+    if kind == 'cls':
+        DRIVER.execute_script(
+            'arguments[0].click()',
+            DRIVER.find_element(By.CLASS_NAME, element),
+        )
+
+    if kind == 'qs':
+        nr = ''
+        if len(element) > 4 and element.find('[') != -1 and element[-1] == ']':
+            element, nr = element.split('[', 1)
+            nr = f'[{nr}'
+
+        DRIVER.execute_script(
+            f"document.querySelectorAll('{element}'){nr}.click()",
+        )
+
+
+def _write_into_field(element: str, text: str, kind: str = 'id', cls_nr: int = 0):
+    if kind == 'id':
+        DRIVER.execute_script(f"document.getElementById('{element}').focus()")
+
+    if kind == 'cls':
+        DRIVER.execute_script(f"document.getElementsByClassName('{element}')[{cls_nr}].focus()")
+
+    DRIVER.execute_script(f"document.execCommand('insertText', false, '{text}');")
+
+
+def _check_kind(element: str) -> (str, str):
+    if element.startswith(QUERY_SELECTOR):
+        return element[3:], 'qs'
+
+    elif element.startswith('.'):
+        return element[1:], 'cls'
+
+    return element[1:], 'id'
+
 
 def test_js_actions():
+    start_ids = {
+        'creds_user': 1,
+    }
+
+
     cnf = {
         'ui': {
-            'tab-jobs': [
+            '.tab-jobs': [
                 ['#nav-btn-lang', '#nav-btn-lang-de'],
                 ['#nav-btn-lang', '#nav-btn-lang-en'],
                 [
@@ -206,7 +249,16 @@ def test_js_actions():
                 # #jobs-btn-exec-start, #jobs-btn-exec-close
                 # todo: test open logs-view (success, failure & exception handling) - check for valid content
             ],
-            'tab-credentials': [
+            '.tab-repositories': [
+                ['.repos-kind-static'],
+                ['.repos-kind-git'],
+                ['#repos-btn-add-dd', '#repos-btn-add-static', '#repo-btn-discard'],
+                [
+                    '#repos-btn-add-dd', '#repos-btn-add-git', '.repo-form-git-opts', '.repo-form-git-hooks',
+                    '#repo-btn-discard',
+                ],
+            ],
+            '.tab-credentials': [
                 ['.creds-kind-user'],
                 ['.creds-kind-shared'],
                 [
@@ -217,17 +269,28 @@ def test_js_actions():
                     '#creds-btn-add-dd', '#creds-btn-add-shared', '.creds-form-accounts', '.creds-form-vault',
                     '#creds-btn-discard'
                 ],
-            ],
-            'tab-repositories': [
-                ['.repos-kind-static'],
-                ['.repos-kind-git'],
-                ['#repos-btn-add-dd', '#repos-btn-add-static', '#repo-btn-discard'],
                 [
-                    '#repos-btn-add-dd', '#repos-btn-add-git', '.repo-form-git-opts', '.repo-form-git-hooks',
-                    '#repo-btn-discard',
+                    '#creds-btn-add-dd', '#creds-btn-add-user', '#creds_name=test',
+                    '.creds-form-accounts', '#creds_conn_user=someGuy',
+                    '.creds-form-vault', '#creds_vault_pass=myTopSecret',
+                    '#creds-btn-save',
+                ],
+                [
+                    # clone user-creds
+                    f'{QUERY_SELECTOR}.aw-accordion[0]', f"#creds-btn-clone-user-{start_ids['creds_user']}", '#creds-btn-save',
+                ],
+                [
+                    # delete user-creds
+                    f'{QUERY_SELECTOR}.aw-accordion[0]', f"#creds-btn-delete-user-{start_ids['creds_user'] + 1}",
+                ],
+                [
+                    # ansible-vault-encrypt text
+                    f'{QUERY_SELECTOR}.aw-accordion[0]', f"#creds-btn-vaultencrypt-user-{start_ids['creds_user']}",
+                    '#creds_vaultencrypt_plaintext=myNewSecret', '#creds-btn-vaultencrypt-submit',
+                    '#creds-btn-vaultencrypt-close',
                 ],
             ],
-            'tab-alerts': [
+            '.tab-alerts': [
                 ['.alerts-kind-global'],
                 ['.alerts-kind-group'],
                 ['.alerts-kind-user'],
@@ -237,19 +300,19 @@ def test_js_actions():
                 ['#alerts-btn-add-dd', '#alerts-btn-add-user', '#alert-btn-discard'],
                 ['#alerts-btn-add-dd', '#alerts-btn-add-plugin', '#plugin-btn-discard'],
             ],
-            # .logs-job-{job.id}, #logs-job-{job.id}-show
         },
+        # .logs-job-{job.id}, #logs-job-{job.id}-show
         'ui/system': {
-            'tab-api-keys': [
+            '.tab-api-keys': [
                 ['#apikeys-btn-add', '#apikeys-btn-add-submit', '#apikeys-btn-add-close'],
             ],
-            'tab-settings': [
+            '.tab-settings': [
                 ['.settings-exec', '.settings-paths', '.settings-mailing', '.settings-internal', '#settings-btn-save'],
             ],
-            'tab-perm': [
+            '.tab-perm': [
                 ['#perms-btn-add', '#perm-btn-discard'],
             ],
-        }
+        },
     }
 
     for location, tab_elements in cnf.items():
@@ -257,19 +320,31 @@ def test_js_actions():
         _open_and_wait_for_load(url)
 
         for tab_class, element_chains in tab_elements.items():
-            _click_on(tab_class, cls=True)
+            tab_class, kind = _check_kind(tab_class)
+            _click_on(tab_class, kind=kind)
             _wait_for_load()
             sleep(1)
 
             for i, element_chain in enumerate(element_chains):
-                for element in element_chain:
-                    print(f'TRIGGER JS ACTION /{location} CHAIN-{i} {element}')
+                for i2, element in enumerate(element_chain):
+                    print(f'TRIGGER JS /{location} {tab_class} CHAIN-{i} {i2} {element}')
+                    element, kind = _check_kind(element)
 
-                    if element.startswith('#'):
-                        _click_on(element[1:])
+                    field_input = None
+                    if element.find('=') != -1:
+                        element, field_input = element.split('=', 1)
+
+                    if DEBUG:
+                        DRIVER.save_screenshot(f'{SCREENSHOT_DIR}{location}-{tab_class}-{i}-{i2}-{element}-1.png')
+
+                    if field_input is not None:
+                        _write_into_field(element=element, text=field_input, kind=kind)
 
                     else:
-                        _click_on(element[1:], cls=True)
+                        _click_on(element, kind=kind)
+
+                    if DEBUG:
+                        DRIVER.save_screenshot(f'{SCREENSHOT_DIR}{location}-{tab_class}-{i}-{i2}-{element}-2-after.png')
 
                     sleep(1)
                     assert _check_requests(url, sub=True)
@@ -304,11 +379,16 @@ def logout():
 
 def main():
     try:
-        login(user=environ['AW_ADMIN'], pwd=environ['AW_ADMIN_PWD'])
-        test_main_pages()
-        test_existence()
-        test_js_actions()
-        logout()
+        try:
+            login(user=environ['AW_ADMIN'], pwd=environ['AW_ADMIN_PWD'])
+            test_main_pages()
+            test_existence()
+            test_js_actions()
+            logout()
+
+        except Exception:
+            DRIVER.save_screenshot(SCREENSHOT_DIR / 'error.png')
+            raise
 
     finally:
         DRIVER.quit()

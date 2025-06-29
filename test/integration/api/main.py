@@ -90,9 +90,7 @@ def test_add():
                        '-----END OPENSSH PRIVATE KEY-----'
         }},
         # todo: create user-credentials with an user-id that's not ours and validate that the backend fixed it
-        {'l': 'credentials/vault_encrypt', 'd': {
-            'credentials_id': '2', 'credentials_type': 'shared', 'plaintext': 'testSecret',
-        }},
+        {'l': 'credentials/shared/2/vault_encrypt', 'd': {'plaintext': 'testSecret'}},
 
         # repos
         {'l': 'repository', 'd': {

@@ -20,6 +20,7 @@ EN = {
     'btn.download': 'Download',
     'btn.update': 'Update',
     'btn.scroll_down': 'Scroll down',
+    'btn.encrypt': 'Ansible-Vault Encrypt',
     'nav.home': 'Home',
     'nav.system': 'System',
     'nav.lang': 'Language',
@@ -113,7 +114,6 @@ EN = {
     'jobs.action.create': 'Job created',
     'jobs.action.update': 'Job updated',
     'jobs.action.exec_delete': 'Execution deleted',
-    'jobs.form.name': 'Name',
     'jobs.form.repository': 'Repository',
     'jobs.form.playbook_file': 'Playbook File',
     'jobs.form.inventory_file': 'Inventory File',
@@ -188,9 +188,11 @@ EN = {
     'creds.shared': 'Shared',
     'creds.new': 'New Credentials',
     'creds.info': 'Credentials Information',
+    'creds.vault_encrypt': 'Ansible-Vault Encrypt',
     'creds.action.create': 'Credentials created',
     'creds.action.update': 'Credentials updated',
     'creds.action.delete': 'Credentials deleted',
+    'creds.action.vault_encrypt': 'Text encrypted',
     ## form fields
     'creds.form.category': 'Category',
     'creds.form.accounts': 'Accounts',
@@ -204,6 +206,7 @@ EN = {
     'creds.form.vault_pwd': 'Vault Password',
     'creds.form.vault_file': 'Vault File',
     'creds.form.vault_id': 'Vault ID',
+    'creds.form.vault_encrypt': 'Text to Encrypt',
     ## form help
     'creds.form.help.vault_file': 'Path to the file containing your vault-password',
     'creds.form.help.vault_id': 'For details see: '
@@ -212,6 +215,9 @@ EN = {
                                 'Ansible Docs - Managing Passwords</a>',
     'creds.form.help.ssh_key': 'Provide an unencrypted SSH private key',
     'creds.form.help.category': 'The category of user credentials. Used for dynamic matching at execution time',
+    'creds.form.help.vault_encrypt': 'Text to encrypt via Ansible-Vault. For details see '
+                                     '<a href="https://docs.ansible.com/ansible/latest/vault_guide/index.html">'
+                                     'Ansible Docs - Vault Guide</a>',
 
     # repositories
     'repos.static': 'Static / Local',

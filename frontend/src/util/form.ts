@@ -24,7 +24,7 @@ export function validateFormField(field: formField) : boolean {
     }
 
     if (field.regex !== undefined) {
-        return field.regex.test(String(field.value));
+        return field.regex.test(`${field.value}`);
     }
 
     return true;
@@ -61,7 +61,11 @@ export function submitFormBase(
             continue;
         }
         if (!ignoreFieldsValidate.includes(k) && !validateFormField(v)) {
-            let e = `${t('common.invalid_value')}: "${tb}${k}"`
+            let lc = `${tb}${k}`;
+            if (k == 'name') {
+                lc = 'common.name';
+            }
+            let e = `${t('common.invalid_value')}: "${lc}"`
             console.log(`ERROR: ${e}`);
             validationErrors.push(e + TT);
             v.color = 'red';

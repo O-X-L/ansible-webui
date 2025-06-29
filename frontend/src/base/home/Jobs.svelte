@@ -82,7 +82,7 @@
         field_values: {
             tags: '', tags_skip: '', mode_check: false, mode_diff: false, limit: '',
             environment_vars: '', cmd_args: '', credentials: null, credentials_req: false,
-            comment: '',
+            comment: '', verbosity: 0,
         },
         var_values: {},
     }

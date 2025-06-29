@@ -17,6 +17,9 @@
 .. |creds_tmp| image:: ../_static/img/credentials_tmp.png
    :class: wiki-img
 
+.. |creds_vault_encrypt| image:: ../_static/img/credentials_vault_encrypt.png
+   :class: wiki-img
+
 ===========
 Credentials
 ===========
@@ -81,3 +84,14 @@ You also have some options on how credentials may be provided at the execution-p
 Temporary credentials can be used to manually provide credentials for one execution. They are deleted afterwards.
 
 |creds_tmp|
+
+----
+
+Ansible-Vault Encrypt
+*********************
+
+Users are able to Ansible-Vault encrypt plaintext if they have read-privileges on credentials that have a Vault-Password, Vault-File or Vault-ID defined.
+
+This is especially useful if users should not have access to the Vault-Password(s) but have to encrypt new secrets used in roles.
+
+|creds_vault_encrypt|

@@ -6,6 +6,7 @@ export const classBtnLink = 'dark:text-white';
 export const classBtnBase = 'text-center focus-within:ring-4 focus-within:outline-none inline-flex items-center justify-center text-sm text-white bg-primary-700 hover:bg-primary-800 dark:bg-primary-600 dark:hover:bg-primary-700 focus-within:ring-primary-300 dark:focus-within:ring-primary-800 rounded-lg';
 export const classSpoilerItem = 'flex items-center justify-between w-full font-medium text-left group-first:rounded-t-xl border-gray-200 dark:border-gray-700';
 export const classSpoilerPad = 'px-2 py-3 sm:p-5';
+export const classSpoilerBtn = 'border-b aw-accordion';  // for ci tests to open accordion
 export const classModalBackdrop = 'fixed inset-0 z-40 bg-gray-900/60';
 export const classModalDialog = 'fixed top-0 start-0 end-0 h-modal md:inset-0 md:h-full z-50 w-full p-2 sm:p-4 flex';
 export const classModalBody = 'max-sm:px-1 max-sm:py-4 sm:p-4 md:p-5 space-y-4 flex-1 overflow-y-auto overscroll-contain';

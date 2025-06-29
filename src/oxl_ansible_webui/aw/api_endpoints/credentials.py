@@ -560,11 +560,11 @@ class APIJobUserCredentialsItem(APIView):
             )
 
         serializer = JobUserCredentialsWriteRequest(data=request.data)
-        credentials, update_error = _update_creds(credentials, serializer)
+        credentials.user = user
+        update_error = _update_creds(credentials, serializer)
         if update_error is not None:
             return update_error
 
-        credentials.user = user
         credentials.save()
 
         return Response(
@@ -575,8 +575,6 @@ class APIJobUserCredentialsItem(APIView):
 
 class VaultEncryptRequest(BaseResponse):
     plaintext = serializers.CharField(required=True)
-    credentials_id = serializers.IntegerField(required=True)
-    credentials_type = serializers.ChoiceField(required=True, choices=['shared', 'user'])
 
 
 class VaultEncryptResponse(GenericResponse):
@@ -598,21 +596,20 @@ class APIVaultEncrypt(APIView):
         summary='Encrypt a secret using Ansible-Vault.',
         operation_id='credentials_vault_encrypt',
     )
-    def post(self, request):
+    def post(self, request, credentials_kind: str, credentials_id: int):
         user = get_api_user(request)
 
         serializer = VaultEncryptRequest(data=request.data)
         if not serializer.is_valid():
             return Response(data={'error': 'Invalid vault-encrypt request'}, status=400)
 
-        credentials_id = serializer.validated_data['credentials_id']
-        if serializer.validated_data['credentials_type'] == 'user':
+        if credentials_kind == 'user':
             credentials = _get_user_creds(credentials_id, user)
 
         else:
             credentials = _get_shared_creds(credentials_id)
 
-        if credentials is None:
+        if credentials is None or credentials_kind not in ['shared', 'user']:
             return Response(
                 data={'error': f'Credentials with ID {credentials_id} do not exist or are inaccessible'},
                 status=404,

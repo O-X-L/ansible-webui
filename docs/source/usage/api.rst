@@ -34,8 +34,8 @@ Requests must have the API key set in the :code:`X-Api-Key` header.
     curl -X 'POST' 'http://localhost:8000/api/job/34' -H 'accept: application/json' -H "X-Api-Key: <KEY>"
     > {"msg":"Job 'Deploy App' execution queued"}
 
-    # Ansible-vault-encrypt data
-    curl -s -X 'POST' 'http://localhost:8000/api/credentials/vault_encrypt' -H 'Content-Type: application/json' -H "X-Api-Key: ${API_TOKEN}" --data '{"credentials_id": 1, "credentials_type": "shared", "plaintext": "testSecret"}' | jq
+    # Ansible-Vault-encrypt data
+    curl -s -X 'POST' 'http://localhost:8000/api/credentials/shared/1/vault_encrypt' -H 'Content-Type: application/json' -H "X-Api-Key: ${API_TOKEN}" --data '{"plaintext": "testSecret"}' | jq
     > {
     >   "msg": "Successfully Ansible-Vault-encrypted data",
     >   "ciphertext": "!vault |\n          $ANSIBLE_VAULT;1.1;AES256\n          63323262306230383434316366333364643937323339633863646536623730303833613466343566\n          3763663732383437646236653066376362666133313933330a363930633461656430373134336536\n          37346534626564646339343436633139326536666464613032353037373235323066363833343566\n          3264366333303731320a663361306535306566393739656465313330613461346439636134386134\n          3362"
