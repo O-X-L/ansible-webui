@@ -1,17 +1,18 @@
-import subprocess
 from pathlib import Path
 from os import environ
 from functools import cache
 
-from aw.settings import BASE_DIR
+from oxl_utils.ps import process as oxl_utils_process
+
 from aw.utils.debug import log
+from aw.settings import BASE_DIR
 from aw.config.environment import AW_ENV_VARS_SECRET, AW_ENV_VARS
 
 
 # pylint: disable=R0914
 def process(
         cmd: (str, list), timeout_sec: int = None, shell: bool = False,
-        cwd: Path = BASE_DIR, env: dict = None, pass_env_secrets: bool = False,
+        cwd: Path = BASE_DIR, env: dict = None, pass_env_secrets: bool = False, stdin: str = None,
 ) -> dict:
     cmd_str = cmd
     if isinstance(cmd, list):
@@ -30,27 +31,10 @@ def process(
                 if secret_env_var in env_full:
                     env_full.pop(secret_env_var)
 
-    try:
-        with subprocess.Popen(
-            cmd,
-            shell=shell,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=cwd,
-            env=env_full,
-        ) as p:
-            b_stdout, b_stderr = p.communicate(timeout=timeout_sec)
-            stdout, stderr, rc = b_stdout.decode('utf-8').strip(), b_stderr.decode('utf-8').strip(), p.returncode
-
-    except (subprocess.TimeoutExpired, subprocess.SubprocessError, subprocess.CalledProcessError,
-            OSError, IOError) as error:
-        stdout, stderr, rc = None, str(error), 1
-
-    return {
-        'stdout': stdout,
-        'stderr': stderr,
-        'rc': rc,
-    }
+    return oxl_utils_process(
+        cmd=cmd, timeout_sec=timeout_sec, shell=shell, cwd=cwd, env=env_full, stdin=stdin,
+        env_inherit=False, empty_none=False, timeout_shell=False,
+    )
 
 
 @cache

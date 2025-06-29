@@ -25,3 +25,6 @@ premailer
 
 # environment (get versions of other modules)
 setuptools
+
+# utils
+oxl_utils

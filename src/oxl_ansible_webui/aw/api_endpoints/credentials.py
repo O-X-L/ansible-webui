@@ -1,3 +1,5 @@
+from shutil import rmtree
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
 from rest_framework.views import APIView
@@ -10,8 +12,8 @@ from aw.model.job_credential import BaseJobCredentials, JobUserCredentials, JobS
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, api_docs_delete, \
     api_docs_put, api_docs_post, validate_no_xss, GenericErrorResponse, response_data_if_changed, API_PARAM_HASH
+from aw.utils.util import is_null, overwrite_and_delete_file, write_file_0600, is_set
 from aw.utils.permission import has_credentials_permission, has_manager_privileges
-from aw.utils.util import is_null, overwrite_and_delete_file, write_file_0600
 from aw.execute.play_credentials import get_pwd_file
 from aw.execute.util import get_path_run, create_dirs
 from aw.config.hardcoded import SECRET_HIDDEN
@@ -612,43 +614,55 @@ class APIVaultEncrypt(APIView):
 
         if credentials is None:
             return Response(
-                data={'error': f"Credentials with ID {credentials_id} do not exist or are inaccessible"},
+                data={'error': f'Credentials with ID {credentials_id} do not exist or are inaccessible'},
                 status=404,
             )
 
-        if is_null(credentials.vault_file) and is_null(credentials.vault_pass):
+        if is_null(credentials.vault_file) and is_null(credentials.vault_pass) and is_null(credentials.vault_id):
             return Response(
-                data={'error': f"Credentials with ID {credentials_id} have no vault-secret configured"},
+                data={'error': f'Credentials with ID {credentials_id} have no vault-secret configured'},
                 status=404,
             )
+
+        cmd = ['ansible-vault', 'encrypt_string']
 
         tmp_vault_file = False
-        vault_file = credentials.vault_file
-        if is_null(vault_file):
-            tmp_vault_file = True
-            path_run = get_path_run()
-            create_dirs(path=path_run, desc='run')
+        vault_file = None
+        path_run = None
+        if is_set(credentials.vault_file) or is_set(credentials.vault_pass):
+            vault_file = credentials.vault_file
+            if is_null(vault_file):
+                tmp_vault_file = True
+                path_run = get_path_run()
+                try:
+                    create_dirs(path=path_run, desc='run')
 
-            vault_file = get_pwd_file(path_run=path_run, attr='vault_pass')
-            write_file_0600(
-                file=vault_file,
-                content=getattr(credentials, 'vault_pass'),
-            )
+                except OSError:
+                    return Response(
+                        data={'error': 'Failed to create temporary vault-password-file'},
+                        status=500,
+                    )
 
-        cmd = ['ansible-vault', 'encrypt_string', f'--vault-password-file={vault_file}']
-        if not is_null(credentials.vault_id):
+                vault_file = get_pwd_file(path_run=path_run, attr='vault_pass')
+                write_file_0600(
+                    file=vault_file,
+                    content=getattr(credentials, 'vault_pass'),
+                )
+
+            cmd.append(f'--vault-password-file={vault_file}')
+
+        if is_set(credentials.vault_id):
             cmd.append(f'--vault-id={credentials.vault_id}')
 
-        cmd.append(serializer.validated_data['plaintext'])
+        result = process(cmd=cmd, timeout_sec=2, stdin=serializer.validated_data['plaintext'])
 
-        result = process(cmd=cmd, timeout_sec=2)
-
-        if tmp_vault_file:
+        if tmp_vault_file and path_run is not None:
             overwrite_and_delete_file(vault_file)
+            rmtree(path_run, ignore_errors=True)
 
         if result['rc'] != 0:
             return Response(
-                data={'error': "Failed to Ansible-Vault-encrypt data"},
+                data={'error': 'Failed to Ansible-Vault-encrypt data'},
                 status=500,
             )
 
