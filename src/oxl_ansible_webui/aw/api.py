@@ -5,7 +5,7 @@ from aw.api_endpoints.key import APIKey, APIKeyItem
 from aw.api_endpoints.job import APIJob, APIJobItem, APIJobExecutionItem, APIJobExecutionLogs, \
     APIJobExecutionLogFile, APIJobExecution, APIJobExecutionSingleJob, APIJobExecutionCleanup
 from aw.api_endpoints.permission import APIPermission, APIPermissionItem
-from aw.api_endpoints.credentials import APIJobCredentials, APIJobSharedCredentials, \
+from aw.api_endpoints.credentials import APIJobCredentials, APIJobSharedCredentials, APIVaultEncrypt, \
     APIJobSharedCredentialsItem, APIJobUserCredentialsItem, APIJobUserCredentials, APIJobTMPCredentials
 from aw.api_endpoints.filesystem import APIFsBrowse, APIFsExists
 from aw.api_endpoints.system import APISystemConfig, APISystemEnvironment, APIUserPasswordChange
@@ -31,6 +31,7 @@ urlpatterns_api = [
     path('api/job', APIJob.as_view()),
     path('api/permission/<int:perm_id>', APIPermissionItem.as_view()),
     path('api/permission', APIPermission.as_view()),
+    path('api/credentials/vault_encrypt', APIVaultEncrypt.as_view()),
     path('api/credentials/shared/<int:credentials_id>', APIJobSharedCredentialsItem.as_view()),
     path('api/credentials/shared', APIJobSharedCredentials.as_view()),
     path('api/credentials/user/<int:credentials_id>', APIJobUserCredentialsItem.as_view()),
