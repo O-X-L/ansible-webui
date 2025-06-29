@@ -11,9 +11,9 @@ from math import ceil
 from sys import maxunicode
 from random import choice as random_choice
 from string import digits, ascii_letters, punctuation
+from importlib.metadata import distribution as get_distribution
 
 from pytz import utc
-from pkg_resources import get_distribution
 from crontab import CronTab
 from django.utils.html import escape as escape_html
 
