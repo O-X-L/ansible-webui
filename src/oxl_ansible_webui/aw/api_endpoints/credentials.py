@@ -13,8 +13,8 @@ from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse,
 from aw.utils.permission import has_credentials_permission, has_manager_privileges
 from aw.utils.util import is_null, overwrite_and_delete_file, write_file_0600
 from aw.execute.play_credentials import get_pwd_file
+from aw.execute.util import get_path_run, create_dirs
 from aw.config.hardcoded import SECRET_HIDDEN
-from aw.execute.util import get_path_run
 from aw.utils.subps import process
 from aw.base import USERS
 
@@ -627,8 +627,7 @@ class APIVaultEncrypt(APIView):
         if is_null(vault_file):
             tmp_vault_file = True
             path_run = get_path_run()
-            if not path_run.is_dir():
-                path_run.mkdir()
+            create_dirs(path=path_run, desc='run')
 
             vault_file = get_pwd_file(path_run=path_run, attr='vault_pass')
             write_file_0600(
