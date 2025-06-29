@@ -1,5 +1,3 @@
-from random import choice
-
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
 from rest_framework.views import APIView
@@ -618,15 +616,16 @@ class APIVaultEncrypt(APIView):
                 status=404,
             )
 
-        print("FILE", credentials.vault_file, "PASS", credentials.vault_pass)
         if is_null(credentials.vault_file) and is_null(credentials.vault_pass):
             return Response(
                 data={'error': f"Credentials with ID {credentials_id} have no vault-secret configured"},
                 status=404,
             )
 
+        tmp_vault_file = False
         vault_file = credentials.vault_file
         if is_null(vault_file):
+            tmp_vault_file = True
             path_run = get_path_run()
             if not path_run.is_dir():
                 path_run.mkdir()
@@ -644,6 +643,9 @@ class APIVaultEncrypt(APIView):
         cmd.append(serializer.validated_data['plaintext'])
 
         result = process(cmd=cmd, timeout_sec=2)
+
+        if tmp_vault_file:
+            overwrite_and_delete_file(vault_file)
 
         if result['rc'] != 0:
             return Response(
