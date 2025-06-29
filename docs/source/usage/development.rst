@@ -27,20 +27,10 @@ Install Unstable Version
     # download
     git clone https://github.com/O-X-L/ansible-webui
 
-    # install dependencies (venv recommended)
-    cd webui
-    python3 -m pip install --upgrade requirements.txt
-    bash scripts/update_version.sh
+    make install
 
-    # run
-    python3 src/oxl_ansible_webui/
+    # first run (init DB)
+    make run-dev-init
 
-
-**Using docker**:
-
-.. code-block:: bash
-
-    docker image pull oxlorg/ansible-webui:unstable
-    docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awdata:/data oxlorg/ansible-webui:unstable
-    # to safe db-migrations use:
-    # --volume /var/local/ansible-webui/migrations/:/usr/local/lib/python3.11/site-packages/oxl_ansible_webui/aw/migrations
+    # afterwards
+    make run-dev

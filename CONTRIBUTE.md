@@ -28,39 +28,22 @@ Read into the [Troubleshooting Guide](https://ansible-webui.OXL.app/usage/troubl
 
 ## Install
 
-### Directly
-
 ```bash
-# download
-git clone https://github.com/O-X-L/ansible-webui
-
-# install dependencies (venv recommended)
-cd webui
-python3 -m pip install --upgrade -r requirements.txt
-bash scripts/update_version.sh
-export AW_VERSION="$(cat VERSION)"
-
-# run
-python3 src/oxl_ansible_webui/
+# setup dev-env
+make install
 ```
 
 #### Frontend
 
 You need to have Node.js installed.
 
-Quick install: `bash ./scripts/frontend/nodejs_install.sh`
+See: [NodeJS download](https://nodejs.org/en/download)
+
+Or use the quick-install script: `bash ./scripts/frontend/nodejs_install.sh`
 
 ----
 
 ### Using Docker
-
-```bash
-docker image pull oxlorg/ansible-webui:dev
-cd ${PATH_TO_SRC}  # repository root directory
-docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awtest:/data --volume $(pwd):/aw oxlorg/ansible-webui:dev
-```
-
-#### Frontend
 
 todo..
 
@@ -71,12 +54,22 @@ todo..
 You can run the service in its development mode:
 
 ```bash
+# first run (performs db-migrations on startup)
+make run-dev-init
+
+# after db-init
+make run-dev
+
+# or
 bash ${REPO}/scripts/run_dev.sh
 ```
 
 Run in staging mode: (*close to production behavior*)
 
 ```bash
+make run-staging
+
+# or
 bash ${REPO}/scripts/run_staging.sh
 ```
 
@@ -89,9 +82,9 @@ Admin user for testing:
 
 To build the frontend bundles - you can either run:
 
-* `bash ./scripts/run_dev.sh` for the full app
-* `bash ./scripts/frontend/run_updater.sh` for automatic update whenever code changes
-* `bash ./scripts/frontend/build.sh` to build it once
+* `make run-dev  # OR: bash ./scripts/run_dev.sh` for the full app
+* `make build-fe-auto  # OR: bash ./scripts/frontend/run_updater.sh` for automatic update whenever code changes
+* `make build-fe  # OR: bash ./scripts/frontend/build.sh` to build it once
 
 The bundles are generated into `src/oxl_ansible_webui/aw/static_dev` - django will use this statics-directory in dev-mode.
 
@@ -119,13 +112,12 @@ bash ${REPO}/scripts/run_pip_build.sh
 Run tests and lint:
 
 ```bash
-python3 -m pip install -r ${REPO}/requirements.txt
-python3 -m pip install -r ${REPO}/requirements_lint.txt
-python3 -m pip install -r ${REPO}/requirements_test_backend.txt
-python3 -m pip install -r ${REPO}/requirements_test_frontend.txt
+# setup dev-env
+make install
 
-bash ${REPO}/scripts/lint.sh
-bash ${REPO}/scripts/test.sh
+make lint
+make test
+
 # or run single tests:
 bash ${REPO}/scripts/test_api.sh
 bash ${REPO}/scripts/test_job_exec.sh

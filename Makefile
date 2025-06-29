@@ -1,11 +1,17 @@
-init:
-	bash scripts/migrate_db.sh
+install:
+	bash scripts/install_dev.sh
+
+run-dev-init:
+	bash scripts/run_dev.sh
 
 run-dev:
 	bash scripts/run_dev.sh q
 
 run-staging:
 	bash scripts/run_staging.sh
+
+lint:
+	bash scripts/lint.sh
 
 test:
 	bash scripts/test.sh
@@ -27,9 +33,11 @@ test-db:
 test-auth:
 	bash scripts/test_auth_saml.sh
 
-
 build-fe:
-	bash scripts/frontend/build_base.sh
+	bash scripts/frontend/build.sh
+
+build-fe-auto:
+	bash scripts/frontend/run_updater.sh
 
 
 #build.sh           kill_ps.sh     run_pip_build.sh  test_api.sh        test_db_mariadb.sh  test_webui.sh
