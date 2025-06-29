@@ -10,9 +10,15 @@ tbd
 
 ### 0.9.0
 
+Fixes:
+
+* Dashboard Status-Query Endless-Loop
+
 Features:
 
 * API and Form to Ansible-Vault-Encrypt data [#7](https://github.com/O-X-L/ansible-webui/issues/7)
+
+
 
 ### 0.8.9
 

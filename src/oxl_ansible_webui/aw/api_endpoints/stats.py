@@ -19,7 +19,7 @@ from aw.base import USERS
 def relative_time_to_dt(t: str) -> (datetime, None):
     # pylint: disable=R0911
     if t.isnumeric():
-        return datetime.fromtimestamp(int(t), tz=config.timezone)
+        return datetime.fromtimestamp(int(t) + 1, tz=config.timezone)
 
     if t.replace('.', '').isnumeric():
         return datetime.fromtimestamp(float(t), tz=config.timezone)
@@ -62,7 +62,7 @@ def _build_stats_jobs_query_limits(request, job_ids: list[Job]) -> dict:
 
         job_ids = job_ids_new
 
-    limits = {'job__in': job_ids}
+    limits = {'job__in': job_ids, 'result__isnull': False, 'result__time_fin__isnull': False}
     limit_time = None
     if 'limit_time' in request.GET:
         limit_time = relative_time_to_dt(request.GET['limit_time'])
@@ -70,7 +70,7 @@ def _build_stats_jobs_query_limits(request, job_ids: list[Job]) -> dict:
     if limit_time is None:
         limit_time = relative_time_to_dt('1w')
 
-    limits['created__gte'] = limit_time
+    limits['result__time_fin__gt'] = limit_time
 
     if 'limit_users' in request.GET:
         limit_users = []
