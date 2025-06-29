@@ -91,7 +91,7 @@ def test_add():
         }},
         # todo: create user-credentials with an user-id that's not ours and validate that the backend fixed it
         {'l': 'credentials/vault_encrypt', 'd': {
-            'credentials_id': '2', 'plaintext': 'testSecret',
+            'credentials_id': '2', 'credentials_type': 'shared', 'plaintext': 'testSecret',
         }},
 
         # repos
