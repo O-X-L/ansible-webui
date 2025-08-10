@@ -125,7 +125,7 @@ class APIBackendInfo(GenericAPIView):
     @extend_schema(
         request=None,
         responses={200: GenericResponse},
-        summary='Return backend-infos needed for frontend rendering',
+        summary='Return backend-infos required for frontend rendering',
         operation_id='backend_infos',
     )
     def get(request):
@@ -161,7 +161,7 @@ class APIBackendTranslations(GenericAPIView):
     @extend_schema(
         request=None,
         responses={200: GenericResponse},
-        summary='Return text-translations needed for frontend rendering',
+        summary='Return text-translations required for frontend rendering',
         operation_id='backend_translations',
     )
     def get(request):
@@ -178,7 +178,7 @@ class APIFormInfosJob(GenericAPIView):
     @extend_schema(
         request=None,
         responses={200: GenericResponse},
-        summary='Return job-form-choices & -defaults needed for frontend rendering',
+        summary='Return job-form-choices & -defaults required for frontend rendering',
         operation_id='form_choices_job',
     )
     def get(request):
@@ -195,7 +195,7 @@ class APIFormInfosCredentials(GenericAPIView):
     @extend_schema(
         request=None,
         responses={200: GenericResponse},
-        summary='Return credential-form-choices & -defaults needed for frontend rendering',
+        summary='Return credential-form-choices & -defaults required for frontend rendering',
         operation_id='form_choices_credentials',
     )
     def get(request):
@@ -216,7 +216,7 @@ class APIFormInfosRepositories(GenericAPIView):
     @extend_schema(
         request=None,
         responses={200: GenericResponse},
-        summary='Return repository-form-choices & -defaults needed for frontend rendering',
+        summary='Return repository-form-choices & -defaults required for frontend rendering',
         operation_id='form_choices_repositories',
     )
     def get(request):
@@ -233,7 +233,7 @@ class APIFormInfosConfig(GenericAPIView):
     @extend_schema(
         request=None,
         responses={200: GenericResponse},
-        summary='Return system-config form-choices & -defaults needed for frontend rendering',
+        summary='Return system-config form-choices & -defaults required for frontend rendering',
         operation_id='form_choices_config',
     )
     def get(request):
@@ -261,7 +261,7 @@ class APIFormInfosGlobalAlerts(GenericAPIView):
     @extend_schema(
         request=None,
         responses={200: GenericResponse},
-        summary='Return global-alert-form-choices & -defaults needed for frontend rendering',
+        summary='Return global-alert-form-choices & -defaults required for frontend rendering',
         operation_id='form_choices_global_alerts',
     )
     def get(request):
@@ -278,7 +278,7 @@ class APIFormInfosGroupAlerts(GenericAPIView):
     @extend_schema(
         request=None,
         responses={200: GenericResponse},
-        summary='Return group-alert-form-choices & -defaults needed for frontend rendering',
+        summary='Return group-alert-form-choices & -defaults required for frontend rendering',
         operation_id='form_choices_group_alerts',
     )
     def get(request):
@@ -295,7 +295,7 @@ class APIFormInfosUserAlerts(GenericAPIView):
     @extend_schema(
         request=None,
         responses={200: GenericResponse},
-        summary='Return user-alert-form-choices & -defaults needed for frontend rendering',
+        summary='Return user-alert-form-choices & -defaults required for frontend rendering',
         operation_id='form_choices_user_alerts',
     )
     def get(request):
@@ -312,7 +312,7 @@ class APIFormInfosPermissions(GenericAPIView):
     @extend_schema(
         request=None,
         responses={200: GenericResponse},
-        summary='Return permission-form-choices & -defaults needed for frontend rendering',
+        summary='Return permission-form-choices & -defaults required for frontend rendering',
         operation_id='form_choices_permission',
     )
     def get(request):

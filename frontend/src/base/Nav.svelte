@@ -129,6 +129,9 @@
       <li class="rounded-sm p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
         <Radio id="nav-btn-lang-de" bind:group={language} value={'de'}>{@html flagIcon('de')} Deutsch</Radio>
       </li>
+      <li class="rounded-sm p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+        <Radio id="nav-btn-lang-es" bind:group={language} value={'es'}>{@html flagIcon('es')} Español</Radio>
+      </li>
     </Dropdown>
     <Tooltip placement="bottom" triggeredBy="#nav-btn-lang">{t('nav.lang')}</Tooltip>
 

@@ -94,11 +94,16 @@ This is also necessary if a sub-component is used in multiple others. You will s
 
 When adding additional svelte-apps - they should be added to `script/frontend/validate_prod_build.sh`.
 
+----
+
 ### Translations
 
-Translations are added in `src/oxl_ansible_webui/aw/config/language.py`.
+* Translations are added in `src/oxl_ansible_webui/aw/config/language.py`.
 
-New languages also have to be added to the frontend in `frontend/src/base/Nav.svelte` and the country's flag needs to be added to `src/oxl_ansible_webui/aw/static/img/`.
+* New languages also have to be added:
+  * to the frontend in `frontend/src/base/Nav.svelte`
+  * the country's flag needs to be added to `src/oxl_ansible_webui/aw/static/img/`
+  * the translations-file needs to be referenced in `src/oxl_ansible_webui/aw/config/language.py` for them to be picked-up by the API at `src/oxl_ansible_webui/aw/api_endpoints/frontend.py` (`APIBackendTranslations`)
 
 ----
 
