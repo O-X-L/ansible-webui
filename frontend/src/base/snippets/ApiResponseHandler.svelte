@@ -1,11 +1,12 @@
 <script lang="ts">
     import { slide } from 'svelte/transition';
 
-    import { share } from '../Share.js';
     import { Alert } from 'flowbite-svelte';
+    import { CloseCircleSolid, InfoCircleSolid, ExclamationCircleSolid } from 'flowbite-svelte-icons';
+
+    import { share } from '../Share.js';
     import { tq, tqSub } from '../../util/translate.js';
     import { API_STATUS_CODES_OK } from '../Config.js';
-    import { CloseCircleSolid, InfoCircleSolid, ExclamationCircleSolid } from 'flowbite-svelte-icons';
 
     let {
         showError = $bindable(false),

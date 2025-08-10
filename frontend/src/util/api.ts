@@ -84,7 +84,7 @@ export function formJSON(f: HTMLFormElement) : string {
     return JSON.stringify(parsed);
 }
 
-export async function apiForm(e: SubmitEvent, callback: CallableFunction) : boolean {
+export async function apiForm(e: SubmitEvent, callback: CallableFunction) : Promise<boolean> {
     e.preventDefault();
 
     let payload = formJSON(e.target);
@@ -93,19 +93,6 @@ export async function apiForm(e: SubmitEvent, callback: CallableFunction) : bool
 
     apiEdit(method, action, payload, callback);
     return false;
-}
-
-// todo: fix that we are unable to pass a state (v).. maybe move it to a dedicated component?
-export function showAPIErrors(status: number, json: any, v: string, scroll: boolean = false, element: string = '') {
-    if (status != 200 || json.error !== undefined) {
-        v = `${json.error} (${status})`;  // todo: pull language-code from api-error and show user the translation
-        if (scroll) {
-            let a = document.getElementById(element);
-            if (a) {
-                a.scrollIntoView({behavior: "smooth", block: "end", inline: "end"});
-            }    
-        }
-    }
 }
 
 export function cacheKey(share: shareObject): string {

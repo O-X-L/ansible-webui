@@ -220,7 +220,7 @@ def _check_kind(element: str) -> (str, str):
     if element.startswith(QUERY_SELECTOR):
         return element[3:], 'qs'
 
-    elif element.startswith('.'):
+    if element.startswith('.'):
         return element[1:], 'cls'
 
     return element[1:], 'id'
@@ -277,7 +277,8 @@ def test_js_actions():
                 ],
                 [
                     # clone user-creds
-                    f'{QUERY_SELECTOR}.aw-accordion[0]', f"#creds-btn-clone-user-{start_ids['creds_user']}", '#creds-btn-save',
+                    f'{QUERY_SELECTOR}.aw-accordion[0]', f"#creds-btn-clone-user-{start_ids['creds_user']}",
+                    '#creds-btn-save',
                 ],
                 [
                     # delete user-creds
