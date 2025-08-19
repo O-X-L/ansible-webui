@@ -21,7 +21,7 @@ def decode_job_env_vars(env_vars_csv: str, src: str) -> dict:
     try:
         env_vars = {}
         for kv in env_vars_csv.split(','):
-            k, v = kv.split('=')
+            k, v = kv.split('=', 1)
             env_vars[k] = v
 
         return env_vars
