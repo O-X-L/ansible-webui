@@ -81,8 +81,7 @@ You can also run inline scripts like this example:
 
 .. code-block:: bash
 
-    /bin/sh -c "if ! git diff-index --quiet HEAD --; then git add . && git commit -m
-'Modification from $(whoami) on $(hostname)' && git push; else echo 'No changes found'; fi"
+    /bin/sh -c "if ! git diff-index --quiet HEAD --; then git add . && git commit -m 'Modification from $(whoami) on $(hostname)' && git push; else echo 'No changes found'; fi"
 
 ----
 

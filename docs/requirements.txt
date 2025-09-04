@@ -1,2 +1,2 @@
 sphinx
-piccolo_theme
+sphinx_immaterial

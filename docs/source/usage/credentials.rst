@@ -8,9 +8,6 @@
 .. |creds_job| image:: ../_static/img/credentials_job.png
    :class: wiki-img
 
-.. |creds_perm| image:: ../_static/img/credentials_permission.png
-   :class: wiki-img
-
 .. |creds_prompt| image:: ../_static/img/credentials_prompt.png
    :class: wiki-img
 
@@ -48,8 +45,6 @@ Access to global credentials can be controlled using :ref:`permissions <usage_pe
   When executing jobs on a schedule - AW verifies that this job-owner is permitted to use the configured credentials.
 
   If a job-owner gets deleted - the linked scheduled jobs will get denied access to any credentials.
-
-|creds_perm|
 
 ----
 

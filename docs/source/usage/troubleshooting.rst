@@ -72,8 +72,6 @@ The Ansible execution itself can fail because of some common issues:
 Common Issues
 *************
 
-----
-
 SSH Hostkey Verification
 ========================
 
@@ -193,8 +191,6 @@ Note: SAML testing has been done using the `mocksaml.com <https://mocksaml.com/>
 
 Edge-Case Issues
 ****************
-
-----
 
 Connection in use
 =================
