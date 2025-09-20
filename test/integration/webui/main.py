@@ -114,6 +114,7 @@ def login(user: str, pwd: str):
     assert _check_console_logs(url)
 
     login_redirect = f'{BASE_URL}/ui#dashboard'
+    sleep(1)  # we wait 500ms until we set the URL-hash
     assert DRIVER.current_url == login_redirect
 
 
