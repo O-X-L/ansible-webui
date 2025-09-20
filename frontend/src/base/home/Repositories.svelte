@@ -297,6 +297,14 @@
                                 </div>
                                 <table>
                                     <tbody>
+                                        <tr>
+                                            <td class={classPopoverColumn1}>
+                                                {t('common.id')}:
+                                            </td>
+                                            <td class={classPopoverColumn2Text}>
+                                                {repo.id}
+                                            </td>
+                                        </tr>
                                         {#if repoKind == 'static'}
                                             <tr>
                                                 <td class={classPopoverColumn1}>

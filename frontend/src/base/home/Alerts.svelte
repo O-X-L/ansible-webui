@@ -268,6 +268,14 @@
                                     <tbody>
                                         <tr>
                                             <td class={classPopoverColumn1}>
+                                                {t('common.id')}:
+                                            </td>
+                                            <td class={classPopoverColumn2Text}>
+                                                {alert.id}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class={classPopoverColumn1}>
                                                 {t('common.name')}:
                                             </td>
                                             <td class={classPopoverColumn2Text}>

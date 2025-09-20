@@ -362,6 +362,14 @@
                                 </div>
                                 <table>
                                     <tbody>
+                                        <tr>
+                                            <td class={classPopoverColumn1}>
+                                                {t('common.id')}:
+                                            </td>
+                                            <td class={classPopoverColumn2Text}>
+                                                {creds.id}
+                                            </td>
+                                        </tr>
                                         {#if credsKind == 'user'}
                                             <tr>
                                                 <td class={classPopoverColumn1}>

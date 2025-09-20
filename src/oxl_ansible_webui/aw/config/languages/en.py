@@ -56,6 +56,7 @@ EN = {
     'common.setting': 'Setting',
     'common.value': 'Value',
     'common.kind': 'Kind',
+    'common.id': 'ID',
 
     # auth
     'login.user': 'Username',

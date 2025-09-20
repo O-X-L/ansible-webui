@@ -521,6 +521,14 @@
                     <tbody>
                         <tr>
                             <td class={classPopoverColumn1}>
+                                {t('common.id')}:
+                            </td>
+                            <td class={classPopoverColumn2Text}>
+                                {job.id}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class={classPopoverColumn1}>
                                 {t('common.comment')}:
                             </td>
                             <td class={classPopoverColumn2Text}>
