@@ -110,23 +110,34 @@ def credentials_in_use(credentials: BaseJobCredentials) -> bool:
     return in_use
 
 
-REGEX_SSH_KEY_PREFIX = regex_compile(r'-----BEGIN [A-Z]* PRIVATE KEY-----')
-REGEX_SSH_KEY_APPENDIX = regex_compile(r'-----END [A-Z]* PRIVATE KEY-----')
+REGEX_SSH_KEY_PREFIX = regex_compile(r'.*?(-----BEGIN [A-Z]* PRIVATE KEY-----)(.*)')
+REGEX_SSH_KEY_APPENDIX = regex_compile(r'(.*)(-----END [A-Z]* PRIVATE KEY-----).*?')
+REGEX_NL_REPLACE = '§'
 
 
 def _validate_and_fix_ssh_key(key: str) -> (str, None):
     if is_null(key):
         return ''
 
+    key = key.replace('\n', REGEX_NL_REPLACE)
+
     prefix = REGEX_SSH_KEY_PREFIX.match(key)
-    appendix = REGEX_SSH_KEY_APPENDIX.match(key)
-    if prefix is None or appendix is None:
+    if prefix is None:
         return None
 
-    prefix = prefix[0]
-    appendix = appendix[0]
+    try:
+        key = prefix[2]
+        prefix = prefix[1]
 
-    key = key.replace(prefix, '').replace(appendix, '').strip().replace(' ', '\n')
+    except IndexError:
+        return None
+
+    appendix = REGEX_SSH_KEY_APPENDIX.match(key)
+    if appendix is None:
+        return None
+
+    key = appendix[1].replace(REGEX_NL_REPLACE, '\n').strip()
+    appendix = appendix[2]
     return f'{prefix}\n{key}\n{appendix}\n'
 
 

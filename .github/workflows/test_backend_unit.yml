@@ -1,0 +1,52 @@
+---
+
+name: Unit-Tests Backend
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [latest]
+    paths:
+      - '**.py'
+      - 'requirements.txt'
+      - 'requirements_test_backend.txt'
+      - '.github/workflows/test_backend_unit.yml'
+
+  pull_request:
+    branches: [latest]
+    paths:
+      - '**.py'
+      - 'requirements.txt'
+      - 'requirements_test_backend.txt'
+      - '.github/workflows/test_backend_unit.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Install python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install backend dependencies
+        run: |
+          pip install -r requirements.txt >/dev/null
+          pip install -r requirements_test_backend.txt >/dev/null
+
+      - name: Running Unit Tests
+        run: |
+          pytest --version
+          python3 -m pytest
+        env:
+          PYTHONUNBUFFERED: 1

@@ -110,13 +110,6 @@ jobs:
         env:
           PYTHONUNBUFFERED: 1
 
-      - name: Running Unit Tests
-        run: |
-          pytest --version
-          python3 -m pytest
-        env:
-          PYTHONUNBUFFERED: 1
-
       - name: Running API Integration Tests
         run: |
           rm -rf src/oxl_ansible_webui/aw/migrations/*

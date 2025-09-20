@@ -3,6 +3,7 @@
 [![Lint](https://github.com/O-X-L/ansible-webui/actions/workflows/lint.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/lint.yml)
 [![Test Frontend](https://github.com/O-X-L/ansible-webui/actions/workflows/test_frontend.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/test_frontend.yml)
 [![Test Backend](https://github.com/O-X-L/ansible-webui/actions/workflows/test_backend.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/test_backend.yml)
+[![Unit-Tests Backend](https://github.com/O-X-L/ansible-webui/actions/workflows/test_backend_unit.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/test_backend_unit.yml)
 [![Test Job-Execution](https://github.com/O-X-L/ansible-webui/actions/workflows/test_job_execution.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/test_job_execution.yml)
 [![Test Databases](https://github.com/O-X-L/ansible-webui/actions/workflows/test_dbs.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/test_dbs.yml)
 

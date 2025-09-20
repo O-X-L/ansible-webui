@@ -57,7 +57,8 @@ ignore=CVS
 # it can't be used as an escape character.
 ignore-paths=venv/*,
              .venv/*,
-             src/oxl_ansible_webui/aw/migrations/*
+             src/oxl_ansible_webui/aw/migrations/*,
+             *_pytest.py,
 
 # Files or directories matching the regular expression patterns are skipped.
 # The regex matches against base names, not paths. The default value ignores

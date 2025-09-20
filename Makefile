@@ -16,6 +16,9 @@ lint:
 test:
 	bash scripts/test.sh
 
+test-unit:
+	bash scripts/test_unit.sh
+
 test-webui:
 	bash scripts/frontend/build.sh
 	bash scripts/test_webui.sh
