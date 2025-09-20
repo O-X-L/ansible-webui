@@ -31,7 +31,7 @@
     const MAX_ERROR_CNT = 10;
     const classText = 'sm:text-base max-sm:text-xs text-wrap';
     const classProp = 'sm:text-base max-sm:text-xs font-bold pr-3';
-    const endDiv = `logs-end-${jobID}-${exec.id}`;
+    const endScrollAnchor = `logs-end-${jobID}-${exec.id}`;
 
     let componentRoot;
     let apiResponseHandler: APIResponseHandler = $state();
@@ -53,9 +53,9 @@
         if (!followLogsToggle) {
             return;
         }
-        let e = document.getElementById(endDiv);
+        let e = document.getElementById(endScrollAnchor);
         if (e) {
-            e.scrollIntoView({behavior: "smooth", block: "end", inline: "end"});
+            e.scrollIntoView({behavior: "smooth", block: "end"});
         }
     }
 
@@ -245,7 +245,7 @@
     {/if}
 
     <div class="h-48"></div>
-    <div id={endDiv} class="w-0 h-0"></div>
+    <div id={endScrollAnchor} class="w-0 h-0"></div>
 
     <div class="fixed bottom-10 left-[50%] translate-x-[-50%]">
         <div class="{classCenterChildDiv} opacity-30 hover:opacity-95 modal-btns">

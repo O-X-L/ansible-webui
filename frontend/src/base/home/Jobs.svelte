@@ -279,6 +279,8 @@
     // todo: update search url-param on input
 
     function loadCredentialInfos(j: any) {
+        j.shared.sort((a: credentialType, b: credentialType) => a.name.localeCompare(b.name));
+        j.user.sort((a: credentialType, b: credentialType) => a.name.localeCompare(b.name));
         usableCredentials = j;
     }
 

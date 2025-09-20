@@ -16,8 +16,7 @@
     import { redirectTo, getURLHashParams } from '../../util/main.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
-        classSpinnerDiv, classListContent, classListHeader, classFooterSpacing, classSpoilerItem,
-        classModalBody, classSpoilerPad,
+        classSpinnerDiv, classListContent, classListHeader, classFooterSpacing, classSpoilerItem, classSpoilerPad,
     } from '../Style.js';
 
     let { open = $bindable(false) } = $props();
@@ -39,7 +38,7 @@
     let loaded = $state(false);
 
     function t(code: string) : string {
-      return tq($share, code);
+        return tq($share, code);
     }
 
     function isJobExecutionActive(exec: executionType) : boolean {
@@ -81,6 +80,7 @@
                 entryJobActions[job.id] = false;
             }
         }
+        j.sort((a: jobType, b: jobType) => a.name.localeCompare(b.name));
         jobList = j;
         apiDataHashJobs = h;
         if (!loaded) {
@@ -129,6 +129,19 @@
         apiGet(`job_exec?execution_count=${executionCount}&hash=${apiDataHashExecs}`, loadExecutionList);
     }
 
+    function tableScrollAnchor(job_id: number): string {
+        return `table-scroll-${job_id}`;
+    }
+
+    function scrollToTable(job_id: number) {
+        let e = document.getElementById(tableScrollAnchor(job_id));
+        if (e) {
+            e.scrollIntoView({behavior: "smooth", block: "start"});
+        } else {
+            console.log("WARNING: Logs not loaded yet - unable to scroll into view!");
+        }
+    }
+
     function openLogsByURL() {
         let params = getURLHashParams();
         if (!params[PARAM_JOB]) {
@@ -137,10 +150,7 @@
         for (let job of jobList) {
             if (String(job.id) == String(params[PARAM_JOB])) {
                 entryJobActions[job.id] = true;
-                let e = document.getElementById(`logs-${job.id}`);
-                if (e) {
-                    e.scrollIntoView({behavior: "smooth", block: "start", inline: "start"});
-                }
+                setTimeout(() => {scrollToTable(job.id)}, 2000);  // wait for table to load
                 break;
             }
         }
@@ -281,7 +291,7 @@
                 </TableBody>
             </Table>
             {/if}
-        </AccordionItem>
+    </AccordionItem>
 
     {#each jobList as job (job.id)}
         <AccordionItem bind:open={entryJobActions[job.id]} defaultClass="{classSpoilerItem} logs-job-{job.id}"
@@ -290,6 +300,8 @@
             {#if !executionList.length}
                 <div class={classSpinnerDiv}><Spinner/></div>
             {:else}
+            <div id={tableScrollAnchor(job.id)} class="w-0 h-0"></div>
+
             <Table striped={true} id="logs-{job.id}" shadow>
                 <TableHead theadClass={classListHeader}>
                     <TableHeadCell class="max-sm:hidden">#</TableHeadCell>
