@@ -12,9 +12,9 @@
     import { tq } from '../../util/translate.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import { type jobType, type executionType } from './Types.js';
-    import { JOB_EXEC_STATI_ACTIVE, PARAM_JOB } from '../Config.js';
-    import { redirectTo, getURLHashParams } from '../../util/main.js';
+    import { getURLHashParams, isSet, setURLHashParams } from '../../util/main.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
+    import { JOB_EXEC_STATI_ACTIVE, WAIT_MOUNT_MODAL, WAIT_MOUNT_SCROLL } from '../Config.js';
     import {
         classSpinnerDiv, classListContent, classListHeader, classFooterSpacing, classSpoilerItem, classSpoilerPad,
     } from '../Style.js';
@@ -22,6 +22,9 @@
     let { open = $bindable(false) } = $props();
 
     const ALL_JOBS_ID = 0;
+    const URL_HASH = 'logs';
+    const HASH_PARAM_JOB = 'job';
+    const HASH_PARAM_EXEC = 'exec';
 
     let apiResponseHandler: APIResponseHandler = $state();
     let jobList: jobType[] = $state([]);
@@ -64,6 +67,11 @@
         apiEdit('delete', `job/${jobId}/${executionId}/cleanup`, null, apiResponseHandler.handleRes);
     }
 
+    function openExecutionLogs(execId: number) {
+        entryExecActions[execId] = true;
+        setURLHashParams(URL_HASH, {job: openJob, exec: execId});
+    }
+
     /*
     function redirectJob(jobId: number) {
         if (!jobId) {
@@ -86,7 +94,6 @@
         jobList = j;
         apiDataHashJobs = h;
         if (!loaded) {
-            loaded = true;
             openLogsByURL();
         }
     }
@@ -131,12 +138,12 @@
         apiGet(`job_exec?execution_count=${executionCount}&hash=${apiDataHashExecs}`, loadExecutionList);
     }
 
-    function tableScrollAnchor(job_id: number): string {
-        return `table-scroll-${job_id}`;
+    function tableScrollAnchor(jobId: number): string {
+        return `table-scroll-${jobId}`;
     }
 
-    function scrollToTable(job_id: number) {
-        let e = document.getElementById(tableScrollAnchor(job_id));
+    function scrollToTable(jobId: number) {
+        let e = document.getElementById(tableScrollAnchor(jobId));
         if (e) {
             e.scrollIntoView({behavior: "smooth", block: "start"});
         } else {
@@ -148,40 +155,90 @@
         return JOB_EXEC_STATI_ACTIVE.includes(exec.status);
     }
 
-    function openLatestActiveExecution() {
-        for (let exec of executionList) {
-            if (isExecActive(exec)) {
-                entryExecActions[exec.id] = true
+    function expandJobExecutionList(jobId: any, openActive: boolean = true) {
+        for (let job of jobList) {
+            if (String(job.id) == String(jobId)) {
+                entryJobActions[job.id] = true;
+                // wait for load
+                setTimeout(() => {scrollToTable(job.id)}, WAIT_MOUNT_SCROLL);
+                if (openActive) {
+                    setTimeout(() => {openLatestActiveExecution()}, WAIT_MOUNT_MODAL);
+                }
                 break;
             }
         }
+    }
+
+    function openLatestActiveExecution() {
+        for (let exec of executionList) {
+            if (isExecActive(exec)) {
+                openExecutionLogs(exec.id);
+                break;
+            }
+        }
+    }
+
+    function openJobExecutionLogView(execId: any) {
+        for (let exec of executionList) {
+            if (String(exec.id) == String(execId)) {
+                openExecutionLogs(exec.id);
+                break;
+            }
+        }
+        loaded = true;
     }
 
     function openLogsByURL() {
         let params = getURLHashParams();
-        if (!params[PARAM_JOB]) {
+
+        let jobId = params[String(HASH_PARAM_JOB)];
+        let execId = params[String(HASH_PARAM_EXEC)];
+
+        if (!jobId && !execId) {
+            loaded = true;
             return;
         }
-        for (let job of jobList) {
-            if (String(job.id) == String(params[PARAM_JOB])) {
-                entryJobActions[job.id] = true;
-                // wait for load
-                setTimeout(() => {scrollToTable(job.id)}, 2000);
-                setTimeout(() => {openLatestActiveExecution()}, 2500);
-                break;
-            }
+        if (execId) {
+            expandJobExecutionList(jobId, false);
+            setTimeout(() => {openJobExecutionLogView(execId)}, WAIT_MOUNT_MODAL);
+
+        } else {
+            expandJobExecutionList(jobId, true);
+            loaded = true;
         }
     }
 
-    function updateOpenJob(actions: any = ''){
-        for (let [j, v] of Object.entries(actions)) {
+    function updateOpenJob(_: any){
+        for (let [j, v] of Object.entries(entryJobActions)) {
             if (v) {
                 if (j != openJob) {
                     executionList = [];
+                    if (openJob !== ALL_JOBS_ID && loaded) {
+                        setURLHashParams(URL_HASH, {job: j});
+                    }
                 }
                 openJob = j;
+
+                // remove exec-id from URL-Hash if modal was closed
+                if (!loaded || !isSet(entryExecActions)) {
+                    return;
+                }
+
+                let anyOpen = false;
+                for (let execId of Object.keys(entryExecActions)) {
+                    if (entryExecActions[execId]) {
+                        anyOpen = true;
+                        break;
+                    }
+                }
+                if (!anyOpen) {
+                    setURLHashParams(URL_HASH, {job: openJob});            
+                }
                 return;
             }
+        }
+        if (loaded) {
+            setURLHashParams(URL_HASH, null);
         }
         openJob = null;
         executionList = [];
@@ -277,7 +334,8 @@
                         </TableBodyCell>
                         <TableBodyCell tdClass="{classListContent} action-btns">
                             <div class="mt-2">
-                                <Button size="xs" on:click={() => {entryExecActions[exec.id] = true}} id="logs-job-{exec.job}-{exec.id}-show">
+                                <Button size="xs" on:click={() => {openExecutionLogs(exec.id)}} id="logs-job-{exec.job}-{exec.id}-show"
+                                    disabled={!exec.log_stdout_url}>
                                     <BookOpenSolid/>
                                 </Button>
                                 <Tooltip>{t('btn.logs')}</Tooltip>
@@ -366,7 +424,8 @@
                         </TableBodyCell>
                         <TableBodyCell tdClass="{classListContent} action-btns">
                             <div class="mt-2">
-                                <Button size="xs" on:click={() => {entryExecActions[exec.id] = true}} id="logs-job-{job.id}-{exec.id}-show">
+                                <Button size="xs" on:click={() => {openExecutionLogs(exec.id)}} id="logs-job-{job.id}-{exec.id}-show"
+                                    disabled={!exec.log_stdout_url}>
                                     <BookOpenSolid/>
                                 </Button>
                                 <Tooltip>{t('btn.logs')}</Tooltip>

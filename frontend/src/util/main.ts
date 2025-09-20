@@ -59,6 +59,9 @@ export function saveToClipboard(o: any) {
   navigator.clipboard.writeText(JSON.stringify(o, null, 2));
 }
 
+export const URL_HASH_PARAM_SEPARATOR = '&';
+export const URL_HASH_PARAM_KV = '=';
+
 export function getURLHash() : string {
   let f = window.location.hash;
   if (f.includes('?')) {
@@ -71,23 +74,37 @@ export function getURLHash() : string {
 
 export function getURLHashPage() : string {
   let f = getURLHash();
-  return f.split('-')[0];
+  return f.split(URL_HASH_PARAM_SEPARATOR)[0];
 }
 
+// get URL-Hash (p.e. #logs-job=1) and extract the key-value pairs after the '-' separator
 export function getURLHashParams() : any {
   let params = {};
   let f = getURLHash();
-  let params_arr = f.split('-');
+  let params_arr = f.split(URL_HASH_PARAM_SEPARATOR);
   if (params_arr.length > 1) {
     params_arr = params_arr.slice(1);
   }
   for (let p of params_arr) {
-    if (p.includes('=')) {
-      let pp = p.split('=');
+    if (p.includes(URL_HASH_PARAM_KV)) {
+      let pp = p.split(URL_HASH_PARAM_KV);
       params[pp[0]] = pp[1];
     }
   }
   return params;
+}
+
+export function setURLHashParams(hash: string, params: any) {
+  if (isSet(params)) {
+    for (let [k, v] of Object.entries(params)) {
+      if (!isSet(k) || !isSet(v)) {
+        continue;
+      }
+      hash += `${URL_HASH_PARAM_SEPARATOR}${k}${URL_HASH_PARAM_KV}${v}`;
+    }
+  }
+  console.log("HASH", hash, params);
+  window.location.hash = hash;
 }
 
 export function arraysEqual(a: any[], b: any[]) {

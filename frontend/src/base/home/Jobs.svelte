@@ -17,19 +17,24 @@
     import JobForm from './forms/Job.svelte';
     import { tq } from '../../util/translate.js';
     import { classModalLabel } from '../Style.js';
+    import { JOB_EXEC_STATI_ACTIVE } from '../Config.js';
     import { choicesFromArray } from '../../util/form.js';
     import { redirectTo, isSet } from '../../util/main.js';
     import CredentialsForm from './forms/Credentials.svelte';
     import { apiEdit, apiGet, cacheKey } from '../../util/api.js';
-    import { JOB_EXEC_STATI_ACTIVE, PARAM_SEARCH } from '../Config.js';
-    import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import { type jobType, type executionPromptsType,} from './Types.js';
     import { type formChoiceType, type formInfoType } from '../Types.js';
+    import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
+    import { getURLHashParams, setURLHashParams, URL_HASH_PARAM_SEPARATOR, URL_HASH_PARAM_KV } from '../../util/main.js';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
         classPopoverColumn2Text, classPopoverColumn2Div, classCenterChildDiv, classSpinnerDiv,
         classListContent, classListHeader, classFooterSpacing, classModalDialog, classModalBody,
     } from '../Style.js';
+
+    const URL_HASH = 'jobs';
+    const HASH_PARAM_EXEC = 'exec';
+    const HASH_PARAM_EDIT = 'edit';
 
     let { open = $bindable(false) } = $props();
 
@@ -47,7 +52,7 @@
     let updatedAt = $state(0);
     // todo: init search from url-param
     //let tableSearchTerm = $state('');
-    //let loaded = $state(false);
+    let loaded = $state(false);
 
     interface executionPromptsFieldValues {
         tags: string,
@@ -124,6 +129,22 @@
         apiEdit('delete', `job/${jobId}`, null, apiResponseHandler.handleRes);
     }
 
+    function editJob(jobId: number) {
+        setURLHashParams(URL_HASH, {edit: jobId});
+        entryActions[jobId].edit = true;
+    }
+
+    function openExecutionPrompt(job: jobType) {
+        setURLHashParams(URL_HASH, {exec: job.id});
+        entryActions[job.id].exec = true;
+        updateExecutionPrompts(job);
+    }
+
+    function closeExecutionPrompt(jobId: number) {
+        setURLHashParams(URL_HASH, null);
+        entryActions[jobId].exec = false;
+    }
+
     function startJob(jobId: number) {
         if (!jobId) {
             return;
@@ -198,13 +219,14 @@
         apiSuccessMsg = 'jobs.action.start';
         apiEdit('post', `job/${jobId}`, promptData, apiResponseHandler.handleRes);
         entryActions[jobId].exec = false;
+        setURLHashParams(URL_HASH, null);
     }
 
     function redirectLogs(jobId: number) {
         if (!jobId) {
             return;
         }
-        redirectTo(`/ui#logs-job=${jobId}`);
+        redirectTo(`/ui#logs${URL_HASH_PARAM_SEPARATOR}job${URL_HASH_PARAM_KV}${jobId}`);
     }
 
     function updateExecutionPrompts(job: jobType) {
@@ -307,6 +329,10 @@
         entryList = j;
         apiDataHash = h;
         updatedAt = Date.now();
+        if (!loaded) {
+            loaded = true;
+            openModalByURL();
+        }
         /*
         if (!loaded) {
             setSearchByURL();
@@ -322,6 +348,55 @@
         }
         apiGet(`job?executions=true&execution_count=1&hash=${apiDataHash}`, loadJobList);
     }
+
+    function openModalByURL() {
+        let params = getURLHashParams();
+        let action = null;
+        let value = null;
+
+        // only one possible
+        for (let k of [HASH_PARAM_EDIT, HASH_PARAM_EXEC]) {
+            if (params[String(k)]) {
+                value = params[String(k)];
+                action = k;
+            }
+        }
+        if (action == null) {
+            return;
+        }
+
+        for (let job of entryList) {
+            if (String(job.id) == String(value)) {
+                if (action == HASH_PARAM_EXEC) {
+                    openExecutionPrompt(job);
+                } else {
+                    entryActions[job.id][action] = true;
+                }
+                break;
+            }
+        }
+    }
+
+    function updateURLHash(_: any) {
+      // remove hash-params from URL if modals were closed
+      if (!loaded) {
+        return;
+      }
+      let any_open = false;
+      for (let job of Object.keys(entryActions)) {
+        if (entryActions[job].exec || entryActions[job].edit) {
+            any_open = true;
+            break;
+        }
+      }
+      if (!any_open) {
+        setURLHashParams(URL_HASH, null);
+      } 
+    }
+
+    $effect(() => {
+      updateURLHash(entryActions);
+    });
 
     onMount(() => {
         buildUpdateJobList();
@@ -386,9 +461,7 @@
             </TableBodyCell>
             <TableBodyCell tdClass="{classListContent} action-btns">
                 <div class="mt-4">
-                    <Button size="xs" on:click={() => {
-                        entryActions[item.id].exec = true; updateExecutionPrompts(item);
-                        }} disabled={isJobActive(item)} id="jobs-btn-exec-{item.id}">
+                    <Button size="xs" on:click={() => {openExecutionPrompt(item)}} disabled={isJobActive(item)} id="jobs-btn-exec-{item.id}">
                         <PlaySolid/>
                     </Button>
                     <Tooltip>{t('btn.execute')}</Tooltip>
@@ -405,7 +478,7 @@
                     <Tooltip>{t('btn.logs')}</Tooltip>
                 </div>
                 <div class="mt-2">
-                    <Button size="xs" on:click={() => {entryActions[item.id].edit = true}} id="jobs-btn-edit-{item.id}">
+                    <Button size="xs" on:click={() => (editJob(item.id))} id="jobs-btn-edit-{item.id}">
                         <EditSolid/>
                     </Button>
                     <Tooltip>{t('btn.edit')}</Tooltip>
@@ -666,7 +739,7 @@
                     <Button id="jobs-btn-exec-start" type="button" on:click={() => {startJob(job.id)}}><PlaySolid/></Button>
                     <Tooltip>{t('btn.execute')}</Tooltip>
 
-                    <Button id="jobs-btn-exec-close" on:click={() => (entryActions[job.id].exec = false)} class="inline-block ml-2">
+                    <Button id="jobs-btn-exec-close" on:click={() => (closeExecutionPrompt(job.id))} class="inline-block ml-2">
                         <CloseCircleSolid/>
                     </Button>
                     <Tooltip>{t('btn.close')}</Tooltip>

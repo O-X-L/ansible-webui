@@ -28,7 +28,7 @@
       alerts: false,
     });
   
-    $effect(() => {
+    function updateURLHash(_: any) {
       // save open tab to URL
       if (!loaded) {
         return;
@@ -51,6 +51,10 @@
       if (f != fn) {
         window.location.hash = f;
       }
+    }
+
+    $effect(() => {
+      updateURLHash(openTab);
     });
 
     function t(code: string) : string {
@@ -74,7 +78,7 @@
       } else {
         openTab.dashboard = true;
       }
-      loaded = true;
+      setTimeout(() => {loaded = true}, 500);
     })
 </script>
 

@@ -28,7 +28,7 @@
       permission: false,
     });
   
-    $effect(() => {
+    function updateURLHash(_: any) {
       // save open tab to URL
       if (!loaded) {
         return;
@@ -48,6 +48,10 @@
       }
 
       window.location.hash = fragment;
+    }
+
+    $effect(() => {
+      updateURLHash(openTab);
     });
 
     function t(code: string) : string {
@@ -74,7 +78,7 @@
       } else {
         openTab.settings = true;
       }
-      loaded = true;
+      setTimeout(() => {loaded = true}, 500);
     })
 </script>
 

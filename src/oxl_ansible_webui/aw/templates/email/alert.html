@@ -68,18 +68,20 @@
 {%   endif %}
 {%   if error_msgs|get_value:'html'|exists %}
         <br>
-        <b>Execution errors</b>:<br>
+        <b>Execution Errors</b>:<br>
 {%     for msg in error_msgs|get_value:'html' %}
         {{ msg|safe }}<br>
 {%     endfor %}
         <br>
 {%   endif %}
 {% endif %}
-        <b>Job History</b>: <a href="{{ url }}/ui/jobs/log?job={{ execution.job.id }}">Link</a><br>
+        <b>Job</b>: <a href="{{ url }}/ui#jobs&edit={{ execution.job.id }}">Link</a><br>
+        <b>Job History</b>: <a href="{{ url }}/ui#logs&job={{ execution.job.id }}">Link</a><br>
 {% for log_attr in execution.log_file_fields %}
 {%   set_var execution|get_value:log_attr as log_file %}
 {%   set_var log_attr|concat:'_url' as log_url %}
 {%   if log_file|file_exists %}
+        <b>Execution Logs</b>: <a href="{{ url }}/ui#logs&job={{ execution.job.id }}&exec={{ execution.id }}">Link</a><br>
         <b>{{ log_attr|whitespace_char:'_'|capitalize }}</b>: <a href="{{ url }}{{ execution|get_value:log_url }}">Download</a><br>
 {%   endif %}
 {% endfor %}
