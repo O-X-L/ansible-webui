@@ -103,7 +103,7 @@ export function setURLHashParams(hash: string, params: any) {
       hash += `${URL_HASH_PARAM_SEPARATOR}${k}${URL_HASH_PARAM_KV}${v}`;
     }
   }
-  console.log("HASH", hash, params);
+  // console.log("HASH", hash, params);
   window.location.hash = hash;
 }
 
