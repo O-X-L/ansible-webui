@@ -52,8 +52,12 @@ class ExecuteRepository:
             git_cmds.append('git lfs fetch')
             git_cmds.append('git lfs checkout')
 
-        for cmd in git_cmds:
-            self._repo_process(cmd=cmd, env=env)
+        try:
+            for cmd in git_cmds:
+                self._repo_process(cmd=cmd, env=env)
+
+        except AnsibleRepositoryError:
+            self.update_repository(env)
 
     def update_repository(self, env: dict):
         if is_set(self.repository.git_override_update):
@@ -104,7 +108,7 @@ class ExecuteRepository:
 
             self._run_repo_hooks(cmds=self.repository.git_hook_pre, env=env)
 
-            if not (Path(path_repo) / '.git/HEAD').is_file():
+            if not (Path(path_repo) / '.git').is_dir():
                 self.create_repository(env=env)
 
             else:
