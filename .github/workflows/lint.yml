@@ -11,6 +11,8 @@ on:
       - '**.yml'
       - '.github/workflows/lint.yml'
       - 'requirements_lint.txt'
+      - '.pylintrc'
+      - '.yamllint'
   pull_request:
     branches: [latest]
     paths:
@@ -18,6 +20,8 @@ on:
       - '**.yml'
       - '.github/workflows/lint.yml'
       - 'requirements_lint.txt'
+      - '.pylintrc'
+      - '.yamllint'
 jobs:
   lint:
     runs-on: ubuntu-latest
