@@ -291,9 +291,8 @@ class APIJobItem(APIView):
                 serializer.validated_data['owner'] = user
 
                 try:
-                    job = Job.objects.filter(id=job.id)
-                    job.update(**serializer.validated_data)
                     log_audit(user=user, title='Job edit', msg=f"Job edited: ID '{job_id}', Name '{job.name}'")
+                    Job.objects.filter(id=job.id).update(**serializer.validated_data)
 
                 except IntegrityError as err:
                     return Response(
