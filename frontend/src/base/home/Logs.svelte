@@ -64,12 +64,14 @@
         apiEdit('delete', `job/${jobId}/${executionId}/cleanup`, null, apiResponseHandler.handleRes);
     }
 
+    /*
     function redirectJob(jobId: number) {
         if (!jobId) {
             return;
         }
         redirectTo(`/ui#jobs-search=id:${jobId}`);
     }
+    */
 
     function loadJobList(j: any, h: string) {
         if (j === null || h == apiDataHashJobs) {
@@ -142,6 +144,19 @@
         }
     }
 
+    function isExecActive(exec: executionType) : boolean {
+        return JOB_EXEC_STATI_ACTIVE.includes(exec.status);
+    }
+
+    function openLatestActiveExecution() {
+        for (let exec of executionList) {
+            if (isExecActive(exec)) {
+                entryExecActions[exec.id] = true
+                break;
+            }
+        }
+    }
+
     function openLogsByURL() {
         let params = getURLHashParams();
         if (!params[PARAM_JOB]) {
@@ -150,7 +165,9 @@
         for (let job of jobList) {
             if (String(job.id) == String(params[PARAM_JOB])) {
                 entryJobActions[job.id] = true;
-                setTimeout(() => {scrollToTable(job.id)}, 2000);  // wait for table to load
+                // wait for load
+                setTimeout(() => {scrollToTable(job.id)}, 2000);
+                setTimeout(() => {openLatestActiveExecution()}, 2500);
                 break;
             }
         }
