@@ -11,6 +11,7 @@ from requests import Session
 BASE_URL = 'http://127.0.0.1:8000/api'
 API_USER = environ['AW_ADMIN']
 API_KEY = environ['AW_API_KEY']
+SINGLE_TIMEOUT = 10
 
 api = Session()
 api.headers['X-Api-Key'] = API_KEY
@@ -50,6 +51,25 @@ def _api_request(location: str, method: str = None, data: dict = None) -> dict:
     return res.json()
 
 
+def _check_status_until_finished_or_timeout(job_id: int, exec_count: int):
+    time_start = time()
+    e = None
+    while time() - SINGLE_TIMEOUT < time_start:
+        res = _api_request(f'job/{job_id}?executions=true', 'get')
+        assert 'executions' in res and len(res['executions']) == exec_count
+        e = res['executions'][0]
+
+        if e['status_name'] in ['Waiting', 'Running']:
+            sleep(1)
+            continue
+
+        print(' =>', e)
+        return e
+
+    print(' =>', e)
+    raise TimeoutError()
+
+
 def test_simple(jid: int = 1):
     print('SIMPLE | ADD JOB')
     _api_request(
@@ -64,11 +84,7 @@ def test_simple(jid: int = 1):
     _api_request(f'job/{jid}', 'post')
 
     print('SIMPLE | CHECK')
-    sleep(5)
-    res = _api_request(f'job/{jid}?executions=true', 'get')
-    assert 'executions' in res and len(res['executions']) == 1
-    e = res['executions'][0]
-    print(' =>', e)
+    e = _check_status_until_finished_or_timeout(jid, 1)
 
     assert e['user_name'] == API_USER
     assert e['status_name'] == 'Finished'
@@ -105,11 +121,7 @@ def test_params(jid: int = 2):
     )
 
     print('PARAMS | CHECK (vars, modes & comment)')
-    sleep(5)
-    res = _api_request(f'job/{jid}?executions=true', 'get')
-    assert 'executions' in res and len(res['executions']) == 1
-    e = res['executions'][0]
-    print(' =>', e)
+    e = _check_status_until_finished_or_timeout(jid, 1)
 
     assert e['status_name'] == 'Finished'
     assert e['failed'] is False
@@ -134,11 +146,7 @@ def test_params(jid: int = 2):
     )
 
     print('PARAMS | CHECK (limit & tags)')
-    sleep(5)
-    res = _api_request('job/2?executions=true', 'get')
-    assert 'executions' in res and len(res['executions']) == 2
-    e = res['executions'][0]
-    print(' =>', e)
+    e = _check_status_until_finished_or_timeout(2, 2)
 
     assert e['status_name'] == 'Finished'
     assert e['failed'] is False
@@ -177,11 +185,7 @@ def test_creds(jid: int = 3):
     )
 
     print('CREDS | CHECK (connect, become & vault pass)')
-    sleep(5)
-    res = _api_request(f'job/{jid}?executions=true', 'get')
-    assert 'executions' in res and len(res['executions']) == 1
-    e = res['executions'][0]
-    print(' =>', e)
+    e = _check_status_until_finished_or_timeout(jid, 1)
 
     assert e['status_name'] == 'Finished'
     assert e['failed'] is False
@@ -227,11 +231,7 @@ def test_repo_git(jid: int = 4):
     )
 
     print('REPO GIT | CHECK (not isolated)')
-    sleep(10)
-    res = _api_request(f'job/{jid}?executions=true', 'get')
-    assert 'executions' in res and len(res['executions']) == 1
-    e = res['executions'][0]
-    print(' =>', e)
+    e = _check_status_until_finished_or_timeout(jid, 1)
 
     assert e['status_name'] == 'Finished'
     assert e['failed'] is False
