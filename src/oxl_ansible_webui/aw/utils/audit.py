@@ -6,6 +6,8 @@ from aw.utils.debug import log
 
 
 def log_audit(user: USERS, title: str, msg: str):
+    # todo: add model change-diff (of non-secret parameters) to log-message
+
     if not config['audit_log']:
         return
 

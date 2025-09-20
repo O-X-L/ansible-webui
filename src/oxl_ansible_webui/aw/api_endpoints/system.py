@@ -136,9 +136,9 @@ class APISystemConfig(APIView):
 
             if changed:
                 log(msg='System config changed - updating', level=5)
+                log_audit(user=user, title='System-Settings edit', msg='System-Settings edited')
                 config_db.save()
 
-            log_audit(user=user, title='System-Settings edit', msg='System-Settings edited')
             return Response(data={'msg': "System config updated"}, status=200)
 
         except IntegrityError as err:
@@ -215,4 +215,5 @@ class APIUserPasswordChange(APIView):
 
         user.set_password(pwd)
         user.save()
+        log_audit(user=user, title='Password change', msg='Password changed')
         return Response({'msg': 'Password updated'}, status=200)

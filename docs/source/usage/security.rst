@@ -118,7 +118,7 @@ Setup
 Target Systems
 **************
 
-If you target Linux-Systems you can limit the IP-addresses from which the automation-user (*configured for Ansible-WebUI*) using your SSH config:
+If your target Linux-Systems you can limit the IP-addresses from which the automation-user (*configured for Ansible-WebUI*) using your SSH config:
 
 .. code-block::
 
