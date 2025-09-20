@@ -100,7 +100,7 @@ When adding additional svelte-apps - they should be added to `script/frontend/va
 
 * Translations are added in `src/oxl_ansible_webui/aw/config/language.py`.
 
-* If you add features that introduce new language-codes - either auto-translate them with a tool like [deepl](https://deepl.com/) or create a follow-up issue/ticket.
+* If you add features that introduce new language-codes - either auto-translate them with a tool like [deepl](https://deepl.com/) or add the new codes commented-out to all languages and create a follow-up issue/ticket.
 
 * New languages also have to be added:
   * to the frontend in `frontend/src/base/Nav.svelte`
