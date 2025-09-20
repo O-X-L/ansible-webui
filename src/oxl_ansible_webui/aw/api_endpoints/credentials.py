@@ -1,4 +1,5 @@
 from shutil import rmtree
+from re import compile as regex_compile
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
@@ -108,19 +109,24 @@ def credentials_in_use(credentials: BaseJobCredentials) -> bool:
     return in_use
 
 
-SSH_KEY_PREFIX = '-----BEGIN OPENSSH PRIVATE KEY-----'
-SSH_KEY_APPENDIX = '-----END OPENSSH PRIVATE KEY-----'
+REGEX_SSH_KEY_PREFIX = regex_compile(r'-----BEGIN [A-Z]* PRIVATE KEY-----')
+REGEX_SSH_KEY_APPENDIX = regex_compile(r'-----END [A-Z]* PRIVATE KEY-----')
 
 
 def _validate_and_fix_ssh_key(key: str) -> (str, None):
     if is_null(key):
         return ''
 
-    if key.find(SSH_KEY_PREFIX) == -1:
+    prefix = REGEX_SSH_KEY_PREFIX.match(key)
+    appendix = REGEX_SSH_KEY_APPENDIX.match(key)
+    if prefix is None or appendix is None:
         return None
 
-    key = key.replace(SSH_KEY_PREFIX, '').replace(SSH_KEY_APPENDIX, '').strip().replace(' ', '\n')
-    return f'{SSH_KEY_PREFIX}\n{key}\n{SSH_KEY_APPENDIX}\n'
+    prefix = prefix[0]
+    appendix = appendix[0]
+
+    key = key.replace(prefix, '').replace(appendix, '').strip().replace(' ', '\n')
+    return f'{prefix}\n{key}\n{appendix}\n'
 
 
 class APIJobCredentials(APIView):

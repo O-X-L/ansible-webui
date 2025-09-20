@@ -13,11 +13,12 @@ tbd
 Fixes:
 
 * Dashboard Status-Query Endless-Loop
+* Allow for different SSH-Key headers [#36](https://github.com/O-X-L/ansible-webui/issues/36)
 
 Features:
 
 * API and Form to Ansible-Vault-Encrypt data [#7](https://github.com/O-X-L/ansible-webui/issues/7)
-
+* Spanish translations [#54](https://github.com/O-X-L/ansible-webui/issues/54)
 
 
 ### 0.8.9
