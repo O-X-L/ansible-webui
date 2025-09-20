@@ -15,7 +15,6 @@
     import { share } from '../../Share.js';
     import { tq } from '../../../util/translate.js';
     import { isSet, rsplit } from '../../../util/main.js';
-    import { setURLHashParams } from '../../../util/main.js';
     import { apiGet, apiEdit, cacheKey } from '../../../util/api.js';
     import { type formInfoType, type inputColorType } from '../../Types.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
@@ -39,7 +38,6 @@
         existingID = null,
     } = $props();
 
-    const URL_HASH = 'jobs';
     const urlExisting = `job/${existingID}`;
 
     let apiResponseHandler: APIResponseHandler = $state();
@@ -302,6 +300,10 @@
         }
 
         for (let p of executionPrompts) {
+            if (!isSet(p.varName.value)) {
+                // will be an invalid extra-var..; todo: show warning
+                continue;
+            }
             let prompt: executionPromptVarType = {
                 name: p.name.value,
                 varName: p.varName.value,
