@@ -48,6 +48,7 @@
         path_ansible_config: string|null
         path_ssh_known_hosts: string|null
         debug: boolean
+        audit_log: boolean
         logo_url: string
         ara_server: string|null
         global_environment_vars: string|null
@@ -81,6 +82,7 @@
         path_ansible_config: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         path_ssh_known_hosts: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         debug: {value: false},
+        audit_log: {value: true},
         logo_url: {value: 'img/logo.svg', color: inputBaseColor, required: false, regex: /^.{0,200}/},
         ara_server: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         global_environment_vars: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
@@ -459,6 +461,12 @@
                     <Tooltip>{t('config.is_read_only')}</Tooltip>
                 {/if}
                 <Helper class={classModalHelp}>{t('config.form.help.debug')}</Helper>
+            </div>
+
+            <div class={classModalInput}>
+                <Label for="cnf_audit_log" class={classModalLabel}>{t('config.form.audit_log')}</Label>
+                <Toggle id="cnf_audit_log" bind:checked={form.audit_log.value} />
+                <Helper class={classModalHelp}>{@html t('config.form.help.audit_log')}</Helper>
             </div>
 
             <div class={classModalInput}>

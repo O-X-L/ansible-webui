@@ -437,7 +437,7 @@
                 <span slot="header">Main</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
-                        <Label for="job_name" class={classModalLabel}>{t('jobs.form.name')}</Label>
+                        <Label for="job_name" class={classModalLabel}>{t('common.name')}</Label>
                         <Input id="job_name" bind:value={form.name.value} bind:color={form.name.color}
                             on:input={valideInput} on:blur={valideInput} required={form.name.required} />
                     </div>

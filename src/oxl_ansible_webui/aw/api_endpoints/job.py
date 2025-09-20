@@ -24,6 +24,7 @@ from aw.execute.util import update_status, is_execution_status
 from aw.utils.util import is_set, ansible_log_html, ansible_log_text
 from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED
 from aw.base import USERS
+from aw.utils.audit import log_audit
 
 
 class JobWriteRequest(serializers.ModelSerializer):
@@ -180,6 +181,7 @@ class APIJob(APIView):
 
         try:
             o = serializer.save()
+            log_audit(user=user, title='Job create', msg=f"Job created: ID '{o.id}', Name '{o.name}'")
             return Response(data={'msg': 'Job created', 'id': o.id}, status=200)
 
         except IntegrityError as err:
@@ -249,6 +251,7 @@ class APIJobItem(APIView):
                 if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_DELETE):
                     return Response(data={'error': f"Not privileged to delete the job '{job.name}'"}, status=403)
 
+                log_audit(user=user, title='Job delete', msg=f"Job deleted: ID '{job.id}', Name '{job.name}'")
                 job.delete()
                 return Response(data={'msg': f"Job '{job.name}' deleted", 'id': job_id}, status=200)
 
@@ -288,7 +291,9 @@ class APIJobItem(APIView):
                 serializer.validated_data['owner'] = user
 
                 try:
-                    Job.objects.filter(id=job.id).update(**serializer.validated_data)
+                    job = Job.objects.filter(id=job.id)
+                    job.update(**serializer.validated_data)
+                    log_audit(user=user, title='Job edit', msg=f"Job edited: ID '{job_id}', Name '{job.name}'")
 
                 except IntegrityError as err:
                     return Response(
@@ -340,6 +345,7 @@ class APIJobItem(APIView):
 
                 execution.save()
                 queue_add(execution=execution)
+                log_audit(user=user, title='Job execute', msg=f"Job executed: ID '{job.id}', Name '{job.name}'")
                 return Response(data={'msg': f"Job '{job.name}' execution queued", 'id': execution.id}, status=200)
 
         except ObjectDoesNotExist:
@@ -380,6 +386,11 @@ class APIJobExecutionItem(APIView):
                     return Response(data={'error': f"Job execution '{job.name}' is not running"}, status=400)
 
                 update_status(execution, 'Stopping')
+                log_audit(
+                    user=user,
+                    title='Job-Execution stop',
+                    msg=f"Job-Execution stopped: Exec-ID: '{exec_id}', Job-ID '{job.id}', Job-Name '{job.name}'",
+                )
                 return Response(data={'msg': f"Job execution '{job.name}' stopping", 'id': exec_id}, status=200)
 
         except ObjectDoesNotExist:
@@ -427,6 +438,11 @@ class APIJobExecutionCleanup(APIView):
                         remove_file(log_file)
 
                 execution.delete()
+                log_audit(
+                    user=user,
+                    title='Job-Execution delete',
+                    msg=f"Job-Execution deleted: Exec-ID: '{exec_id}', Job-ID '{job.id}', Job-Name '{job.name}'",
+                )
                 return Response(data={'msg': f"Job execution of job '{job.name}' deleted", 'id': exec_id}, status=200)
 
         except ObjectDoesNotExist:

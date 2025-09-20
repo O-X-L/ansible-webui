@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.admin.models import LogEntry
 from rest_framework_api_key.admin import APIKey
 
 from aw.base import USERS
@@ -20,6 +21,30 @@ class UserExtendedInline(admin.StackedInline):
 
 class UserAdmin(BaseUserAdmin):
     inlines = [UserExtendedInline]
+
+
+@admin.register(LogEntry)
+class AuditLog(admin.ModelAdmin):
+    """
+    Custom Admin view for LogEntry model to make it read-only.
+    """
+    # Display these fields in the list view
+    list_display = ('action_time', 'user', 'object_repr', 'change_message')
+
+    # Add filters for easier navigation
+    list_filter = ('action_time', 'user', 'object_repr')
+
+    # Add a search field
+    search_fields = ('object_repr', 'user__username', 'object_id')
+
+    def has_add_permission(self, request) -> bool:
+        return False
+
+    def has_change_permission(self, request, obj=None) -> bool:
+        return False
+
+    def has_delete_permission(self, request, obj=None) -> bool:
+        return False
 
 
 admin.site.unregister(APIKey)

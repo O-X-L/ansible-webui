@@ -14,6 +14,7 @@ from aw.utils.permission import has_manager_privileges
 from aw.utils.system import get_system_environment
 from aw.config.environment import check_aw_env_var_is_set
 from aw.config.hardcoded import SECRET_HIDDEN
+from aw.utils.audit import log_audit
 
 
 class SystemConfigSettings(BaseResponse):
@@ -34,6 +35,7 @@ class SystemConfigSettings(BaseResponse):
     mail_user = serializers.CharField()
     mail_sender = serializers.CharField()
     mail_ssl_verify = serializers.BooleanField()
+    audit_log = serializers.BooleanField()
 
     # SystemConfig.api_fields_read_only
     db = serializers.CharField()
@@ -100,7 +102,8 @@ class APISystemConfig(APIView):
         operation_id='system_config_edit',
     )
     def put(self, request):
-        privileged = has_manager_privileges(user=get_api_user(request), kind='system')
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='system')
         if not privileged:
             return Response(
                 data={'error': 'Not privileged to manage system config'},
@@ -135,6 +138,7 @@ class APISystemConfig(APIView):
                 log(msg='System config changed - updating', level=5)
                 config_db.save()
 
+            log_audit(user=user, title='System-Settings edit', msg='System-Settings edited')
             return Response(data={'msg': "System config updated"}, status=200)
 
         except IntegrityError as err:

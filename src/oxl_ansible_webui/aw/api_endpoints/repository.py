@@ -19,6 +19,7 @@ from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE,
     CHOICE_PERMISSION_EXECUTE
 from aw.api_endpoints.job_util import get_log_file_content
 from aw.execute.repository import ExecuteRepository
+from aw.utils.audit import log_audit
 
 
 class RepositoryWriteRequest(serializers.ModelSerializer):
@@ -131,7 +132,8 @@ class APIRepository(APIView):
         operation_id='repository_create',
     )
     def post(self, request):
-        privileged = has_manager_privileges(user=get_api_user(request), kind='repository')
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='repository')
         if not privileged:
             return Response(data={'error': 'Not privileged to manage repositories'}, status=403)
 
@@ -148,10 +150,15 @@ class APIRepository(APIView):
             repo = serializer.save()
             create_update_git_repo(repo)
 
+            log_audit(
+                user=user,
+                title='Repository create',
+                msg=f"Repository created: ID '{repo.id}', Name '{repo.name}'",
+            )
             return Response({
                 'msg': f"Repository '{serializer.validated_data['name']}' created successfully",
                 'id': repo.id,
-            })
+            }, status=200)
 
         except IntegrityError as err:
             return Response(data={'error': f"Provided repository data is not valid: '{err}'"}, status=400)
@@ -230,6 +237,11 @@ class APIRepositoryItem(GenericAPIView):
 
         try:
             Repository.objects.filter(id=repo_id).update(**serializer.validated_data)
+            log_audit(
+                user=user,
+                title='Repository edit',
+                msg=f"Repository edited: ID '{repo.id}', Name '{repo.name}'",
+            )
             return Response(data={'msg': f"Repository '{repo.name}' updated", 'id': repo_id}, status=200)
 
         except IntegrityError as err:
@@ -264,6 +276,11 @@ class APIRepositoryItem(GenericAPIView):
                     )
 
                 repo.delete()
+                log_audit(
+                    user=user,
+                    title='Repository delete',
+                    msg=f"Repository deleted: ID '{repo.id}', Name '{repo.name}'",
+                )
                 return Response(data={'msg': f"Repository '{repo.name}' deleted", 'id': repo_id}, status=200)
 
         except ObjectDoesNotExist:
@@ -299,6 +316,11 @@ class APIRepositoryItem(GenericAPIView):
 
                 create_update_git_repo(repo)
 
+                log_audit(
+                    user=user,
+                    title='Repository download',
+                    msg=f"Repository downloaded: ID '{repo.id}', Name '{repo.name}'",
+                )
                 return Response(
                     data={'msg': f"Repository '{repo.name}' update initiated", 'id': repo_id},
                     status=200,

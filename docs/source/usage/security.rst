@@ -2,6 +2,9 @@
 
 .. include:: ../_include/head.rst
 
+.. |audit_log| image:: ../_static/img/admin_audit_log.png
+   :class: wiki-img
+
 
 ========
 Security
@@ -82,6 +85,10 @@ Security considerations this project does take into account:
 * A basic job-queue validation that checks that the entries of the queue were actually created by the application.
 
   This lowers the danger of an attack-vector that would utilize DB-write-access to execute jobs.
+
+* All create/update/delete/execute actions by users are logged inside the **Audit Log** (*opt-out in the System-Settings*)
+
+  |audit_log|
 
 ----
 

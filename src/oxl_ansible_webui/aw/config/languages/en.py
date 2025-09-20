@@ -321,6 +321,7 @@ EN = {
     'config.form.path_ansible_config': 'Ansible Config-File',
     'config.form.path_ssh_known_hosts': 'SSH Known-Hosts File',
     'config.form.debug': 'Debug Mode',
+    'config.form.audit_log': 'Audit Logging',
     ### env-vars
     'config.form.timezone': 'Timezone',
     'config.form.db': 'Database',
@@ -359,6 +360,9 @@ EN = {
     'config.form.help.debug': 'Enable Debug-mode. Do not enable permanent on production systems! '
                               'It can possibly open attack vectors. '
                               'You might need to restart the application to apply this setting',
+    'config.form.help.audit_log': 'Enable Audit-Logging. All create/update/delete actions are logged to the database '
+                                  'and can be viewed in the Admin-UI at '
+                                  '<a href="/ui/system#admin">System - Admin - Administration - Log entries</a>',
     'config.form.help.logo_url': 'Example: '
                                  '<a href="https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo'
                                  '/vscode-ansible.svg">'

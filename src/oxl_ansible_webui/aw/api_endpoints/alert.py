@@ -12,6 +12,7 @@ from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user,
     api_docs_post, validate_no_xss, GenericErrorResponse, response_data_if_changed, API_PARAM_HASH, BaseResponse
 from aw.utils.permission import has_manager_privileges
 from aw.model.alert import BaseAlert, AlertPlugin, AlertGlobal, AlertGroup, AlertUser
+from aw.utils.audit import log_audit
 
 
 def update_jobs(alert: BaseAlert, job_ids: list):
@@ -59,7 +60,8 @@ class APIAlertPlugin(GenericAPIView):
         operation_id='alert_plugin_create',
     )
     def post(self, request):
-        privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='alert')
         if not privileged:
             return Response(
                 data={'error': 'Not privileged to manage Alert-Plugin'},
@@ -76,10 +78,15 @@ class APIAlertPlugin(GenericAPIView):
 
         try:
             o = serializer.save()
+            log_audit(
+                user=user,
+                title='Alert-Plugin create',
+                msg=f"Alert-Plugin created: ID '{o.id}', Name '{o.name}'",
+            )
             return Response({
                 'msg': f"Alert-Plugin '{serializer.validated_data['name']}' created successfully",
                 'id': o.id,
-            })
+            }, status=200)
 
         except IntegrityError as err:
             return Response(
@@ -122,7 +129,8 @@ class APIAlertPluginItem(GenericAPIView):
         operation_id='alert_plugin_edit',
     )
     def put(self, request, plugin_id: int):
-        privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='alert')
         if not privileged:
             return Response(
                 data={'error': 'Not privileged to manage Alert-Plugins'},
@@ -151,6 +159,11 @@ class APIAlertPluginItem(GenericAPIView):
 
         try:
             AlertPlugin.objects.filter(id=plugin.id).update(**serializer.validated_data)
+            log_audit(
+                user=user,
+                title='Alert-Plugin edit',
+                msg=f"Alert-Plugin edited: ID '{plugin.id}', Name '{plugin.name}'",
+            )
             return Response(data={'msg': f"Alert-Plugin '{plugin.name}' updated", 'id': plugin_id}, status=200)
 
         except IntegrityError as err:
@@ -163,7 +176,8 @@ class APIAlertPluginItem(GenericAPIView):
         operation_id='alert_plugin_delete'
     )
     def delete(self, request, plugin_id: int):
-        privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='alert')
         if not privileged:
             return Response(
                 data={'error': 'Not privileged to manage Alert-Plugins'},
@@ -174,6 +188,11 @@ class APIAlertPluginItem(GenericAPIView):
             plugin = AlertPlugin.objects.get(id=plugin_id)
             if plugin is not None:
                 plugin.delete()
+                log_audit(
+                    user=user,
+                    title='Alert-Plugin delete',
+                    msg=f"Alert-Plugin deleted: ID '{plugin.id}', Name '{plugin.name}'",
+                )
                 return Response(data={'msg': f"Alert-Plugin '{plugin.name}' deleted", 'id': plugin_id}, status=200)
 
         except ObjectDoesNotExist:
@@ -251,7 +270,15 @@ class APIAlertUser(GenericAPIView):
         try:
             serializer.validated_data['user_id'] = user.id
             o = serializer.save()
-            return Response({'msg': f"Alert '{serializer.validated_data['name']}' created successfully", 'id': o.id})
+            log_audit(
+                user=user,
+                title='Alert-User create',
+                msg=f"Alert-User created: ID '{o.id}', Name '{o.name}'",
+            )
+            return Response(
+                {'msg': f"Alert '{serializer.validated_data['name']}' created successfully", 'id': o.id},
+                status=200,
+            )
 
         except IntegrityError as err:
             return Response(
@@ -324,6 +351,11 @@ class APIAlertUserItem(GenericAPIView):
             AlertUser.objects.filter(id=alert.id).update(
                 **{**serializer.validated_data, 'user': user.id}
             )
+            log_audit(
+                user=user,
+                title='Alert-User edit',
+                msg=f"Alert-User edited: ID '{alert.id}', Name '{alert.name}'",
+            )
             return Response(data={'msg': f"Alert '{alert.name}' updated", 'id': alert_id}, status=200)
 
         except IntegrityError as err:
@@ -342,6 +374,11 @@ class APIAlertUserItem(GenericAPIView):
             alert = AlertUser.objects.get(id=alert_id, user=user)
             if alert is not None:
                 alert.delete()
+                log_audit(
+                    user=user,
+                    title='Alert-User delete',
+                    msg=f"Alert-User deleted: ID '{alert.id}', Name '{alert.name}'",
+                )
                 return Response(data={'msg': f"Alert '{alert.name}' deleted", 'id': alert_id}, status=200)
 
         except ObjectDoesNotExist:
@@ -402,7 +439,8 @@ class APIAlertGlobal(GenericAPIView):
         operation_id='alert_global_create',
     )
     def post(self, request):
-        privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='alert')
         if not privileged:
             return Response(
                 data={'error': 'Not privileged to manage Alert'},
@@ -419,7 +457,15 @@ class APIAlertGlobal(GenericAPIView):
 
         try:
             o = serializer.save()
-            return Response({'msg': f"Alert '{serializer.validated_data['name']}' created successfully", 'id': o.id})
+            log_audit(
+                user=user,
+                title='Alert-Global create',
+                msg=f"Alert-Global created: ID '{o.id}', Name '{o.name}'",
+            )
+            return Response(
+                {'msg': f"Alert '{serializer.validated_data['name']}' created successfully", 'id': o.id},
+                status=200,
+            )
 
         except IntegrityError as err:
             return Response(
@@ -462,7 +508,8 @@ class APIAlertGlobalItem(GenericAPIView):
         operation_id='alert_global_edit',
     )
     def put(self, request, alert_id: int):
-        privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='alert')
         if not privileged:
             return Response(
                 data={'error': 'Not privileged to manage Alerts'},
@@ -492,6 +539,11 @@ class APIAlertGlobalItem(GenericAPIView):
         try:
             update_jobs(alert=alert, job_ids=serializer.validated_data.pop('jobs'))
             AlertGlobal.objects.filter(id=alert.id).update(**serializer.validated_data)
+            log_audit(
+                user=user,
+                title='Alert-Global edit',
+                msg=f"Alert-Global edited: ID '{alert.id}', Name '{alert.name}'",
+            )
             return Response(data={'msg': f"Alert '{alert.name}' updated", 'id': alert_id}, status=200)
 
         except IntegrityError as err:
@@ -504,7 +556,8 @@ class APIAlertGlobalItem(GenericAPIView):
         operation_id='alert_global_delete'
     )
     def delete(self, request, alert_id: int):
-        privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='alert')
         if not privileged:
             return Response(
                 data={'error': 'Not privileged to manage Alerts'},
@@ -515,6 +568,11 @@ class APIAlertGlobalItem(GenericAPIView):
             alert = AlertGlobal.objects.get(id=alert_id)
             if alert is not None:
                 alert.delete()
+                log_audit(
+                    user=user,
+                    title='Alert-Global delete',
+                    msg=f"Alert-Global deleted: ID '{alert.id}', Name '{alert.name}'",
+                )
                 return Response(data={'error': f"Alert '{alert.name}' deleted", 'id': alert_id}, status=200)
 
         except ObjectDoesNotExist:
@@ -573,7 +631,8 @@ class APIAlertGroup(GenericAPIView):
         operation_id='alert_group_create',
     )
     def post(self, request):
-        privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='alert')
         if not privileged:
             return Response(
                 data={'error': 'Not privileged to manage Alerts'},
@@ -590,7 +649,15 @@ class APIAlertGroup(GenericAPIView):
 
         try:
             o = serializer.save()
-            return Response({'msg': f"Alert '{serializer.validated_data['name']}' created successfully", 'id': o.id})
+            log_audit(
+                user=user,
+                title='Alert-Group create',
+                msg=f"Alert-Group created: ID '{o.id}', Name '{o.name}'",
+            )
+            return Response(
+                {'msg': f"Alert '{serializer.validated_data['name']}' created successfully", 'id': o.id},
+                status=200,
+            )
 
         except IntegrityError as err:
             return Response(
@@ -637,7 +704,8 @@ class APIAlertGroupItem(GenericAPIView):
         operation_id='alert_group_edit',
     )
     def put(self, request, alert_id: int):
-        privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='alert')
         if not privileged:
             return Response(
                 data={'error': 'Not privileged to manage Alerts'},
@@ -667,6 +735,11 @@ class APIAlertGroupItem(GenericAPIView):
         try:
             update_jobs(alert=alert, job_ids=serializer.validated_data.pop('jobs'))
             AlertGroup.objects.filter(id=alert.id).update(**serializer.validated_data)
+            log_audit(
+                user=user,
+                title='Alert-Group edit',
+                msg=f"Alert-Group edited: ID '{alert.id}', Name '{alert.name}'",
+            )
             return Response(data={'msg': f"Alert '{alert.name}' updated", 'id': alert_id}, status=200)
 
         except IntegrityError as err:
@@ -679,7 +752,8 @@ class APIAlertGroupItem(GenericAPIView):
         operation_id='alert_group_delete'
     )
     def delete(self, request, alert_id: int):
-        privileged = has_manager_privileges(user=get_api_user(request), kind='alert')
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='alert')
         if not privileged:
             return Response(
                 data={'error': 'Not privileged to manage Alerts'},
@@ -690,6 +764,11 @@ class APIAlertGroupItem(GenericAPIView):
             alert = AlertGroup.objects.get(id=alert_id)
             if alert is not None:
                 alert.delete()
+                log_audit(
+                    user=user,
+                    title='Alert-Group delete',
+                    msg=f"Alert-Group deleted: ID '{alert.id}', Name '{alert.name}'",
+                )
                 return Response(data={'msg': f"Alert '{alert.name}' deleted", 'id': alert_id}, status=200)
 
         except ObjectDoesNotExist:

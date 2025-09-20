@@ -31,7 +31,7 @@ class SystemConfig(BaseModel):
     api_fields_read = [
         'path_run', 'path_play', 'path_log', 'path_template', 'timezone', 'run_timeout', 'session_timeout',
         'path_ansible_config', 'path_ssh_known_hosts', 'debug', 'logo_url', 'ara_server', 'global_environment_vars',
-        'mail_server', 'mail_transport', 'mail_ssl_verify', 'mail_sender', 'mail_user',
+        'mail_server', 'mail_transport', 'mail_ssl_verify', 'mail_sender', 'mail_user', 'audit_log',
     ]
 
     # NOTE: 'AW_DB' is needed to get this config from DB and 'AW_SECRET' cannot be saved because of security breach
@@ -50,6 +50,7 @@ class SystemConfig(BaseModel):
     path_ansible_config = models.TextField(max_length=500, **DEFAULT_NONE)
     path_ssh_known_hosts = models.TextField(max_length=500, **DEFAULT_NONE)
     debug = models.BooleanField(default=False, choices=CHOICES_BOOL)
+    audit_log = models.BooleanField(default=True, choices=CHOICES_BOOL)
     logo_url = models.TextField(max_length=500, **DEFAULT_NONE)
     ara_server = models.TextField(max_length=300, **DEFAULT_NONE)
     global_environment_vars = models.TextField(max_length=1000, **DEFAULT_NONE)

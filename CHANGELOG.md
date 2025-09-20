@@ -19,7 +19,9 @@ Features:
 
 * API and Form to Ansible-Vault-Encrypt data [#7](https://github.com/O-X-L/ansible-webui/issues/7)
 * Spanish translations [#54](https://github.com/O-X-L/ansible-webui/issues/54)
+* Security: Audit logging of all create/update/delete/execute actions performed by users [#49](https://github.com/O-X-L/ansible-webui/issues/49)
 
+----
 
 ### 0.8.9
 

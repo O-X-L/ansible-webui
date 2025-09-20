@@ -321,6 +321,7 @@ ES = {
     'config.form.path_ansible_config': 'Archivo de configuración de Ansible',
     'config.form.path_ssh_known_hosts': 'Archivo SSH Known-Hosts',
     'config.form.debug': 'Modo de depuración',
+    # 'config.form.audit_log': 'Audit Logging',
 
     ### env-vars
     'config.form.timezone': 'Zona horaria',
@@ -360,6 +361,9 @@ ES = {
     'config.form.help.debug': 'Habilitar el modo de depuración. ¡No lo habilite de forma permanente en sistemas de producción! '
                               'Es posible que abra vectores de ataque. '
                               'Es posible que tengas que reiniciar la aplicación para aplicar esta configuración',
+    # 'config.form.help.audit_log': 'Enable Audit-Logging. All create/update/delete actions are logged to the database '
+    #                               'and can be viewed in the Admin-UI at '
+    #                               '<a href="/ui/system#admin">System - Admin - Administration - Log entries</a>',
     'config.form.help.logo_url': 'Ejemplo: '
                                  '<a href="https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo'
                                  '/vscode-ansible.svg">'

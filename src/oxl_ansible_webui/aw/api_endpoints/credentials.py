@@ -20,6 +20,7 @@ from aw.execute.util import get_path_run, create_dirs
 from aw.config.hardcoded import SECRET_HIDDEN
 from aw.utils.subps import process
 from aw.base import USERS
+from aw.utils.audit import log_audit
 
 
 class JobSharedCredentialsReadResponse(serializers.ModelSerializer):
@@ -274,6 +275,11 @@ class APIJobSharedCredentials(APIView):
 
         try:
             o = serializer.save()
+            log_audit(
+                user=user,
+                title='Credentials-Shared create',
+                msg=f"Credentials-Shared created: ID '{o.id}', Name '{o.name}'",
+            )
             return Response(data={'msg': 'Shared-credentials created', 'id': o.id}, status=200)
 
         except IntegrityError as err:
@@ -324,6 +330,11 @@ class APIJobUserCredentials(APIView):
 
         try:
             o = serializer.save()
+            log_audit(
+                user=user,
+                title='Credentials-User create',
+                msg=f"Credentials-User created: ID '{o.id}', Name '{o.name}'",
+            )
             return Response(data={'msg': 'User-credentials created', 'id': o.id}, status=200)
 
         except IntegrityError as err:
@@ -356,6 +367,11 @@ class APIJobTMPCredentials(APIView):
 
         try:
             o = serializer.save()
+            log_audit(
+                user=user,
+                title='Credentials-Temporary create',
+                msg=f"Credentials-Temporary created: ID '{o.id}', Name '{o.name}'",
+            )
             return Response(data={'msg': 'Temporary-credentials created', 'id': o.id}, status=200)
 
         except IntegrityError as err:
@@ -442,6 +458,11 @@ class APIJobSharedCredentialsItem(APIView):
             )
 
         credentials.delete()
+        log_audit(
+            user=user,
+            title='Credentials-Shared delete',
+            msg=f"Credentials-Shared deleted: ID '{credentials.id}', Name '{credentials.name}'",
+        )
         return Response(
             data={'msg': f"Shared-credentials '{credentials.name}' deleted", 'id': credentials_id},
             status=200,
@@ -479,7 +500,11 @@ class APIJobSharedCredentialsItem(APIView):
             return update_error
 
         credentials.save()
-
+        log_audit(
+            user=user,
+            title='Credentials-Shared edit',
+            msg=f"Credentials-Shared edited: ID '{credentials.id}', Name '{credentials.name}'",
+        )
         return Response(data={
             'msg': f"Shared-credentials '{credentials.name}' updated",
             'id': credentials_id
@@ -544,6 +569,11 @@ class APIJobUserCredentialsItem(APIView):
             )
 
         credentials.delete()
+        log_audit(
+            user=user,
+            title='Credentials-User delete',
+            msg=f"Credentials-User deleted: ID '{credentials.id}', Name '{credentials.name}'",
+        )
         return Response(data={
             'msg': f"User-credentials '{credentials.name}' deleted",
             'id': credentials_id
@@ -572,7 +602,11 @@ class APIJobUserCredentialsItem(APIView):
             return update_error
 
         credentials.save()
-
+        log_audit(
+            user=user,
+            title='Credentials-User edit',
+            msg=f"Credentials-User edited: ID '{credentials.id}', Name '{credentials.name}'",
+        )
         return Response(
             data={'msg': f"User-credentials '{credentials.name}' updated", 'id': credentials_id},
             status=200,

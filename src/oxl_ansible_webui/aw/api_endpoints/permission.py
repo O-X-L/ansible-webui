@@ -15,6 +15,7 @@ from aw.utils.permission import has_manager_privileges
 from aw.utils.util import is_set
 from aw.base import USERS, GROUPS
 from aw.model.repository import Repository
+from aw.utils.audit import log_audit
 
 
 class PermissionReadResponse(serializers.ModelSerializer):
@@ -255,7 +256,8 @@ class APIPermission(APIView):
         operation_id='permission_create',
     )
     def post(self, request):
-        privileged = has_manager_privileges(user=get_api_user(request), kind='permission')
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='permission')
         if not privileged:
             return Response(
                 data={'error': 'Not privileged to manage permissions'},
@@ -272,10 +274,15 @@ class APIPermission(APIView):
 
         try:
             o = serializer.create_or_update(validated_data=serializer.validated_data, perm=None)
+            log_audit(
+                user=user,
+                title='Permission create',
+                msg=f"Permission created: ID '{o.id}', Name '{o.name}'",
+            )
             return Response({
                 'msg': f"Permission '{serializer.validated_data['name']}' created successfully",
                 'id': o.id,
-            })
+            }, status=200)
 
         except IntegrityError as err:
             return Response(
@@ -307,7 +314,8 @@ class APIPermissionItem(APIView):
         operation_id='permission_edit',
     )
     def put(self, request, perm_id: int):
-        privileged = has_manager_privileges(user=get_api_user(request), kind='permission')
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='permission')
         if not privileged:
             return Response(
                 data={'error': 'Not privileged to manage permissions'},
@@ -336,6 +344,11 @@ class APIPermissionItem(APIView):
 
         try:
             serializer.create_or_update(validated_data=serializer.validated_data, perm=permission)
+            log_audit(
+                user=user,
+                title='Permission edit',
+                msg=f"Permission edited: ID '{permission.id}', Name '{permission.name}'",
+            )
             return Response(data={'msg': f"Permission '{permission.name}' updated", 'id': perm_id}, status=200)
 
         except IntegrityError as err:
@@ -348,7 +361,8 @@ class APIPermissionItem(APIView):
         operation_id='permission_delete'
     )
     def delete(self, request, perm_id: int):
-        privileged = has_manager_privileges(user=get_api_user(request), kind='permission')
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='permission')
         if not privileged:
             return Response(
                 data={'error': 'Not privileged to manage permissions'},
@@ -365,6 +379,11 @@ class APIPermissionItem(APIView):
                     )
 
                 permission.delete()
+                log_audit(
+                    user=user,
+                    title='Permission delete',
+                    msg=f"Permission deleted: ID '{permission.id}', Name '{permission.name}'",
+                )
                 return Response(data={'msg': f"Permission '{permission.name}' deleted", 'id': perm_id}, status=200)
 
         except ObjectDoesNotExist:

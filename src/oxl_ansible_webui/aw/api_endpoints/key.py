@@ -9,6 +9,7 @@ from aw.config.hardcoded import KEY_TIME_FORMAT
 from aw.model.api import AwAPIKey
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, GenericErrorResponse, \
     response_data_if_changed
+from aw.utils.audit import log_audit
 
 
 class KeyReadResponse(BaseResponse):
@@ -65,6 +66,11 @@ class APIKey(APIView):
         token = f'{user}-{datetime_w_tz().strftime(KEY_TIME_FORMAT)}'
         _, key = AwAPIKey.objects.create_key(name=token, user=user, comment=comment)
 
+        log_audit(
+            user=user,
+            title='API-Key create',
+            msg=f"API-Key created: Token '{token}', Comment '{comment}'",
+        )
         return Response({'token': token, 'key': key, 'comment': comment})
 
 
@@ -83,10 +89,16 @@ class APIKeyItem(APIView):
     )
     def delete(self, request, token: str):
         try:
-            result = AwAPIKey.objects.get(user=get_api_user(request), name=token)
+            user = get_api_user(request)
+            result = AwAPIKey.objects.get(user=user, name=token)
 
             if result is not None:
                 result.delete()
+                log_audit(
+                    user=user,
+                    title='API-Key delete',
+                    msg=f"API-Key deleted: Token '{result.name}', Comment '{result.comment}'",
+                )
                 return Response(data={'msg': 'API key deleted'}, status=200)
 
         except ObjectDoesNotExist:
