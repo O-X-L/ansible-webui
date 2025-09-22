@@ -2,6 +2,12 @@
 
 # NOTE: remove all existing images: "docker rmi -f $(docker images -aq)"
 
+# to manually test:
+#   docker run --rm --network=host --name aw-test oxlorg/ansible-webui-unprivileged
+#   check webUI
+#   CTRL+C
+#   docker stop aw-test
+
 set -e
 
 if [ -z "$1" ]
