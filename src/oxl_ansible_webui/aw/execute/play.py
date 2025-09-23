@@ -84,6 +84,9 @@ def _tmp_dump_runner_config(cfg: RunnerConfig):
     ]:
         attrs[attr] = getattr(cfg, attr)
 
+    with open('/tmp/runner_config.txt', 'w', encoding='utf-8') as f:
+        f.write('\n'.join([f'{k}={v}' for k, v in attrs.items()]))
+
     raise ValueError(attrs)
 
 

@@ -86,6 +86,9 @@ def test_simple(jid: int = 1):
     print('SIMPLE | CHECK')
     e = _check_status_until_finished_or_timeout(jid, 1)
 
+    with open('/tmp/runner_config.txt', 'r', encoding='utf-8') as f:
+        print(f.read())
+
     assert e['user_name'] == API_USER
     assert e['status_name'] == 'Finished'
     assert e['time_fin'] is not None
