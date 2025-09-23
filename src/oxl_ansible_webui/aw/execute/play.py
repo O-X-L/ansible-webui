@@ -15,13 +15,6 @@ from aw.utils.debug import log
 from aw.utils.db_handler import close_old_mysql_connections
 
 
-def _tmp_dump_runner_config(kwargs: dict):
-    with open('/tmp/runner_config.txt', 'w', encoding='utf-8') as f:
-        f.write('\n'.join([f'{k}={v}' for k, v in kwargs.items()]))
-
-    raise ValueError(kwargs)
-
-
 def ansible_playbook(job: Job, execution: (JobExecution, None)):
     time_start = datetime_w_tz()
     path_run = get_path_run()
@@ -58,7 +51,6 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
         close_old_mysql_connections()
         execution.save()
 
-        _tmp_dump_runner_config({**opts, 'timeout': config['run_timeout'], 'quiet': True})
         runner = Runner(config=runner_cfg, cancel_callback=_cancel_job)
         runner.run()
 
