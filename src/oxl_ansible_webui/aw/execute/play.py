@@ -20,6 +20,42 @@ class AwRunnerConfig(RunnerConfig):
         super().__init__(**kwargs, timeout=config['run_timeout'], quiet=True)
 
 
+
+def _tmp_dump_runner_config(cfg: RunnerConfig):
+    attrs = {}
+    for attr in [
+        'runner_mode',
+        'playbook',
+        'inventory',
+        'roles_path',
+        'limit',
+        'module',
+        'module_args',
+        'host_pattern',
+        'binary',
+        'extra_vars',
+        'process_isolation_path',
+        'process_isolation_path_actual',
+        'process_isolation_hide_paths',
+        'process_isolation_show_paths',
+        'process_isolation_ro_paths',
+        'directory_isolation_path',
+        'verbosity',
+        'suppress_output_file',
+        'suppress_ansible_output',
+        'tags',
+        'skip_tags',
+        'execution_mode',
+        'forks',
+        'cmdline_args',
+        'omit_event_data',
+        'only_failed_event_data',
+    ]:
+        attrs[attr] = getattr(cfg, attr)
+
+    raise ValueError(attrs)
+
+
 def ansible_playbook(job: Job, execution: (JobExecution, None)):
     time_start = datetime_w_tz()
     path_run = get_path_run()
@@ -56,6 +92,7 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
         close_old_mysql_connections()
         execution.save()
 
+        _tmp_dump_runner_config(runner_cfg)
         runner = Runner(config=runner_cfg, cancel_callback=_cancel_job)
         runner.run()
 
