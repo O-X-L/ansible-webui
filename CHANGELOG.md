@@ -8,6 +8,19 @@ tbd
 
 ## Version 0
 
+### 0.9.1
+
+Fixes:
+
+* Numeric env-var values leading to error [#66](https://github.com/O-X-L/ansible-webui/issues/66)
+* MySQL/MariaDB-client may throw connection-error when writing audit-logs [#49](https://github.com/O-X-L/ansible-webui/issues/49)
+
+Features:
+
+* Write login/logout events to audit-log [#49](https://github.com/O-X-L/ansible-webui/issues/49)
+
+----
+
 ### 0.9.0
 
 Fixes:
