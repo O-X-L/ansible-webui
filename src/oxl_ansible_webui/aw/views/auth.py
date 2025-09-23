@@ -15,6 +15,7 @@ from aw.settings import SAML2_AUTH, LOGIN_PATH, LOGIN_REDIRECT_URL
 from aw.utils.debug import log, log_error
 from aw.utils.util import get_client_ip
 from aw.dependencies import saml_installed, log_dependency_error
+from aw.utils.audit import log_audit
 
 
 # SP-initiated SAML SSO; see: https://github.com/grafana/django-saml2-auth/issues/105
@@ -51,13 +52,25 @@ def saml_sp_initiated_login_init(request) -> HttpResponse:
 @receiver(user_logged_in)
 def user_logged_in_callback(sender, request, user, **kwargs):
     del sender
-    log(f"Login successful: User '{user}' from IP {get_client_ip(request)}")
+    ip = get_client_ip(request)
+    log(f"Login successful: User '{user}' from IP {ip}")
+    log_audit(
+        user=user,
+        title='Login',
+        msg=f"IP {ip}'",
+    )
 
 
 @receiver(user_logged_out)
 def user_logged_out_callback(sender, request, user, **kwargs):
     del sender
-    log(f"Logout successful: User '{user}' from IP {get_client_ip(request)}")
+    ip = get_client_ip(request)
+    log(f"Logout successful: User '{user}' from IP {ip}")
+    log_audit(
+        user=user,
+        title='Logout',
+        msg=f"IP {ip}'",
+    )
 
 
 @receiver(user_login_failed)
