@@ -2,20 +2,41 @@
 
 .. include:: ../_include/head.rst
 
-.. |creds_ui| image:: ../_static/img/credentials_ui.png
-   :class: wiki-img
+.. |creds_ui_dark| image:: ../_static/img/credentials_ui_dark.webp
+   :class: wiki-img-dark
 
-.. |creds_job| image:: ../_static/img/credentials_job.png
-   :class: wiki-img
+.. |creds_ui_light| image:: ../_static/img/credentials_ui_light.webp
+   :class: wiki-img-light
 
-.. |creds_prompt| image:: ../_static/img/credentials_prompt.png
-   :class: wiki-img
+.. |creds_job_dark| image:: ../_static/img/credentials_job_dark.webp
+   :class: wiki-img-dark
 
-.. |creds_tmp| image:: ../_static/img/credentials_tmp.png
-   :class: wiki-img
+.. |creds_job_light| image:: ../_static/img/credentials_job_light.webp
+   :class: wiki-img-light
 
-.. |creds_vault_encrypt| image:: ../_static/img/credentials_vault_encrypt.png
-   :class: wiki-img
+.. |creds_prompt_dark| image:: ../_static/img/credentials_prompt_dark.webp
+   :class: wiki-img-dark
+
+.. |creds_prompt_light| image:: ../_static/img/credentials_prompt_light.webp
+   :class: wiki-img-light
+
+.. |creds_tmp1_dark| image:: ../_static/img/credentials_tmp1_dark.webp
+   :class: wiki-img-xs-dark
+
+.. |creds_tmp1_light| image:: ../_static/img/credentials_tmp1_light.webp
+   :class: wiki-img-xs-light
+
+.. |creds_tmp2_dark| image:: ../_static/img/credentials_tmp2_dark.webp
+   :class: wiki-img-dark
+
+.. |creds_tmp2_light| image:: ../_static/img/credentials_tmp2_light.webp
+   :class: wiki-img-light
+
+.. |creds_vault_dark| image:: ../_static/img/credentials_vault_encrypt_dark.webp
+   :class: wiki-img-dark
+
+.. |creds_vault_light| image:: ../_static/img/credentials_vault_encrypt_light.webp
+   :class: wiki-img-light
 
 ===========
 Credentials
@@ -27,7 +48,9 @@ The saved credential secrets are never returned to the user/Web-UI! They are sav
 
 The UI at :code:`Home - Credentials` allows you to manage them.
 
-|creds_ui|
+|creds_ui_dark|
+
+|creds_ui_light|
 
 Global Credentials
 ******************
@@ -66,7 +89,9 @@ Jobs
 
 You can define if a job needs credentials to run:
 
-|creds_job|
+|creds_job_dark|
+
+|creds_job_light|
 
 You also have some options on how credentials may be provided at the execution-prompts:
 
@@ -74,11 +99,19 @@ You also have some options on how credentials may be provided at the execution-p
 * :code:`Require Credentials` => Do not allow WebUI execution without the user selecting/providing credentials
 * :code:`Temporary Credentials` => Allow the user to provide credentials that will only be available for this execution
 
-|creds_prompt|
+|creds_prompt_dark|
+
+|creds_prompt_light|
 
 Temporary credentials can be used to manually provide credentials for one execution. They are deleted afterwards.
 
-|creds_tmp|
+|creds_tmp1_dark|
+
+|creds_tmp1_light|
+
+|creds_tmp2_dark|
+
+|creds_tmp2_light|
 
 ----
 
@@ -89,4 +122,6 @@ Users are able to Ansible-Vault encrypt plaintext if they have read-privileges o
 
 This is especially useful if users should not have access to the Vault-Password(s) but have to encrypt new secrets used in roles.
 
-|creds_vault_encrypt|
+|creds_vault_dark|
+
+|creds_vault_light|

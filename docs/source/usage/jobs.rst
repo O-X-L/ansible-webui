@@ -2,21 +2,51 @@
 
 .. include:: ../_include/head.rst
 
-.. |job_exec| image:: ../_static/img/job_execution.png
-   :class: wiki-img
+.. |jobs_ui_dark| image:: ../_static/img/jobs_ui_dark.webp
+   :class: wiki-img-dark
 
-.. |job_prompts1| image:: ../_static/img/job_prompts_1.png
-   :class: wiki-img
+.. |jobs_ui_light| image:: ../_static/img/jobs_ui_light.webp
+   :class: wiki-img-light
 
-.. |job_prompts2| image:: ../_static/img/job_prompts_2.png
-   :class: wiki-img
+.. |job_prompts_1_dark| image:: ../_static/img/job_prompts_1_dark.webp
+   :class: wiki-img-dark
 
+.. |job_prompts_1_light| image:: ../_static/img/job_prompts_1_light.webp
+   :class: wiki-img-light
+
+.. |job_prompts_2_dark| image:: ../_static/img/job_prompts_2_dark.webp
+   :class: wiki-img-dark
+
+.. |job_prompts_2_light| image:: ../_static/img/job_prompts_2_light.webp
+   :class: wiki-img-light
+
+.. |job_exec_dark| image:: ../_static/img/job_execution_dark.webp
+   :class: wiki-img-sm-dark
+
+.. |job_exec_light| image:: ../_static/img/job_execution_light.webp
+   :class: wiki-img-sm-light
+
+.. |logs_ui_dark| image:: ../_static/img/logs_ui_dark.webp
+   :class: wiki-img-dark
+
+.. |logs_ui_light| image:: ../_static/img/logs_ui_light.webp
+   :class: wiki-img-light
+
+.. |logs_live_dark| image:: ../_static/img/logs_live_dark.webp
+   :class: wiki-img-dark
+
+.. |logs_live_light| image:: ../_static/img/logs_live_light.webp
+   :class: wiki-img-light
 
 ====
 Jobs
 ====
 
 You can use the UI at :code:`Home - Jobs` to create and execute jobs.
+
+|jobs_ui_dark|
+
+|jobs_ui_light|
 
 ----
 
@@ -46,13 +76,37 @@ You have two options to execute a job:
 
     The fields available as overrides can be configured in the job settings!
 
-    |job_prompts1|
+    |job_prompts_1_dark|
 
-    |job_prompts2|
+    |job_prompts_1_light|
+
+    |job_prompts_2_dark|
+
+    |job_prompts_2_light|
 
     These will be shown in the job overview:
 
-    |job_exec|
+    |job_exec_dark|
+
+    |job_exec_light|
+
+----
+
+Logs
+****
+
+Via the **Logs** Tab you can view the output of your jobs:
+
+|logs_ui_dark|
+
+|logs_ui_light|
+
+You are also able to follow the live-output-stream of running jobs - and perform actions like stopping the job ad-hoc:
+
+|logs_live_light|
+
+|logs_live_dark|
+
 
 ----
 

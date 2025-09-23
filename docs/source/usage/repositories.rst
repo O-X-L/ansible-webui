@@ -2,9 +2,11 @@
 
 .. include:: ../_include/head.rst
 
-.. |repo_ui| image:: ../_static/img/repo_ui.png
-   :class: wiki-img
+.. |repo_ui_dark| image:: ../_static/img/repo_ui_dark.webp
+   :class: wiki-img-dark
 
+.. |repo_ui_light| image:: ../_static/img/repo_ui_light.webp
+   :class: wiki-img-light
 
 ============
 Repositories
@@ -14,7 +16,9 @@ By default the static Repository set by :code:`AW_PATH_PLAY` is used.
 
 You are able to create multiple Repositories that act as Ansible-Playbook base-directories.
 
-|repo_ui|
+|repo_ui_dark|
+
+|repo_ui_light|
 
 ----
 

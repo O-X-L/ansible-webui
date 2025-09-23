@@ -1,4 +1,4 @@
-.wiki-img {
+.wiki-img, .wiki-img-dark, .wiki-img-light {
     width: 90%;
     margin: 5px 0px;
     border-radius: 5px;
@@ -7,11 +7,61 @@
     border-width: 3px;
 }
 
-.wiki-img-sm {
+.wiki-img-sm, .wiki-img-sm-dark, .wiki-img-sm-light {
     width: 60%;
+    margin-left: 10%;
     margin: 5px 0px;
     border-radius: 5px;
     border-style: solid;
     border-color: #343a40;
     border-width: 3px;
+}
+
+.wiki-img-xs, .wiki-img-xs-dark, .wiki-img-xs-light {
+    width: 30%;
+    margin-left: 30%;
+    margin: 5px 0px;
+    border-radius: 5px;
+    border-style: solid;
+    border-color: #343a40;
+    border-width: 3px;
+}
+
+body[data-md-color-media="(prefers-color-scheme: dark)"] .wiki-img-light {
+    display: none;
+}
+body[data-md-color-media="(prefers-color-scheme: dark)"] .wiki-img-dark {
+    display: inline;
+}
+body[data-md-color-media="(prefers-color-scheme: light)"] .wiki-img-dark {
+    display: none;
+}
+body[data-md-color-media="(prefers-color-scheme: light)"] .wiki-img-light {
+    display: inline;
+}
+
+body[data-md-color-media="(prefers-color-scheme: dark)"] .wiki-img-sm-light {
+    display: none;
+}
+body[data-md-color-media="(prefers-color-scheme: dark)"] .wiki-img-sm-dark {
+    display: inline;
+}
+body[data-md-color-media="(prefers-color-scheme: light)"] .wiki-img-sm-dark {
+    display: none;
+}
+body[data-md-color-media="(prefers-color-scheme: light)"] .wiki-img-sm-light {
+    display: inline;
+}
+
+body[data-md-color-media="(prefers-color-scheme: dark)"] .wiki-img-xs-light {
+    display: none;
+}
+body[data-md-color-media="(prefers-color-scheme: dark)"] .wiki-img-xs-dark {
+    display: inline;
+}
+body[data-md-color-media="(prefers-color-scheme: light)"] .wiki-img-xs-dark {
+    display: none;
+}
+body[data-md-color-media="(prefers-color-scheme: light)"] .wiki-img-xs-light {
+    display: inline;
 }

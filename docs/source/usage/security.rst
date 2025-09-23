@@ -2,8 +2,17 @@
 
 .. include:: ../_include/head.rst
 
-.. |audit_log| image:: ../_static/img/admin_audit_log.png
-   :class: wiki-img
+.. |audit_log_dark| image:: ../_static/img/admin_audit_log_dark.webp
+   :class: wiki-img-dark
+
+.. |audit_log_light| image:: ../_static/img/admin_audit_log_light.webp
+   :class: wiki-img-light
+
+.. |creds_tmp_dark| image:: ../_static/img/credentials_tmp1_dark.webp
+   :class: wiki-img-xs-dark
+
+.. |creds_tmp_light| image:: ../_static/img/credentials_tmp1_light.webp
+   :class: wiki-img-xs-light
 
 
 ========
@@ -18,7 +27,7 @@ You are very welcome to search for security vulnerabilities and `report them <ht
 
 .. warning::
 
-    The most secured application can be exploited if implemented incorrectly!
+    The most secured application can be exploited if provisioned/set-up/configured incorrectly!
 
     Make sure to heavily restrict access to your **SECRET** and database access.
 
@@ -42,6 +51,10 @@ Known Issues
   This **includes reading the config-file**!
 
   So if possible - you should set your **AW_SECRET** (*and other secrets*) as environmental variable!
+
+  **Possible workaround**:
+
+  * Supply secrets only via **Temporary Credentials** - they are only accessible once
 
   **Possible future fixes**:
 
@@ -86,9 +99,21 @@ Security considerations this project does take into account:
 
   This lowers the danger of an attack-vector that would utilize DB-write-access to execute jobs.
 
+* Users can supply **temporary job-credentials** at the ad-hoc execution-form.
+
+  These credentials are only saved until the job starts.
+
+  After the credentials were read by the pre-start stage - the temporary encryption-key is deleted.
+
+  |creds_tmp_dark|
+
+  |creds_tmp_light|
+
 * All create/update/delete/execute actions by users are logged inside the **Audit Log** (*opt-out in the System-Settings*)
 
-  |audit_log|
+  |audit_log_dark|
+
+  |audit_log_light|
 
 ----
 
@@ -118,7 +143,9 @@ Setup
 Target Systems
 **************
 
-If your target Linux-Systems you can limit the IP-addresses from which the automation-user (*configured for Ansible-WebUI*) using your SSH config:
+On Linux-Target-Systems it is recommended to limit the IP-addresses, from which the automation-user (*configured for Ansible-WebUI*) is allowed to connect from.
+
+Besides the network-level limitations by the host-level firewall, you can do so in the SSH-server config:
 
 .. code-block::
 

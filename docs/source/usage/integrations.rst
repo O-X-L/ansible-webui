@@ -31,3 +31,10 @@ Identity Providers using SAML SSO
 Easily integrate with SAML2 SSO identity providers like Okta, Azure AD and others.
 
 For configuration - see: :ref:`Usage - Authentication <usage_auth>`
+
+----
+
+Netbox
+******
+
+See: :ref:`Usage - API - Netbox Webhooks <usage_api_netbox>`

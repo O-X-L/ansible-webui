@@ -2,13 +2,16 @@
 
 .. include:: ../_include/head.rst
 
-.. |api_docs| image:: ../_static/img/api_docs.png
+.. |api_docs_dark| image:: ../_static/img/api_docs_dark.webp
+   :class: wiki-img-dark
+
+.. |api_docs_light| image:: ../_static/img/api_docs_light.webp
+   :class: wiki-img-light
+
+.. |netbox| image:: ../_static/img/api_netbox_webhook.webp
    :class: wiki-img
 
-.. |netbox| image:: ../_static/img/api_netbox_webhook.png
-   :class: wiki-img
-
-.. |browser_console| image:: ../_static/img/api_browser_console.png
+.. |browser_console| image:: ../_static/img/api_browser_console.webp
    :class: wiki-img
 
 ===
@@ -26,7 +29,9 @@ Swagger API Docs
 
 You can see the available API-endpoints in the built-in API-docs at :code:`System - API Docs` (*swagger*)
 
-|api_docs|
+|api_docs_dark|
+
+|api_docs_light|
 
 ----
 
@@ -88,6 +93,8 @@ To do so:
 |browser_console|
 
 ----
+
+.. _usage_api_netbox:
 
 Netbox Webhooks
 ***************

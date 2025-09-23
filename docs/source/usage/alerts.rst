@@ -2,8 +2,8 @@
 
 .. include:: ../_include/head.rst
 
-.. |alert_email| image:: ../_static/img/alert_email.png
-   :class: wiki-img
+.. |alert_email| image:: ../_static/img/alert_email.webp
+   :class: wiki-img-sm
 
 ======
 Alerts

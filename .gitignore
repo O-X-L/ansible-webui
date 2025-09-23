@@ -19,6 +19,8 @@ dist/*.whl
 dist/*.tar.gz
 oxl_ansible_webui.egg-info/
 docs/build/
+docs/source/_static/img/*.png
+docs/source/_static/img/*.jpg
 
 # svelte
 frontend/package-lock.json

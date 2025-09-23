@@ -2,6 +2,12 @@
 
 .. include:: ../_include/head.rst
 
+.. |system_settings_dark| image:: ../_static/img/system_settings_dark.webp
+   :class: wiki-img-dark
+
+.. |system_settings_light| image:: ../_static/img/system_settings_light.webp
+   :class: wiki-img-light
+
 ==========
 4 - Config
 ==========
@@ -12,6 +18,10 @@ WebUI
 *****
 
 Runtime system configuration can be managed using the WebUI :code:`System - Settings` page.
+
+|system_settings_dark|
+
+|system_settings_light|
 
 ----
 
