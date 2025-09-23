@@ -344,7 +344,12 @@ class APIJobItem(APIView):
 
                 execution.save()
                 queue_add(execution=execution)
-                log_audit(user=user, title='Job execute', msg=f"Job executed: ID '{job.id}', Name '{job.name}'")
+                log_audit(
+                    user=user,
+                    title='Job execute',
+                    msg=f"Job execution queued: ID: '{execution.id}', Job-ID '{job.id}', Name '{job.name}', "
+                        f"Comment '{execution.comment}'",
+                )
                 return Response(data={'msg': f"Job '{job.name}' execution queued", 'id': execution.id}, status=200)
 
         except ObjectDoesNotExist:

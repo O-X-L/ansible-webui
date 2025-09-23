@@ -13,6 +13,23 @@ from aw.utils.util import datetime_w_tz, is_null, timed_lru_cache  # get_ansible
 from aw.utils.handlers import AnsibleConfigError, AnsibleRepositoryError
 from aw.utils.debug import log
 from aw.utils.db_handler import close_old_mysql_connections
+from aw.utils.audit import log_audit
+
+
+def _log_audit(job: Job, execution: JobExecution):
+    user = execution.user
+    if user is None:
+        user = job.owner
+
+    if user is None:
+        log(msg=f"Execution of job '{job.name}' has neither user nor owner!", level=3)
+        return
+
+    log_audit(
+        user=user,
+        title='Job execute',
+        msg=f"Job executed: ID '{execution.id}', Job-ID '{job.id}', Name '{job.name}', Comment '{execution.comment}'"
+    )
 
 
 def ansible_playbook(job: Job, execution: (JobExecution, None)):
@@ -20,6 +37,8 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
     path_run = get_path_run()
     if is_null(execution):
         execution = JobExecution(user=None, job=job, comment='Scheduled')
+
+    _log_audit(job, execution)
 
     result = JobExecutionResult(time_start=time_start)
     close_old_mysql_connections()
