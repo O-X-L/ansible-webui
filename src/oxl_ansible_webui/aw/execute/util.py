@@ -44,7 +44,7 @@ def update_status(obj: (JobExecution, Repository), status: (str, int)):
         obj.save()
 
     except ValueError:
-        return
+        pass
 
 
 def is_execution_status(execution: JobExecution, status: str) -> bool:

@@ -16,6 +16,7 @@ from aw.model.base import JOB_EXEC_STATUS_FAILED, JOB_EXEC_STATUS_RETRY
 from aw.utils.db_handler import close_old_mysql_connections
 
 
+# pylint: disable=R0912
 class Workload(Thread):
     FAIL_SLEEP = 5
     MAX_CONFIG_INVALID = 3
