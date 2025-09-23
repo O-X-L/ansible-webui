@@ -15,73 +15,11 @@ from aw.utils.debug import log
 from aw.utils.db_handler import close_old_mysql_connections
 
 
-def _tmp_dump_runner_config(cfg: RunnerConfig):
-    attrs = {}
-    for attr in [
-        'runner_mode',
-        'playbook',
-        'inventory',
-        'roles_path',
-        'limit',
-        'module',
-        'module_args',
-        'host_pattern',
-        'binary',
-        'extra_vars',
-        'process_isolation_path',
-        'process_isolation_path_actual',
-        'process_isolation_hide_paths',
-        'process_isolation_show_paths',
-        'process_isolation_ro_paths',
-        'directory_isolation_path',
-        'verbosity',
-        'suppress_output_file',
-        'suppress_ansible_output',
-        'tags',
-        'skip_tags',
-        'execution_mode',
-        'forks',
-        'cmdline_args',
-        'omit_event_data',
-        'only_failed_event_data',
-        'host_cwd',
-        'envvars',
-        'ssh_key_data',
-        'command',
-        'process_isolation',
-        'process_isolation_executable',
-        'container_image',
-        'container_volume_mounts',
-        'container_workdir',
-        'container_auth_data',
-        'registry_auth_path:',
-        'container_name:',
-        'container_options',
-        'rotate_artifacts',
-        'quiet',
-        'json_mode',
-        'passwords',
-        'settings',
-        'timeout',
-        'check_job_event_data',
-        'suppress_env_files',
-        'private_data_dir',
-        'ident',
-        'artifact_dir',
-        'private_data_dir,',
-        'rotate_artifacts',
-        'fact_cache_type',
-        'fact_cache_type',
-        'loader',
-        'host_cwd',
-        'cwd',
-    ]:
-        attrs[attr] = getattr(cfg, attr, '-')
-
+def _tmp_dump_runner_config(kwargs: dict):
     with open('/tmp/runner_config.txt', 'w', encoding='utf-8') as f:
-        f.write('\n'.join([f'{k}={v}' for k, v in attrs.items()]))
+        f.write('\n'.join([f'{k}={v}' for k, v in kwargs.items()]))
 
-    raise ValueError(attrs)
+    raise ValueError(kwargs)
 
 
 def ansible_playbook(job: Job, execution: (JobExecution, None)):
@@ -120,7 +58,7 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
         close_old_mysql_connections()
         execution.save()
 
-        _tmp_dump_runner_config(runner_cfg)
+        _tmp_dump_runner_config({**opts, 'timeout': config['run_timeout'], 'quiet': True})
         runner = Runner(config=runner_cfg, cancel_callback=_cancel_job)
         runner.run()
 
