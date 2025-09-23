@@ -18,6 +18,7 @@ Fixes:
 Features:
 
 * Write login/logout events to audit-log [#49](https://github.com/O-X-L/ansible-webui/issues/49)
+* Fixed issue with ansible-runner usage [ansible-runner #1398](https://github.com/ansible/ansible-runner/issues/1398) - changed back to official runner
 
 ----
 
