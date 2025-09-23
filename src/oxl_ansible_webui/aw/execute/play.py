@@ -15,12 +15,6 @@ from aw.utils.debug import log
 from aw.utils.db_handler import close_old_mysql_connections
 
 
-class AwRunnerConfig(RunnerConfig):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs, timeout=config['run_timeout'], quiet=True)
-
-
-
 def _tmp_dump_runner_config(cfg: RunnerConfig):
     attrs = {}
     for attr in [
@@ -53,7 +47,7 @@ def _tmp_dump_runner_config(cfg: RunnerConfig):
         'host_cwd',
         'envvars',
         'ssh_key_data',
-        'command:',
+        'command',
         'process_isolation',
         'process_isolation_executable',
         'container_image',
@@ -82,7 +76,7 @@ def _tmp_dump_runner_config(cfg: RunnerConfig):
         'host_cwd',
         'cwd',
     ]:
-        attrs[attr] = getattr(cfg, attr)
+        attrs[attr] = getattr(cfg, attr, '-')
 
     with open('/tmp/runner_config.txt', 'w', encoding='utf-8') as f:
         f.write('\n'.join([f'{k}={v}' for k, v in attrs.items()]))
@@ -117,7 +111,7 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
         opts = runner_prep(job=job, execution=execution, path_run=path_run, project_dir=project_dir)
         close_old_mysql_connections()
         execution.save()
-        runner_cfg = AwRunnerConfig(**opts)
+        runner_cfg = RunnerConfig(**opts, timeout=config['run_timeout'], quiet=True)
         runner_logs(cfg=runner_cfg, log_files=log_files)
         runner_cfg.prepare()
         command = ' '.join(runner_cfg.command)
