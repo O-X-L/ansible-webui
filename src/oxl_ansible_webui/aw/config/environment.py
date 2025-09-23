@@ -47,10 +47,18 @@ for key_config, keys_env in AW_ENV_VARS.items():
 
 
 def get_aw_env_var(var: str) -> (str, None):
-    if var in AW_ENV_VARS:
-        for key in AW_ENV_VARS[var]:
-            if key in environ:
-                return environ[key]
+    if var not in AW_ENV_VARS:
+        return None
+
+    for key in AW_ENV_VARS[var]:
+        if key not in environ:
+            continue
+
+        value = environ[key]
+        if value.isnumeric():
+            return int(value)
+
+        return value
 
     return None
 
