@@ -1,0 +1,23 @@
+ARG AW_VERSION=0.0
+
+# BUILD: docker build -f Dockerfile_production_unprivileged -t ansible-webui:<VERSION> --build-arg "AW_VERSION=<VERSION>" --progress=plain --no-cache .
+# RUN:
+#   sudo useradd ansible-webui --shell /usr/sbin/nologin --uid 8785 --user-group
+#   mkdir ${YOUR_DATA_DIR} && chown -R ansible-webui ${YOUR_DATA_DIR}
+#   docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume ${YOUR_DATA_DIR}:/data --volume $(pwd)/ansible/play:/play ansible-webui:<VERSION>
+
+FROM oxlorg/ansible-webui-builder-fe:${AW_VERSION} AS builder
+
+FROM oxlorg/ansible-webui:${AW_VERSION}-debian
+
+ARG AW_VERSION
+ARG PY_VERSION=3.12
+ARG AW_UID=8785
+ARG AW_USER=aw
+
+RUN useradd --uid ${AW_UID} --user-group --shell /usr/sbin/nologin --home-dir /home/ansible-webui --create-home ${AW_USER} && \
+    chown -R ${AW_USER}:${AW_USER} /data /play
+
+COPY --from=builder /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/ /usr/local/lib/python${PY_VERSION}/site-packages/oxl_ansible_webui/aw/static_prod/
+
+USER ${AW_USER}

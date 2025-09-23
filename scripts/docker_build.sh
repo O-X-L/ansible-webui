@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
 
-# NOTE: remove all existing images: "docker rmi -f $(docker images -aq)"
-
-# to manually test:
-#   docker run --rm --network=host --name aw-test oxlorg/ansible-webui-unprivileged
-#   check webUI
-#   CTRL+C
-#   docker stop aw-test
-
 set -e
 
 if [ -z "$1" ]
@@ -22,107 +14,58 @@ VERSION="$1"
 
 cd "$(dirname "$0")/../docker"
 
-IMAGE_REPO="oxlorg/ansible-webui"
-IMAGE_REPO_UNPRIV="${IMAGE_REPO}-unprivileged"
-IMAGE_REPO_AWS="${IMAGE_REPO}-aws"
-IMAGE_REPO_MYSQL="${IMAGE_REPO}-mysql"
-IMAGE_REPO_PSQL="${IMAGE_REPO}-psql"
-
-# todo: allow for multi-platform builds
-# RELEASE_ARCHS="linux/arm/v7,linux/arm64/v8,linux/amd64"
-
-image="${IMAGE_REPO}:${VERSION}"
-image_latest="${IMAGE_REPO}:latest"
-
-image_unpriv="${IMAGE_REPO_UNPRIV}:${VERSION}"
-image_unpriv_latest="${IMAGE_REPO_UNPRIV}:latest"
-
-image_aws="${IMAGE_REPO_AWS}:${VERSION}"
-image_aws_latest="${IMAGE_REPO_AWS}:latest"
-
-image_mysql="${IMAGE_REPO_MYSQL}:${VERSION}"
-image_mysql_latest="${IMAGE_REPO_MYSQL}:latest"
-
-image_psql="${IMAGE_REPO_PSQL}:${VERSION}"
-image_psql_latest="${IMAGE_REPO_PSQL}:latest"
-
-container="ansible-webui-${VERSION}"
+source ./build_config.sh
 
 read -r -p "Build version ${VERSION} as latest? [y/N] " -n 1
 
-function cleanup_container() {
-  if docker ps -a | grep -q "$container"
-  then
-    docker stop "$container"
-    docker rm "$container"
-  fi
-}
-
 echo ''
 echo "### CLEANUP ###"
-cleanup_container
 
 if docker image ls | grep "$IMAGE_REPO" | grep -q "$VERSION"
 then
-  docker image rm "$image" || true
-  docker image rm "$image_unpriv" || true
-  docker image rm "$image_aws" || true
-  docker image rm "$image_mysql" || true
+  for img in $(docker image ls | egrep "^${IMAGE_REPO}" | awk '{print $1":"$2}')
+  do
+    docker image rm "$img" || true
+  done
 fi
 
-if [[ "$REPLY" =~ ^[Yy]$ ]]
-then
-  if docker image ls | grep "$IMAGE_REPO" | grep -q 'latest'
+function build() {
+  set -u
+  img="$1"
+  dockerfile="$2"
+  tag="$3"
+  img_with_tag="${img}:${tag}"
+  echo "##### BUILDING ${img_with_tag} #####"
+  docker build -f "$dockerfile" -t "$img_with_tag" --network host --build-arg "AW_VERSION=${VERSION}" --no-cache .
+}
+
+echo ''
+echo "### BUILDING FRONTEND ###"
+docker build -f "Dockerfile_builder_frontend" -t "${IMAGE_REPO}-builder-fe:${VERSION}" --network host --build-arg "AW_VERSION=${VERSION}" --no-cache .
+
+for img in "${IMAGES[@]}"
+do
+  echo ''
+  echo "### BUILDING ${img} ###"
+
+  set +u
+  if [ -n "${DOCKERFILES_DEBIAN["$img"]+_}" ]
   then
-    docker image rm "$image_latest" || true
-    docker image rm "$image_unpriv_latest" || true
-    docker image rm "$image_aws_latest" || true
-    docker image rm "$image_mysql_latest" || true
-    docker image rm "$image_psql_latest" || true
+    build "$img" "${DOCKERFILES_DEBIAN["$img"]}" "${VERSION}-debian"
   fi
-fi
+
+  set +u
+  if [ -n "${DOCKERFILES_ALPINE["$img"]+_}" ]
+  then
+    build "$img" "${DOCKERFILES_ALPINE["$img"]}" "${VERSION}-alpine"
+  fi
+  set -u
+
+  if [[ "$REPLY" =~ ^[Yy]$ ]]
+  then
+    build "$img" "${DOCKERFILES_LATEST["$img"]}" "latest"
+  fi
+done
 
 echo ''
-echo "### BUILDING IMAGE ${image} ###"
-docker build -f Dockerfile_production -t "$image" --network host --build-arg "AW_VERSION=${VERSION}" --no-cache .
-
-if [[ "$REPLY" =~ ^[Yy]$ ]]
-then
-  docker build -f Dockerfile_production -t "$image_latest" --network host --build-arg "AW_VERSION=${VERSION}" .
-fi
-
-echo ''
-echo "### BUILDING IMAGE ${image_unpriv} ###"
-docker build -f Dockerfile_production_unprivileged -t "$image_unpriv" --network host --build-arg "AW_VERSION=${VERSION}" --no-cache .
-
-if [[ "$REPLY" =~ ^[Yy]$ ]]
-then
-  docker build -f Dockerfile_production_unprivileged -t "$image_unpriv_latest" --network host --build-arg "AW_VERSION=${VERSION}" .
-fi
-
-echo ''
-echo "### BUILDING IMAGE ${image_aws} ###"
-docker build -f Dockerfile_production_aws -t "$image_aws" --network host --build-arg "AW_VERSION=${VERSION}" --no-cache --progress=plain .
-
-if [[ "$REPLY" =~ ^[Yy]$ ]]
-then
-  docker build -f Dockerfile_production_aws -t "$image_aws_latest" --network host --build-arg "AW_VERSION=${VERSION}" .
-fi
-
-echo ''
-echo "### BUILDING IMAGE ${image_mysql} ###"
-docker build -f Dockerfile_production_mysql -t "$image_mysql" --network host --build-arg "AW_VERSION=${VERSION}" --no-cache --progress=plain .
-
-if [[ "$REPLY" =~ ^[Yy]$ ]]
-then
-  docker build -f Dockerfile_production_mysql -t "$image_mysql_latest" --network host --build-arg "AW_VERSION=${VERSION}" .
-fi
-
-echo ''
-echo "### BUILDING IMAGE ${image_psql} ###"
-docker build -f Dockerfile_production_psql -t "$image_psql" --network host --build-arg "AW_VERSION=${VERSION}" --no-cache --progress=plain .
-
-if [[ "$REPLY" =~ ^[Yy]$ ]]
-then
-  docker build -f Dockerfile_production_psql -t "$image_psql_latest" --network host --build-arg "AW_VERSION=${VERSION}" .
-fi
+echo "### DONE - PLEASE TEST THAT THE IMAGES WORK BEFORE PUSHING THEM! ###"

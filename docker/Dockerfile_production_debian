@@ -1,0 +1,30 @@
+ARG AW_VERSION=0.0
+
+FROM oxlorg/ansible-webui-builder-fe:${AW_VERSION} AS builder
+
+FROM python:3.12-slim AS aw
+ARG AW_VERSION
+ARG PY_VERSION=3.12
+
+RUN apt-get update && \
+    apt-get -y --no-install-recommends install git git-lfs openssh-client sshpass xmlsec1 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip install --no-cache-dir --upgrade pip 2>/dev/null && \
+    pip install --no-cache-dir "git+https://github.com/O-X-L/ansible-webui.git@${AW_VERSION}" && \
+    mkdir -p /play /data/log
+
+COPY --from=builder /tmp/ansible-webui-${AW_VERSION}/src/oxl_ansible_webui/aw/static_prod/ /usr/local/lib/python${PY_VERSION}/site-packages/oxl_ansible_webui/aw/static_prod/
+
+ENV AW_VERSION=${AW_VERSION} \
+    AW_DOCKER=1 \
+    PYTHONUNBUFFERED=1 \
+    AW_DB=/data/aw.db \
+    AW_PATH_LOG=/data/log \
+    AW_PATH_PLAY=/play
+WORKDIR /play
+EXPOSE 8000
+
+COPY --chmod=0755 entrypoint_production.sh /entrypoint.sh
+COPY --chmod=0755 requirements.sh /entrypoint_requirements.sh
+ENTRYPOINT ["/entrypoint.sh"]

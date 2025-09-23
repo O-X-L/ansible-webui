@@ -19,6 +19,8 @@ Images
 
 We recommend to use the :code:`latest` tag.
 
+The images use the `official Python3 containers <https://hub.docker.com/_/python>`_ (:code:`alpine` and :code:`debian`) as a base.
+
 ----
 
 Ansible Requirements

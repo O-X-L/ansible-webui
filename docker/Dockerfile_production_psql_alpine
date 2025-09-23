@@ -1,6 +1,6 @@
 ARG AW_VERSION=0.0
 
-FROM oxlorg/ansible-webui-unprivileged:${AW_VERSION}
+FROM oxlorg/ansible-webui-unprivileged:${AW_VERSION}-alpine
 ARG AW_USER=aw
 
 USER root

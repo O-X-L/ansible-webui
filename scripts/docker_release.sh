@@ -11,57 +11,41 @@ fi
 set -u
 
 VERSION="$1"
-IMAGE_REPO="oxlorg/ansible-webui"
-IMAGE_REPO_UNPRIV="${IMAGE_REPO}-unprivileged"
-IMAGE_REPO_AWS="${IMAGE_REPO}-aws"
-IMAGE_REPO_MYSQL="${IMAGE_REPO}-mysql"
-IMAGE_REPO_PSQL="${IMAGE_REPO}-psql"
+cd "$(dirname "$0")/../docker"
 
-image="${IMAGE_REPO}:${VERSION}"
-image_latest="${IMAGE_REPO}:latest"
-
-image_unpriv="${IMAGE_REPO_UNPRIV}:${VERSION}"
-image_unpriv_latest="${IMAGE_REPO_UNPRIV}:latest"
-
-image_aws="${IMAGE_REPO_AWS}:${VERSION}"
-image_aws_latest="${IMAGE_REPO_AWS}:latest"
-
-image_mysql="${IMAGE_REPO_MYSQL}:${VERSION}"
-image_mysql_latest="${IMAGE_REPO_MYSQL}:latest"
-
-image_psql="${IMAGE_REPO_PSQL}:${VERSION}"
-image_psql_latest="${IMAGE_REPO_PSQL}:latest"
-
-if ! docker image ls | grep "$IMAGE_REPO" | grep -q "$VERSION"
-then
-  echo "Image not found: ${image}"
-  exit 1
-fi
+source ./build_config.sh
 
 echo ''
 read -r -p "Release version ${VERSION} as latest? [y/N] " -n 1
 
-echo ''
-echo "### RELEASING IMAGES WITH TAG ${VERSION} ###"
-docker push "$image"
-docker push "$image_unpriv"
-docker push "$image_aws"
-docker push "$image_mysql"
-docker push "$image_psql"
+function push() {
+  img="$1"
+  tag="$2"
+  img_with_tag="${img}:${tag}"
+  echo "##### PUSHING ${img_with_tag} #####"
+  docker push "$img_with_tag"
+}
 
-if [[ "$REPLY" =~ ^[Yy]$ ]]
-then
-  if ! docker image ls | grep "$IMAGE_REPO" | grep -q 'latest'
+for img in "${IMAGES[@]}"
+do
+  echo ''
+  echo "### BUILDING ${img} ###"
+
+  set +u
+  if [ -n "${DOCKERFILES_DEBIAN["$img"]+_}" ]
   then
-    echo "Image not found: ${image_latest}"
-    exit 1
+    push "$img" "${VERSION}-debian"
   fi
 
-  echo ''
-  echo "### RELEASING IMAGES WITH TAG latest ###"
-  docker push "$image_latest"
-  docker push "$image_unpriv_latest"
-  docker push "$image_aws_latest"
-  docker push "$image_mysql_latest"
-  docker push "$image_psql_latest"
-fi
+  set +u
+  if [ -n "${DOCKERFILES_ALPINE["$img"]+_}" ]
+  then
+    push "$img" "${VERSION}-alpine"
+  fi
+  set -u
+
+  if [[ "$REPLY" =~ ^[Yy]$ ]]
+  then
+    push "$img" "latest"
+  fi
+done

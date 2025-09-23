@@ -1,0 +1,19 @@
+ARG AW_VERSION=0.0
+
+FROM python:3.12-alpine AS builder_mysql
+
+RUN apk add --update --no-cache gcc musl-dev mariadb-connector-c mariadb-dev
+RUN pip install --no-cache-dir mysqlclient
+
+FROM oxlorg/ansible-webui-unprivileged:${AW_VERSION}-alpine
+ARG AW_USER=aw
+ARG PY_VERSION=3.12
+
+USER root
+
+RUN apk add --update --no-cache mariadb-dev
+
+COPY --from=builder_mysql /usr/local/lib/python${PY_VERSION}/site-packages/MySQLdb /usr/local/lib/python${PY_VERSION}/site-packages/MySQLdb
+COPY --from=builder_mysql /usr/local/lib/python${PY_VERSION}/site-packages/mysqlclient-*.dist-info /usr/local/lib/python${PY_VERSION}/site-packages/
+
+USER ${AW_USER}

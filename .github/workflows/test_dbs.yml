@@ -83,7 +83,7 @@ jobs:
 
       - name: Install MariaDB/MySQL dependencies
         run: |
-          sudo apt install default-libmysqlclient-dev >/dev/null 2>/dev/null
+          sudo apt install python3-dev default-libmysqlclient-dev build-essential pkg-config >/dev/null 2>/dev/null
           pip install mysqlclient >/dev/null
 
       - name: Testing MariaDB/MySQL
