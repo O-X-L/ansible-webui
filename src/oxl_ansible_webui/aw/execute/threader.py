@@ -64,6 +64,8 @@ class Workload(Thread):
     def run(self, error: bool = False) -> None:
         if error and is_set(self.execution):
             update_status(self.execution, status=JOB_EXEC_STATUS_RETRY)
+            if self.execution.credentials_tmp is not None:
+                self.execution.credentials_tmp.cleanup_secret(remove_file=True)
 
         if self.once and self.started:
             self.stop()

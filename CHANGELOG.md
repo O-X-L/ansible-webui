@@ -20,6 +20,7 @@ Features:
 * Write login/logout events to audit-log [#49](https://github.com/O-X-L/ansible-webui/issues/49)
 * Write job-executions (ad-hoc and scheduled) to audit-log [#49](https://github.com/O-X-L/ansible-webui/issues/49)
 * Fixed issue with ansible-runner usage [ansible-runner #1398](https://github.com/ansible/ansible-runner/issues/1398) - changed back to official runner
+* Security: Clean temporary job-credentials before starting job
 
 ----
 

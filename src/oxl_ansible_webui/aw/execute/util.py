@@ -40,7 +40,11 @@ def update_status(obj: (JobExecution, Repository), status: (str, int)):
 
     obj.status = status
     close_old_mysql_connections()
-    obj.save()
+    try:
+        obj.save()
+
+    except ValueError:
+        return
 
 
 def is_execution_status(execution: JobExecution, status: str) -> bool:

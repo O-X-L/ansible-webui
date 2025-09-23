@@ -14,7 +14,7 @@ except (ImportError, ModuleNotFoundError):
 
 from aw.config.main import config
 from aw.utils.util import is_set, datetime_w_tz, write_file_0640, overwrite_and_delete_file
-from aw.model.job_credential import BaseJobCredentials
+from aw.model.job_credential import BaseJobCredentials, JobUserTMPCredentials
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, JobError
 from aw.execute.util import update_status, decode_job_env_vars, create_dirs, is_execution_status, config_error
 from aw.utils.debug import log
@@ -188,10 +188,14 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path, project_dir: 
     create_dirs(path=path_run, desc='run')
     create_dirs(path=config['path_log'], desc='log')
 
+    creds_args = get_runner_credentials_args(creds=creds)
+    if isinstance(creds, JobUserTMPCredentials):
+        creds.cleanup_secret(remove_file=False)
+
     update_status(execution, status='Running')
     return {
         **opts,
-        **get_runner_credentials_args(creds=creds),
+        **creds_args,
     }
 
 
@@ -218,7 +222,7 @@ def runner_cleanup(execution: JobExecution, path_run: Path, exec_repo: ExecuteRe
     overwrite_and_delete_file(f"{path_run}/env/passwords")
     overwrite_and_delete_file(f"{path_run}/env/ssh_key")
     if is_set(execution.credentials_tmp):
-        execution.credentials_tmp.cleanup_secret()
+        execution.credentials_tmp.cleanup_secret(remove_file=True)
         execution.credentials_tmp.delete()
 
     try:

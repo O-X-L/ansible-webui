@@ -116,18 +116,18 @@ def get_runner_credentials_args(creds: BaseJobCredentials) -> dict:
         return args
 
     if is_set(creds.ssh_key):
-        args['ssh_key'] = creds.ssh_key
+        args['ssh_key'] = f'{creds.ssh_key}'
 
     if is_set(creds.connect_pass) or is_set(creds.become_pass) or is_set(creds.vault_pass):
         args['passwords'] = {}
 
         if is_set(creds.connect_pass):
-            args['passwords'][r'^SSH\s[pP]assword:\s*$'] = creds.connect_pass
+            args['passwords'][r'^SSH\s[pP]assword:\s*$'] = f'{creds.connect_pass}'
 
         if is_set(creds.become_pass):
-            args['passwords'][r'^BECOME\s[pP]assword.*:\s*$'] = creds.become_pass
+            args['passwords'][r'^BECOME\s[pP]assword.*:\s*$'] = f'{creds.become_pass}'
 
         if is_set(creds.vault_pass):
-            args['passwords'][r'^Vault\s[pP]assword:\s*$'] = creds.vault_pass
+            args['passwords'][r'^Vault\s[pP]assword:\s*$'] = f'{creds.vault_pass}'
 
     return args

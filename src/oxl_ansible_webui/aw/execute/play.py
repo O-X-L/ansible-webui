@@ -63,6 +63,7 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
         execution.save()
         runner_cfg = RunnerConfig(**opts, timeout=config['run_timeout'], quiet=True)
         runner_logs(cfg=runner_cfg, log_files=log_files)
+
         runner_cfg.prepare()
         command = ' '.join(runner_cfg.command)
         log(msg=f"Running job '{job.name}': '{command}'", level=5)

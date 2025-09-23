@@ -179,11 +179,24 @@ class JobUserTMPCredentials(BaseJobCredentials):
 
         return Path(config['path_run']) / f'.exec_tmpkey_{self.file_id}'
 
+    def _secret_file_is_valid(self) -> bool:
+        # we can ignore decryption-errors if we nulled-out the file before
+        sf = self._get_secret_file()
+        with open(sf, 'r', encoding='utf-8') as f:
+            empty = f.read() == ''
+
+        return sf.is_file() and not empty
+
     def _generate_secret(self):
         write_file_0600(file=self._get_secret_file(), content=get_random_str())
 
-    def cleanup_secret(self):
-        overwrite_and_delete_file(self._get_secret_file())
+    def cleanup_secret(self, remove_file: bool):
+        sf = self._get_secret_file()
+        overwrite_and_delete_file(sf)
+
+        # if the file is removed, a call to 'get_secret' will re-generate it..
+        if not remove_file:
+            write_file_0600(file=sf, content='')
 
     def get_secret(self) -> str:
         sf = self._get_secret_file()
@@ -199,8 +212,9 @@ class JobUserTMPCredentials(BaseJobCredentials):
         if is_null(self._enc_vault_pass):
             return ''
 
-        d1 = decrypt(self._enc_vault_pass)
-        return decrypt(ciphertext=d1, secret=self.get_secret())
+        secret_valid = self._secret_file_is_valid()
+        d1 = decrypt(self._enc_vault_pass, warn=secret_valid)
+        return decrypt(ciphertext=d1, secret=self.get_secret(), warn=secret_valid)
 
     @vault_pass.setter
     def vault_pass(self, value: str):
@@ -216,8 +230,9 @@ class JobUserTMPCredentials(BaseJobCredentials):
         if is_null(self._enc_become_pass):
             return ''
 
-        d1 = decrypt(self._enc_become_pass)
-        return decrypt(ciphertext=d1, secret=self.get_secret())
+        secret_valid = self._secret_file_is_valid()
+        d1 = decrypt(self._enc_become_pass, warn=secret_valid)
+        return decrypt(ciphertext=d1, secret=self.get_secret(), warn=secret_valid)
 
     @become_pass.setter
     def become_pass(self, value: str):
@@ -233,8 +248,9 @@ class JobUserTMPCredentials(BaseJobCredentials):
         if is_null(self._enc_connect_pass):
             return ''
 
-        d1 = decrypt(self._enc_connect_pass)
-        return decrypt(ciphertext=d1, secret=self.get_secret())
+        secret_valid = self._secret_file_is_valid()
+        d1 = decrypt(self._enc_connect_pass, warn=secret_valid)
+        return decrypt(ciphertext=d1, secret=self.get_secret(), warn=secret_valid)
 
     @connect_pass.setter
     def connect_pass(self, value: str):
@@ -250,8 +266,9 @@ class JobUserTMPCredentials(BaseJobCredentials):
         if is_null(self._enc_ssh_key):
             return ''
 
-        d1 = decrypt(self._enc_ssh_key)
-        return decrypt(ciphertext=d1, secret=self.get_secret())
+        secret_valid = self._secret_file_is_valid()
+        d1 = decrypt(self._enc_ssh_key, warn=secret_valid)
+        return decrypt(ciphertext=d1, secret=self.get_secret(), warn=secret_valid)
 
     @ssh_key.setter
     def ssh_key(self, value: str):

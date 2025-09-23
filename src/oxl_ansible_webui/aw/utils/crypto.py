@@ -48,7 +48,7 @@ def _encrypt(plaintext: bytes, secret: bytes) -> bytes:
     return b64encode(ciphertext)
 
 
-def decrypt(ciphertext: str, secret: str = None) -> str:
+def decrypt(ciphertext: str, secret: str = None, warn: bool = True) -> str:
     if is_null(ciphertext):
         return ''
 
@@ -60,13 +60,15 @@ def decrypt(ciphertext: str, secret: str = None) -> str:
         ).decode('utf-8')
 
     except ValueError as err:
-        if secret is None:
-            log_warn("Unable to decrypt secret! Maybe the key 'AW_SECRET' changed?")
+        if warn:
+            if secret is None:
+                log_warn("Unable to decrypt secret! Maybe the key 'AW_SECRET' changed?")
 
-        else:
-            log_warn("Unable to decrypt secret! Maybe the provided secret does not match.")
+            else:
+                log_warn("Unable to decrypt secret! Maybe the provided secret does not match.")
 
-        log(msg=f"Got error decrypting ciphertext: '{err}'", level=6)
+            log(msg=f"Got error decrypting ciphertext: '{err}'", level=6)
+
         return ''
 
 
