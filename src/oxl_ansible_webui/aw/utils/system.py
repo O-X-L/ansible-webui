@@ -2,7 +2,7 @@ from os import environ
 from pathlib import Path
 from getpass import getuser
 
-from ansibleguy_runner.interface import get_ansible_config
+from ansible_runner.interface import get_ansible_config
 
 from aw.utils.subps import process_cache
 from aw.utils.version import get_system_versions, parsed_ansible_version, parsed_python_modules, get_version

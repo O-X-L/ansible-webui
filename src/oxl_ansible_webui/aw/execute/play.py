@@ -1,7 +1,7 @@
 import traceback
 
 from django.db.utils import OperationalError, IntegrityError
-from ansibleguy_runner import RunnerConfig, Runner
+from ansible_runner import RunnerConfig, Runner
 
 from aw.config.main import config
 from aw.model.job import Job, JobExecution, JobExecutionResult
