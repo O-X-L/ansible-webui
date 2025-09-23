@@ -1,7 +1,7 @@
-FROM python:3.11-alpine
+FROM python:3.12-alpine
 
 # BUILD: docker build -f Dockerfile_dev -t oxlorg/ansible-webui:dev --no-cache .
-# RUN: docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awtest:/data --volume $(pwd):/aw ansible-webui:dev
+# RUN: docker run -it --name ansible-webui-dev --volume /tmp/awtest:/data --volume $(pwd):/aw ansible-webui:dev
 
 RUN apk add --update --no-cache openssh-client sshpass xmlsec && \
     pip install --no-cache-dir --upgrade pip 2>/dev/null && \

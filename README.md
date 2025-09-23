@@ -37,6 +37,8 @@ oxl-ansible-webui
 
 Images: [ansible-webui](https://hub.docker.com/r/oxlorg/ansible-webui), [ansible-webui-unprivileged](https://hub.docker.com/r/oxlorg/ansible-webui-unprivileged), [ansible-webui-mysql](https://hub.docker.com/r/oxlorg/ansible-webui-mysql), [ansible-webui-psql](https://hub.docker.com/r/oxlorg/ansible-webui-psql), [ansible-webui-aws](https://hub.docker.com/r/oxlorg/ansible-webui-aws)
 
+We build the image for `alpine` and `debian`.
+
 ```bash
 docker image pull oxlorg/ansible-webui:latest
 docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 oxlorg/ansible-webui:latest
