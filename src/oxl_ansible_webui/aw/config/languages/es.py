@@ -182,6 +182,7 @@ ES = {
                                    'Asegúrate de seleccionar el "ECMAScript (Javascript)" sabor.',
 
     # credentials
+    'creds.edit': 'Editar Credencial',
     'creds.user': 'Personal',
     'creds.shared': 'Compartido',
     'creds.new': 'Nueva Credencial',

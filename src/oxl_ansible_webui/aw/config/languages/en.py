@@ -185,6 +185,7 @@ EN = {
                                    'Make sure to select the "ECMAScript (Javascript)" flavor.',
 
     # credentials
+    'creds.edit': 'Edit Credentials',
     'creds.user': 'Personal',
     'creds.shared': 'Shared',
     'creds.new': 'New Credentials',
