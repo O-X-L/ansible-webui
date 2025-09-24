@@ -14,7 +14,7 @@ Fixes:
 
 * Numeric env-var values leading to error [#66](https://github.com/O-X-L/ansible-webui/issues/66)
 * MySQL/MariaDB-client may throw connection-error when writing audit-logs [#49](https://github.com/O-X-L/ansible-webui/issues/49)
-* Error when pressing download button for isolated Git-repository [#68](https://github.com/O-X-L/ansible-webui/issues/68)
+* Error when pressing download button for Git-repositories that require credentials [#68](https://github.com/O-X-L/ansible-webui/issues/68)
 
 Features:
 
