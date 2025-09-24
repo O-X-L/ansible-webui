@@ -92,7 +92,7 @@ You can also run inline scripts like this example:
 Clone via SSH
 =============
 
-You can specify which :code:`known_hosts` file AW should use using the :ref:`System config <usage_config>`!
+You can specify which :code:`known_hosts` file AW should use using the :ref:`System config <start_config>`!
 
 You are able to append the port to the origin string like so: :code:`git@git.intern -p1337`
 

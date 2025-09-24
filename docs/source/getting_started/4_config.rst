@@ -1,12 +1,14 @@
-.. _usage_config:
-
-.. include:: ../_include/head.rst
+.. _start_config:
 
 .. |system_settings_dark| image:: ../_static/img/system_settings_dark.webp
    :class: wiki-img-dark
 
 .. |system_settings_light| image:: ../_static/img/system_settings_light.webp
    :class: wiki-img-light
+
+.. include:: ../_include/head.rst
+
+.. include:: ../_include/head_getting_started.rst
 
 ==========
 4 - Config
@@ -15,7 +17,7 @@
 **Tip**: You can use the key-combination :code:`ALT + S` to quick-safe your changes.
 
 WebUI
-*****
+#####
 
 Runtime system configuration can be managed using the WebUI :code:`System - Settings` page.
 
@@ -26,7 +28,7 @@ Runtime system configuration can be managed using the WebUI :code:`System - Sett
 ----
 
 Jobs
-====
+****
 
 Jobs can be managed at the :code:`Home - Jobs` page.
 
@@ -35,34 +37,34 @@ Jobs can be managed at the :code:`Home - Jobs` page.
 ----
 
 Permissions, Users, Groups
-==========================
+**************************
 
 See: :ref:`Usage - Privileges <usage_permission>`
 
 ----
 
 Repositories
-============
+************
 
 See: :ref:`Usage - Repositories <usage_repositories>`
 
 ----
 
 Environmental variables
-***********************
+#######################
 
 You can find the currently set environmental variables at the :code:`System - Settings` page.
 
 ----
 
-.. _usage_config_file:
+.. _start_config_file:
 
 Config File
-===========
+***********
 
 You are able to provide the following settings by using a `YAML <https://www.redhat.com/en/topics/automation/what-is-yaml>`_ config-file.
 
- **WARNING**: If possible - set your secrets as environmental variables. Users that are allowed to execute/modify jobs :ref:`are be able to read the content of the config-file <usage_security_issues>`
+ **WARNING**: If possible - set your secrets as environmental variables. Users that are allowed to execute/modify jobs :ref:`are be able to read the content of the config-file <administration_security_issues>`
 
 
 * Provide it by flag: :code:`oxl-ansible-webui -c /etc/ansible-webui/config.yml`
@@ -96,10 +98,10 @@ Docker usage:
 ----
 
 Settings
-========
+********
 
-Only Env
---------
+Only Env-Vars
+=============
 
 Some settings are only available as environmental variables.
 
@@ -110,7 +112,7 @@ Some settings are only available as environmental variables.
    It **has to be set** for job-secrets like passwords to be loadable after restart.
    It has to be **at least 30 characters** long!
 
-   **WARNING**: If possible - set this secret as environmental variable. Users that are allowed to execute/modify jobs :ref:`are be able to read the content of the config-file <usage_security_issues>`
+   **WARNING**: If possible - set this secret as environmental variable. Users that are allowed to execute/modify jobs :ref:`are be able to read the content of the config-file <administration_security_issues>`
 
 
 * **AW_ADMIN**
@@ -139,7 +141,7 @@ Some settings are only available as environmental variables.
 
    Choices: :code:`mysql`, :code:`postgresql`
 
-   See also: :ref:`Install Notes <usage_install_db>`
+   See also: :ref:`Install Notes <start_install_db>`
 
 
 * **AW_DB**
@@ -212,7 +214,7 @@ Some settings are only available as environmental variables.
 
 
 General System Settings
------------------------
+=======================
 
 These settings are also configurable using the WebUI.
 
@@ -259,7 +261,7 @@ These settings are also configurable using the WebUI.
 
 
 Advanced Settings
------------------
+=================
 
 Normal users will not have to use these.
 
@@ -312,7 +314,7 @@ Normal users will not have to use these.
 ----
 
 Usage
-=====
+*****
 
 Environmental variables can be set before/when starting Ansible-WebUI.
 

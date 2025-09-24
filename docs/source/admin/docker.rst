@@ -1,4 +1,4 @@
-.. _usage_docker:
+.. _administration_docker:
 
 .. include:: ../_include/head.rst
 

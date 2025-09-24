@@ -1,4 +1,4 @@
-.. _usage_security:
+.. _administration_security:
 
 .. include:: ../_include/head.rst
 
@@ -37,7 +37,7 @@ You are very welcome to search for security vulnerabilities and `report them <ht
 
 ----
 
-.. _usage_security_issues:
+.. _administration_security_issues:
 
 Known Issues
 ************

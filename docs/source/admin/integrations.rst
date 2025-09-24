@@ -1,4 +1,4 @@
-.. _usage_integrations:
+.. _administration_integrations:
 
 .. include:: ../_include/head.rst
 
@@ -30,11 +30,11 @@ Identity Providers using SAML SSO
 
 Easily integrate with SAML2 SSO identity providers like Okta, Azure AD and others.
 
-For configuration - see: :ref:`Usage - Authentication <usage_auth>`
+For configuration - see: :ref:`Administration - Authentication <administration_auth>`
 
 ----
 
 Netbox
 ******
 
-See: :ref:`Usage - API - Netbox Webhooks <usage_api_netbox>`
+See: :ref:`Administration - API - Netbox Webhooks <administration_api_netbox>`

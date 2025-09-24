@@ -1,4 +1,4 @@
-.. _usage_auth:
+.. _administration_auth:
 
 .. include:: ../_include/head.rst
 
@@ -15,14 +15,14 @@ SAML SSO
 
 This app is integrating the `grafana/django-saml2-auth module <https://github.com/grafana/django-saml2-auth>`_ (indirect `pysaml2 <https://github.com/IdentityPython/pysaml2>`_).
 
-If you have troubles with getting SAML to work - check out :ref:`Usage - Troubleshooting - SAML <usage_troubleshooting_saml>`
+If you have troubles with getting SAML to work - check out :ref:`Administration - Troubleshooting - SAML <administration_troubleshooting_saml>`
 
 ----
 
 Setup
 =====
 
-1. Add the :code:`SAML` config-block to your config-file. See: :ref:`Usage - Config - File <usage_config_file>`
+1. Add the :code:`SAML` config-block to your config-file. See: :ref:`Getting Started - Config - File <start_config_file>`
 
   For options see: `Module settings <https://github.com/grafana/django-saml2-auth?tab=readme-ov-file#module-settings>`_
 

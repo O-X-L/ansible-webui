@@ -1,4 +1,4 @@
-.. _usage_api:
+.. _administration_api:
 
 .. include:: ../_include/head.rst
 
@@ -94,7 +94,7 @@ To do so:
 
 ----
 
-.. _usage_api_netbox:
+.. _administration_api_netbox:
 
 Netbox Webhooks
 ***************

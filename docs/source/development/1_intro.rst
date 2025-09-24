@@ -1,4 +1,4 @@
-.. _usage_development:
+.. _dev_intro:
 
 .. include:: ../_include/head.rst
 
@@ -12,7 +12,7 @@ Testers are also very welcome! Please `give feedback <https://github.com/O-X-L/a
 
 For further details - see: `Contribute <https://github.com/O-X-L/ansible-webui/blob/latest/CONTRIBUTE.md>`_
 
-Read into the :ref:`Troubleshooting Guide <usage_troubleshooting>` to get some insight on how the stack works.
+Read into the :ref:`Troubleshooting Guide <administration_troubleshooting>` to get some insight on how the stack works.
 
 
 ----

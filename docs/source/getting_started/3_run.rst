@@ -1,13 +1,15 @@
-.. _usage_run:
+.. _start_run:
 
 .. include:: ../_include/head.rst
+
+.. include:: ../_include/head_getting_started.rst
 
 =======
 3 - Run
 =======
 
 Getting Started
-***************
+###############
 
 You may want to:
 
@@ -19,12 +21,12 @@ You may want to:
   * Set the :code:`AW_PATH_PLAY` to your Playbook base-directory (env-var or via WebUI)
 
 
-See: :ref:`Usage - Config <usage_config>` for more details
+See: :ref:`Getting Started - Config <start_config>` for more details
 
 ----
 
 Run Locally (PIP)
-*****************
+#################
 
 .. code-block:: bash
 
@@ -50,7 +52,7 @@ Run Locally (PIP)
 ----
 
 Run Dockerized
-**************
+##############
 
 .. code-block:: bash
 

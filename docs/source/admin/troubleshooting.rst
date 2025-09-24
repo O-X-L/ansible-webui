@@ -1,4 +1,4 @@
-.. _usage_troubleshooting:
+.. _administration_troubleshooting:
 
 .. include:: ../_include/head.rst
 
@@ -63,7 +63,7 @@ The Ansible execution itself can fail because of some common issues:
 
     You can find the current versions used by your Controller system at the :code:`System - Environment` page
 
-  * If you are using Docker - you can install those dependencies using requirements-files. See :ref:`Usage - Docker <usage_docker>`
+  * If you are using Docker - you can install those dependencies using requirements-files. See :ref:`Administration - Docker <administration_docker>`
 
 * to be continued..
 
@@ -109,7 +109,7 @@ Python Module not installed
 
   You could also find and install the module using your systems package manager: :code:`sudo apt install python3-<MODULE>` (NOTE: these packages are older versions)
 
-* If you are using Docker, you can create and mount a :code:`requirements.txt` and restart your container. See also: :ref:`Usage - Docker <usage_docker>`
+* If you are using Docker, you can create and mount a :code:`requirements.txt` and restart your container. See also: :ref:`Administration - Docker <administration_docker>`
 
 ----
 
@@ -139,7 +139,7 @@ SSH Shared connection
 
 ----
 
-.. _usage_troubleshooting_saml:
+.. _administration_troubleshooting_saml:
 
 SAML Issues
 ===========

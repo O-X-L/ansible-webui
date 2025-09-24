@@ -2,22 +2,24 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
    <url><loc>https://ansible-webui.oxl.app/</loc></url>
 
-   <url><loc>https://ansible-webui.oxl.app/usage/1_intro.html</loc></url>
-   <url><loc>https://ansible-webui.oxl.app/usage/2_install.html</loc></url>
-   <url><loc>https://ansible-webui.oxl.app/usage/3_run.html</loc></url>
-   <url><loc>https://ansible-webui.oxl.app/usage/4_config.html</loc></url>
+   <url><loc>https://ansible-webui.oxl.app/getting_started/1_intro.html</loc></url>
+   <url><loc>https://ansible-webui.oxl.app/getting_started/2_install.html</loc></url>
+   <url><loc>https://ansible-webui.oxl.app/getting_started/3_run.html</loc></url>
+   <url><loc>https://ansible-webui.oxl.app/getting_started/4_config.html</loc></url>
 
    <url><loc>https://ansible-webui.oxl.app/usage/alerts.html</loc></url>
-   <url><loc>https://ansible-webui.oxl.app/usage/api.html</loc></url>
-   <url><loc>https://ansible-webui.oxl.app/usage/authentication.html</loc></url>
-   <url><loc>https://ansible-webui.oxl.app/usage/backup.html</loc></url>
    <url><loc>https://ansible-webui.oxl.app/usage/credentials.html</loc></url>
-   <url><loc>https://ansible-webui.oxl.app/usage/development.html</loc></url>
-   <url><loc>https://ansible-webui.oxl.app/usage/docker.html</loc></url>
-   <url><loc>https://ansible-webui.oxl.app/usage/integrations.html</loc></url>
    <url><loc>https://ansible-webui.oxl.app/usage/jobs.html</loc></url>
    <url><loc>https://ansible-webui.oxl.app/usage/privileges.html</loc></url>
    <url><loc>https://ansible-webui.oxl.app/usage/repositories.html</loc></url>
-   <url><loc>https://ansible-webui.oxl.app/usage/security.html</loc></url>
-   <url><loc>https://ansible-webui.oxl.app/usage/troubleshooting.html</loc></url>
+
+   <url><loc>https://ansible-webui.oxl.app/admin/api.html</loc></url>
+   <url><loc>https://ansible-webui.oxl.app/admin/authentication.html</loc></url>
+   <url><loc>https://ansible-webui.oxl.app/admin/backup.html</loc></url>
+   <url><loc>https://ansible-webui.oxl.app/admin/docker.html</loc></url>
+   <url><loc>https://ansible-webui.oxl.app/admin/integrations.html</loc></url>
+   <url><loc>https://ansible-webui.oxl.app/admin/security.html</loc></url>
+   <url><loc>https://ansible-webui.oxl.app/admin/troubleshooting.html</loc></url>
+
+   <url><loc>https://ansible-webui.oxl.app/development/1_intro.html</loc></url>
 </urlset>

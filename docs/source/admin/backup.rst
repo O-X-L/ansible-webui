@@ -1,4 +1,4 @@
-.. _usage_backup:
+.. _administration_backup:
 
 .. include:: ../_include/head.rst
 
