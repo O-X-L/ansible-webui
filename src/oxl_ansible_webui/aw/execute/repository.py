@@ -10,7 +10,7 @@ from aw.model.job import  JobExecution
 from aw.utils.util import is_null, is_set, write_file_0640, datetime_w_tz
 from aw.utils.subps import process
 from aw.execute.play_credentials import write_pwd_file, get_pwd_file
-from aw.execute.util import update_status, create_dirs
+from aw.execute.util import update_status, create_dirs, get_path_run
 from aw.utils.handlers import AnsibleRepositoryError
 from aw.model.repository import Repository
 from aw.model.base import JOB_EXEC_STATUS_FAILED
@@ -23,8 +23,12 @@ class ExecuteRepository:
     def __init__(self, repository: Repository, execution: JobExecution = None, path_run: Path = None):
         self.repository = repository
         self.path_run = path_run
+        if self.path_run is None:
+            self.path_run = get_path_run()
+
         self.execution = execution
         self.path_repo = None
+        # we need a persistent repo-clone for the WebUI-interaction (file-browsing and so on)
         self.isolate_subdir = self.execution.id if self.execution is not None else self.ISOLATE_BROWSABLE
         create_dirs(path=config['path_log'], desc='log')
 
@@ -127,7 +131,7 @@ class ExecuteRepository:
     def _error(self, msg: str):
         write_file_0640(file=self.repository.log_stderr, content=msg)
         update_status(self.repository, status=JOB_EXEC_STATUS_FAILED)
-        raise AnsibleRepositoryError(msg).with_traceback(None) from None
+        raise AnsibleRepositoryError(msg)
 
     def get_path_run_repo(self) -> Path:
         return self.path_run / '.repository'
