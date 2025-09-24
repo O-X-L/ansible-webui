@@ -2,6 +2,28 @@
 
 ## Images
 
+### Development
+
+* `Dockerfile_dev_frontend` => build the frontend JS-files from your local sources
+
+  ```bash
+  # build image
+  docker build -f Dockerfile_dev_frontend -t aw-dev-fe --network=host --no-cache .
+  # run whenever you want to re-build the JS-bundle
+  docker run -it --rm --network=host --volume "$(pwd)/..:/repo" aw-dev-fe
+  ```
+
+* `Dockerfile_dev_backend` => initialize and run the Gunicorn/Django web service
+
+  ```bash
+  # build image
+  docker build -f Dockerfile_dev_backend -t aw-dev-be --network=host --no-cache .
+  # start web-service
+  docker run -it --rm --network=host --volume "$(pwd)/..:/repo" aw-dev-be
+  ```
+
+### End-Users
+
 * `Dockerfile_builder_frontend` => build the frontend JS-files from Svelte-src via npm
 
 * `Dockerfile_production_alpine` => Base image on alpine (running as root)

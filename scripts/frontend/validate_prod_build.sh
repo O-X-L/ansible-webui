@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -eo pipefail
+
+ENV='prod'
+if [ -n "$1" ]
+then
+  ENV="$1"
+fi
 
 cd "$(dirname "$0")/../.."
 
-DST='src/oxl_ansible_webui/aw/static_prod/dist'
+
+DST="src/oxl_ansible_webui/aw/static_${ENV}/dist"
 
 if [ ! -f "${DST}/tailwind.min.css" ]
 then

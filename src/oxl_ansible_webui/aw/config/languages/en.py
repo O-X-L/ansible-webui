@@ -370,7 +370,7 @@ EN = {
                                  'https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo/vscode-ansible.svg'
                                  '</a>',
     'config.form.help.ara_server': 'Provide the URL to your ARA server. Can be used to gather job statistics. See: '
-                                   '<a href="https://ansible-webui.OXL.app/usage/integrations.html">'
+                                   '<a href="https://ansible-webui.OXL.app/admin/integrations.html">'
                                    'Documentation - Integrations</a>',
     'config.form.help.global_environment_vars': 'Set environmental variables that will be added to every job execution. '
                                                 'Comma-separated list of key-value pairs. (VAR1=TEST1,VAR2=0)',

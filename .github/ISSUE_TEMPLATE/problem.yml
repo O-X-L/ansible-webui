@@ -13,7 +13,7 @@ body:
 
         - [ ] Read the documentation: [Docs](https://ansible-webui.OXL.app/)
 
-        - [ ] Read the troubleshooting info: [Troubleshooting](https://ansible-webui.OXL.app/usage/troubleshooting.html)
+        - [ ] Read the troubleshooting info: [Troubleshooting](https://ansible-webui.OXL.app/admin/troubleshooting.html)
 
         - [ ] Check if there are existing [issues](https://github.com/O-X-L/ansible-webui/issues)
         or [discussions](https://github.com/O-X-L/ansible-webui/discussions) regarding your topic

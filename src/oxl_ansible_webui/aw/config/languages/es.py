@@ -370,7 +370,7 @@ ES = {
                                  'https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo/vscode-ansible.svg'
                                  '</a>',
     'config.form.help.ara_server': 'Proporcione la URL de su servidor ARA (análisis de ejecución de Ansible). Se puede utilizar para recopilar estadísticas de trabajo. Véase: '
-                                   '<a href="https://ansible-webui.OXL.app/usage/integrations.html">'
+                                   '<a href="https://ansible-webui.OXL.app/admin/integrations.html">'
                                    'Documentación - Integraciones</a>',
     'config.form.help.global_environment_vars': 'Establecer variables de entorno que se añadirán a cada ejecución de trabajo. '
                                                 'Lista separada por comas de pares clave-valor. (VAR1=TEST1,VAR2=0)',

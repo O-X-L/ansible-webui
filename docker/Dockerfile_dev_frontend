@@ -1,0 +1,10 @@
+FROM node:23-alpine AS builder
+
+ARG AW_VERSION
+WORKDIR /repo
+VOLUME /repo
+
+RUN apk add --update --no-cache bash
+
+COPY --chmod=0755 entrypoint_dev_frontend.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
