@@ -3,40 +3,40 @@
 .. include:: ../_include/head.rst
 
 .. |creds_ui_dark| image:: ../_static/img/credentials_ui_dark.webp
-   :class: wiki-img-dark
+   :class: wiki-img-sm-dark
 
 .. |creds_ui_light| image:: ../_static/img/credentials_ui_light.webp
-   :class: wiki-img-light
+   :class: wiki-img-sm-light
 
 .. |creds_job_dark| image:: ../_static/img/credentials_job_dark.webp
-   :class: wiki-img-dark
+   :class: wiki-img-sm-dark
 
 .. |creds_job_light| image:: ../_static/img/credentials_job_light.webp
-   :class: wiki-img-light
+   :class: wiki-img-sm-light
 
 .. |creds_prompt_dark| image:: ../_static/img/credentials_prompt_dark.webp
-   :class: wiki-img-dark
+   :class: wiki-img-sm-dark
 
 .. |creds_prompt_light| image:: ../_static/img/credentials_prompt_light.webp
-   :class: wiki-img-light
+   :class: wiki-img-sm-light
 
-.. |creds_tmp1_dark| image:: ../_static/img/credentials_tmp1_dark.webp
+.. |creds_tmp_dark| image:: ../_static/img/credentials_tmp_dark.webp
    :class: wiki-img-xs-dark
 
-.. |creds_tmp1_light| image:: ../_static/img/credentials_tmp1_light.webp
+.. |creds_tmp_light| image:: ../_static/img/credentials_tmp_light.webp
    :class: wiki-img-xs-light
-
-.. |creds_tmp2_dark| image:: ../_static/img/credentials_tmp2_dark.webp
-   :class: wiki-img-dark
-
-.. |creds_tmp2_light| image:: ../_static/img/credentials_tmp2_light.webp
-   :class: wiki-img-light
 
 .. |creds_vault_dark| image:: ../_static/img/credentials_vault_encrypt_dark.webp
    :class: wiki-img-dark
 
 .. |creds_vault_light| image:: ../_static/img/credentials_vault_encrypt_light.webp
    :class: wiki-img-light
+
+.. |job_exec_creds_dark| image:: ../_static/img/job_execution_creds_dark.webp
+   :class: wiki-img-xs-dark
+
+.. |job_exec_creds_light| image:: ../_static/img/job_execution_creds_light.webp
+   :class: wiki-img-xs-light
 
 ===========
 Credentials
@@ -52,10 +52,70 @@ The UI at :code:`Home - Credentials` allows you to manage them.
 
 |creds_ui_light|
 
-Global Credentials
-******************
+----
 
-Global credentials can be used for scheduled job executions.
+Job Execution
+#############
+
+Requirement
+***********
+
+You can configure a job to require credentials:
+
+|creds_job_dark|
+
+|creds_job_light|
+
+**Prompt options**:
+
+* :code:`Credentials` => Prompt for which User/Shared-Credentials to use
+
+* :code:`Require Credentials` => Do not allow WebUI execution without the user selecting/providing credentials
+
+* :code:`Temporary Credentials` => Allow the user to provide credentials that will only be available for this execution
+
+|creds_prompt_dark|
+
+|creds_prompt_light|
+
+Supplying them
+**************
+
+Whenever a job is executed **that requires credentials** - you have multiple ways of supplying them:
+
+* Choose from previously **saved credentials** in the Job-Execution-Form
+
+  |job_exec_creds_dark|
+
+  |job_exec_creds_light|
+
+* Supply **temporary Credentials** in the Job-Execution-Form
+
+  **Security**: These credentials are only accessible to AW for one job-execution. They are inaccessible after the execution started.
+
+  |creds_tmp_dark|
+
+  |creds_tmp_light|
+
+* If the job is ran on a schedule - the job has to be configured with **Shared Credentials** that should be used.
+
+* If a job is executed manually by a user and no credentials are chosen/supplied - the job checks if the user has any personal credentials.
+
+  * If the user has multiple ones and the job has a **Credentials Category** configured - it will use the credentials that match the category.
+
+  * If no category was configured or it could not be matched - the first user-credentials are used.
+
+  * If the user has no personal credentials - the execution fails.
+
+----
+
+Kinds
+#####
+
+Shared
+******
+
+Shared credentials can be used for **scheduled job executions**.
 
 Users that are members of the :code:`AW Credentials Managers` group are able to create and manage global credentials.
 
@@ -71,12 +131,12 @@ Access to global credentials can be controlled using :ref:`permissions <usage_pe
 
 ----
 
-User Credentials
-****************
+Personal
+********
 
 User credential can only be used and accessed by the user that created them.
 
-Jobs that are executed by an user will use: (*if the job is set to need credentials*)
+Job executions:
 
 * the user-credentials matching the jobs :code:`credential category`
 
@@ -84,43 +144,12 @@ Jobs that are executed by an user will use: (*if the job is set to need credenti
 
 ----
 
-Jobs
-****
-
-You can define if a job needs credentials to run:
-
-|creds_job_dark|
-
-|creds_job_light|
-
-You also have some options on how credentials may be provided at the execution-prompts:
-
-* :code:`Credentials` => Prompt for which User/Shared-Credentials to use
-* :code:`Require Credentials` => Do not allow WebUI execution without the user selecting/providing credentials
-* :code:`Temporary Credentials` => Allow the user to provide credentials that will only be available for this execution
-
-|creds_prompt_dark|
-
-|creds_prompt_light|
-
-Temporary credentials can be used to manually provide credentials for one execution. They are deleted afterwards.
-
-|creds_tmp1_dark|
-
-|creds_tmp1_light|
-
-|creds_tmp2_dark|
-
-|creds_tmp2_light|
-
-----
-
 Ansible-Vault Encrypt
-*********************
+#####################
 
-Users are able to Ansible-Vault encrypt plaintext if they have read-privileges on credentials that have a Vault-Password, Vault-File or Vault-ID defined.
+Users are able to Ansible-Vault encrypt text if they have read-privileges on credentials that have a Vault-Password, Vault-File or Vault-ID defined.
 
-This is especially useful if users should not have access to the Vault-Password(s) but have to encrypt new secrets used in roles.
+This is especially useful if users should not be able to read the Vault-Password(s) but have to encrypt new secrets used in roles.
 
 |creds_vault_dark|
 

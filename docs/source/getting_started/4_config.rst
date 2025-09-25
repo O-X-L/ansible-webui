@@ -1,10 +1,10 @@
 .. _start_config:
 
 .. |system_settings_dark| image:: ../_static/img/system_settings_dark.webp
-   :class: wiki-img-dark
+   :class: wiki-img-sm-dark
 
 .. |system_settings_light| image:: ../_static/img/system_settings_light.webp
-   :class: wiki-img-light
+   :class: wiki-img-sm-light
 
 .. include:: ../_include/head.rst
 
@@ -107,110 +107,113 @@ Some settings are only available as environmental variables.
 
 * **AW_SECRET**
 
-   Define a secret key to use for cookie and password encryption.
-   By default it will be re-generated at service restart.
-   It **has to be set** for job-secrets like passwords to be loadable after restart.
-   It has to be **at least 30 characters** long!
+  Define a secret key to use for cookie and password encryption.
 
-   **WARNING**: If possible - set this secret as environmental variable. Users that are allowed to execute/modify jobs :ref:`are be able to read the content of the config-file <administration_security_issues>`
+  By default it will be re-generated at service restart.
+
+  It **has to be set** for job-secrets like passwords to be loadable after restart.
+
+  It has to be **at least 30 characters** long!
+
+  **WARNING**: If possible - set this secret as environmental variable. Users that are allowed to execute/modify jobs :ref:`are be able to read the content of the config-file <administration_security_issues>`
 
 
 * **AW_ADMIN**
 
-   Define the user-name for the initial admin user.
+  Define the user-name for the initial admin user.
 
 
 * **AW_ADMIN_PWD**
 
-   Define the password for the initial admin user.
+  Define the password for the initial admin user.
 
 
 * **AW_PROXY**
 
-   Set if Ansible-WebUI is operated behind a proxy-server.
+  Set if Ansible-WebUI is operated behind a proxy-server.
 
 
 * **AW_HOSTNAMES**
 
-   Set a comma-separated list of hostnames that are in use and should be trusted. If not set you might encounter 'CSRF' errors.
+  Set a comma-separated list of hostnames that are in use and should be trusted. If not set you might encounter 'CSRF' errors.
 
 
 * **AW_DB_TYPE**
 
-   The type of database to use. Default: :code:`sqlite`
+  The type of database to use. Default: :code:`sqlite`
 
-   Choices: :code:`mysql`, :code:`postgresql`
+  Choices: :code:`mysql`, :code:`postgresql`
 
-   See also: :ref:`Install Notes <start_install_db>`
+  See also: :ref:`Install Notes <administration_service_install_db>`
 
 
 * **AW_DB**
 
-   Define the path where the SQLite3 database is placed. Default: :code:`${HOME}/.config/ansible-webui/aw.db`
+  Define the path where the SQLite3 database is placed. Default: :code:`${HOME}/.config/ansible-webui/aw.db`
 
-   If not SQLite:
+  If not SQLite:
 
-   Database to use. Can also be an `Easy Connect string or DSN <https://docs.djangoproject.com/en/5.2/ref/databases/#full-dsn-and-easy-connect>`_.
+  Database to use. Can also be an `Easy Connect string or DSN <https://docs.djangoproject.com/en/5.2/ref/databases/#full-dsn-and-easy-connect>`_.
 
 
 * **AW_DB_HOST**
 
-   Database hostname/DNS/IP.
+  Database hostname/DNS/IP.
 
 
 * **AW_DB_SOCKET**
 
-   Alternative to AW_DB_HOST when using MariaDB/MySQL
+  Alternative to AW_DB_HOST when using MariaDB/MySQL
 
 
 * **AW_DB_PORT**
 
-   Database port.
+  Database port.
 
 
 * **AW_DB_USER**
 
-   User to use for DB-authentication.
+  User to use for DB-authentication.
 
 
 * **AW_DB_PWD**
 
-   Password to use for DB-authentication.
+  Password to use for DB-authentication.
 
 
 * **AW_PORT**
 
-   Port to listen on. Default: :code:`8000`
+  Port to listen on. Default: :code:`8000`
 
 
 * **AW_LISTEN**
 
-   IP Address to listen on. Default: :code:`127.0.0.1`
+  IP Address to listen on. Default: :code:`127.0.0.1`
 
 
 * **AW_SSL_CERT**
 
-   Optionally provide the path to a ssl certificate to use. Use a (full-)chain if not self-signed.
+  Optionally provide the path to a ssl certificate to use. Use a (full-)chain if not self-signed.
 
-   **WARNING**: You should use a proxy in front of this application in production setups.
+  **WARNING**: You should use a proxy in front of this application in production setups.
 
 
 * **AW_SSL_KEY**
 
-   Optionally provide the path to an unencrypted ssl key to use.
+  Optionally provide the path to an unencrypted ssl key to use.
 
-   **WARNING**: You should use a proxy in front of this application in production setups.
+  **WARNING**: You should use a proxy in front of this application in production setups.
 
 
 * **AW_AUTH**
 
-    Choose the authentication mode you want to use.
+  Choose the authentication mode you want to use.
 
-    One of :code:`saml`, :code:`ldap` or :code:`local`. Default: :code:`local`
+  One of :code:`saml`, :code:`ldap` or :code:`local`. Default: :code:`local`
 
-    If the mode is set to :code:`saml` or :code:`ldap` - you need to define its config inside the config file.
+  If the mode is set to :code:`saml` or :code:`ldap` - you need to define its config inside the config file.
 
-    For non-local auth you will have to install the dependencies: :code:`oxl-ansible-webui[saml]` or :code:`oxl-ansible-webui[ldap]`
+  For non-local auth you will have to install the dependencies: :code:`oxl-ansible-webui[saml]` or :code:`oxl-ansible-webui[ldap]`
 
 
 General System Settings
@@ -220,44 +223,46 @@ These settings are also configurable using the WebUI.
 
 * **AW_PATH_LOG**
 
-   Define the path where full job-logs are saved. Default: :code:`${HOME}/.local/share/ansible-webui/`
+  Define the path where full job-logs are saved. Default: :code:`${HOME}/.local/share/ansible-webui/`
 
 
 * **AW_PATH_RUN**
 
-   Base directory for `Ansible-Runner runtime files <https://ansible.readthedocs.io/projects/runner/en/latest/intro/>`_. Default: :code:`/tmp/ansible-webui/`
+  Base directory for `Ansible-Runner runtime files <https://ansible.readthedocs.io/projects/runner/en/latest/intro/>`_. Default: :code:`/tmp/ansible-webui/`
 
 
 * **AW_PATH_PLAY**
 
-   Path to the `Ansible base/playbook directory <https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout>`_. Default: current working directory (*when executing ansible-webui*)
+  Path to the `Ansible base/playbook directory <https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout>`_. Default: current working directory (*when executing ansible-webui*)
 
 
 * **AW_RUN_TIMEOUT**
 
-   Timeout for the execution of a playbook in seconds. Default: 3.600 (1h)
-   You might want to lower this value to a sane value for your use-cases.
+  Timeout for the execution of a playbook in seconds. Default: 3.600 (1h)
+  You might want to lower this value to a sane value for your use-cases.
 
 
 * **AW_SESSION_TIMEOUT**
 
-   Timeout for WebUI sessions in seconds. Default: 43.200 (12h)
+  Timeout for WebUI sessions in seconds. Default: 43.200 (12h)
 
 
 * **AW_SSH_KNOWN_HOSTS**
 
-   Define the path to the known-hosts file that should be used. You can use :code:`${AW_PATH_PLAY}` to reference paths relative to your playbook base-directory!
+  Define the path to the known-hosts file that should be used. You can use :code:`${AW_PATH_PLAY}` to reference paths relative to your playbook base-directory!
 
-   Default: None - fallback to user defaults
+  Default: None - fallback to user defaults
 
-   Default in docker: :code:`${AW_PATH_PLAY}/known_hosts`
+  Default in docker: :code:`${AW_PATH_PLAY}/known_hosts`
 
 
 * **AW_TIMEZONE**
 
-   Override the timezone used.
-   Default is the system timezone.
-   Fallback value is :code:`UTC` if all others are invalid.
+  Override the timezone used.
+
+  Default is the system timezone.
+
+  Fallback value is :code:`UTC` if all others are invalid.
 
 
 Advanced Settings
@@ -267,49 +272,53 @@ Normal users will not have to use these.
 
 * **AW_DEBUG**
 
-    Enable debug output.
+  Enable debug output.
 
-    This debug mode **SHOULD ONLY BE ENABLED TEMPORARILY**! It could possibly open attack vectors.
+  This debug mode **SHOULD ONLY BE ENABLED TEMPORARILY**! It could possibly open attack vectors.
 
 
 * **AW_AUDIT**
 
-    Enable permission-audit output.
+  Enable permission-audit output.
 
-    If you are scheduling jobs, it will write many logs.
+  If you are scheduling jobs, it will write many logs.
 
 
 * **AW_SERVE_STATIC**
 
-   If defined - the built-in static-file serving is disabled.
-   Use this if in production and a `proxy like nginx <https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/>`_ is in front of the Ansible-WebUI webservice.
+  If defined - the built-in static-file serving is disabled.
+
+  Use this if in production and a `proxy like nginx <https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/>`_ is in front of the Ansible-WebUI webservice.
 
 
 * **AW_DB_MIGRATE**
 
-   Define to disable automatic database schema-upgrades.
-   After upgrading the module you might have to run the upgrade manually:
+  Define to disable automatic database schema-upgrades.
 
-   .. code-block:: bash
+  After upgrading the module you might have to run the upgrade manually:
 
-        # if running non-release version
-        oxl-ansible-webui-manage makemigrations
-        oxl-ansible-webui-manage makemigrations aw
+  .. code-block:: bash
 
-        # all
-        oxl-ansible-webui-manage migrate
+       # if running non-release version
+       oxl-ansible-webui-manage makemigrations
+       oxl-ansible-webui-manage makemigrations aw
+
+       # all
+       oxl-ansible-webui-manage migrate
 
 
 * **AW_ENV**
 
-   **Only in development**.
-   If unset or value is neither :code:`dev` nor :code:`staging` the webservice will be in production mode.
-   :code:`staging` mode is close to production behavior.
+  **Only in development**.
+
+  If unset or value is neither :code:`dev` nor :code:`staging` the webservice will be in production mode.
+
+  :code:`staging` mode is close to production behavior.
 
 
 * **AW_DOCKER**
 
-   Used to notify the software that it is running inside a docker container. Needed for listen port.
+  Used to notify the software that it is running inside a docker container. Needed for listen port.
 
 ----
 

@@ -3,40 +3,40 @@
 .. include:: ../_include/head.rst
 
 .. |jobs_ui_dark| image:: ../_static/img/jobs_ui_dark.webp
-   :class: wiki-img-dark
-
-.. |jobs_ui_light| image:: ../_static/img/jobs_ui_light.webp
-   :class: wiki-img-light
-
-.. |job_prompts_1_dark| image:: ../_static/img/job_prompts_1_dark.webp
-   :class: wiki-img-dark
-
-.. |job_prompts_1_light| image:: ../_static/img/job_prompts_1_light.webp
-   :class: wiki-img-light
-
-.. |job_prompts_2_dark| image:: ../_static/img/job_prompts_2_dark.webp
-   :class: wiki-img-dark
-
-.. |job_prompts_2_light| image:: ../_static/img/job_prompts_2_light.webp
-   :class: wiki-img-light
-
-.. |job_exec_dark| image:: ../_static/img/job_execution_dark.webp
    :class: wiki-img-sm-dark
 
-.. |job_exec_light| image:: ../_static/img/job_execution_light.webp
+.. |jobs_ui_light| image:: ../_static/img/jobs_ui_light.webp
    :class: wiki-img-sm-light
 
+.. |job_prompts_1_dark| image:: ../_static/img/job_prompts_1_dark.webp
+   :class: wiki-img-sm-dark
+
+.. |job_prompts_1_light| image:: ../_static/img/job_prompts_1_light.webp
+   :class: wiki-img-sm-light
+
+.. |job_prompts_2_dark| image:: ../_static/img/job_prompts_2_dark.webp
+   :class: wiki-img-sm-dark
+
+.. |job_prompts_2_light| image:: ../_static/img/job_prompts_2_light.webp
+   :class: wiki-img-sm-light
+
+.. |job_exec_dark| image:: ../_static/img/job_execution_dark.webp
+   :class: wiki-img-xs-dark
+
+.. |job_exec_light| image:: ../_static/img/job_execution_light.webp
+   :class: wiki-img-xs-light
+
 .. |logs_ui_dark| image:: ../_static/img/logs_ui_dark.webp
-   :class: wiki-img-dark
+   :class: wiki-img-sm-dark
 
 .. |logs_ui_light| image:: ../_static/img/logs_ui_light.webp
-   :class: wiki-img-light
+   :class: wiki-img-sm-light
 
 .. |logs_live_dark| image:: ../_static/img/logs_live_dark.webp
-   :class: wiki-img-dark
+   :class: wiki-img-sm-dark
 
 .. |logs_live_light| image:: ../_static/img/logs_live_light.webp
-   :class: wiki-img-light
+   :class: wiki-img-sm-light
 
 ====
 Jobs

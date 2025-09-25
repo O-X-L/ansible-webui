@@ -5,12 +5,18 @@
 .. |ts_sys_ov| image:: ../_static/img/troubleshoot_system_overview.svg
    :class: wiki-img
 
+.. |env_dark| image:: ../_static/img/env_dark.webp
+   :class: wiki-img-sm-dark
+
+.. |env_light| image:: ../_static/img/env_light.webp
+   :class: wiki-img-sm-light
+
 ===============
 Troubleshooting
 ===============
 
 Topology
-********
+########
 
 This Ansible-WebUI is made of a few main components.
 
@@ -20,8 +26,8 @@ It will be beneficial for the troubleshooting process if we find out in which th
 
 ----
 
-Debugging
-*********
+Verbosity
+#########
 
 You can enable the debug mode at the :code:`System - Settings` page.
 
@@ -34,9 +40,23 @@ You might need to restart the application to apply this setting.
 ----
 
 Versions
-********
+#########
 
 You can find the versions of software packages in use at the :code:`System - Environment` page.
+
+It covers:
+
+* General system-information (AW stack, OS, Service-User context)
+
+* Ansible configuration discovered by the Ansible-Runner (*outside of a repository*)
+
+* Ansible collections discovered and their versions
+
+* Python modules in use and their versions
+
+|env_light|
+
+|env_dark|
 
 Alternatively you can check it from the cli: :code:`oxl-ansible-webui-cli --version`
 
@@ -180,11 +200,11 @@ Note: The SAML config-file is only reloaded on restart.
 
   Per example:
 
-    * :code:`1107` means you supplied an invalid SAML configuration or the :code:`xmlsec` package is not installed
+  * :code:`1107` means you supplied an invalid SAML configuration or the :code:`xmlsec` package is not installed
 
-    * :code:`1110` means you might need to check your IDPs metadata and modify the :code:`NAME_ID_FORMAT` setting
+  * :code:`1110` means you might need to check your IDPs metadata and modify the :code:`NAME_ID_FORMAT` setting
 
-    * :code:`1113` and :code:`1114` mean you have not or mis-configured your attribute mappings
+  * :code:`1113` and :code:`1114` mean you have not or mis-configured your attribute mappings
 
 Note: SAML testing has been done using the `mocksaml.com <https://mocksaml.com/>`_ service
 
@@ -301,30 +321,30 @@ Database Migration Issues
 
   * Or check your database manually:
 
-      .. code-block:: bash
+    .. code-block:: bash
 
-          sqlite3 <PATH-TO-YOUR-DB>
-          SELECT name,applied FROM django_migrations WHERE app = "aw";
+        sqlite3 <PATH-TO-YOUR-DB>
+        SELECT name,applied FROM django_migrations WHERE app = "aw";
 
   * You can also check the current schema of the table you see mentioned in the error message
 
-      .. code-block:: bash
+    .. code-block:: bash
 
-          sqlite3 <PATH-TO-YOUR-DB>
-          .table
-          .schema <TABLE>
+        sqlite3 <PATH-TO-YOUR-DB>
+        .table
+        .schema <TABLE>
 
 * Check which migrations are available: :code:`oxl-ansible-webui-cli -a migrations.list`
 
 * With that information you should be able to determine which migrations you can :code:`fake` and which ones to apply.
 
-    .. code-block:: bash
+  .. code-block:: bash
 
-        # migrations that are available and already are applied to the database - can be faked (only last one)
-        oxl-ansible-webui-manage migrate --fake aw 0001_v0_0_12
+      # migrations that are available and already are applied to the database - can be faked (only last one)
+      oxl-ansible-webui-manage migrate --fake aw 0001_v0_0_12
 
-        # you should then be able to apply the un-applied migrations
-        oxl-ansible-webui-manage migrate aw 0002_v0_0_13
+      # you should then be able to apply the un-applied migrations
+      oxl-ansible-webui-manage migrate aw 0002_v0_0_13
 
 ----
 

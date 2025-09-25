@@ -10,14 +10,17 @@ Integrations
 ARA Records Ansible
 *******************
 
-ARA can be used to gather detailed statistics of Ansible executions.
+ARA can be used to gather detailed logs & statistics of Ansible executions.
 
 To enable AW to send data to an ARA server - you need to:
 
 * Install the :code:`ara` Python3 module on your controller system
+
 * Configure the server at :code:`System - Settings`
 
-Quote: ara provides Ansible reporting by recording ansible and ansible-playbook commands regardless of how and where they run.
+Quote:
+
+    ara provides Ansible reporting by recording ansible and ansible-playbook commands regardless of how and where they run.
 
 `Documentation <https://ara.readthedocs.io/>`_ | `Repository <https://github.com/ansible-community/ara>`_
 

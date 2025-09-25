@@ -8,10 +8,10 @@
 .. |audit_log_light| image:: ../_static/img/admin_audit_log_light.webp
    :class: wiki-img-light
 
-.. |creds_tmp_dark| image:: ../_static/img/credentials_tmp1_dark.webp
+.. |creds_tmp_dark| image:: ../_static/img/credentials_tmp_dark.webp
    :class: wiki-img-xs-dark
 
-.. |creds_tmp_light| image:: ../_static/img/credentials_tmp1_light.webp
+.. |creds_tmp_light| image:: ../_static/img/credentials_tmp_light.webp
    :class: wiki-img-xs-light
 
 
@@ -54,13 +54,13 @@ Known Issues
 
   **Possible workaround**:
 
-  * Supply secrets only via **Temporary Credentials** - they are only accessible once
+  * Supply secrets only via **Temporary Credentials** - they are only accessible to AW for one execution
 
   **Possible future fixes**:
 
-  * Run Ansible-Runner with `process-isolation (execution in container) <https://ansible.readthedocs.io/projects/runner/en/stable/standalone/#running-with-process-isolation>`_ enabled (*not yet implemented in AW*)
+  * Run Ansible-Runner as `dedicated user <https://github.com/O-X-L/ansible-webui/issues/67>`_ (*not yet implemented in* `Ansible-Runner <https://github.com/ansible/ansible-runner/issues/1350>`_ *and AW*)
 
-  * Run Ansible-Runner as `dedicated user <https://github.com/ansible/ansible-runner/issues/1350>`_ (*not yet implemented in Ansible-Runner and AW*)
+  * Run Ansible-Runner with `process-isolation (execution in container) <https://github.com/O-X-L/ansible-webui/issues/71>`_ enabled (*not yet implemented in AW*)
 
   * Run multiple Instances of this lightweight App in separate containers to cleanly separate the access to credentials.
 
@@ -122,19 +122,19 @@ Setup
 
 * You should use a proxy like nginx in front of AW
 
-    Recommended Config: (`Example <https://github.com/O-X-L/ansible-webui/blob/latest/examples/nginx.conf>`_)
+  Recommended Config: (`Example <https://github.com/O-X-L/ansible-webui/blob/latest/examples/nginx.conf>`_)
 
-    * use HTTPS with a valid certificate
+  * use HTTPS with a valid certificate
 
-    * restrict the HTTP security headers (X-Frame-Options, X-Content-Type, Content-Security-Policy and Referrer-Policy, HSTS)
+  * restrict the HTTP security headers (X-Frame-Options, X-Content-Type, Content-Security-Policy and Referrer-Policy, HSTS)
 
-    * limit the networks able to access the Web-application using your firewall(s)
+  * limit the networks able to access the Web-application using your firewall(s)
 
-    * limit the `request rate <https://docs.nginx.com/nginx/admin-guide/security-controls/controlling-access-proxied-http/>`_ on the login form :code:`/a/*` and API :code:`/api/*`
+  * limit the `request rate <https://docs.nginx.com/nginx/admin-guide/security-controls/controlling-access-proxied-http/>`_ on the login form :code:`/a/*` and API :code:`/api/*`
 
-    * serve static files using the proxy
+  * serve static files using the proxy
 
-        :code:`/static/ => ${PATH_VENV}/lib/python${PY_VERSION}/site-packages/oxl_ansible_webui/aw/static/`
+    :code:`/static/ => ${PATH_VENV}/lib/python${PY_VERSION}/site-packages/oxl_ansible_webui/aw/static/`
 
 * Make sure the Account passwords and API keys are kept/used safe
 

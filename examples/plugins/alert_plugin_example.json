@@ -1,0 +1,61 @@
+{
+  "alert": {
+    "type": "user",
+    "condition": "always"
+  },
+  "user": {
+    "name": "ansible",
+    "first_name": "",
+    "last_name": "",
+    "email": "ansible@localhost",
+    "phone": null,
+    "description": "test",
+    "is_active": true,
+    "last_login": 1715487270,
+    "groups": []
+  },
+  "execution": {
+    "failed": true,
+    "status": "Failed",
+    "job_name": "test2",
+    "job_id": 1,
+    "execution_id": 85,
+    "user_name": "ansible",
+    "time_start": 1715502006,
+    "time_start_pretty": "2024-05-12 08:20:06 CEST",
+    "time_fin": 1715502007,
+    "time_fin_pretty": "2024-05-12 08:20:07 CEST",
+    "time_duration": 0.845428,
+    "time_duration_pretty": "1s",
+    "error_short": null,
+    "error_med": null,
+    "log_url": "http://localhost:8000/ui/jobs/log?job=1",
+    "log_stdout": "/home/guy/.local/share/ansible-webui/test2_2024-05-12_08-20-06_ansible_stdout.log",
+    "log_stdout_url": "http://localhost:8000/api/job/1/85/log?type=stdout",
+    "log_stderr": null,
+    "log_stderr_url": null,
+    "log_stdout_repo": null,
+    "log_stdout_repo_url": null,
+    "log_stderr_repo": null,
+    "log_stderr_repo_url": null
+  },
+  "errors": {
+    "html": [
+      "<span class=\"aw-log-err\">fatal: [localhost]: FAILED! => {\"changed\": false, \"msg\": \"Just failing\"}</span>\n"
+    ],
+    "text": [
+      "fatal: [localhost]: FAILED! = {changed: false, msg: Just failing}"
+    ]
+  },
+  "stats": {
+    "localhost": {
+      "unreachable": false,
+      "tasks_skipped": 3,
+      "tasks_ok": 0,
+      "tasks_failed": 1,
+      "tasks_rescued": 0,
+      "tasks_ignored": 0,
+      "tasks_changed": 0
+    }
+  }
+}

@@ -3,18 +3,24 @@
 .. include:: ../_include/head.rst
 
 .. |repo_ui_dark| image:: ../_static/img/repo_ui_dark.webp
-   :class: wiki-img-dark
+   :class: wiki-img-sm-dark
 
 .. |repo_ui_light| image:: ../_static/img/repo_ui_light.webp
-   :class: wiki-img-light
+   :class: wiki-img-sm-light
+
+.. |repo_edit_dark| image:: ../_static/img/repo_edit_dark.webp
+   :class: wiki-img-sm-dark
+
+.. |repo_edit_light| image:: ../_static/img/repo_edit_light.webp
+   :class: wiki-img-sm-light
 
 ============
 Repositories
 ============
 
-By default the static Repository set by :code:`AW_PATH_PLAY` is used.
-
 You are able to create multiple Repositories that act as Ansible-Playbook base-directories.
+
+If you are new to Ansible - make sure to read the `official Documentation covering the Directory Layout <https://docs.ansible.com/ansible/latest/tips_tricks/sample_setup.html#sample-directory-layout>`_.
 
 |repo_ui_dark|
 
@@ -23,25 +29,29 @@ You are able to create multiple Repositories that act as Ansible-Playbook base-d
 ----
 
 Static
-******
+######
 
-Absolute path to an existing local static directory that contains your `playbook directory structure <https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout>`_.
+Absolute path to an existing local static directory that contains your playbook directory structure.
 
 ----
 
 Git
-***
+###
 
 Git repositories are also supported.
 
 They can either be updated at execution or completely re-created (*isolated*).
 
-The timeout for any single git-command is 5min.
+The timeout for any single git-command is currently 5 min.
+
+|repo_edit_dark|
+
+|repo_edit_light|
 
 ----
 
 Override commands
-=================
+*****************
 
 If you have some special environment or want to tweak the way your repository is cloned - you can override the default git-commands!
 
@@ -69,7 +79,7 @@ Default commands:
 ----
 
 Hook commands
-=============
+*************
 
 You are able to run some hook-commands before and after updating the repository.
 
@@ -90,7 +100,7 @@ You can also run inline scripts like this example:
 ----
 
 Clone via SSH
-=============
+*************
 
 You can specify which :code:`known_hosts` file AW should use using the :ref:`System config <start_config>`!
 
@@ -101,7 +111,8 @@ The SSH-key configured in the linked credentials will be used.
 ----
 
 Example GitHub Private-Repository
-=================================
+*********************************
 
 1. Create global Credentials that use your Access-Token as :code:`connect password`
+
 2. Create the Git-Repository and link the Credentials

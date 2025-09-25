@@ -8,8 +8,10 @@ Authentication
 
 In case your primary authentication method is not working for some reason - you can enter the application with a local user at: :code:`/a/login/fallback`
 
+.. _administration_auth_saml:
+
 SAML SSO
-********
+########
 
 **Tested config examples**: `Google Workspace <https://github.com/O-X-L/ansible-webui/blob/latest/examples/saml_google_workspace.yml>`_
 
@@ -20,7 +22,7 @@ If you have troubles with getting SAML to work - check out :ref:`Administration 
 ----
 
 Setup
-=====
+*****
 
 1. Add the :code:`SAML` config-block to your config-file. See: :ref:`Getting Started - Config - File <start_config_file>`
 
@@ -84,7 +86,7 @@ You should now be able to see :code:`[INFO] [main] Using Auth-Mode: saml` logged
 ----
 
 Docker
-======
+******
 
 Example:
 

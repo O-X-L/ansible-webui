@@ -18,6 +18,7 @@
    <url><loc>https://ansible-webui.oxl.app/admin/backup.html</loc></url>
    <url><loc>https://ansible-webui.oxl.app/admin/docker.html</loc></url>
    <url><loc>https://ansible-webui.oxl.app/admin/integrations.html</loc></url>
+   <url><loc>https://ansible-webui.oxl.app/admin/run_as_service.html</loc></url>
    <url><loc>https://ansible-webui.oxl.app/admin/security.html</loc></url>
    <url><loc>https://ansible-webui.oxl.app/admin/troubleshooting.html</loc></url>
 
