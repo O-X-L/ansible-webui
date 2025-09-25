@@ -573,7 +573,7 @@ class APIAlertGlobalItem(GenericAPIView):
                     title='Alert-Global delete',
                     msg=f"Alert-Global deleted: ID '{alert.id}', Name '{alert.name}'",
                 )
-                return Response(data={'error': f"Alert '{alert.name}' deleted", 'id': alert_id}, status=200)
+                return Response(data={'msg': f"Alert '{alert.name}' deleted", 'id': alert_id}, status=200)
 
         except ObjectDoesNotExist:
             pass
