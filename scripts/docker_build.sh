@@ -34,9 +34,17 @@ function build() {
   img="$1"
   dockerfile="$2"
   tag="$3"
+  cache="$4"
   img_with_tag="${img}:${tag}"
+  if [[ "$cache" == "1" ]]
+  then
+    cache=""
+  else
+    cache=" --no-cache"
+  fi
+
   echo "##### BUILDING ${img_with_tag} #####"
-  docker build -f "$dockerfile" -t "$img_with_tag" --network host --build-arg "AW_VERSION=${VERSION}" --no-cache .
+  docker build -f "$dockerfile" -t "$img_with_tag" --network host --build-arg "AW_VERSION=${VERSION}" $cache .
 }
 
 echo ''
@@ -51,19 +59,27 @@ do
   set +u
   if [ -n "${DOCKERFILES_DEBIAN["$img"]+_}" ]
   then
-    build "$img" "${DOCKERFILES_DEBIAN["$img"]}" "${VERSION}-debian"
+    build "$img" "${DOCKERFILES_DEBIAN["$img"]}" "${VERSION}-debian" "0"
+    if [[ "$REPLY" =~ ^[Yy]$ ]]
+    then
+      build "$img" "${DOCKERFILES_DEBIAN["$img"]}" "latest-debian" "1"
+    fi
   fi
 
   set +u
   if [ -n "${DOCKERFILES_ALPINE["$img"]+_}" ]
   then
-    build "$img" "${DOCKERFILES_ALPINE["$img"]}" "${VERSION}-alpine"
+    build "$img" "${DOCKERFILES_ALPINE["$img"]}" "${VERSION}-alpine" "0"
+    if [[ "$REPLY" =~ ^[Yy]$ ]]
+    then
+      build "$img" "${DOCKERFILES_ALPINE["$img"]}" "latest-alpine" "1"
+    fi
   fi
   set -u
 
   if [[ "$REPLY" =~ ^[Yy]$ ]]
   then
-    build "$img" "${DOCKERFILES_LATEST["$img"]}" "latest"
+    build "$img" "${DOCKERFILES_LATEST["$img"]}" "latest" "1"
   fi
 done
 

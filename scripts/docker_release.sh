@@ -35,12 +35,20 @@ do
   if [ -n "${DOCKERFILES_DEBIAN["$img"]+_}" ]
   then
     push "$img" "${VERSION}-debian"
+    if [[ "$REPLY" =~ ^[Yy]$ ]]
+    then
+      push "$img" "latest-debian"
+    fi
   fi
 
   set +u
   if [ -n "${DOCKERFILES_ALPINE["$img"]+_}" ]
   then
     push "$img" "${VERSION}-alpine"
+    if [[ "$REPLY" =~ ^[Yy]$ ]]
+    then
+      push "$img" "latest-alpine"
+    fi
   fi
   set -u
 
