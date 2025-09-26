@@ -39,7 +39,7 @@ Local
 Requirements
 ============
 
-* Create a Python3-VENV (>=3.10) and install all requirements in :code:`${REPO}/requirements*.txt`
+* Create a Python3-VENV (>=3.11) and install all requirements in :code:`${REPO}/requirements*.txt`
 
     .. code-block:: bash
 

@@ -18,14 +18,31 @@
 }
 
 .wiki-img-xs, .wiki-img-xs-dark, .wiki-img-xs-light {
-    width: 30%;
-    margin-left: 30%;
+    width: 35%;
+    margin-left: 25%;
     margin: 5px 0px;
     border-radius: 5px;
     border-style: solid;
     border-color: #343a40;
     border-width: 3px;
 }
+
+@media (max-width: 768px){
+    .wiki-img, .wiki-img-dark, .wiki-img-light {
+        width: 95%;
+    }
+
+    .wiki-img-sm, .wiki-img-sm-dark, .wiki-img-sm-light {
+        margin-left: 5%;
+        width: 85%;
+    }
+
+    .wiki-img-xs, .wiki-img-xs-dark, .wiki-img-xs-light {
+        margin-left: 10%;
+        width: 65%;
+    }
+}
+
 
 body[data-md-color-media="(prefers-color-scheme: dark)"] .wiki-img-light {
     display: none;
