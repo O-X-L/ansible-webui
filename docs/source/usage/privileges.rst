@@ -90,7 +90,7 @@ Available ones are:
 
 * :code:`AW Repository Managers` - create new repositories, view and update all existing ones
 
-* :code:`AW Credentials Managers` - create new global credentials, view and update all existing ones
+* :code:`AW Credentials Managers` - create new shared credentials, view and update all existing ones
 
 * :code:`AW Alert Managers` - create new global- & group-alerts, view and update all existing ones
 

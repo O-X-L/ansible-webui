@@ -91,7 +91,14 @@ The cleanup-hook can be used to commit files that were created by the job-execut
 
 **Note**: For security reasons (XSS) these characters are currently not allowed: :code:`< >`
 
-You can also run inline scripts like this example:
+Example of a :code:`post-hook` (after update/create of the repo):
+
+.. code-block:: bash
+
+    # 'roles/requirements.yml' is a relative path from the root of the repository
+    ansible-galaxy role install -r roles/requirements.yml -f -p ./roles/
+
+You can also run more complex inline scripts like this example:
 
 .. code-block:: bash
 
@@ -113,6 +120,6 @@ The SSH-key configured in the linked credentials will be used.
 Example GitHub Private-Repository
 *********************************
 
-1. Create global Credentials that use your Access-Token as :code:`connect password`
+1. Create shared credentials and set the :code:`connect password` to your :code:`GitHub Personal Access-Token`
 
 2. Create the Git-Repository and link the Credentials

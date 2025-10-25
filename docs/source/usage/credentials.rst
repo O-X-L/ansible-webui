@@ -117,9 +117,9 @@ Shared
 
 Shared credentials can be used for **scheduled job executions**.
 
-Users that are members of the :code:`AW Credentials Managers` group are able to create and manage global credentials.
+Users that are members of the :code:`AW Credentials Managers` group are able to create and manage shared credentials.
 
-Access to global credentials can be controlled using :ref:`permissions <usage_permission>`.
+Access to shared credentials can be controlled using :ref:`permissions <usage_permission>`.
 
 * Whenever jobs are executed by a user (*via WebUI or API*) AW verifies that the user is actually permitted to use the credentials.
 
