@@ -130,9 +130,10 @@ API_PARAM_HASH = OpenApiParameter(
 )
 
 def client_server_data_changed(request, data) -> (bool, str):
-    if 'hash' in request.GET and str(request.GET['hash']) != '0':
+    _hash = str(request.GET.get('hash', '0'))
+    if _hash != '0':
         h = md5(json_dumps(data).encode('utf-8')).hexdigest()[:6]
-        return h != request.GET['hash'], h
+        return h != _hash, h
 
     return True, '-'
 

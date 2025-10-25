@@ -371,7 +371,7 @@ class APIRepositoryLogFile(GenericAPIView):
                     )
 
                 logfile = repo.log_stdout
-                if 'type' in request.GET and request.GET['type'] == 'stderr':
+                if request.GET.get('type', 'stdout') == 'stderr':
                     logfile = repo.log_stderr
 
                 if logfile is None:
