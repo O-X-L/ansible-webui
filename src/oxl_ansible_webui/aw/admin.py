@@ -10,7 +10,7 @@ from aw.model.permission import JobPermission, JobPermissionMemberUser, JobPermi
     JobPermissionMapping, JobCredentialsPermissionMapping, JobRepositoryPermissionMapping
 from aw.model.job_credential import JobSharedCredentials, JobUserCredentials
 from aw.model.repository import Repository
-from aw.model.system import SystemConfig, UserExtended
+from aw.model.system import SystemConfig, UserExtended, SSHHostkeys
 from aw.model.alert import AlertUser, AlertGroup, AlertGlobal, AlertPlugin
 
 
@@ -67,6 +67,7 @@ admin.site.register(JobUserCredentials)
 admin.site.register(AwAPIKey)
 admin.site.register(Repository)
 admin.site.register(SystemConfig)
+admin.site.register(SSHHostkeys)
 admin.site.register(AlertUser)
 admin.site.register(AlertGroup)
 admin.site.register(AlertGlobal)

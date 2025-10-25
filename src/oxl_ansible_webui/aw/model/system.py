@@ -151,3 +151,30 @@ class UserExtended(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['user'], name='user_extended_unique')
         ]
+
+
+class SSHHostkeys(models.Model):
+    api_fields_read = ['host', 'hostkeys', 'file']
+
+    host = models.CharField(max_length=300, null=False, blank=False)
+    _hostkeys = models.TextField(max_length=5000, **DEFAULT_NONE)
+    file = models.CharField(max_length=100, default='default')
+
+    @property
+    def hostkeys(self) -> list[str]:
+        if is_null(self._hostkeys):
+            return []
+
+        return self._hostkeys.split(',')
+
+    @hostkeys.setter
+    def hostkeys(self, value: list[str]):
+        self._hostkeys = ','.join(value)
+
+    def __str__(self) -> str:
+        return f"SSH-hostkeys for host '{self.host}' (count {len(self.hostkeys)})"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['host'], name='sshhostkey_host_unique')
+        ]

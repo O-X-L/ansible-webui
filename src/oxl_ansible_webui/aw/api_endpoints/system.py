@@ -1,11 +1,15 @@
+from ipaddress import ip_network, AddressValueError, NetmaskValueError
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import serializers
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 from django.db.utils import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
+from oxl_utils.valid.dns import valid_domain
 
 from aw.config.main import config
-from aw.model.system import SystemConfig, get_config_from_db
+from aw.model.system import SystemConfig, get_config_from_db, SSHHostkeys
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, GenericErrorResponse, \
     HDR_CACHE_1W, response_data_if_changed
 from aw.utils.util_no_config import is_set, is_null
@@ -15,6 +19,7 @@ from aw.utils.system import get_system_environment
 from aw.config.environment import check_aw_env_var_is_set
 from aw.config.hardcoded import SECRET_HIDDEN
 from aw.utils.audit import log_audit
+from aw.execute.known_hosts import create_or_update_ssh_hostkeys
 
 
 class SystemConfigSettings(BaseResponse):
@@ -191,7 +196,7 @@ class UserPasswordChangeRequest(BaseResponse):
 
 class APIUserPasswordChange(APIView):
     http_method_names = ['put']
-    serializer_class = SystemConfigReadResponse
+    serializer_class = GenericResponse
     permission_classes = API_PERMISSION
 
     @extend_schema(
@@ -217,3 +222,91 @@ class APIUserPasswordChange(APIView):
         user.save()
         log_audit(user=user, title='Password change', msg='Password changed')
         return Response({'msg': 'Password updated'}, status=200)
+
+
+class APISSHHostkeyScanRequest(BaseResponse):
+    target = serializers.CharField()  # Target to scan - an IP, Domain or Network in CIDR-format
+    port = serializers.IntegerField(default=22)  # SSH port to scan
+    file = serializers.CharField(default='default')  # Known-Hosts file to add the hostkeys to
+
+
+class APISSHHostkeyQueryRequest(serializers.ModelSerializer):
+    class Meta:
+        model = SSHHostkeys
+        fields = SSHHostkeys.api_fields_read
+
+
+class APISSHHostkey(APIView):
+    http_method_names = ['get', 'post']
+    serializer_class = GenericResponse
+    permission_classes = API_PERMISSION
+
+    @staticmethod
+    @extend_schema(
+        request=None,
+        responses={
+            200: APISSHHostkeyQueryRequest,
+            404: OpenApiResponse(response=GenericErrorResponse, description='No SSH-hostkeys found'),
+        },
+        summary='Return SSH-hostkeys saved inside the database.',
+        operation_id='system_ssh_hostkey_view',
+    )
+    def get(request):
+        del request
+        try:
+            data = {}
+            for entry in SSHHostkeys.objects.all():
+                data[entry.host] = entry.hostkeys
+
+            return Response(data=data, status=200)
+
+        except ObjectDoesNotExist:
+            pass
+
+        return Response(data={'error': 'No SSH-hostkeys found'}, status=404)
+
+    @extend_schema(
+        request=APISSHHostkeyScanRequest,
+        responses={
+            200: OpenApiResponse(response=GenericResponse, description='SSH-Hostkey scan initiated'),
+            400: OpenApiResponse(response=GenericErrorResponse, description='Invalid target or port provided'),
+        },
+        summary='Scan target(s) for SSH-hostkeys and add them to the database.',
+        operation_id='system_ssh_hostkey_scan',
+    )
+    def post(self, request):
+        user = get_api_user(request)
+        target = request.data.get('target', None)
+        port = request.data.get('port', 22)
+        file = request.data.get('file', 'default')
+
+        if valid_domain(target):
+            valid = True
+
+        else:
+            try:
+                target = ip_network(target, strict=False)
+                valid = True
+
+            except (ValueError, AddressValueError, NetmaskValueError):
+                valid = False
+
+        if not valid:
+            return Response({'error': 'Target is neither a valid IP, Domain nor Network'}, status=400)
+
+        try:
+            port = int(port)
+            if port < 1 or port > 65535:
+                raise TypeError()
+
+        except TypeError:
+            return Response({'error': 'Port is not valid'}, status=400)
+
+        create_or_update_ssh_hostkeys(target=target, port=port, file=file)
+
+        log_audit(
+            user=user,
+            title='System-SSH-Hostkey scan',
+            msg=f"Target(s) '{target} -p {port}' scanned for SSH-hostkeys (file {file})",
+        )
+        return Response({'msg': 'SSH-Hostkey scan initiated'}, status=200)
