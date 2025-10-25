@@ -154,11 +154,12 @@ class UserExtended(models.Model):
 
 
 class SSHHostkeys(models.Model):
-    api_fields_read = ['host', 'hostkeys', 'file']
+    api_fields_read = ['host', 'hostkeys', 'file', 'comment']
 
     host = models.CharField(max_length=300, null=False, blank=False)
     _hostkeys = models.TextField(max_length=5000, **DEFAULT_NONE)
     file = models.CharField(max_length=100, default='default')
+    comment = models.CharField(max_length=150, **DEFAULT_NONE)
 
     @property
     def hostkeys(self) -> list[str]:

@@ -30,6 +30,12 @@ jobs:
       run:
         shell: bash
 
+    services:
+      test_ssh_server:
+        image: 'serversideup/docker-ssh:latest'
+        ports:
+          - '127.0.0.1:2222:2222'
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3

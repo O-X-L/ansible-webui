@@ -277,7 +277,7 @@
         </AccordionItem>
     </Accordion>
 
-    <Button size="xs" class="mt-5 ml-2" on:click={() => saveToClipboard(envInfos)}><FileCloneSolid/></Button>
+    <Button size="xs" class="mt-5 ml-2" id="env-btn-copy" on:click={() => saveToClipboard(envInfos)}><FileCloneSolid/></Button>
     <Tooltip>{t('common.click_to_copy')}</Tooltip>
 {/if}
 

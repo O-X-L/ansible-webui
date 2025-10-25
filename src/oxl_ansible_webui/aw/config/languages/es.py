@@ -1,4 +1,5 @@
 from aw.config.main import config
+from aw.config.hardcoded import PATH_SSH_HOSTKEY_FILES
 
 ES = {
     # base
@@ -103,7 +104,6 @@ ES = {
     'jobs.execute.required_var': 'Falta variable requerida',
     'jobs.execute.required_credentials': 'Credenciales requeridas',
     'jobs.execute.regex_mismatch': 'La entrada no cumple con el patrón requerido',
-    'jobs.execute.regex_mismatch': 'Input does not satisfy the required pattern',
 
     ## form fields
     'jobs.action.start': 'Trabajo en cola',
@@ -296,6 +296,7 @@ ES = {
     'system.api_keys': 'API Keys',
     'system.admin': 'Admin',
     'system.api_docs': 'API Docs',
+    'system.ssh_hostkey': 'SSH Hostkeys',
 
     # api-keys
     'api_keys.token': 'Token',
@@ -322,7 +323,7 @@ ES = {
     'config.form.path_ansible_config': 'Archivo de configuración de Ansible',
     'config.form.path_ssh_known_hosts': 'Archivo SSH Known-Hosts',
     'config.form.debug': 'Modo de depuración',
-    # 'config.form.audit_log': 'Audit Logging',
+    'config.form.audit_log': 'Registro de auditoría',
 
     ### env-vars
     'config.form.timezone': 'Zona horaria',
@@ -445,4 +446,17 @@ ES = {
     'permission.jobs_all': 'Todos los trabajos',
     'permission.credentials_all': 'Todas las credenciales',
     'permission.repositories_all': 'Todos los repositorios',
+
+    # ssh hostkeys
+    'ssh_hostkey.action.scan': 'Destino(s) escaneado(s) en busca de claves de host SSH',
+    'ssh_hostkey.action.delete': 'Claves de host SSH de destino eliminadas',
+    'ssh_hostkey.scan': 'Escanear destino(s) para claves de host SSH',
+    'ssh_hostkey.target': 'Escanear destino(s)',
+
+    ## form help
+    'ssh_hostkey.form.help.target': 'Dominio, IP o red de destino en formato CIDR',
+    'ssh_hostkey.form.help.file': 'El nombre del archivo en el que se escribirán las claves de host SSH. '
+                                  'Esto puede ser útil para separar las claves de host entre entornos '
+                                  '(por ejemplo, interno y de producción). '
+                                  f'Se pueden encontrar en {PATH_SSH_HOSTKEY_FILES}/$FILE',
 }

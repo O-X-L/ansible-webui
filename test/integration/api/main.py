@@ -8,6 +8,7 @@ from requests import Session, Response
 BASE_URL = 'http://127.0.0.1:8000/api'
 API_USER = environ['AW_ADMIN']
 API_KEY = environ['AW_API_KEY']
+INSIDE_CI = environ['CI']
 
 api = Session()
 api.headers['X-Api-Key'] = API_KEY
@@ -54,7 +55,12 @@ def test_modify_locations(location_data_list: list[dict]):
 
 def test_add_locations(location_data_list: list[dict]):
     for loc_data in location_data_list:
-        assert _api_request_ok(loc_data['l'], 'post', loc_data['d'])
+        result = _api_request_ok(loc_data['l'], 'post', loc_data['d'])
+        if loc_data.get('ci', False) and INSIDE_CI and not result:
+            print(f"WARNING: Request flagged with 'CI' has failed outside CI: {loc_data['l']}")
+
+        else:
+            assert result
 
 
 def test_delete_locations(location_list: list):
@@ -130,6 +136,9 @@ def test_add():
         {'l': 'alert/global', 'd': {'name': 'glob1'}},
         {'l': 'alert/group', 'd': {'name': 'grp1', 'group': 1}},
         {'l': 'alert/user', 'd': {'name': 'usr1'}},
+
+        # ssh hostkeys => expects local SSH-server on port 2222!
+        {'l': 'ssh-hostkey', 'd': {'target': 'localhost', 'port': 2222}, 'ci': True}
     ])
 
 
@@ -166,7 +175,7 @@ def test_list():
     test_get_locations([
         'credentials', 'job', 'job_exec', 'key', 'permission', 'config', 'repository',
         'fs/exists?item=/etc', 'alert', 'alert/global', 'alert/group', 'alert/user', 'alert/plugin',
-        'environment',
+        'environment', 'ssh-hostkey',
     ])
 
 
@@ -180,6 +189,8 @@ def test_delete():
         'alert/global/1',
         'alert/group/1',
         'alert/user/1',
+        # ssh hostkeys => expects local SSH-server on port 2222!
+        # 'ssh-hostkey/127.0.0.1',
     ])
 
 

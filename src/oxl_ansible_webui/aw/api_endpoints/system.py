@@ -11,7 +11,7 @@ from oxl_utils.valid.dns import valid_domain
 from aw.config.main import config
 from aw.model.system import SystemConfig, get_config_from_db, SSHHostkeys
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, GenericErrorResponse, \
-    HDR_CACHE_1W, response_data_if_changed
+    HDR_CACHE_1W, response_data_if_changed, API_PARAM_HASH
 from aw.utils.util_no_config import is_set, is_null
 from aw.utils.debug import log
 from aw.utils.permission import has_manager_privileges
@@ -76,6 +76,7 @@ class APISystemConfig(APIView):
         responses={200: SystemConfigReadResponse},
         summary='Return currently active config.',
         operation_id='system_config_view',
+        parameters=[API_PARAM_HASH],
     )
     def get(request):
         data = {
@@ -228,9 +229,10 @@ class APISSHHostkeyScanRequest(BaseResponse):
     target = serializers.CharField()  # Target to scan - an IP, Domain or Network in CIDR-format
     port = serializers.IntegerField(default=22)  # SSH port to scan
     file = serializers.CharField(default='default')  # Known-Hosts file to add the hostkeys to
+    comment = serializers.CharField(default=None)
 
 
-class APISSHHostkeyQueryRequest(serializers.ModelSerializer):
+class APISSHHostkeyQueryResponse(serializers.ModelSerializer):
     class Meta:
         model = SSHHostkeys
         fields = SSHHostkeys.api_fields_read
@@ -245,20 +247,20 @@ class APISSHHostkey(APIView):
     @extend_schema(
         request=None,
         responses={
-            200: APISSHHostkeyQueryRequest,
+            200: APISSHHostkeyQueryResponse,
             404: OpenApiResponse(response=GenericErrorResponse, description='No SSH-hostkeys found'),
         },
         summary='Return SSH-hostkeys saved inside the database.',
         operation_id='system_ssh_hostkey_view',
+        parameters=[API_PARAM_HASH],
     )
     def get(request):
-        del request
         try:
-            data = {}
-            for entry in SSHHostkeys.objects.all():
-                data[entry.host] = entry.hostkeys
-
-            return Response(data=data, status=200)
+            data =[
+                APISSHHostkeyQueryResponse(instance=entry).data
+                for entry in SSHHostkeys.objects.all()
+            ]
+            return response_data_if_changed(request, data=data)
 
         except ObjectDoesNotExist:
             pass
@@ -269,16 +271,28 @@ class APISSHHostkey(APIView):
         request=APISSHHostkeyScanRequest,
         responses={
             200: OpenApiResponse(response=GenericResponse, description='SSH-Hostkey scan initiated'),
-            400: OpenApiResponse(response=GenericErrorResponse, description='Invalid target or port provided'),
+            400: OpenApiResponse(response=GenericErrorResponse, description='Invalid target, port or file provided'),
+            403: OpenApiResponse(response=GenericErrorResponse, description='Not privileged to manage SSH-hostkeys'),
         },
         summary='Scan target(s) for SSH-hostkeys and add them to the database.',
         operation_id='system_ssh_hostkey_scan',
     )
     def post(self, request):
         user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='ssh_hostkey')
+        if not privileged:
+            return Response(
+                data={'error': 'Not privileged to manage SSH-hostkeys'},
+                status=403,
+            )
+
         target = request.data.get('target', None)
         port = request.data.get('port', 22)
         file = request.data.get('file', 'default')
+        comment = request.data.get('comment', None)
+
+        if file.find('/') != -1 or file.startswith('.'):
+            return Response({'error': 'Filename is not valid'}, status=400)
 
         if valid_domain(target):
             valid = True
@@ -302,11 +316,53 @@ class APISSHHostkey(APIView):
         except TypeError:
             return Response({'error': 'Port is not valid'}, status=400)
 
-        create_or_update_ssh_hostkeys(target=target, port=port, file=file)
+        create_or_update_ssh_hostkeys(target=target, port=port, file=file, comment=comment)
 
         log_audit(
             user=user,
-            title='System-SSH-Hostkey scan',
+            title='SSH-Hostkey scan',
             msg=f"Target(s) '{target} -p {port}' scanned for SSH-hostkeys (file {file})",
         )
         return Response({'msg': 'SSH-Hostkey scan initiated'}, status=200)
+
+
+class APISSHHostkeyItem(APIView):
+    http_method_names = ['delete']
+    serializer_class = GenericResponse
+    permission_classes = API_PERMISSION
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(response=GenericResponse, description='SSH-Hostkey host deleted'),
+            403: OpenApiResponse(response=GenericErrorResponse, description='Not privileged to manage SSH-hostkeys'),
+            404: OpenApiResponse(response=GenericErrorResponse, description='SSH-hostkey host does not exist'),
+        },
+        summary='Delete one of the existing SSH-hostkey hosts.',
+        operation_id='system_ssh_hostkey_delete',
+    )
+    def delete(self, request, host: str):
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='ssh_hostkey')
+        if not privileged:
+            return Response(
+                data={'error': 'Not privileged to manage SSH-hostkeys'},
+                status=403,
+            )
+
+        try:
+            result = SSHHostkeys.objects.get(host=host)
+
+            if result is not None:
+                result.delete()
+                log_audit(
+                    user=user,
+                    title='SSH-Hostkey delete',
+                    msg=f"SSH-Hostkey deleted: Host '{result.host}', Comment '{result.comment}'",
+                )
+                return Response(data={'msg': 'SSH-hostkey host deleted'}, status=200)
+
+        except ObjectDoesNotExist:
+            pass
+
+        return Response(data={'error': 'SSH-hostkey host not found'}, status=404)

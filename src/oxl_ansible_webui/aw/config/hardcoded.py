@@ -1,5 +1,7 @@
 # todo: some of these settings could be moved to the system-config later on
 
+from os import environ
+
 THREAD_JOIN_TIMEOUT = 3
 INTERVAL_RELOAD = 10  # start/stop threads for configured jobs
 INTERVAL_CHECK = 5  # check for queued jobs
@@ -20,8 +22,10 @@ GRP_MANAGER = {
     'credentials': 'AW Credentials Managers',
     'alert': 'AW Alert Managers',
     'system': 'AW System Managers',
+    'ssh_hostkey': 'AW SSH-Hostkey Managers',
 }
 REPO_CLONE_TIMEOUT = 300
 ENV_KEY_CONFIG = 'AW_CONFIG'
 ENV_KEY_SAML = 'AW_SAML'
 SECRET_HIDDEN = '⬤' * 15
+PATH_SSH_HOSTKEY_FILES = f"{environ['HOME']}/.ssh/ansible_webui_known_hosts/"

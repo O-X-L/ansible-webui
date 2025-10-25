@@ -8,7 +8,7 @@ from aw.utils.util import datetime_w_tz
 from aw.config.hardcoded import KEY_TIME_FORMAT
 from aw.model.api import AwAPIKey
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, GenericErrorResponse, \
-    response_data_if_changed
+    response_data_if_changed, API_PARAM_HASH
 from aw.utils.audit import log_audit
 
 
@@ -34,6 +34,7 @@ class APIKey(APIView):
         request=None,
         responses={200: KeyReadResponse},
         summary='Return a list of all existing API keys of the current user.',
+        parameters=[API_PARAM_HASH],
     )
     def get(request):
         tokens = []

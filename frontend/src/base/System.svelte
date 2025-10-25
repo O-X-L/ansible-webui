@@ -3,7 +3,7 @@
 
     import { Tabs, TabItem } from 'flowbite-svelte';
     import {
-      AdjustmentsHorizontalSolid, RocketSolid, DatabaseSolid, BookSolid, DrawSquareSolid, LockSolid,
+      AdjustmentsHorizontalSolid, RocketSolid, DatabaseSolid, BookSolid, DrawSquareSolid, LockSolid, InboxFullSolid,
     } from 'flowbite-svelte-icons'
 
     import { share } from './Share.js';
@@ -14,6 +14,7 @@
     import APIKeys from './system/APIKeys.svelte';
     import Environment from './system/Environment.svelte';
     import Permissions from './system/Permissions.svelte';
+    import SSHHostkeys from './system/SSHHostkeys.svelte';
 
     const classIFrameDiv = 'w-full h-full';
     const classIFrame = 'w-full h-full overflow-y-auto overflow-x-hidden border-none';
@@ -26,6 +27,7 @@
       admin: false,
       environment: false,
       permission: false,
+      ssh_hostkey: false,
     });
   
     function updateURLHash(_: any) {
@@ -45,6 +47,8 @@
         fragment = 'env';
       } else if (openTab.permission) {
         fragment = 'permission';
+      } else if (openTab.ssh_hostkey) {
+        fragment = 'hostkey';
       }
 
       window.location.hash = fragment;
@@ -75,6 +79,8 @@
         openTab.environment = true;
       } else if (f == '#permission') {
         openTab.permission = true;
+      } else if (f == '#hostkey') {
+        openTab.ssh_hostkey = true;
       } else {
         openTab.settings = true;
       }
@@ -128,6 +134,13 @@
       <iframe src="/api/_docs" title="API Docs" class={classIFrame}
         frameborder=0 marginheight=0 marginwidth=0></iframe>
       <div id="loaded" class="h-0 w-0"></div>
+    </TabItem>
+
+    <TabItem bind:open={openTab.ssh_hostkey} defaultClass="{classTabButton} tab-ssh-hostkey">
+      <div slot="title" class={classTabTitle}>
+        <InboxFullSolid size="md" /> {t('system.ssh_hostkey')}
+      </div>
+      <SSHHostkeys bind:open={openTab.ssh_hostkey}/>
     </TabItem>
   </Tabs>
 </div>
