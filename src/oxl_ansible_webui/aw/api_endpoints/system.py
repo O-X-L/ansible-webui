@@ -421,7 +421,7 @@ class APISSHHostkey(APIView):
         if file.find('/') != -1 or file.startswith('.'):
             return Response({'error': 'Filename is not valid'}, status=400)
 
-        if valid_domain(target):
+        if target in ['localhost'] or valid_domain(target):
             valid = True
 
         else:

@@ -60,8 +60,8 @@
     }
 
     function handleSubmitResponse(s: number, j: any) {
+        scanLoading = false;
         if (s == 200 && j.error === undefined) {
-            scanLoading = false;
             scanModal = false;
         }
         apiResponseHandler.handleRes(s, j);
