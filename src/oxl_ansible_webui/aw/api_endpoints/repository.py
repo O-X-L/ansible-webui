@@ -20,6 +20,7 @@ from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE,
 from aw.api_endpoints.job_util import get_log_file_content
 from aw.execute.repository import ExecuteRepository
 from aw.utils.audit import log_audit
+from aw.utils.debug import log
 
 
 class RepositoryWriteRequest(serializers.ModelSerializer):
@@ -161,7 +162,11 @@ class APIRepository(APIView):
             }, status=200)
 
         except IntegrityError as err:
-            return Response(data={'error': f"Provided repository data is not valid: '{err}'"}, status=400)
+            log(level=3, msg=f"API | Provided repository data is not valid: '{err}'")
+            return Response(
+                data={'error': 'Provided repository data is not valid'},
+                status=400,
+            )
 
 
 class APIRepositoryItem(GenericAPIView):
@@ -245,7 +250,11 @@ class APIRepositoryItem(GenericAPIView):
             return Response(data={'msg': f"Repository '{repo.name}' updated", 'id': repo_id}, status=200)
 
         except IntegrityError as err:
-            return Response(data={'error': f"Provided repository data is not valid: '{err}'"}, status=400)
+            log(level=3, msg=f"API | Provided repository data is not valid: '{err}'")
+            return Response(
+                data={'error': 'Provided repository data is not valid'},
+                status=400,
+            )
 
     @extend_schema(
         request=None,

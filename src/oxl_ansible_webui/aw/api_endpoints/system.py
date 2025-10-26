@@ -148,7 +148,8 @@ class APISystemConfig(APIView):
             return Response(data={'msg': "System config updated"}, status=200)
 
         except IntegrityError as err:
-            return Response(data={'error': f"Provided system config is not valid: '{err}'"}, status=400)
+            log(level=3, msg=f"API | Provided system config data is not valid: '{err}'")
+            return Response(data={'error': 'Provided system config is not valid'}, status=400)
 
 
 class SystemEnvironmentReadResponse(BaseResponse):
@@ -304,8 +305,9 @@ class APISSHHostkeyFile(APIView):
             }, status=200)
 
         except IntegrityError as err:
+            log(level=3, msg=f"API | Provided SSH-Hostkey-file data is not valid: '{err}'")
             return Response(
-                data={'error': f"Provided SSH-Hostkey-file data is not valid: '{err}'"},
+                data={'error': 'Provided SSH-Hostkey-file data is not valid'},
                 status=400,
             )
 

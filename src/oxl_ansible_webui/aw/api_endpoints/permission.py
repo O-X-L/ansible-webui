@@ -16,6 +16,7 @@ from aw.utils.util import is_set
 from aw.base import USERS, GROUPS
 from aw.model.repository import Repository
 from aw.utils.audit import log_audit
+from aw.utils.debug import log
 
 
 class PermissionReadResponse(serializers.ModelSerializer):
@@ -285,8 +286,9 @@ class APIPermission(APIView):
             }, status=200)
 
         except IntegrityError as err:
+            log(level=3, msg=f"API | Provided permission data is not valid: '{err}'")
             return Response(
-                data={'error': f"Provided permission data is not valid: '{err}'"},
+                data={'error': 'Provided permission data is not valid'},
                 status=400,
             )
 
@@ -352,7 +354,11 @@ class APIPermissionItem(APIView):
             return Response(data={'msg': f"Permission '{permission.name}' updated", 'id': perm_id}, status=200)
 
         except IntegrityError as err:
-            return Response(data={'error': f"Provided permission data is not valid: '{err}'"}, status=400)
+            log(level=3, msg=f"API | Provided permission data is not valid: '{err}'")
+            return Response(
+                data={'error': 'Provided permission data is not valid'},
+                status=400,
+            )
 
     @extend_schema(
         request=None,

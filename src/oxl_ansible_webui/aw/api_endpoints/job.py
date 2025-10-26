@@ -185,8 +185,9 @@ class APIJob(APIView):
             return Response(data={'msg': 'Job created', 'id': o.id}, status=200)
 
         except IntegrityError as err:
+            log(level=3, msg=f"API | Provided job data is not valid: '{err}'")
             return Response(
-                data={'error': f"Provided job data is not valid: '{err}'"},
+                data={'error': 'Provided job data is not valid'},
                 status=400,
             )
 
@@ -295,8 +296,9 @@ class APIJobItem(APIView):
                     Job.objects.filter(id=job.id).update(**serializer.validated_data)
 
                 except IntegrityError as err:
+                    log(level=3, msg=f"API | Provided job data is not valid: '{err}'")
                     return Response(
-                        data={'error': f"Provided job data is not valid: '{err}'"},
+                        data={'error': 'Provided job data is not valid'},
                         status=400,
                     )
 
