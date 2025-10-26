@@ -101,7 +101,7 @@ def test_add():
         # repos
         {'l': 'repository', 'd': {
             'name': 'gitty1', 'rtype': 2, 'git_origin': 'https://github.com/O-X-L/ansible-webui.git',
-            'git_branch': 'latest',
+            'git_branch': 'latest', 'git_playbook_base': 'test',
         }},
         {'l': 'repository', 'd': {'name': 'staticy1', 'rtype': 1, 'static_path': '/etc/ansible/repo'}},
 
@@ -196,9 +196,19 @@ def test_delete():
     ])
 
 
+def test_custom():
+    test_get_locations([
+        # depends on the git-repository #1 (O-X-L/ansible-webui base-directory 'test')
+        'fs/browse/1',
+        'inventory/list?inventory=inv%2Fhosts.yml&repository=1',
+        'inventory/list?inventory=inv%2Fhosts.yml&limit=cloud&repository=1',
+    ])
+
+
 def main():
     test_add()
     test_list()
+    test_custom()
     test_modify()
     test_delete()
     # todo: add should-fail checks

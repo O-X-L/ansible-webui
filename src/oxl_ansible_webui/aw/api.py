@@ -17,6 +17,7 @@ from aw.api_endpoints.frontend import APIBackendInfo, APIBackendTranslations, AP
     APIFormInfosCredentials, APIFormInfosRepositories, APIFormInfosConfig, APIFormInfosGlobalAlerts, \
     APIFormInfosGroupAlerts, APIFormInfosUserAlerts, APIFormInfosPermissions
 from aw.api_endpoints.stats import APIStatsJobs
+from aw.api_endpoints.inventory import APIInventoryList
 # from aw.api_endpoints.base import not_implemented
 
 urlpatterns_api = [
@@ -58,8 +59,9 @@ urlpatterns_api = [
     path('api/ssh-hostkey-file', APISSHHostkeyFile.as_view()),
     path('api/ssh-hostkey-file/<str:name>', APISSHHostkeyFileItem.as_view()),
     path('api/user/password', APIUserPasswordChange.as_view()),
-    path('api/fs/browse/<str:repository>', APIFsBrowse.as_view()),
+    path('api/fs/browse/<int:repo_id>', APIFsBrowse.as_view()),
     path('api/fs/exists', APIFsExists.as_view()),
+    path('api/inventory/list', APIInventoryList.as_view()),
     path('api/_schema/', SpectacularAPIView.as_view(), name='_schema'),
     path('api/_docs', SpectacularSwaggerView.as_view(url_name='_schema'), name='swagger-ui'),
     path('api/frontend/info', APIBackendInfo.as_view()),
