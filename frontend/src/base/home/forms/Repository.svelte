@@ -50,6 +50,7 @@
         'git_override_update',
         'git_playbook_base',
         'git_timeout',
+        'ssh_hostkey_file',
     ];
     const ignoreFieldsGit = ['static_path'];
 
@@ -82,6 +83,7 @@
         git_override_update: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         git_playbook_base: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         git_timeout: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
+        ssh_hostkey_file: {value: '', color: inputBaseColor, required: false},
     });
 
     function t(code: string) : string {
@@ -288,6 +290,11 @@
                             <Label for="repo_git_isolate" class={classModalLabel}>{t('repos.form.git_isolate')}</Label>
                             <Toggle id="repo_git_isolate" bind:checked={form.git_isolate.value} />
                             <Helper class={classModalHelp}>{t('repos.form.help.git_isolate')}</Helper>
+                        </div>
+                        <div class={classModalInput}>
+                            <Label for="repo_ssh_hostkey_file" class={classModalLabel}>{t('system.ssh_hostkey')}</Label>
+                            <Select id="repo_ssh_hostkey_file" items={formInfos.choices.ssh_hostkey_file}
+                                bind:value={form.ssh_hostkey_file.value} bind:color={form.ssh_hostkey_file.color} />
                         </div>
                     </div>
                 </AccordionItem>

@@ -52,15 +52,18 @@ def relative_time_to_dt(t: str) -> (datetime, None):
 
 def _build_stats_jobs_query_limits(request, job_ids: list[Job]) -> dict:
     # pylint: disable=R0912
-    if 'limit_jobs' in request.GET:
-        job_ids_new = []
-        for limit_job in request.GET['limit_jobs'].split(','):
-            if limit_job.isnumeric():
-                limit_job = int(limit_job)
-                if limit_job in job_ids:
-                    job_ids_new.append(limit_job)
+    limit_jobs = request.GET.get('limit_jobs', [])
+    if isinstance(limit_jobs, str):
+        limit_jobs = limit_jobs.split(',')
 
-        job_ids = job_ids_new
+    job_ids_new = []
+    for limit_job in limit_jobs:
+        if limit_job.isnumeric():
+            limit_job = int(limit_job)
+            if limit_job in job_ids:
+                job_ids_new.append(limit_job)
+
+    job_ids = job_ids_new
 
     limits = {'job__in': job_ids, 'result__isnull': False, 'result__time_fin__isnull': False}
     limit_time = None

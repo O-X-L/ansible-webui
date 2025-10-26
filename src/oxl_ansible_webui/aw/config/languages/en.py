@@ -1,7 +1,5 @@
 from aw.config.main import config
 
-# pylint: disable=C0301
-
 # todo: api-endpoint responses (add lang-code to api responses)
 
 EN = {
@@ -297,6 +295,7 @@ EN = {
     'system.api_keys': 'API Keys',
     'system.admin': 'Admin',
     'system.api_docs': 'API Docs',
+    'system.ssh_hostkey': 'SSH Hostkeys',
 
     # api-keys
     'api_keys.token': 'Token',
@@ -445,4 +444,16 @@ EN = {
     'permission.jobs_all': 'All Jobs',
     'permission.credentials_all': 'All Credentials',
     'permission.repositories_all': 'All Repositories',
+
+    # ssh hostkeys
+    'ssh_hostkey.action.scan': 'Target(s) scanned for SSH-hostkeys',
+    'ssh_hostkey.action.delete': 'Target SSH-hostkeys deleted',
+    'ssh_hostkey.scan': 'Scan Target(s) for SSH-hostkeys',
+    'ssh_hostkey.target': 'Scan Target(s)',
+
+    ## form help
+    'ssh_hostkey.form.help.target': 'Target Domain, IP or Network in CIDR-format',
+    'ssh_hostkey.form.help.file': 'The name of the file to write the SSH-hostkeys to. '
+                                  'This can be useful to separate hostkeys between environments. '
+                                  '(p.e. internal and prod)',
 }

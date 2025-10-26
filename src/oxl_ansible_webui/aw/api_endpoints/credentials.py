@@ -21,6 +21,7 @@ from aw.config.hardcoded import SECRET_HIDDEN
 from aw.utils.subps import process
 from aw.base import USERS
 from aw.utils.audit import log_audit
+from aw.utils.debug import log
 
 
 class JobSharedCredentialsReadResponse(serializers.ModelSerializer):
@@ -231,8 +232,9 @@ def _update_creds(
             setattr(credentials, field, value)
 
     except IntegrityError as err:
+        log(level=3, msg=f"API | Provided credentials data is not valid: '{err}'")
         return Response(
-            data={'error': f"Provided credentials data is not valid: '{err}'"},
+            data={'error': 'Provided credentials data is not valid'},
             status=400,
         )
 
@@ -294,8 +296,9 @@ class APIJobSharedCredentials(APIView):
             return Response(data={'msg': 'Shared-credentials created', 'id': o.id}, status=200)
 
         except IntegrityError as err:
+            log(level=3, msg=f"API | Provided shared-credentials data is not valid: '{err}'")
             return Response(
-                data={'error': f"Provided shared-credentials data is not valid: '{err}'"},
+                data={'error': 'Provided shared-credentials data is not valid'},
                 status=400,
             )
 
@@ -349,8 +352,9 @@ class APIJobUserCredentials(APIView):
             return Response(data={'msg': 'User-credentials created', 'id': o.id}, status=200)
 
         except IntegrityError as err:
+            log(level=3, msg=f"API | Provided user-credentials data is not valid: '{err}'")
             return Response(
-                data={'error': f"Provided user-credentials data is not valid: '{err}'"},
+                data={'error': 'Provided user-credentials data is not valid'},
                 status=400,
             )
 
@@ -386,8 +390,9 @@ class APIJobTMPCredentials(APIView):
             return Response(data={'msg': 'Temporary-credentials created', 'id': o.id}, status=200)
 
         except IntegrityError as err:
+            log(level=3, msg=f"API | Provided temporary-credentials data is not valid: '{err}'")
             return Response(
-                data={'error': f"Provided temporary-credentials data is not valid: '{err}'"},
+                data={'error': 'Provided temporary-credentials data is not valid'},
                 status=400,
             )
 

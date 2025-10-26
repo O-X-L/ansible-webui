@@ -81,10 +81,7 @@ class APIFsBrowse(APIView):
         if not browse_root.is_dir():
             return Response(data={'error': f"Base directory '{browse_root}' does not exist"}, status=404)
 
-        if 'base' not in request.GET:
-            base = '/'
-        else:
-            base = str(request.GET['base'])
+        base = str(request.GET.get('base', '/'))
 
         if base.find('..') != -1 or base.startswith('/'):
             return Response(data={'error': 'Traversal not allowed'}, status=403)

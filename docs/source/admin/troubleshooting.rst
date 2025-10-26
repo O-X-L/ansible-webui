@@ -107,6 +107,8 @@ SSH Hostkey Verification
 
 * In production you might want to either:
 
+  * Utilize the :ref:`System SSH-Hostkeys <usage_ssh_hostkeys>`
+
   * Maintain a `list of known-good hostkeys <https://en.wikibooks.org/wiki/OpenSSH/Client_Configuration_Files#~/.ssh/known_hosts>`_
 
     You can specify which :code:`known_hosts` file AW should use, using the config setting :code:`AW_SSH_KNOWN_HOSTS`

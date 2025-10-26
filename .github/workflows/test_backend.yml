@@ -30,6 +30,14 @@ jobs:
       run:
         shell: bash
 
+    services:
+      test_ssh_server:
+        image: 'serversideup/docker-ssh:v3'
+        ports:
+          - '127.0.0.1:2222:2222'
+        environment:
+          AUTHORIZED_KEYS: 'ssh-ed25519 1234567890abcdefghijklmnoqrstuvwxyz user-a'
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3

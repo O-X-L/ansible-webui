@@ -1,4 +1,4 @@
-ARG AW_VERSION=0.0
+ARG AW_VERSION
 
 # BUILD: docker build -f Dockerfile_production_unprivileged -t ansible-webui:<VERSION> --build-arg "AW_VERSION=<VERSION>" --progress=plain --no-cache .
 # RUN:

@@ -66,6 +66,7 @@ export interface jobType {
     execution_prompts_json: string|null,
     next_run: string|null,
     executions: executionType[],
+    ssh_hostkey_file: string|null,
 }
 
 export interface credentialsSharedType {

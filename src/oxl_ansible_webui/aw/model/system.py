@@ -151,3 +151,51 @@ class UserExtended(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['user'], name='user_extended_unique')
         ]
+
+
+class SSHHostkeyFile(models.Model):
+    api_fields_read = ['name']
+
+    name = models.CharField(max_length=100, null=False, blank=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['name'], name='sshhostkeyfile_name_unique')
+        ]
+
+
+class SSHHostkeys(models.Model):
+    api_fields_read = ['host', 'hostkeys', 'file', 'comment']
+
+    host = models.CharField(max_length=300, null=False, blank=False)
+    _hostkeys = models.TextField(max_length=5000, **DEFAULT_NONE)
+    comment = models.CharField(max_length=150, **DEFAULT_NONE)
+
+    _file = models.ForeignKey(SSHHostkeyFile, on_delete=models.CASCADE, related_name='sshhostkey_fk_file')
+
+    @property
+    def hostkeys(self) -> list[str]:
+        if is_null(self._hostkeys):
+            return []
+
+        return self._hostkeys.split(',')
+
+    @hostkeys.setter
+    def hostkeys(self, value: list[str]):
+        self._hostkeys = ','.join(value)
+
+    @property
+    def file(self) -> str:
+        return self._file.name
+
+    @file.setter
+    def file(self, value: SSHHostkeyFile):
+        self._file = value
+
+    def __str__(self) -> str:
+        return f"SSH-hostkeys for host '{self.host}' (count {len(self.hostkeys)})"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['host'], name='sshhostkey_host_unique')
+        ]

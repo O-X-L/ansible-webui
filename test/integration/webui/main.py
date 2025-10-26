@@ -155,6 +155,7 @@ def test_main_pages():
             '.tab-api-docs': '#api_docs',
             '.tab-settings': '#settings',
             '.tab-env': '#env',
+            '.tab-ssh-hostkey': '#hostkey',
         },
     })
 
@@ -311,8 +312,19 @@ def test_js_actions():
             '.tab-settings': [
                 ['.settings-exec', '.settings-paths', '.settings-mailing', '.settings-internal', '#settings-btn-save'],
             ],
+            '.tab-env': [
+                ['.env-main', '.env-anscnf', '.env-anscol', '.env-pymod', '#env-btn-copy'],
+            ],
             '.tab-perm': [
+                # todo: create permission
                 ['#perms-btn-add', '#perm-btn-discard'],
+            ],
+            '.tab-ssh-hostkey': [
+                [
+                    '#ssh-hostkey-btn-scan',
+                    '#ssh_hostkey_target=localhost', '#ssh_hostkey_port=22', '#ssh_hostkey_cmt=test',
+                    '#ssh-hostkey-btn-scan-submit',
+                ],
             ],
         },
     }

@@ -24,8 +24,8 @@ fi
 
 if [[ "$DEV_INIT" == '1' ]]
 then
-  log 'INSTALLING REQUIREMENTS'
-  python3 -m pip install --upgrade -r /repo/requirements.txt >/dev/null
+  # log 'INSTALLING REQUIREMENTS'
+  # python3 -m pip install --upgrade -r /repo/requirements.txt >/dev/null
 
   log 'INITIALIZING DATABASE SCHEMA'
   bash /repo/scripts/migrate_db.sh "$TEST_MIGRATE"

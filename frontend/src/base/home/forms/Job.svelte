@@ -78,6 +78,7 @@
         execution_prompts: {value: '', color: inputBaseColor},  // legacy prompts
         execution_prompts_json: {value: '', color: inputBaseColor},
         owner: {value: $share.backend.user_id},
+        ssh_hostkey_file: {value: '', color: inputBaseColor},
     });
 
     function t(code: string) : string {
@@ -600,6 +601,11 @@
                         <Label for="job_args" class={classModalLabel}>{t('jobs.form.cmd_args')}</Label>
                         <Input id="job_args" bind:value={form.cmd_args.value} bind:color={form.cmd_args.color} />
                         <Helper class={classModalHelp}>{t('jobs.form.help.cmd_args')}</Helper>
+                    </div>
+                    <div class={classModalInput}>
+                        <Label for="job_ssh_hostkey_file" class={classModalLabel}>{t('system.ssh_hostkey')}</Label>
+                        <Select id="job_ssh_hostkey_file" items={formInfos.choices.ssh_hostkey_file}
+                            bind:value={form.ssh_hostkey_file.value} bind:color={form.ssh_hostkey_file.color} />
                     </div>
                 </div>
             </AccordionItem>

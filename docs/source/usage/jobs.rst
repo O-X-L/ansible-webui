@@ -213,6 +213,13 @@ Additional
 
   Example: Use simple IPs instead of an inventory - :code:`-i 192.0.2.5,192.0.2.6,192.0.2.7,`
 
+* **SSH HOSTKEYS**:
+
+  Optional. You can choose a SSH-Hostkey known_hosts-file to be used for this job.
+
+  The :code:`System - SSH Hostkeys` page allows you to add and manage hostkeys.
+
+
 Execution Prompts
 =================
 

@@ -22,6 +22,7 @@ from aw.execute.repository import ExecuteRepository
 from aw.execute.play_credentials import get_runner_credentials_args, get_credentials_to_use
 from aw.model.base import JOB_EXEC_STATUS_FAILED
 from aw.utils.db_handler import close_old_mysql_connections
+from aw.execute.ssh_hostkey import get_ssh_known_hosts_file
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
 
@@ -34,7 +35,7 @@ def _exec_log(execution: JobExecution, msg: str, level: int = 3):
     )
 
 
-def _commandline_arguments(job: Job, execution: JobExecution, creds: (BaseJobCredentials, None)) -> str:
+def _commandline_arguments(job: Job, execution: JobExecution, creds: (BaseJobCredentials, None), path_run: Path) -> str:
     cmd_arguments = []
     if is_set(job.cmd_args):
         cmd_arguments.append(job.cmd_args)
@@ -48,15 +49,11 @@ def _commandline_arguments(job: Job, execution: JobExecution, creds: (BaseJobCre
     if execution.mode_diff or job.mode_diff:
         cmd_arguments.append('--diff')
 
-    if is_set(config['path_ssh_known_hosts']) and \
-            ' '.join(cmd_arguments).find('ansible_ssh_extra_args') == -1:
-        if Path(config['path_ssh_known_hosts']).is_file():
-            cmd_arguments.append(
-                f"-e 'ansible_ssh_extra_args=\"-o UserKnownHostsFile={config['path_ssh_known_hosts']}\"'"
-            )
-
-        else:
-            _exec_log(execution=execution, msg='Ignoring known_hosts file because it does not exist', level=5)
+    ssh_known_hosts_file = get_ssh_known_hosts_file(job, path_run=path_run)
+    if ssh_known_hosts_file is not None:
+        cmd_arguments.append(
+            f"-e 'ansible_ssh_extra_args=\"-o UserKnownHostsFile={ssh_known_hosts_file}\"'"
+        )
 
     if is_set(creds):
         if is_set(creds.become_pass):
@@ -149,7 +146,7 @@ def _runner_options(
     elif job.verbosity != 0:
         verbosity = job.verbosity
 
-    cmdline_args = _commandline_arguments(job=job, execution=execution, creds=creds)
+    cmdline_args = _commandline_arguments(job=job, execution=execution, creds=creds, path_run=path_run)
 
     opts = {
         'project_dir': project_dir,

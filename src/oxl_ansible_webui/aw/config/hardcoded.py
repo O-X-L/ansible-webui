@@ -20,6 +20,7 @@ GRP_MANAGER = {
     'credentials': 'AW Credentials Managers',
     'alert': 'AW Alert Managers',
     'system': 'AW System Managers',
+    'ssh_hostkey': 'AW SSH-Hostkey Managers',
 }
 REPO_CLONE_TIMEOUT = 300
 ENV_KEY_CONFIG = 'AW_CONFIG'

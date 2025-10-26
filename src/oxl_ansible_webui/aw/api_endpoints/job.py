@@ -25,6 +25,7 @@ from aw.utils.util import is_set, ansible_log_html, ansible_log_text
 from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED
 from aw.base import USERS
 from aw.utils.audit import log_audit
+from aw.utils.debug import log
 
 
 class JobWriteRequest(serializers.ModelSerializer):
@@ -83,7 +84,7 @@ def _job_execution_count(request) -> (int, None):
 
 def _want_job_executions(request) -> tuple:
     max_count = None
-    if 'executions' in request.GET and request.GET['executions'] == 'true':
+    if request.GET.get('executions', None) == 'true':
         try:
             return True, _job_execution_count(request)
 
@@ -185,8 +186,9 @@ class APIJob(APIView):
             return Response(data={'msg': 'Job created', 'id': o.id}, status=200)
 
         except IntegrityError as err:
+            log(level=3, msg=f"API | Provided job data is not valid: '{err}'")
             return Response(
-                data={'error': f"Provided job data is not valid: '{err}'"},
+                data={'error': 'Provided job data is not valid'},
                 status=400,
             )
 
@@ -295,8 +297,9 @@ class APIJobItem(APIView):
                     Job.objects.filter(id=job.id).update(**serializer.validated_data)
 
                 except IntegrityError as err:
+                    log(level=3, msg=f"API | Provided job data is not valid: '{err}'")
                     return Response(
-                        data={'error': f"Provided job data is not valid: '{err}'"},
+                        data={'error': 'Provided job data is not valid'},
                         status=400,
                     )
 
@@ -486,11 +489,7 @@ class APIJobExecutionLogs(APIView):
     def get(self, request, job_id: int, exec_id: int, line_start: int = 0):
         user = get_api_user(request)
 
-        if 'format' not in request.GET:
-            log_fmt = 'html'
-
-        else:
-            log_fmt = str(request.GET['format'])
+        log_fmt = str(request.GET.get('format', 'html'))
 
         try:
             job, execution = _find_job_and_execution(job_id, exec_id)

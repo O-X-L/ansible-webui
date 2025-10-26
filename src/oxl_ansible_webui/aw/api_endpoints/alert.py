@@ -13,6 +13,7 @@ from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user,
 from aw.utils.permission import has_manager_privileges
 from aw.model.alert import BaseAlert, AlertPlugin, AlertGlobal, AlertGroup, AlertUser
 from aw.utils.audit import log_audit
+from aw.utils.debug import log
 
 
 def update_jobs(alert: BaseAlert, job_ids: list):
@@ -89,8 +90,9 @@ class APIAlertPlugin(GenericAPIView):
             }, status=200)
 
         except IntegrityError as err:
+            log(level=3, msg=f"API | Provided Alert-Plugin data is not valid: '{err}'")
             return Response(
-                data={'error': f"Provided Alert-Plugin data is not valid: '{err}'"},
+                data={'error': 'Provided Alert-Plugin data is not valid'},
                 status=400,
             )
 
@@ -167,7 +169,8 @@ class APIAlertPluginItem(GenericAPIView):
             return Response(data={'msg': f"Alert-Plugin '{plugin.name}' updated", 'id': plugin_id}, status=200)
 
         except IntegrityError as err:
-            return Response(data={'error': f"Provided Alert-Plugin data is not valid: '{err}'"}, status=400)
+            log(level=3, msg=f"API | Provided Alert-Plugin data is not valid: '{err}'")
+            return Response(data={'error': 'Provided Alert-Plugin data is not valid'}, status=400)
 
     @extend_schema(
         request=None,
@@ -281,8 +284,9 @@ class APIAlertUser(GenericAPIView):
             )
 
         except IntegrityError as err:
+            log(level=3, msg=f"API | Provided Alert data is not valid: '{err}'")
             return Response(
-                data={'error': f"Provided Alert data is not valid: '{err}'"},
+                data={'error': 'Provided Alert data is not valid'},
                 status=400,
             )
 
@@ -359,7 +363,8 @@ class APIAlertUserItem(GenericAPIView):
             return Response(data={'msg': f"Alert '{alert.name}' updated", 'id': alert_id}, status=200)
 
         except IntegrityError as err:
-            return Response(data={'error': f"Provided Alert data is not valid: '{err}'"}, status=400)
+            log(level=3, msg=f"API | Provided Alert data is not valid: '{err}'")
+            return Response(data={'error': 'Provided Alert data is not valid'}, status=400)
 
     @extend_schema(
         request=None,
@@ -468,8 +473,9 @@ class APIAlertGlobal(GenericAPIView):
             )
 
         except IntegrityError as err:
+            log(level=3, msg=f"API | Provided Alert data is not valid: '{err}'")
             return Response(
-                data={'error': f"Provided Alert data is not valid: '{err}'"},
+                data={'error': 'Provided Alert data is not valid'},
                 status=400,
             )
 
@@ -547,7 +553,8 @@ class APIAlertGlobalItem(GenericAPIView):
             return Response(data={'msg': f"Alert '{alert.name}' updated", 'id': alert_id}, status=200)
 
         except IntegrityError as err:
-            return Response(data={'error': f"Provided Alert data is not valid: '{err}'"}, status=400)
+            log(level=3, msg=f"API | Provided Alert data is not valid: '{err}'")
+            return Response(data={'error': 'Provided Alert data is not valid'}, status=400)
 
     @extend_schema(
         request=None,
@@ -660,8 +667,9 @@ class APIAlertGroup(GenericAPIView):
             )
 
         except IntegrityError as err:
+            log(level=3, msg=f"API | Provided Alert data is not valid: '{err}'")
             return Response(
-                data={'error': f"Provided Alert data is not valid: '{err}'"},
+                data={'error': 'Provided Alert data is not valid'},
                 status=400,
             )
 
@@ -743,7 +751,8 @@ class APIAlertGroupItem(GenericAPIView):
             return Response(data={'msg': f"Alert '{alert.name}' updated", 'id': alert_id}, status=200)
 
         except IntegrityError as err:
-            return Response(data={'error': f"Provided Alert data is not valid: '{err}'"}, status=400)
+            log(level=3, msg=f"API | Provided Alert data is not valid: '{err}'")
+            return Response(data={'error': 'Provided Alert data is not valid'}, status=400)
 
     @extend_schema(
         request=None,
