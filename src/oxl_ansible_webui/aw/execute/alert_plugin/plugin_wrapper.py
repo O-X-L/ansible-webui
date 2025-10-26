@@ -44,7 +44,7 @@ def alert_plugin_wrapper(
             'phone': '',
             'description': '',
             'is_active': user.is_active,
-            'last_login': int(unix_timestamp(datetime_from_db(user.last_login).timetuple())),
+            'last_login': None if user.last_login is None else int(unix_timestamp(datetime_from_db(user.last_login).timetuple())),
             'groups': [group.name for group in user.groups.all()],
         },
         'execution': {

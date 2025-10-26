@@ -16,6 +16,7 @@ Fixes:
 * MySQL/MariaDB-client may throw connection-error when writing audit-logs [#49](https://github.com/O-X-L/ansible-webui/issues/49)
 * Error when pressing download button for Git-repositories that require credentials [#68](https://github.com/O-X-L/ansible-webui/issues/68)
 * Log-color for higher-verbosity [#74](https://github.com/O-X-L/ansible-webui/issues/74)
+* Alert-plugin error for users that have never logged-in [#73](https://github.com/O-X-L/ansible-webui/issues/73)
 
 Features:
 
