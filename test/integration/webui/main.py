@@ -322,7 +322,7 @@ def test_js_actions():
             '.tab-ssh-hostkey': [
                 [
                     '#ssh-hostkey-btn-scan',
-                    '#ssh_hostkey_target=localhost', '#ssh_hostkey_port=2222', '#ssh_hostkey_cmt=test',
+                    '#ssh_hostkey_target=localhost', '#ssh_hostkey_port=22', '#ssh_hostkey_cmt=test',
                     '#ssh-hostkey-btn-scan-submit',
                 ],
             ],
