@@ -1,4 +1,3 @@
-from shutil import rmtree
 from re import compile as regex_compile
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -8,20 +7,21 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
+from aw.base import USERS
+from aw.utils.debug import log
+from aw.utils.subps import process
+from aw.utils.audit import log_audit
+from aw.utils.util import is_null, is_set
 from aw.model.job import Job, JobExecution
-from aw.model.job_credential import BaseJobCredentials, JobUserCredentials, JobSharedCredentials, JobUserTMPCredentials
-from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
-from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, api_docs_delete, \
-    api_docs_put, api_docs_post, validate_no_xss, GenericErrorResponse, response_data_if_changed, API_PARAM_HASH
-from aw.utils.util import is_null, overwrite_and_delete_file, write_file_0600, is_set
-from aw.utils.permission import has_credentials_permission, has_manager_privileges
+from aw.config.hardcoded import SECRET_HIDDEN
 from aw.execute.play_credentials import get_pwd_file
 from aw.execute.util import get_path_run, create_dirs
-from aw.config.hardcoded import SECRET_HIDDEN
-from aw.utils.subps import process
-from aw.base import USERS
-from aw.utils.audit import log_audit
-from aw.utils.debug import log
+from aw.utils.filesystem import overwrite_and_delete_file, write_file_0600, rm_dir
+from aw.utils.permission import has_credentials_permission, has_manager_privileges
+from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
+from aw.model.job_credential import BaseJobCredentials, JobUserCredentials, JobSharedCredentials, JobUserTMPCredentials
+from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, api_docs_delete, \
+    api_docs_put, api_docs_post, validate_no_xss, GenericErrorResponse, response_data_if_changed, API_PARAM_HASH
 
 
 class JobSharedCredentialsReadResponse(serializers.ModelSerializer):
@@ -711,7 +711,7 @@ class APIVaultEncrypt(APIView):
 
         if tmp_vault_file and path_run is not None:
             overwrite_and_delete_file(vault_file)
-            rmtree(path_run, ignore_errors=True)
+            rm_dir(path_run)
 
         if result['rc'] != 0:
             return Response(

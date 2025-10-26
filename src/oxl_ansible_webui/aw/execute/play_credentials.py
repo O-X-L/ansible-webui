@@ -2,14 +2,15 @@ from pathlib import Path
 
 from django.core.exceptions import ObjectDoesNotExist
 
+from aw.base import USERS
+from aw.utils.debug import log
+from aw.utils.util import is_set, is_null
+from aw.execute.util import config_error
 from aw.model.job import Job, JobExecution
+from aw.utils.filesystem import write_file_0600
+from aw.utils.db_handler import close_old_mysql_connections
 from aw.model.job_credential import BaseJobCredentials, JobUserCredentials
 from aw.utils.permission import has_credentials_permission, CHOICE_PERMISSION_READ
-from aw.base import USERS
-from aw.utils.debug import log  # log_warn
-from aw.utils.util import is_set, is_null, write_file_0600
-from aw.execute.util import config_error
-from aw.utils.db_handler import close_old_mysql_connections
 
 
 def get_pwd_file(path_run: (str, Path), attr: str) -> str:

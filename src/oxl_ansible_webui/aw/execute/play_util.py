@@ -1,5 +1,4 @@
 from pathlib import Path
-from shutil import rmtree
 from os import symlink
 from os import path as os_path
 from os import remove as remove_file
@@ -12,17 +11,18 @@ try:
 except (ImportError, ModuleNotFoundError):
     ara_callback_plugins = None
 
-from aw.config.main import config
-from aw.utils.util import is_set, datetime_w_tz, write_file_0640, overwrite_and_delete_file
-from aw.model.job_credential import BaseJobCredentials, JobUserTMPCredentials
-from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, JobError
-from aw.execute.util import update_status, decode_job_env_vars, create_dirs, is_execution_status, config_error
 from aw.utils.debug import log
-from aw.execute.repository import ExecuteRepository
-from aw.execute.play_credentials import get_runner_credentials_args, get_credentials_to_use
+from aw.config.main import config
+from aw.utils.util import is_set, datetime_w_tz
 from aw.model.base import JOB_EXEC_STATUS_FAILED
+from aw.execute.repository import ExecuteRepository
 from aw.utils.db_handler import close_old_mysql_connections
 from aw.execute.ssh_hostkey import get_ssh_known_hosts_file
+from aw.model.job_credential import BaseJobCredentials, JobUserTMPCredentials
+from aw.utils.filesystem import write_file_0640, overwrite_and_delete_file, rm_dir
+from aw.execute.play_credentials import get_runner_credentials_args, get_credentials_to_use
+from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, JobError
+from aw.execute.util import update_status, decode_job_env_vars, create_dirs, is_execution_status, config_error
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
 
@@ -238,7 +238,7 @@ def runner_cleanup(execution: JobExecution, path_run: Path, exec_repo: ExecuteRe
         except (FileNotFoundError, TypeError):
             pass
 
-    rmtree(path_run, ignore_errors=True)
+    rm_dir(path_run)
 
 
 def _run_stats(runner: Runner, result: JobExecutionResult) -> bool:
