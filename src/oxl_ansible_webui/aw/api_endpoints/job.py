@@ -25,6 +25,7 @@ from aw.utils.util import is_set, ansible_log_html, ansible_log_text
 from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED
 from aw.base import USERS
 from aw.utils.audit import log_audit
+from aw.utils.debug import log
 
 
 class JobWriteRequest(serializers.ModelSerializer):
