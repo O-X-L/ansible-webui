@@ -1,39 +1,46 @@
+from os import listdir
 from pathlib import Path
-from shutil import rmtree
+from threading import Thread
 from re import sub as regex_replace
 
 from django.utils import timezone
 
 from aw.config.main import config
-from aw.config.hardcoded import REPO_CLONE_TIMEOUT, FILE_TIME_FORMAT
-from aw.model.job import  JobExecution
-from aw.utils.util import is_null, is_set, write_file_0640, datetime_w_tz
 from aw.utils.subps import process
-from aw.execute.play_credentials import write_pwd_file, get_pwd_file
-from aw.execute.util import update_status, create_dirs, get_path_run
-from aw.utils.handlers import AnsibleRepositoryError
-from aw.model.repository import Repository
+from aw.model.job import  JobExecution
 from aw.model.base import JOB_EXEC_STATUS_FAILED
+from aw.utils.handlers import AnsibleRepositoryError
+from aw.utils.filesystem import write_file_0640, rm_dir
+from aw.utils.util import is_null, is_set, datetime_w_tz
 from aw.utils.db_handler import close_old_mysql_connections
 from aw.execute.ssh_hostkey import get_ssh_known_hosts_file
+from aw.utils.repository import get_path_repo, get_path_play
+from aw.model.repository import Repository, REPOSITORY_TYPE_STATIC
+from aw.config.hardcoded import REPO_CLONE_TIMEOUT, FILE_TIME_FORMAT
+from aw.execute.play_credentials import write_pwd_file, get_pwd_file
+from aw.execute.util import update_status, create_dirs, get_path_run
 
 
 class ExecuteRepository:
-    ISOLATE_BROWSABLE = 'isolated'
-
     def __init__(self, repository: Repository, execution: JobExecution = None, path_run: Path = None):
         self.repository = repository
-        self.path_run = path_run
-        if self.path_run is None:
-            self.path_run = get_path_run()
+        self.path_run_base = path_run
+        if self.path_run_base is None:
+            self.path_run_base = get_path_run()
+
+        self.path_run = self.path_run_base / '.repository'
 
         self.execution = execution
-        self.path_repo = None
-        # we need a persistent repo-clone for the WebUI-interaction (file-browsing and so on)
-        self.isolate_subdir = self.execution.id if self.execution is not None else self.ISOLATE_BROWSABLE
+        self.isolate_browsable = self.execution is None
+        self._path_repo = self._get_path_repo()
         create_dirs(path=config['path_log'], desc='log')
 
     def create_repository(self, env: dict):
+        if self._path_repo.is_dir() and not (self._path_repo / '.git').is_dir() and len(listdir(self._path_repo)) > 0:
+            # not empty and not a git repo
+            rm_dir(self._path_repo)
+            self._path_repo.mkdir(mode=0o750, parents=True, exist_ok=True)
+
         if is_set(self.repository.git_override_initialize):
             self._run_repo_hooks(
                 cmds=self.repository.git_override_initialize,
@@ -46,10 +53,7 @@ class ExecuteRepository:
         if is_set(self.repository.git_limit_depth):
             git_clone.extend(['--depth', str(self.repository.git_limit_depth)])
 
-        if self.path_repo is None:
-            self.path_repo = self.get_path_repo()
-
-        git_clone.extend([self._git_origin_with_credentials(), str(self.path_repo)])
+        git_clone.extend([self._git_origin_with_credentials(), str(self._path_repo)])
 
         git_cmds = [' '.join(git_clone)]
 
@@ -57,12 +61,8 @@ class ExecuteRepository:
             git_cmds.append('git lfs fetch')
             git_cmds.append('git lfs checkout')
 
-        try:
-            for cmd in git_cmds:
-                self._repo_process(cmd=cmd, env=env)
-
-        except AnsibleRepositoryError:
-            self.update_repository(env)
+        for cmd in git_cmds:
+            self._repo_process(cmd=cmd, env=env)
 
     def update_repository(self, env: dict):
         if is_set(self.repository.git_override_update):
@@ -90,7 +90,7 @@ class ExecuteRepository:
             self._repo_process(cmd=cmd, env=env)
 
     def create_or_update_repository(self):
-        if is_null(self.repository) or self.repository.rtype_name == 'Static':
+        if is_null(self.repository) or self.repository.rtype_name == REPOSITORY_TYPE_STATIC:
             return
 
         if self.execution is not None:
@@ -105,7 +105,7 @@ class ExecuteRepository:
 
         try:
             update_status(self.repository, status='Running')
-            path_repo = self.get_path_repo()
+            self.path_run.mkdir(mode=0o700, parents=True, exist_ok=True)
 
             env = self._git_env()
             if len(env) > 0:
@@ -113,7 +113,7 @@ class ExecuteRepository:
 
             self._run_repo_hooks(cmds=self.repository.git_hook_pre, env=env)
 
-            if not (Path(path_repo) / '.git').is_dir():
+            if not (self._path_repo / '.git').is_dir():
                 self.create_repository(env=env)
 
             else:
@@ -129,13 +129,12 @@ class ExecuteRepository:
         except Exception as err:
             self._error(msg=f"Got unexpected error: '{err}'")
 
+        rm_dir(self.path_run_base)
+
     def _error(self, msg: str):
         write_file_0640(file=self.repository.log_stderr, content=msg)
         update_status(self.repository, status=JOB_EXEC_STATUS_FAILED)
         raise AnsibleRepositoryError(msg)
-
-    def get_path_run_repo(self) -> Path:
-        return self.path_run / '.repository'
 
     def _git_env(self) -> dict:
         env = {
@@ -150,13 +149,11 @@ class ExecuteRepository:
             except IndexError:
                 pass
 
-        path_run_repo = self.get_path_run_repo()
-        path_run_repo.mkdir(mode=0o700, parents=True, exist_ok=True)
         if is_set(self.repository.git_credentials) and is_set(self.repository.git_credentials.ssh_key):
-            write_pwd_file(credentials=self.repository.git_credentials, attr='ssh_key', path_run=path_run_repo)
-            env['GIT_SSH_COMMAND'] += f" -i {get_pwd_file(path_run=path_run_repo, attr='ssh_key')}"
+            write_pwd_file(credentials=self.repository.git_credentials, attr='ssh_key', path_run=self.path_run)
+            env['GIT_SSH_COMMAND'] += f" -i {get_pwd_file(path_run=self.path_run, attr='ssh_key')}"
 
-        ssh_known_hosts_file = get_ssh_known_hosts_file(self.repository, path_run=path_run_repo)
+        ssh_known_hosts_file = get_ssh_known_hosts_file(self.repository, path_run=self.path_run)
         if ssh_known_hosts_file is not None:
             env['GIT_SSH_COMMAND'] += f" -o UserKnownHostsFile={ssh_known_hosts_file}"
 
@@ -166,43 +163,35 @@ class ExecuteRepository:
         return env
 
     def get_project_dir(self) -> str:
-        if is_null(self.repository):
-            return config['path_play']
+        exec_id = None
+        if self.execution is not None:
+            exec_id = self.execution.id
 
-        return str(self.get_path_playbook_base())
+        return str(get_path_play(
+            repository=self.repository,
+            exec_id=exec_id,
+        ))
 
     def cleanup_repository(self):
-        if is_null(self.repository) or self.repository.rtype_name == 'Static':
+        if is_null(self.repository) or self.repository.rtype_name == REPOSITORY_TYPE_STATIC:
             return
 
         self._run_repo_hooks(cmds=self.repository.git_hook_cleanup, env=self._git_env())
-        if self.repository.git_isolate and self.isolate_subdir != self.ISOLATE_BROWSABLE:
-            rmtree(self.get_path_repo(), ignore_errors=True)
+        if self.repository.git_isolate and not self.isolate_browsable:
+            rm_dir(self._path_repo)
 
-    def get_path_repo(self) -> Path:
-        path_repo = get_path_repo_wo_isolate(self.repository)
+    def _get_path_repo(self) -> Path:
+        exec_id = None
+        if self.execution is not None:
+            exec_id = self.execution.id
 
-        if self.repository.git_isolate:
-            path_repo = path_repo / str(self.isolate_subdir)
-            path_repo.mkdir(mode=0o750, parents=True, exist_ok=True)
-
-        return path_repo
-
-    def get_path_playbook_base(self) -> Path:
-        path_repo = self.get_path_repo()
-        if self.repository.rtype_name == 'Git' and is_set(self.repository.git_playbook_base):
-            path_repo = path_repo / self.repository.git_playbook_base
-
-        return path_repo
+        return get_path_repo(repository=self.repository, exec_id=exec_id)
 
     def _repo_process(self, cmd: str, env: dict, hook: bool = False):
-        if self.path_repo is None:
-            self.path_repo = self.get_path_repo()
-
         if not hook:
             cmd = f'timeout {self.repository.git_timeout} {cmd}'
 
-        result = process(cmd=cmd, cwd=self.path_repo, env=env, shell=True, timeout_sec=REPO_CLONE_TIMEOUT)
+        result = process(cmd=cmd, cwd=self._path_repo, env=env, shell=True, timeout_sec=REPO_CLONE_TIMEOUT)
         self._log_file_write(f"COMMAND: {cmd}\n{result['stdout']}")
         if result['rc'] != 0:
             self._error(
@@ -257,11 +246,15 @@ class ExecuteRepository:
         self.repository.log_stderr = f'{log_file}_stderr_repo.log'
 
 
-def get_path_repo_wo_isolate(repository: Repository) -> Path:
-    if repository.rtype_name == 'Static':
-        return repository.static_path
+def create_update_git_repo(repo: Repository) -> bool:
+    if is_null(repo) or repo.rtype_name == REPOSITORY_TYPE_STATIC:
+        return False
 
-    safe_repo_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=repository.name)
-    path_repo = Path(config['path_run']) / 'repositories' / safe_repo_name
-    path_repo.mkdir(mode=0o750, parents=True, exist_ok=True)
-    return path_repo
+    def _create_update(r: Repository):
+        ExecuteRepository(r).create_or_update_repository()
+
+    Thread(
+        target=_create_update,
+        kwargs={'r': repo}
+    ).start()
+    return True

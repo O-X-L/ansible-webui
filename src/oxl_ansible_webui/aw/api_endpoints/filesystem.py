@@ -2,17 +2,16 @@ from os import listdir
 from pathlib import Path
 from functools import cache
 
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
 from rest_framework import serializers
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
+from django.core.exceptions import ObjectDoesNotExist
 
-from aw.config.main import config
-from aw.api_endpoints.base import API_PERMISSION, BaseResponse, GenericErrorResponse
 from aw.model.repository import Repository
-from aw.execute.repository import get_path_repo_wo_isolate, ExecuteRepository
-from aw.utils.util import is_set
+from aw.utils.repository import get_path_play
+from aw.utils.db_handler import close_old_mysql_connections
+from aw.api_endpoints.base import API_PERMISSION, BaseResponse, GenericErrorResponse
 
 
 class FileSystemReadResponse(BaseResponse):
@@ -48,45 +47,36 @@ class APIFsBrowse(APIView):
         description="This endpoint is mainly used for form auto-completion when selecting job-files",
         parameters=[
             OpenApiParameter(
-                name='base', type=str, default='/', description='Relative directory to query',
+                name='base', type=str, default='', description='Relative directory to query',
                 required=False,
             ),
         ],
     )
-    def get(cls, request, repository: int = None):
-        # pylint: disable=R0912
-        browse_root = Path(config['path_play'])
+    def get(cls, request, repo_id: int = None):
+        # pylint: disable=R0801
         items = {'files': [], 'dirs': []}
 
-        if repository not in [None, 0, '0']:
-            try:
-                repository = Repository.objects.get(id=repository)
-                if repository is None:
-                    raise ObjectDoesNotExist
-
-                if repository.rtype_name == 'Static':
-                    browse_root = Path(repository.static_path)
-
-                else:
-                    browse_root = get_path_repo_wo_isolate(repository)
-                    if repository.git_isolate:
-                        browse_root = browse_root / ExecuteRepository.ISOLATE_BROWSABLE
-
-                    if is_set(repository.git_playbook_base):
-                        browse_root = browse_root / repository.git_playbook_base
-
-            except ObjectDoesNotExist:
-                return Response(data={'error': 'Provided repository does not exist'}, status=404)
-
-        if not browse_root.is_dir():
-            return Response(data={'error': f"Base directory '{browse_root}' does not exist"}, status=404)
-
-        base = str(request.GET.get('base', '/'))
+        base = str(request.GET.get('base', ''))
 
         if base.find('..') != -1 or base.startswith('/'):
             return Response(data={'error': 'Traversal not allowed'}, status=403)
 
-        browse_root = browse_root / base
+        repo = None
+        if repo_id is not None:
+            try:
+                close_old_mysql_connections()
+                repo = Repository.objects.get(id=repo_id)
+                if repo is None:
+                    raise ObjectDoesNotExist()
+
+            except ObjectDoesNotExist:
+                return Response(data={'error': 'Provided repository does not exist'}, status=404)
+
+        path_play = get_path_play(repository=repo)
+        if path_play is None:
+            return Response(data={'error': 'Provided playbook-dir does not exist'}, status=404)
+
+        browse_root = path_play / base
 
         if not browse_root.is_dir():
             return Response(data={'error': f"Base directory '{browse_root}' does not exist"}, status=404)
