@@ -1,6 +1,7 @@
 from os import environ
 from importlib.metadata import version, PackageNotFoundError
 from sys import stderr
+from pathlib import Path
 
 from pytz import all_timezones, timezone, BaseTzInfo
 from django.db.utils import IntegrityError, OperationalError
@@ -98,3 +99,9 @@ def init_config():
     # pylint: disable=W0601
     global config
     config = Config()
+
+    for path in [
+        Path(config['path_run']),
+        Path(config['path_log']),
+    ]:
+        path.mkdir(mode=0o750, parents=True, exist_ok=True)

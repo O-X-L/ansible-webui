@@ -22,6 +22,12 @@ then
   TEST_MIGRATE='clean'
 fi
 
+bash /repo/scripts/update_version.sh
+if [ -f /repo/VERSION ]
+then
+  export AW_VERSION="$(cat /repo/VERSION)"
+fi
+
 if [[ "$DEV_INIT" == '1' ]]
 then
   # log 'INSTALLING REQUIREMENTS'

@@ -17,6 +17,7 @@ Fixes:
 * Error when pressing download button for Git-repositories that require credentials [#68](https://github.com/O-X-L/ansible-webui/issues/68)
 * Log-color for higher-verbosity [#74](https://github.com/O-X-L/ansible-webui/issues/74)
 * Alert-plugin error for users that have never logged-in [#73](https://github.com/O-X-L/ansible-webui/issues/73)
+* Create missing directories [#72](https://github.com/O-X-L/ansible-webui/issues/72)
 
 Features:
 

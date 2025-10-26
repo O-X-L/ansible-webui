@@ -80,8 +80,12 @@ def _open_file_0600(path: (str, Path), flags):
 
 
 def write_file_0600(file: (str, Path), content: str):
+    file = Path(file)
+    if not file.parent.is_dir():
+        file.parent.mkdir(mode=0o750, parents=True, exist_ok=True)
+
     mode = 'w'
-    if Path(file).is_file():
+    if file.is_file():
         mode = 'a'
 
     with open(file, mode, encoding='utf-8', opener=_open_file_0600) as _file:
@@ -93,8 +97,12 @@ def _open_file_0640(path: (str, Path), flags):
 
 
 def write_file_0640(file: (str, Path), content: str):
+    file = Path(file)
+    if not file.parent.is_dir():
+        file.parent.mkdir(mode=0o750, parents=True, exist_ok=True)
+
     mode = 'w'
-    if Path(file).is_file():
+    if file.is_file():
         mode = 'a'
 
     with open(file, mode, encoding='utf-8', opener=_open_file_0640) as _file:
