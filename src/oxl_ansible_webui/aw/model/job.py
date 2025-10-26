@@ -16,6 +16,7 @@ from aw.utils.util import get_choice_key_by_value, get_choice_value_by_key, date
     datetime_from_db, pretty_timedelta_str
 from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED
 from aw.utils.db_handler import close_old_mysql_connections
+from aw.model.system import SSHHostkeyFile
 
 
 class JobError(BareModel):
@@ -82,7 +83,7 @@ class Job(BaseJob):
     form_fields = [
         'name', 'playbook_file', 'inventory_file', 'repository', 'schedule', 'enabled', 'limit', 'verbosity',
         'mode_diff', 'mode_check', 'tags', 'tags_skip', 'verbosity', 'comment', 'environment_vars', 'cmd_args',
-        'credentials_default', 'credentials_needed', 'credentials_category', 'owner',
+        'credentials_default', 'credentials_needed', 'credentials_category', 'owner', 'ssh_hostkey_file',
     ]
     CHANGE_FIELDS = form_fields.copy()
     CHANGE_FIELDS.extend(['execution_prompts', 'execution_prompts_json'])
@@ -116,6 +117,10 @@ class Job(BaseJob):
     owner = models.ForeignKey(
         USERS, on_delete=models.SET_NULL, null=True, default=1,
         related_name='job_fk_user', editable=False,
+    )
+
+    ssh_hostkey_file = models.ForeignKey(
+        SSHHostkeyFile, on_delete=models.SET_NULL, related_name='job_fk_sshhostkeyfile', **DEFAULT_NONE,
     )
 
     def __str__(self) -> str:

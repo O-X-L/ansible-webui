@@ -1,5 +1,4 @@
 from aw.config.main import config
-from aw.config.hardcoded import PATH_SSH_HOSTKEY_FILES
 
 ES = {
     # base
@@ -456,7 +455,6 @@ ES = {
     ## form help
     'ssh_hostkey.form.help.target': 'Dominio, IP o red de destino en formato CIDR',
     'ssh_hostkey.form.help.file': 'El nombre del archivo en el que se escribirán las claves de host SSH. '
-                                  'Esto puede ser útil para separar las claves de host entre entornos '
-                                  '(por ejemplo, interno y de producción). '
-                                  f'Se pueden encontrar en {PATH_SSH_HOSTKEY_FILES}/$FILE',
+                                  'Esto puede ser útil para separar las claves de host entre entornos. '
+                                  '(por ejemplo, interno y de producción)',
 }

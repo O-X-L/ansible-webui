@@ -1,5 +1,4 @@
 from aw.config.main import config
-from aw.config.hardcoded import PATH_SSH_HOSTKEY_FILES
 
 # todo: api-endpoint responses (add lang-code to api responses)
 
@@ -455,7 +454,6 @@ EN = {
     ## form help
     'ssh_hostkey.form.help.target': 'Target Domain, IP or Network in CIDR-format',
     'ssh_hostkey.form.help.file': 'The name of the file to write the SSH-hostkeys to. '
-                                  'This can be useful to separate hostkeys between environments '
-                                  '(p.e. internal and prod). '
-                                  f'They can be found at {PATH_SSH_HOSTKEY_FILES}/$FILE',
+                                  'This can be useful to separate hostkeys between environments. '
+                                  '(p.e. internal and prod)',
 }

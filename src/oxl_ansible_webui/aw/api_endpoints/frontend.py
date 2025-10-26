@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny
 from drf_spectacular.utils import extend_schema
 
 from aw.base import USERS
-from aw.model.system import SystemConfig
+from aw.model.system import SystemConfig, SSHHostkeyFile
 from aw.settings import AUTH_MODE
 from aw.utils.util import get_logo
 from aw.utils.version import get_version
@@ -26,6 +26,10 @@ def _choices_alert_plugins() -> list[tuple]:
     return [(p.id, p.name) for p in AlertPlugin.objects.all()]
 
 
+def _choices_ssh_hostkey_files() -> list[tuple]:
+    return [(f.id, f.name) for f in SSHHostkeyFile.objects.all()]
+
+
 FK_CHOICES = {
     AlertGlobal: {
         'plugin': _choices_alert_plugins,
@@ -40,6 +44,12 @@ FK_CHOICES = {
     JobPermission: {
         'users': choices_user,
         'groups': choices_group,
+    },
+    Job: {
+        'ssh_hostkey_file': _choices_ssh_hostkey_files,
+    },
+    Repository: {
+        'ssh_hostkey_file': _choices_ssh_hostkey_files,
     },
 }
 

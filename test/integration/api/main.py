@@ -138,7 +138,8 @@ def test_add():
         {'l': 'alert/user', 'd': {'name': 'usr1'}},
 
         # ssh hostkeys => expects local SSH-server on port 2222!
-        {'l': 'ssh-hostkey', 'd': {'target': 'localhost', 'port': 2222}, 'ci': True}
+        {'l': 'ssh-hostkey-file', 'd': {'name': 'test'}},
+        {'l': 'ssh-hostkey', 'd': {'target': 'localhost', 'port': 2222, 'file': 'test', 'comment': 'Test'}, 'ci': True},
     ])
 
 
@@ -175,7 +176,7 @@ def test_list():
     test_get_locations([
         'credentials', 'job', 'job_exec', 'key', 'permission', 'config', 'repository',
         'fs/exists?item=/etc', 'alert', 'alert/global', 'alert/group', 'alert/user', 'alert/plugin',
-        'environment', 'ssh-hostkey',
+        'environment', 'ssh-hostkey', 'ssh-hostkey-file',
     ])
 
 
@@ -191,6 +192,7 @@ def test_delete():
         'alert/user/1',
         # ssh hostkeys => expects local SSH-server on port 2222!
         # 'ssh-hostkey/127.0.0.1',
+        'ssh-hostkey-file/test',
     ])
 
 

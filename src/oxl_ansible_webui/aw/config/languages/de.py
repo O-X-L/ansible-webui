@@ -1,4 +1,3 @@
-from aw.config.hardcoded import PATH_SSH_HOSTKEY_FILES
 
 DE = {
     # base
@@ -101,7 +100,6 @@ DE = {
     ## form help
     'ssh_hostkey.form.help.target': 'Ziel-Domäne, IP oder Netzwerk im CIDR-Format',
     'ssh_hostkey.form.help.file': 'Der Name der Datei, in welche die SSH-Hostkeys geschrieben werden sollen. '
-                                  'Dies kann nützlich sein, um Hostschlüssel zwischen Umgebungen zu trennen '
-                                  '(z.B. intern and prod). '
-                                  f'Sie sind unter diesem Pfad zu finden: {PATH_SSH_HOSTKEY_FILES}/$DATEI',
+                                  'Dies kann nützlich sein, um Hostschlüssel zwischen Umgebungen zu trennen. '
+                                  '(z.B. intern and prod)',
 }

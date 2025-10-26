@@ -15,6 +15,7 @@ from aw.utils.handlers import AnsibleRepositoryError
 from aw.model.repository import Repository
 from aw.model.base import JOB_EXEC_STATUS_FAILED
 from aw.utils.db_handler import close_old_mysql_connections
+from aw.execute.ssh_hostkey import get_ssh_known_hosts_file
 
 
 class ExecuteRepository:
@@ -149,18 +150,15 @@ class ExecuteRepository:
             except IndexError:
                 pass
 
+        path_run_repo = self.get_path_run_repo()
+        path_run_repo.mkdir(mode=0o700, parents=True, exist_ok=True)
         if is_set(self.repository.git_credentials) and is_set(self.repository.git_credentials.ssh_key):
-            path_run_repo = self.get_path_run_repo()
-            path_run_repo.mkdir(mode=0o700, parents=True, exist_ok=True)
             write_pwd_file(credentials=self.repository.git_credentials, attr='ssh_key', path_run=path_run_repo)
             env['GIT_SSH_COMMAND'] += f" -i {get_pwd_file(path_run=path_run_repo, attr='ssh_key')}"
 
-        if is_set(config['path_ssh_known_hosts']):
-            if Path(config['path_ssh_known_hosts']).is_file():
-                env['GIT_SSH_COMMAND'] += f" -o UserKnownHostsFile={config['path_ssh_known_hosts']}"
-
-            else:
-                self._log_file_write('Ignoring known_hosts file because it does not exist')
+        ssh_known_hosts_file = get_ssh_known_hosts_file(self.repository, path_run=path_run_repo)
+        if ssh_known_hosts_file is not None:
+            env['GIT_SSH_COMMAND'] += f" -o UserKnownHostsFile={ssh_known_hosts_file}"
 
         if env['GIT_SSH_COMMAND'] == 'ssh':
             env.pop('GIT_SSH_COMMAND')

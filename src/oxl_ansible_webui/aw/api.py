@@ -9,7 +9,7 @@ from aw.api_endpoints.credentials import APIJobCredentials, APIJobSharedCredenti
     APIJobSharedCredentialsItem, APIJobUserCredentialsItem, APIJobUserCredentials, APIJobTMPCredentials
 from aw.api_endpoints.filesystem import APIFsBrowse, APIFsExists
 from aw.api_endpoints.system import APISystemConfig, APISystemEnvironment, APIUserPasswordChange, \
-    APISSHHostkey, APISSHHostkeyItem
+    APISSHHostkey, APISSHHostkeyItem, APISSHHostkeyFile, APISSHHostkeyFileItem
 from aw.api_endpoints.repository import APIRepository, APIRepositoryItem, APIRepositoryLogFile
 from aw.api_endpoints.alert import APIAlertPlugin, APIAlertPluginItem, APIAlertUser, APIAlertUserItem, \
     APIAlertGlobal, APIAlertGlobalItem, APIAlertGroup, APIAlertGroupItem, APIAlertAll
@@ -55,6 +55,8 @@ urlpatterns_api = [
     path('api/environment', APISystemEnvironment.as_view()),
     path('api/ssh-hostkey', APISSHHostkey.as_view()),
     path('api/ssh-hostkey/<str:host>', APISSHHostkeyItem.as_view()),
+    path('api/ssh-hostkey-file', APISSHHostkeyFile.as_view()),
+    path('api/ssh-hostkey-file/<str:name>', APISSHHostkeyFileItem.as_view()),
     path('api/user/password', APIUserPasswordChange.as_view()),
     path('api/fs/browse/<str:repository>', APIFsBrowse.as_view()),
     path('api/fs/exists', APIFsExists.as_view()),

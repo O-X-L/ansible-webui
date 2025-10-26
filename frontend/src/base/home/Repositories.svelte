@@ -21,7 +21,7 @@
     import {
         classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
         classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle, classFooterSpacing,
-        classSpoilerItem, classModalBody, classSpoilerPad,
+        classSpoilerItem, classSpoilerPad,
     } from '../Style.js';
  
     let { open = $bindable(false) } = $props();
@@ -65,6 +65,7 @@
         log_stdout_url: string|null,
         log_stderr: string|null,
         log_stderr_url: string|null,
+        ssh_hostkey_file: string|null,
     }
     interface repoLists {
         static: repoType[]
@@ -375,6 +376,14 @@
                                                     <button class="cursor-default">
                                                         <Radio class="inline-block" checked={repo.git_isolate}></Radio>
                                                     </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class={classPopoverColumn1}>
+                                                    {t('system.ssh_hostkey')}:
+                                                </td>
+                                                <td class={classPopoverColumn2Text}>
+                                                    {repo.ssh_hostkey_file ? repo.ssh_hostkey_file : '-'}
                                                 </td>
                                             </tr>
                                             <tr>

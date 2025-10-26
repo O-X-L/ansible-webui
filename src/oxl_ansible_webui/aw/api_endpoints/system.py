@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from oxl_utils.valid.dns import valid_domain
 
 from aw.config.main import config
-from aw.model.system import SystemConfig, get_config_from_db, SSHHostkeys
+from aw.model.system import SystemConfig, get_config_from_db, SSHHostkeys, SSHHostkeyFile
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, GenericErrorResponse, \
     HDR_CACHE_1W, response_data_if_changed, API_PARAM_HASH
 from aw.utils.util_no_config import is_set, is_null
@@ -225,6 +225,133 @@ class APIUserPasswordChange(APIView):
         return Response({'msg': 'Password updated'}, status=200)
 
 
+class APISSHHostkeyFileRequestResponse(serializers.ModelSerializer):
+    class Meta:
+        model = SSHHostkeyFile
+        fields = SSHHostkeyFile.api_fields_read
+
+
+class APISSHHostkeyFile(APIView):
+    http_method_names = ['get', 'post']
+    serializer_class = GenericResponse
+    permission_classes = API_PERMISSION
+
+    @staticmethod
+    @extend_schema(
+        request=None,
+        responses={
+            200: APISSHHostkeyFileRequestResponse,
+            404: OpenApiResponse(response=GenericErrorResponse, description='No SSH-hostkey files found'),
+        },
+        summary='Return existing SSH-hostkey files.',
+        operation_id='system_ssh_hostkey_file_view',
+        parameters=[API_PARAM_HASH],
+    )
+    def get(request):
+        try:
+            data =[
+                APISSHHostkeyFileRequestResponse(instance=entry).data
+                for entry in SSHHostkeyFile.objects.all()
+            ]
+            return response_data_if_changed(request, data=data)
+
+        except ObjectDoesNotExist:
+            pass
+
+        return Response(data={'error': 'No SSH-hostkey files found'}, status=404)
+
+    @extend_schema(
+        request=APISSHHostkeyFileRequestResponse,
+        responses={
+            200: OpenApiResponse(response=GenericResponse, description='SSH-Hostkey file created'),
+            400: OpenApiResponse(response=GenericErrorResponse, description='Invalid file-name provided'),
+            403: OpenApiResponse(response=GenericErrorResponse, description='Not privileged to manage SSH-hostkeys'),
+        },
+        summary='Create a SSH-hostkey file.',
+        operation_id='system_ssh_hostkey_file_create',
+    )
+    def post(self, request):
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='ssh_hostkey')
+        if not privileged:
+            return Response(
+                data={'error': 'Not privileged to manage SSH-hostkeys'},
+                status=403,
+            )
+
+        serializer = APISSHHostkeyFileRequestResponse(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(
+                data={'error': f"Provided SSH-Hostkey-file data is not valid: '{serializer.errors}'"},
+                status=400,
+            )
+
+        name = serializer.validated_data['name']
+        if name.find('/') != -1 or name.startswith('.'):
+            return Response({'error': 'Invalid file-name provided'}, status=400)
+
+        try:
+            o = serializer.save()
+            log_audit(
+                user=user,
+                title='SSH-Hostkey-file create',
+                msg=f"SSH-Hostkey-file created: ID '{o.id}', Name '{o.name}'",
+            )
+            return Response({
+                'msg': 'SSH-Hostkey-file created',
+                'id': o.id,
+            }, status=200)
+
+        except IntegrityError as err:
+            return Response(
+                data={'error': f"Provided SSH-Hostkey-file data is not valid: '{err}'"},
+                status=400,
+            )
+
+
+class APISSHHostkeyFileItem(APIView):
+    http_method_names = ['delete']
+    serializer_class = GenericResponse
+    permission_classes = API_PERMISSION
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(response=GenericResponse, description='SSH-Hostkey file deleted'),
+            403: OpenApiResponse(response=GenericErrorResponse, description='Not privileged to manage SSH-hostkeys'),
+            404: OpenApiResponse(response=GenericErrorResponse, description='SSH-hostkey file does not exist'),
+        },
+        summary='Delete one of the existing SSH-hostkey files and its related hosts.',
+        operation_id='system_ssh_hostkey_file_delete',
+    )
+    def delete(self, request, name: str):
+        user = get_api_user(request)
+        privileged = has_manager_privileges(user=user, kind='ssh_hostkey')
+        if not privileged:
+            return Response(
+                data={'error': 'Not privileged to manage SSH-hostkeys'},
+                status=403,
+            )
+
+        try:
+            result = SSHHostkeyFile.objects.get(name=name)
+
+            if result is not None:
+                result.delete()
+                log_audit(
+                    user=user,
+                    title='SSH-Hostkey-file delete',
+                    msg=f"SSH-Hostkey-file deleted: File '{result.name}'",
+                )
+                return Response(data={'msg': 'SSH-hostkey file deleted'}, status=200)
+
+        except ObjectDoesNotExist:
+            pass
+
+        return Response(data={'error': 'SSH-hostkey file not found'}, status=404)
+
+
 class APISSHHostkeyScanRequest(BaseResponse):
     target = serializers.CharField()  # Target to scan - an IP, Domain or Network in CIDR-format
     port = serializers.IntegerField(default=22)  # SSH port to scan
@@ -250,7 +377,7 @@ class APISSHHostkey(APIView):
             200: APISSHHostkeyQueryResponse,
             404: OpenApiResponse(response=GenericErrorResponse, description='No SSH-hostkeys found'),
         },
-        summary='Return SSH-hostkeys saved inside the database.',
+        summary='Return eisting SSH-hostkeys.',
         operation_id='system_ssh_hostkey_view',
         parameters=[API_PARAM_HASH],
     )

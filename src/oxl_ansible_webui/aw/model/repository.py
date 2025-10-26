@@ -5,6 +5,7 @@ from aw.config.hardcoded import SHORT_TIME_FORMAT
 from aw.model.base import BaseModel, DEFAULT_NONE, CHOICES_BOOL, CHOICES_JOB_EXEC_STATUS
 from aw.model.job_credential import JobSharedCredentials
 from aw.utils.util import get_choice_value_by_key, get_choice_key_by_value, datetime_from_db_str, is_null
+from aw.model.system import SSHHostkeyFile
 
 CHOICES_REPOSITORY = [
     (1, 'Static'),
@@ -17,14 +18,14 @@ class Repository(BaseModel):
         'name', 'git_origin', 'git_credentials', 'git_branch', 'git_isolate', 'git_lfs', 'git_limit_depth',
         'git_playbook_base',
         'git_hook_pre', 'git_hook_post', 'git_hook_cleanup', 'git_override_initialize', 'git_override_update',
-        'git_timeout',
+        'git_timeout', 'ssh_hostkey_file',
     ]
     form_fields_static = ['name', 'static_path']
     form_fields = [
         'name', 'rtype', 'static_path', 'git_origin', 'git_credentials', 'git_branch', 'git_isolate', 'git_lfs',
         'git_limit_depth', 'git_hook_pre', 'git_hook_post', 'git_hook_cleanup',
         'git_override_initialize', 'git_override_update',
-        'git_playbook_base', 'git_timeout',
+        'git_playbook_base', 'git_timeout', 'ssh_hostkey_file',
     ]
     api_fields_read = form_fields.copy()
     api_fields_read.extend([
@@ -60,6 +61,10 @@ class Repository(BaseModel):
         JobSharedCredentials, on_delete=models.SET_NULL, related_name='repo_fk_cred', null=True, blank=True,
     )
     git_timeout = models.PositiveSmallIntegerField(default=30)
+
+    ssh_hostkey_file = models.ForeignKey(
+        SSHHostkeyFile, on_delete=models.SET_NULL, related_name='repo_fk_sshhostkeyfile', **DEFAULT_NONE,
+    )
 
     @property
     def rtype_name(self) -> str:
