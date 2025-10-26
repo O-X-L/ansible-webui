@@ -1,4 +1,4 @@
-ARG AW_VERSION=0.0
+ARG AW_VERSION
 
 FROM oxlorg/ansible-webui-unprivileged:${AW_VERSION}-debian
 ARG AW_USER=aw

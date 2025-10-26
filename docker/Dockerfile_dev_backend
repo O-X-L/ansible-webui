@@ -1,13 +1,18 @@
-ARG AW_VERSION=0.0
-
 FROM python:3.12-slim AS aw
-ARG AW_VERSION
+ARG UID
+ARG AW_VERSION=0.0
+ARG AW_USER=aw
+
+COPY --chmod=0644 requirements.txt /etc/requirements.txt
 
 RUN apt-get update && \
     apt-get -y --no-install-recommends install git git-lfs openssh-client sshpass xmlsec1 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    mkdir -p /data/log
+    mkdir -p /data/log && \
+    useradd --uid ${UID} --user-group --shell /usr/sbin/nologin --home-dir /home/ansible-webui --create-home ${AW_USER} && \
+    chown ${AW_USER}:${AW_USER} /data/log && \
+    python3 -m pip install -r /etc/requirements.txt
 
 ENV AW_VERSION=${AW_VERSION}.dev \
     AW_DEV=1 \
@@ -22,9 +27,12 @@ ENV AW_VERSION=${AW_VERSION}.dev \
     DJANGO_SUPERUSER_EMAIL='ansible@localhost' \
     DEV_CLEAN=0 \
     DEV_INIT=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/ansible-webui/.local/bin
 WORKDIR /repo/test
 EXPOSE 8000
 
-COPY --chmod=0755 entrypoint_dev_backend.sh /entrypoint.sh
+COPY --chmod=0755 docker/entrypoint_dev_backend.sh /entrypoint.sh
+
+USER ${AW_USER}
 ENTRYPOINT ["/entrypoint.sh"]

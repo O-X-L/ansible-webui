@@ -10,16 +10,18 @@
   # build image
   docker build -f Dockerfile_dev_frontend -t aw-dev-fe --network=host --no-cache .
   # run whenever you want to re-build the JS-bundle
-  docker run -it --rm --network=host --volume "$(pwd)/..:/repo" aw-dev-fe
+  docker run -it --rm --name aw-dev-fe --network=host --volume "$(pwd)/..:/repo" aw-dev-fe
   ```
 
 * `Dockerfile_dev_backend` => initialize and run the Gunicorn/Django web service
 
   ```bash
   # build image
-  docker build -f Dockerfile_dev_backend -t aw-dev-be --network=host --no-cache .
+  docker build -f Dockerfile_dev_backend -t aw-dev-be --network=host --no-cache --build-arg "UID=$(id -u)" ..
   # start web-service
-  docker run -it --rm --network=host --volume "$(pwd)/..:/repo" aw-dev-be
+  docker run -it --rm --name aw-dev-be --network=host --volume "$(pwd)/..:/repo" aw-dev-be
+  # ad-hoc analysis while it is running
+  docker exec -it aw-dev-be /bin/bash
   ```
 
 ### End-Users

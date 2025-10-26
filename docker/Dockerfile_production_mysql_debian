@@ -1,4 +1,4 @@
-ARG AW_VERSION=0.0
+ARG AW_VERSION
 
 FROM python:3.12-slim AS builder_mysql
 

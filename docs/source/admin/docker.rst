@@ -82,7 +82,19 @@ It might make sense for you to mount these paths in the container:
 
 If you are running an :code:`unprivileged` image - you will have to allow the service-user to write to the directories. The UID needs to match!
 
-Basic example:
+To give AW the same filesystem-access as the user that builds the image - you can pass the UID:
+
+.. code-block:: bash
+
+    VERSION=0.9.0  # change to whatever release you want
+
+    git clone https://github.com/O-X-L/ansible-webui
+    cd $REPO/docker
+    docker build -f 'Dockerfile_production_unprivileged_debian' -t 'ansible-webui:local' --network host --build-arg "AW_VERSION=${VERSION}" --build-arg "AW_UID=$(id -u)" --no-cache .
+
+    docker image ls | grep 'ansible-webui'
+
+If you do not want to re-build the image you can also create a service-user on the host-system:
 
 .. code-block:: bash
 

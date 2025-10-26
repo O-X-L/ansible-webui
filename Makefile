@@ -1,13 +1,25 @@
 install:
 	bash scripts/install_dev.sh
 
-run-dev-init:
+run-dev-local-init:
 	bash scripts/run_dev.sh
 
-run-dev:
+run-dev-local:
 	bash scripts/run_dev.sh q
 
-run-staging:
+run-dev:
+	bash scripts/docker_dev.sh
+
+run-dev-fe:
+	bash scripts/docker_dev_fe.sh
+
+run-dev-be:
+	bash scripts/docker_dev_be.sh
+
+run-dev-be-noinit:
+	bash scripts/docker_dev_be.sh 0
+
+run-staging-local:
 	bash scripts/run_staging.sh
 
 lint:
@@ -37,10 +49,10 @@ test-db:
 test-auth:
 	bash scripts/test_auth_saml.sh
 
-build-fe:
+build-fe-local:
 	bash scripts/frontend/build.sh
 
-build-fe-auto:
+build-fe-local-auto:
 	bash scripts/frontend/run_updater.sh
 
 

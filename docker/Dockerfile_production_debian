@@ -1,4 +1,4 @@
-ARG AW_VERSION=0.0
+ARG AW_VERSION
 
 FROM oxlorg/ansible-webui-builder-fe:${AW_VERSION} AS builder
 

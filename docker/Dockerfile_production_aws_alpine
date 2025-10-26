@@ -1,4 +1,4 @@
-ARG AW_VERSION=0.0
+ARG AW_VERSION
 
 # BUILD: docker build -f Dockerfile_production_aws -t "oxlorg/ansible-webui-aws:<VERSION>" --build-arg "AW_VERSION=<VERSION>" --no-cache --progress=plain .
 

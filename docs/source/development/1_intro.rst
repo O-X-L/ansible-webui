@@ -29,6 +29,19 @@ Containerized
 
 We recommend to use the containerized/dockerized development environment.
 
+.. code-block:: bash
+
+   # basic (frontend & backend)
+   make run-dev
+
+   # build frontend bundle
+   make run-dev-fe
+
+   # run web service
+   make run-dev-be
+   ## without the init-steps
+   make run-dev-be-noinit
+
 For details see: `${REPO}/docker/README.md <https://github.com/O-X-L/ansible-webui/blob/latest/docker/README.md>`_
 
 ----
@@ -60,9 +73,9 @@ Frontend
 
 To build the frontend bundles - you can either run:
 
-* :code:`make run-dev` or :code:`bash ./scripts/run_dev.sh` for the full app
-* :code:`make build-fe-auto` or :code:`bash ./scripts/frontend/run_updater.sh` for automatic update whenever code changes
-* :code:`make build-fe` or :code:`bash ./scripts/frontend/build.sh` to build it once
+* :code:`make run-dev-local` or :code:`bash ./scripts/run_dev.sh` for the full app
+* :code:`make build-fe-local-auto` or :code:`bash ./scripts/frontend/run_updater.sh` for automatic update whenever code changes
+* :code:`make build-fe-local` or :code:`bash ./scripts/frontend/build.sh` to build it once
 
 The bundles are generated into :code:`src/oxl_ansible_webui/aw/static_dev` - django will use this statics-directory in dev-mode.
 
@@ -80,10 +93,10 @@ You can run the service in its development mode:
 .. code-block:: bash
 
     # first run (performs db-migrations on startup)
-    make run-dev-init
+    make run-dev-local-init
 
     # after db-init
-    make run-dev
+    make run-dev-local
 
     # or
     bash ${REPO}/scripts/run_dev.sh
