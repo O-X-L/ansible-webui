@@ -257,6 +257,7 @@ ANSIBLE_LOG_COLOR_MAP = {
     '\x1B[0;33m': '<span class="aw-log-change">',
     '\x1B[1;33m': '<span class="aw-log-change">',
     '\x1B[0;34m': '<span class="aw-log-debug">',
+    '\x1B[1;30m': '<span class="aw-log-debug">',
 }
 
 
