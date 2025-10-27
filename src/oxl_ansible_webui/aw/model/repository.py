@@ -104,7 +104,7 @@ class Repository(BaseModel):
         return f"/api/repository/log/{self.id}?type=stderr"
 
     def __str__(self) -> str:
-        if self.rtype_name == 'Git':
+        if self.rtype_name == REPOSITORY_TYPE_GIT:
             isolated = 'isolated ' if self.git_isolate else ''
             return f"{self.rtype_name.capitalize()} {isolated}repository - origin {self.git_origin}:{self.git_branch}"
 

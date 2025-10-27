@@ -11,10 +11,10 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParamet
 from aw.model.job import Job
 from aw.utils.debug import log
 from aw.utils.audit import log_audit
-from aw.model.repository import Repository
 from aw.utils.util import unset_or_null, is_set
 from aw.execute.repository import create_update_git_repo
 from aw.api_endpoints.job_util import get_log_file_content
+from aw.model.repository import Repository, REPOSITORY_TYPE_GIT
 from aw.utils.permission import has_manager_privileges, has_repository_permission, get_viewable_repositories
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE, \
     CHOICE_PERMISSION_EXECUTE
@@ -58,7 +58,7 @@ def repository_in_use(repo: Repository) -> bool:
 
 def validate_repository_types(repo: dict) -> (bool, str):
     rtype_name = Repository.rtype_name_from_id(repo['rtype'])
-    if rtype_name == 'Git':
+    if rtype_name == REPOSITORY_TYPE_GIT:
         try:
             if is_set(repo['git_override_initialize']) and is_set(repo['git_override_update']):
                 return True, ''

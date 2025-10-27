@@ -1,8 +1,8 @@
 from pathlib import Path
 from re import sub as regex_replace
 
-from aw.utils.util import is_set
 from aw.config.main import config
+from aw.utils.util import is_set, is_null
 from aw.model.repository import Repository, REPOSITORY_TYPE_STATIC, REPOSITORY_TYPE_GIT
 
 ISOLATE_MAIN = 'isolated'
@@ -11,7 +11,7 @@ ISOLATE_BROWSABLE = 'browse'
 
 
 def get_path_repo(repository: Repository, exec_id: (int, None) = None) -> Path:
-    if repository.rtype_name == REPOSITORY_TYPE_STATIC:
+    if is_null(repository) or repository.rtype_name == REPOSITORY_TYPE_STATIC:
         return Path(repository.static_path)
 
     safe_repo_name = str(repository.id) + '_'
