@@ -45,6 +45,7 @@ ara = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+exclude = ["*_pytest.py"]
 
 [tool.setuptools.package-data]
 "*" = ["*.html", "*.js", "*.css", "*.svg", "*.txt"]
