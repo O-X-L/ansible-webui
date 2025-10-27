@@ -12,6 +12,9 @@ def _get_and_create_custom_known_hosts_file(job_repo: (Job, Repository), path_ru
     if not is_set(job_repo.ssh_hostkey_file):
         return None
 
+    if not path_run.is_dir():
+        path_run.mkdir(mode=0o750, parents=True, exist_ok=True)
+
     custom_file = path_run / f'ssh_known_hosts_{job_repo.ssh_hostkey_file.name}'
     close_old_mysql_connections()
     hostkeys = SSHHostkeys.objects.filter(_file=job_repo.ssh_hostkey_file)

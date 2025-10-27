@@ -35,6 +35,8 @@ def _log_audit(job: Job, execution: JobExecution):
 def ansible_playbook(job: Job, execution: (JobExecution, None)):
     time_start = datetime_w_tz()
     path_run = get_path_run()
+    path_run.mkdir(mode=0o750, parents=True, exist_ok=True)
+
     if is_null(execution):
         execution = JobExecution(user=None, job=job, comment='Scheduled')
 
