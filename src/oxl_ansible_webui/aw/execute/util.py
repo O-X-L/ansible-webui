@@ -5,11 +5,11 @@ from re import sub as regex_replace
 from random import choice as random_choice
 
 from aw.config.main import config
-from aw.config.hardcoded import FILE_TIME_FORMAT
-from aw.utils.handlers import AnsibleConfigError
+from aw.utils.util import datetime_w_tz
 from aw.model.job import JobExecution, Job
 from aw.model.repository import Repository
-from aw.utils.util import datetime_w_tz
+from aw.config.hardcoded import FILE_TIME_FORMAT
+from aw.utils.handlers import AnsibleConfigError
 from aw.utils.db_handler import close_old_mysql_connections
 
 
@@ -61,7 +61,7 @@ def get_path_run() -> Path:
         path_run += '/'
 
     path_run += datetime.now().strftime(FILE_TIME_FORMAT)
-    path_run += ''.join(random_choice(digits) for _ in range(5))
+    path_run += '_' + ''.join(random_choice(digits) for _ in range(5))
     return Path(path_run)
 
 

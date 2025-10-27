@@ -76,7 +76,7 @@ def test_simple(jid: int = 1):
         'job',
         'post',
         {
-            'name': f'job{jid}', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/hosts.yml', 'limit': 'srv1',
+            'name': f'job{jid}', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/empty.yml', 'limit': 'srv1',
         }
     )
 
@@ -92,7 +92,7 @@ def test_simple(jid: int = 1):
     assert e['failed'] is False
     assert e['job_comment'] is None
     assert e['comment'] is None
-    assert e['command'] == 'ansible-playbook -i inv/hosts.yml --limit srv1 play1.yml'
+    assert e['command'] == 'ansible-playbook -i inv/empty.yml --limit srv1 play1.yml'
     assert e['log_stdout'] is not None
     assert Path(e['log_stdout']).is_file()
 
@@ -103,7 +103,7 @@ def test_params(jid: int = 2):
         'job',
         'post',
         {
-            'name': f'job{jid}', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/hosts.yml',
+            'name': f'job{jid}', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/empty.yml',
         }
     )
 
@@ -126,7 +126,7 @@ def test_params(jid: int = 2):
     assert e['status_name'] == 'Finished'
     assert e['failed'] is False
     assert e['comment'] == comment
-    assert e['command'] == f'ansible-playbook {cmd_args} --check --diff -i inv/hosts.yml play1.yml'
+    assert e['command'] == f'ansible-playbook {cmd_args} --check --diff -i inv/empty.yml play1.yml'
     assert e['log_stdout'] is not None
     assert Path(e['log_stdout']).is_file()
 
@@ -150,7 +150,7 @@ def test_params(jid: int = 2):
 
     assert e['status_name'] == 'Finished'
     assert e['failed'] is False
-    assert e['command'] == (f'ansible-playbook --check -i inv/hosts.yml --limit {limit} --tags {tags} '
+    assert e['command'] == (f'ansible-playbook --check -i inv/empty.yml --limit {limit} --tags {tags} '
                             f'--skip-tags {tags_skip} play1.yml')
 
 
@@ -160,7 +160,7 @@ def test_creds(jid: int = 3):
         'job',
         'post',
         {
-            'name': f'job{jid}', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/hosts.yml',
+            'name': f'job{jid}', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/empty.yml',
             'credentials_needed': True,
         }
     )
@@ -190,7 +190,7 @@ def test_creds(jid: int = 3):
     assert e['status_name'] == 'Finished'
     assert e['failed'] is False
     assert e['command'] == (f'ansible-playbook --ask-become-pass --become-user {become_user} --ask-pass '
-                            f'--user {connect_user} --ask-vault-pass -i inv/hosts.yml play1.yml')
+                            f'--user {connect_user} --ask-vault-pass -i inv/empty.yml play1.yml')
 
     assert e['log_stdout'] is not None
     assert Path(e['log_stdout']).is_file()
@@ -218,7 +218,7 @@ def test_repo_git(jid: int = 4):
         'job',
         'post',
         {
-            'name': f'job{jid}', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/hosts.yml',
+            'name': f'job{jid}', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/empty.yml',
             'repository': 1,
         }
     )

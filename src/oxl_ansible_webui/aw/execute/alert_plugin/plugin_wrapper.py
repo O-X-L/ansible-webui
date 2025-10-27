@@ -6,14 +6,15 @@ from os import remove as remove_file
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from aw.config.main import config
 from aw.base import USERS
 from aw.utils.debug import log
+from aw.config.main import config
 from aw.utils.subps import process
-from aw.utils.util import datetime_from_db, write_file_0600
-from aw.model.system import UserExtended
-from aw.settings import get_main_web_address
 from aw.model.job import JobExecution
+from aw.model.system import UserExtended
+from aw.utils.util import datetime_from_db
+from aw.settings import get_main_web_address
+from aw.utils.filesystem import write_file_0600
 from aw.model.alert import BaseAlert, AlertUser, AlertGroup
 from aw.utils.db_handler import close_old_mysql_connections
 

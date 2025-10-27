@@ -58,7 +58,7 @@ def test_add():
         }},
         {'l': 'repository', 'd': {'name': 'staticy1', 'rtype': 1, 'static_path': '/etc/ansible/repo'}},
         {'l': 'job', 'd': {
-            'name': 'job1', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/hosts.yml', 'tags': 'svc1',
+            'name': 'job1', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/empty.yml', 'tags': 'svc1',
             'limit': 'srv1',
         }},
     ])

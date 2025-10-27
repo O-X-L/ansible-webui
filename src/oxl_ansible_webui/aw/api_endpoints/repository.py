@@ -1,4 +1,3 @@
-from threading import Thread
 from pathlib import Path
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -9,18 +8,18 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
 
-from aw.model.repository import Repository
-from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user, LogDownloadResponse, api_docs_put, \
-    api_docs_delete, api_docs_post, validate_no_xss, GenericErrorResponse, response_data_if_changed, API_PARAM_HASH
-from aw.utils.permission import has_manager_privileges, has_repository_permission, get_viewable_repositories
 from aw.model.job import Job
-from aw.utils.util import unset_or_null, is_set, is_null
+from aw.utils.debug import log
+from aw.utils.audit import log_audit
+from aw.utils.util import unset_or_null, is_set
+from aw.execute.repository import create_update_git_repo
+from aw.api_endpoints.job_util import get_log_file_content
+from aw.model.repository import Repository, REPOSITORY_TYPE_GIT
+from aw.utils.permission import has_manager_privileges, has_repository_permission, get_viewable_repositories
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE, \
     CHOICE_PERMISSION_EXECUTE
-from aw.api_endpoints.job_util import get_log_file_content
-from aw.execute.repository import ExecuteRepository
-from aw.utils.audit import log_audit
-from aw.utils.debug import log
+from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user, LogDownloadResponse, api_docs_put, \
+    api_docs_delete, api_docs_post, validate_no_xss, GenericErrorResponse, response_data_if_changed, API_PARAM_HASH
 
 
 class RepositoryWriteRequest(serializers.ModelSerializer):
@@ -59,7 +58,7 @@ def repository_in_use(repo: Repository) -> bool:
 
 def validate_repository_types(repo: dict) -> (bool, str):
     rtype_name = Repository.rtype_name_from_id(repo['rtype'])
-    if rtype_name == 'Git':
+    if rtype_name == REPOSITORY_TYPE_GIT:
         try:
             if is_set(repo['git_override_initialize']) and is_set(repo['git_override_update']):
                 return True, ''
@@ -88,19 +87,6 @@ def build_repository(repo: Repository) -> dict:
         data['log_stderr_url'] = None
 
     return data
-
-
-def create_update_git_repo(repo: Repository):
-    if is_null(repo) or repo.rtype != 2:
-        return
-
-    def _create_update(r: Repository):
-        ExecuteRepository(r).create_or_update_repository()
-
-    Thread(
-        target=_create_update,
-        kwargs={'r': repo}
-    ).start()
 
 
 class APIRepository(APIView):
@@ -323,15 +309,19 @@ class APIRepositoryItem(GenericAPIView):
                         status=403,
                     )
 
-                create_update_git_repo(repo)
+                if create_update_git_repo(repo):
+                    log_audit(
+                        user=user,
+                        title='Repository download',
+                        msg=f"Repository downloaded: ID '{repo.id}', Name '{repo.name}'",
+                    )
+                    return Response(
+                        data={'msg': f"Repository '{repo.name}' update initiated", 'id': repo_id},
+                        status=200,
+                    )
 
-                log_audit(
-                    user=user,
-                    title='Repository download',
-                    msg=f"Repository downloaded: ID '{repo.id}', Name '{repo.name}'",
-                )
                 return Response(
-                    data={'msg': f"Repository '{repo.name}' update initiated", 'id': repo_id},
+                    data={'msg': f"Repository '{repo.name}' is static", 'id': repo_id},
                     status=200,
                 )
 

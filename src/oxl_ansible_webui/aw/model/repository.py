@@ -7,9 +7,11 @@ from aw.model.job_credential import JobSharedCredentials
 from aw.utils.util import get_choice_value_by_key, get_choice_key_by_value, datetime_from_db_str, is_null
 from aw.model.system import SSHHostkeyFile
 
+REPOSITORY_TYPE_STATIC = 'Static'
+REPOSITORY_TYPE_GIT = 'Git'
 CHOICES_REPOSITORY = [
-    (1, 'Static'),
-    (2, 'Git'),
+    (1, REPOSITORY_TYPE_STATIC),
+    (2, REPOSITORY_TYPE_GIT),
 ]
 
 
@@ -102,7 +104,7 @@ class Repository(BaseModel):
         return f"/api/repository/log/{self.id}?type=stderr"
 
     def __str__(self) -> str:
-        if self.rtype_name == 'Git':
+        if self.rtype_name == REPOSITORY_TYPE_GIT:
             isolated = 'isolated ' if self.git_isolate else ''
             return f"{self.rtype_name.capitalize()} {isolated}repository - origin {self.git_origin}:{self.git_branch}"
 
