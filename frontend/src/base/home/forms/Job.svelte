@@ -155,83 +155,197 @@
     })
 
     // autocomplete via api filesystem-browsing (playbook/inventory)
-    //   todo: browing not working for git-isolate enabled repo
     interface browseResponse {
         dirs: string[],
         files: string[],
     }
-    const classFsBrowse = 'bg-gray-100 dark:bg-gray-600 text-gray-800 p-2 dark:text-gray-50 text-sm ml-5 mt-1 mb-3 max-h-80 overflow-y-scroll rounded-b';
-    const classFsBrowseRow = 'block w-full text-left py-1 round';
-    const classFsBrowseItem = `${classFsBrowseRow} hover:bg-primary-200 dark:hover:bg-primary-600`;
+    const classDynChoices = 'bg-gray-100 dark:bg-gray-600 text-gray-800 p-2 dark:text-gray-50 text-sm ml-5 mt-1 mb-3 max-h-80 overflow-y-scroll rounded-b';
+    const classDynChoicesRow = 'block w-full text-left py-1 round';
+    const classDynChoicesItem = `${classDynChoicesRow} hover:bg-primary-200 dark:hover:bg-primary-600`;
 
     const fsBrowseNone = {dirs: [], files: []};
-    let fsBrowseActive: string = $state('');
-    let fsBrowseChoices: browseResponse = $state(fsBrowseNone);
+    let fsBrowseField: string = $state('');
+    let fsBrowseCurrentBase: string = $state('');
+    let fsBrowseChoices: browseResponse = $state(fsBrowseNone);  // cached full-list of dirs/files
+    let fsBrowseChoicesActive: browseResponse = $state(fsBrowseNone);  // list we actually show to the user; to be manipulated
 
-    function fsBrowseClick(f: string) {
-        fsBrowseClear();
-        if (fsBrowseActive == f) {
-            return;
-        }
+    function fsBrowseClick(f: 'playbook_file'|'inventory_file') {
+        fsBrowseClearActive();
         fsBrowse(f);
     }
 
-    function fsBrowseBase(full: string) : string {
-        let b = '';
-        let p = rsplit(full, '/');
-        if (p[1] && fsBrowseChoices.dirs.includes(p[1])) {
-            b = full;
+    function fsBrowse(f: 'playbook_file'|'inventory_file', event: Event|null = null) {
+        // validate current input and query new contents if required
+        fsBrowseField = f;
+        fsBrowseValidate(f);
+        let requireQuery = false;
 
-        } else if (p[0] != full || fsBrowseChoices.dirs.includes(p[0])) {
-            b = p[0];
+        // if we are new - no value was selected yet or we have not yet got an API response
+        if (!form[f].value || (fsBrowseChoices.files.length == 0 && fsBrowseChoices.dirs.length == 0)) {
+            requireQuery = true;
         }
-        return b;
+
+        // autocorrect
+        if (form[f].value.includes('//')) {
+            form[f].value = form[f].value.replaceAll('//', '/');
+        }
+
+        let base = fsBrowseBase(f);
+
+        // backspace - the user exited the child-directory; we need to re-query the parent-dir
+        if (base != fsBrowseCurrentBase) {
+            requireQuery = true;
+            fsBrowseCurrentBase = base;
+
+        }
+        // if the current input is a valid directory - append a slash and query its content
+        if (form[f].value != '' && base == form[f].value) {
+            if (!form[f].value.endsWith('/')) {
+                form[f].value += '/';
+            }
+            requireQuery = true;
+        }
+
+        if (requireQuery) {
+            fsBrowseQueryNew(f, base);
+
+        } else {
+            fsBrowseSubstringFilter(f);
+            if (event && event.data) {
+                // ignore backspace
+                fsBrowseAutoComplete(f);
+                fsBrowseValidate(f);
+            }
+        }
     }
 
-    function fsBrowse(f: string) {
-        let b = '';
-        b = fsBrowseBase(form[f].value);
-        if (b == form[f].value && !(form[f].value.slice(-1)[0] == '/') && form[f].value != '') {
-            form[f].value += '/';
+    function fsBrowseQueryNew(f: 'playbook_file'|'inventory_file', base: str|null = null) {
+        if (!base) {
+            base = fsBrowseBase(f);
         }
 
-        apiGet(`fs/browse/${form.repository.value||0}?base=${b}`, (j: any) => {fsBrowseUpdate(j, f)});
+        apiGet(
+            `fs/browse/${form.repository.value||0}?base=${base}`,
+            (j: any) => {fsBrowseUpdate(j, f)},
+        );
+    }
+
+    function fsBrowseSubstringFilter(f: 'playbook_file'|'inventory_file') {
+        // filter choices by sub-string
+        let [_, current] = fsBrowsePathCurrent(f);
+        if (!current) {
+            fsBrowseChoicesActive = JSON.parse(JSON.stringify(fsBrowseChoices));
+            return;
+        }
+
+        let newChoices: browseResponse = JSON.parse(JSON.stringify(fsBrowseNone));
+        for (let d of fsBrowseChoices.dirs) {
+            if (d.includes(current)) {
+                newChoices.dirs.push(d);
+            }
+        }
+        for (let f of fsBrowseChoices.files) {
+            if (f.includes(current)) {
+                newChoices.files.push(f);
+            }
+        }
+        fsBrowseChoicesActive = newChoices;
+    }
+
+    function fsBrowseAutoComplete(f: 'playbook_file'|'inventory_file') {
+        // autocomplete if only one option is left
+        if (fsBrowseChoicesActive.files.length == 0 && fsBrowseChoicesActive.dirs.length == 1) {
+            fsBrowseSetCurrent(f, fsBrowseChoicesActive.dirs[0] + '/');
+            fsBrowseQueryNew(f);
+
+        } else if (fsBrowseChoicesActive.files.length == 1 && fsBrowseChoicesActive.dirs.length == 0) {
+            fsBrowseSetCurrent(f, fsBrowseChoicesActive.files[0]);
+            fsBrowseChoicesActive.files = [];
+        }
+    }
+
+    function fsBrowseBase(f: 'playbook_file'|'inventory_file') : string {
+        // get directory-path without (partial-) files
+        let full = form[f].value;
+        let base = '';
+        let [path, current] = fsBrowsePathCurrent(f);
+
+        if (current && fsBrowseChoices.dirs.includes(current)) {
+            base = full;
+
+        } else if (path && (path != full || fsBrowseChoices.dirs.includes(path))) {
+            base = path;
+        }
+        return base;
+    }
+
+    function fsBrowsePathCurrent(f: 'playbook_file'|'inventory_file') : [string|null, string|null] {
+        let full = form[f].value;
+        if (!full.includes('/')) {
+            return [null, full];
+        }
+
+        let p = rsplit(full, '/');
+        return [p[0], p[1]];
+    }
+
+    function fsBrowseSetCurrent(f: 'playbook_file'|'inventory_file', current: string) {
+        let [path, _] = fsBrowsePathCurrent(f);
+        if (path) {
+            form[f].value = `${path}/${current}`;
+        } else {
+            form[f].value = current;
+        }
+    }
+
+    function fsBrowseClearActive() {
+        fsBrowseField = '';
+        fsBrowseChoicesActive = JSON.parse(JSON.stringify(fsBrowseNone));
     }
 
     function fsBrowseClear() {
-        fsBrowseActive = '';
+        fsBrowseClearActive();
         fsBrowseChoices = fsBrowseNone;
     }
 
-    function fsBrowseValidate(full: string) : inputColorType {
-        let p = rsplit(full, '/');
-        if ((p[0] && fsBrowseChoices.files.includes(p[0])) || (p[1] && fsBrowseChoices.files.includes(p[1]))) {
-            fsBrowseClear();
-            return 'green';
-        } else if (full != '') {
-            return 'red';
+    function fsBrowseValidate(f: 'playbook_file'|'inventory_file') {
+        // checks if the current input (without base-path) is a valid choice
+        let [path, current] = fsBrowsePathCurrent(f);
+
+        console.log(
+            path,
+            (path && fsBrowseChoices.files.includes(path)),
+            current,
+            (current && fsBrowseChoices.files.includes(current)),
+        )
+        if ((path && fsBrowseChoices.files.includes(path)) || (current && fsBrowseChoices.files.includes(current))) {
+            fsBrowseClearActive();
+            form[f].color = 'green';
+        } else if (form[f].value != '') {
+            form[f].color = 'red';
         } else {
-            return inputBaseColor;
+            form[f].color = inputBaseColor;
         }
     }
 
-    function fsBrowseUpdate(j: any, f: string) {
-        fsBrowseActive = f;
+    function fsBrowseUpdate(j: any, f: 'playbook_file'|'inventory_file') {
+        fsBrowseField = f;
         if (j.error) {
             return;
         }
-        fsBrowseChoices.files = j.files.sort()
-        fsBrowseChoices.dirs = j.dirs.sort()
-
-        form[f].color = fsBrowseValidate(form[f].value);
+        fsBrowseChoices = j;
+        fsBrowseChoicesActive = JSON.parse(JSON.stringify(fsBrowseChoices));
     }
 
-    function fsBrowseSelect(f: string, c: string) {
+    function fsBrowseSelect(f: 'playbook_file'|'inventory_file', c: string) {
         let p = rsplit(form[f].value, '/');
-        if (p[1] == null && !fsBrowseChoices.dirs.includes(p[0])) {
+        let path = p[0];
+        let current = p[1];
+
+        if ((!path) || (!current && !fsBrowseChoices.dirs.includes(path))) {
             form[f].value = c;
         } else {
-            form[f].value = `${p[0]}/${c}`;
+            form[f].value = `${path}/${c}`;
         }
 
         fsBrowse(f);
@@ -459,25 +573,26 @@
                     <div class={classModalInput}>
                         <Label for="job_pb" class={classModalLabel}>{t('jobs.form.playbook_file')}</Label>
                         <Input id="job_pb" bind:value={form.playbook_file.value} bind:color={form.playbook_file.color}
-                            on:input={valideInput} on:blur={valideInput} required={form.playbook_file.required}
-                            on:input={() => {fsBrowse('playbook_file')}}
+                            required={form.playbook_file.required}
+                            on:blur={() => {fsBrowseValidate('playbook_file')}}
+                            on:input={(event) => {fsBrowse('playbook_file', event)}}
                             on:click={() => {fsBrowseClick('playbook_file')}} />
-                        {#if fsBrowseActive == 'playbook_file'}
-                            <div class={classFsBrowse}>
-                                {#each fsBrowseChoices.files as c}
-                                    <button type="button" class={classFsBrowseItem}
+                        {#if fsBrowseField == 'playbook_file'}
+                            <div class={classDynChoices}>
+                                {#each fsBrowseChoicesActive.files as c}
+                                    <button type="button" class={classDynChoicesItem}
                                         onclick={(e) => {fsBrowseSelect('playbook_file', c)}}>
                                         <FileSolid class="inline-block" /> {c}
                                     </button>
                                 {/each}
-                                {#each fsBrowseChoices.dirs as c}
-                                    <button type="button" class={classFsBrowseItem}
+                                {#each fsBrowseChoicesActive.dirs as c}
+                                    <button type="button" class={classDynChoicesItem}
                                         onclick={(e) => {fsBrowseSelect('playbook_file', c)}}>
                                         <FolderSolid class="inline-block" /> {c}
                                     </button>
                                 {/each}
-                                {#if !fsBrowseChoices.dirs.length && !fsBrowseChoices.files.length}
-                                    <div class="{classFsBrowseRow} cursor-wait">
+                                {#if !fsBrowseChoicesActive.dirs.length && !fsBrowseChoicesActive.files.length}
+                                    <div class="{classDynChoicesRow} cursor-wait">
                                         - {t('jobs.form.file_browse.empty')} -
                                     </div>
                                 {/if}
@@ -489,24 +604,25 @@
                         <Label for="job_inv" class={classModalLabel}>{t('jobs.form.inventory_file')}</Label>
                         <Input id="job_inv"
                             bind:value={form.inventory_file.value} bind:color={form.inventory_file.color}
-                            on:input={() => {fsBrowse('inventory_file')}}
+                            on:blur={() => {fsBrowseValidate('inventory_file')}}
+                            on:input={(event) => {fsBrowse('inventory_file', event)}}
                             on:click={() => {fsBrowseClick('inventory_file')}} />
-                        {#if fsBrowseActive == 'inventory_file'}
-                            <div class={classFsBrowse}>
-                                {#each fsBrowseChoices.files as c}
-                                    <button type="button" class={classFsBrowseItem}
+                        {#if fsBrowseField == 'inventory_file'}
+                            <div class={classDynChoices}>
+                                {#each fsBrowseChoicesActive.files as c}
+                                    <button type="button" class={classDynChoicesItem}
                                         onclick={(e) => {fsBrowseSelect('inventory_file', c)}}>
                                         <FileSolid class="inline-block" /> {c}
                                     </button>
                                 {/each}
-                                {#each fsBrowseChoices.dirs as c}
-                                    <button type="button" class={classFsBrowseItem}
+                                {#each fsBrowseChoicesActive.dirs as c}
+                                    <button type="button" class={classDynChoicesItem}
                                         onclick={(e) => {fsBrowseSelect('inventory_file', c)}}>
                                         <FolderSolid class="inline-block" /> {c}
                                     </button>
                                 {/each}
-                                {#if !fsBrowseChoices.dirs.length && !fsBrowseChoices.files.length}
-                                    <div class="{classFsBrowseRow} cursor-wait">
+                                {#if !fsBrowseChoicesActive.dirs.length && !fsBrowseChoicesActive.files.length}
+                                    <div class="{classDynChoicesRow} cursor-wait">
                                         - {t('jobs.form.file_browse.empty')} -
                                     </div>
                                 {/if}

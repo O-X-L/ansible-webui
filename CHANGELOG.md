@@ -27,6 +27,7 @@ Features:
 * Security: Clean temporary job-credentials before starting job
 * API & Frontend to add and manage SSH-hostkeys [#77](https://github.com/O-X-L/ansible-webui/issues/77), [#6](https://github.com/O-X-L/ansible-webui/issues/6)
 * API & Form-integration for inventory-list (limit-field suggestions) [#78](https://github.com/O-X-L/ansible-webui/issues/78), [#29](https://github.com/O-X-L/ansible-webui/issues/29)
+* Playbook- & Inventory-File autocomplete and filtering [#69](https://github.com/O-X-L/ansible-webui/issues/69)
 
 ----
 
