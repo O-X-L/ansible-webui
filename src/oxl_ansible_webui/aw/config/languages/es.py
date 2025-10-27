@@ -172,10 +172,6 @@ ES = {
     'jobs.form.help.credentials_category': 'La categoría de credenciales se puede utilizar para la coincidencia dinámica de '
                                            'credenciales de usuario en el momento de la ejecución',
     'jobs.form.help.enabled': 'Activar o desactivar la programación. Se puede ignorar si no se ha establecido ninguna programación',
-    'jobs.form.help.execution_prompts_required': 'Atributos y/o variables del trabajo necesarios para solicitar en la ejecución personalizada. '
-                                                 'Lista separada por comas de pares clave-valor.<br>'
-                                                 "Las variables se pueden proporcionar de la siguiente manera: 'var={VAR-NAME}#{DISPLAY-NAME}'<br>"
-                                                 "Ejemplo: 'límite,comprobación,var=add_user #Usuario que añadir' ",
     'jobs.form.help.prompt_choices': 'Lista de opciones separadas por comas.',
     'jobs.form.help.prompt_regex': 'Puede usar <a href="https://regex101.com/">Regex101.com</a> para comprobar la validación de sus entradas. '
                                    'Asegúrate de seleccionar el "ECMAScript (Javascript)" sabor.',

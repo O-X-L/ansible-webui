@@ -127,7 +127,7 @@ EN = {
     'jobs.form.mode_check': 'Check Mode (Try Run)',
     'jobs.form.environment_vars': 'Environmental Variables',
     'jobs.form.cmd_args': 'Commandline Arguments',
-    'jobs.form.credentials_needed': 'Needs Credentials',
+    'jobs.form.credentials_needed': 'Credentials required',
     'jobs.form.credentials_default': 'Default Job Credentials',
     'jobs.form.credentials_category': 'Credentials Category',
     'jobs.form.execution_prompts': 'Execution Prompts',
@@ -151,7 +151,7 @@ EN = {
                                      'intro_inventory.html">Ansible Docs - Inventory</a>',
     'jobs.form.help.repository': 'Used to define the static or dynamic source of your playbook directory structure. '
                                  f"Default is '{config['path_play']}'",
-    'jobs.form.help.limit': 'Ansible inventory hosts or groups to limit the execution to.'
+    'jobs.form.help.limit': 'Ansible inventory hosts or groups to limit the execution to. '
                             'For details see: '
                             '<a href="https://docs.ansible.com/ansible/latest/inventory_guide/intro_patterns.html">'
                             'Ansible Docs - Limit</a>',
@@ -174,10 +174,6 @@ EN = {
     'jobs.form.help.credentials_category': 'The credential category can be used for dynamic matching of '
                                            'user credentials at execution time',
     'jobs.form.help.enabled': 'En- or disable the schedule. Can be ignored if no schedule was set',
-    'jobs.form.help.execution_prompts_required': 'Required job attributes and/or variables to prompt at custom execution. '
-                                                 'Comma-separated list of key-value pairs.<br>'
-                                                 "Variables can be supplied like so: 'var={VAR-NAME}#{DISPLAY-NAME}'<br>"
-                                                 "Example: 'limit,check,var=add_user#User to add' ",
     'jobs.form.help.prompt_choices': 'Comma-separated list of choices.',
     'jobs.form.help.prompt_regex': 'You can use <a href="https://regex101.com/">Regex101.com</a> to test your input-validation. '
                                    'Make sure to select the "ECMAScript (Javascript)" flavor.',
@@ -259,7 +255,7 @@ EN = {
     'repos.form.help.git_lfs': 'En- or disable checkout of Git-LFS files',
     'repos.form.help.git_isolate': 'En- or disable if one clone of the Git-repository should be used for all jobs. '
                                    'If enabled - the repository will be cloned/fetched on every job execution. '
-                                   'This will have a negative impact on performance',
+                                   'This introduces a delay before the job starts (depending on the repository-size)',
     'repos.form.help.git_hook_pre': 'Commands to execute before initializing/updating the repository. '
                                     'Comma-separated list of shell-commands',
     'repos.form.help.git_hook_post': 'Commands to execute after initializing/updating the repository. '

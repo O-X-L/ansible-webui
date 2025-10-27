@@ -31,6 +31,7 @@ Features:
 * API & Form-integration for inventory-list (limit-field suggestions) [#78](https://github.com/O-X-L/ansible-webui/issues/78), [#29](https://github.com/O-X-L/ansible-webui/issues/29)
 * Playbook- & Inventory-File autocomplete and filtering [#69](https://github.com/O-X-L/ansible-webui/issues/69)
 * UI: Lowered table-row height for better overview
+* UI: German translations
 
 ----
 
