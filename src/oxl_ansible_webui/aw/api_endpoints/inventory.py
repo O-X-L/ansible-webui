@@ -56,7 +56,7 @@ class APIInventoryList(APIView):
         ],
     )
     def get(request):
-        # pylint: disable=R0912,R0801
+        # pylint: disable=R0912,R0801,R0914,R0915
         inventory = request.GET.get('inventory', None)
         if inventory is None:
             return Response(data={'error': 'Inventory file is required'}, status=400)

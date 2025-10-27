@@ -10,8 +10,11 @@ ISOLATE_MAIN = 'isolated'
 ISOLATE_BROWSABLE = 'browse'
 
 
-def get_path_repo(repository: Repository, exec_id: (int, None) = None) -> Path:
-    if is_null(repository) or repository.rtype_name == REPOSITORY_TYPE_STATIC:
+def get_path_repo(repository: Repository, exec_id: (int, None) = None) -> (Path, None):
+    if is_null(repository):
+        return None
+
+    if repository.rtype_name == REPOSITORY_TYPE_STATIC:
         return Path(repository.static_path)
 
     safe_repo_name = str(repository.id) + '_'
@@ -43,6 +46,9 @@ def get_path_play(repository: (None, Repository) = None, exec_id: (None, int) = 
         return Path(config['path_play'])
 
     path_play = get_path_repo(repository=repository, exec_id=exec_id)
+    if path_play is None:
+        return None
+
     if repository.rtype_name == REPOSITORY_TYPE_GIT and is_set(repository.git_playbook_base):
         path_play = path_play / repository.git_playbook_base
 
