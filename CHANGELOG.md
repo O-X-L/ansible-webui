@@ -18,6 +18,7 @@ Fixes:
 * Log-color for higher-verbosity [#74](https://github.com/O-X-L/ansible-webui/issues/74)
 * Alert-plugin error for users that have never logged-in [#73](https://github.com/O-X-L/ansible-webui/issues/73)
 * Create missing directories [#72](https://github.com/O-X-L/ansible-webui/issues/72)
+* Security: Pass git authentication-secret via env-var instead of cli-arg [#76](https://github.com/O-X-L/ansible-webui/issues/76)
 
 Features:
 

@@ -16,9 +16,12 @@ from aw.utils.db_handler import close_old_mysql_connections
 from aw.execute.ssh_hostkey import get_ssh_known_hosts_file
 from aw.utils.repository import get_path_repo, get_path_play
 from aw.model.repository import Repository, REPOSITORY_TYPE_STATIC
-from aw.config.hardcoded import REPO_CLONE_TIMEOUT, FILE_TIME_FORMAT
 from aw.execute.play_credentials import write_pwd_file, get_pwd_file
 from aw.execute.util import update_status, create_dirs, get_path_run
+from aw.config.hardcoded import REPO_CLONE_TIMEOUT, FILE_TIME_FORMAT, SECRET_HIDDEN_PLAIN
+
+
+ENV_VAR_GIT_SECRET = 'AW_GIT_SECRET'
 
 
 class ExecuteRepository:
@@ -107,9 +110,15 @@ class ExecuteRepository:
             update_status(self.repository, status='Running')
             self.path_run.mkdir(mode=0o700, parents=True, exist_ok=True)
 
+            self._log_file_write(f"PATH: {self._path_repo}")
+
             env = self._git_env()
             if len(env) > 0:
-                self._log_file_write(f"USING ENVIRONMENT: {env}")
+                env_str = str(env)
+                if ENV_VAR_GIT_SECRET in env:
+                    env_str = env_str.replace(env[ENV_VAR_GIT_SECRET], SECRET_HIDDEN_PLAIN)
+
+                self._log_file_write(f"USING ENVIRONMENT: {env_str}")
 
             self._run_repo_hooks(cmds=self.repository.git_hook_pre, env=env)
 
@@ -124,6 +133,9 @@ class ExecuteRepository:
             self._run_repo_hooks(cmds=self.repository.git_hook_post, env=env)
 
             update_status(self.repository, status='Finished')
+
+        except AnsibleRepositoryError:
+            raise
 
         # pylint: disable=W0718
         except Exception as err:
@@ -149,9 +161,13 @@ class ExecuteRepository:
             except IndexError:
                 pass
 
-        if is_set(self.repository.git_credentials) and is_set(self.repository.git_credentials.ssh_key):
-            write_pwd_file(credentials=self.repository.git_credentials, attr='ssh_key', path_run=self.path_run)
-            env['GIT_SSH_COMMAND'] += f" -i {get_pwd_file(path_run=self.path_run, attr='ssh_key')}"
+        if is_set(self.repository.git_credentials):
+            if is_set(self.repository.git_credentials.ssh_key):
+                write_pwd_file(credentials=self.repository.git_credentials, attr='ssh_key', path_run=self.path_run)
+                env['GIT_SSH_COMMAND'] += f" -i {get_pwd_file(path_run=self.path_run, attr='ssh_key')}"
+
+            if is_set(self.repository.git_credentials.connect_pass):
+                env[ENV_VAR_GIT_SECRET] = self.repository.git_credentials.connect_pass
 
         ssh_known_hosts_file = get_ssh_known_hosts_file(self.repository, path_run=self.path_run)
         if ssh_known_hosts_file is not None:
@@ -194,10 +210,13 @@ class ExecuteRepository:
         result = process(cmd=cmd, cwd=self._path_repo, env=env, shell=True, timeout_sec=REPO_CLONE_TIMEOUT)
         self._log_file_write(f"COMMAND: {cmd}\n{result['stdout']}")
         if result['rc'] != 0:
+            if result['stdout'].strip() != '':
+                self._log_file_write(result['stdout'])
+
             self._error(
                 f"Repository command failed: '{cmd}'\n"
-                f"Got error: '{result['stderr']}'\n"
-                f"Got output: '{result['stdout']}'"
+                f"{result['stdout']}\n"
+                f"{result['stderr']}"
             )
 
     def _run_repo_hooks(self, cmds: str, env: dict):
@@ -208,24 +227,26 @@ class ExecuteRepository:
     def _git_origin_with_credentials(self) -> str:
         origin = self.repository.git_origin
 
-        if is_set(self.repository.git_credentials):
-            credentials = self.repository.git_credentials
+        if not is_set(self.repository.git_credentials):
+            return origin
 
-            if origin.find('://') != -1 and origin.find('ssh://') == -1:
-                # not ssh
-                if origin.find('@') == -1:
-                    proto, origin_host = origin.split('://', 1)
-                    if is_set(credentials.connect_user) and is_set(credentials.connect_pass):
-                        origin = f'{proto}://{credentials.connect_user}:{credentials.connect_pass}@{origin_host}'
+        credentials = self.repository.git_credentials
 
-                    elif is_set(credentials.connect_pass):
-                        # token authentication
-                        origin = f'{proto}://{credentials.connect_pass}@{origin_host}'
+        if origin.find('://') != -1 and origin.find('ssh://') == -1:
+            # not ssh
+            if origin.find('@') == -1:
+                proto, origin_host = origin.split('://', 1)
+                if is_set(credentials.connect_user) and is_set(credentials.connect_pass):
+                    origin = f'{proto}://{credentials.connect_user}:${{{ENV_VAR_GIT_SECRET}}}@{origin_host}'
 
-            else:
-                # ssh
-                if origin.find('@') == -1 and is_set(credentials.connect_user):
-                    origin = f'{credentials.connect_user}@{origin}'
+                elif is_set(credentials.connect_pass):
+                    # token authentication
+                    origin = f'{proto}://${{{ENV_VAR_GIT_SECRET}}}@{origin_host}'
+
+        else:
+            # ssh
+            if origin.find('@') == -1 and is_set(credentials.connect_user):
+                origin = f'{credentials.connect_user}@{origin}'
 
         return origin
 
