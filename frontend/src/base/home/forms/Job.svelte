@@ -3,10 +3,11 @@
 
     import {
         FolderSolid, FileSolid, CloseCircleSolid, TrashBinSolid, FloppyDiskSolid, CirclePlusSolid,
+        ServerSolid, InfoCircleSolid,
     } from 'flowbite-svelte-icons';
     import {
         Heading, Button, Input, Label, Helper, Toggle, Select, Spinner, Tooltip,
-        AccordionItem, Accordion,  // Modal
+        AccordionItem, Accordion, Popover,
     } from 'flowbite-svelte';
 
     import Modal from '../../../flowbite-custom/Modal.svelte';
@@ -26,7 +27,7 @@
     import {
         classModalBackdrop, classModalLabel, classModalHelp, classModalBtns, classModalForm,
         classModalInputDiv, classCenterChildDiv, classModalInput, classSpinnerDiv, classSpoilerItem,
-        classModalDialog, classModalBody, classSpoilerPad,
+        classModalDialog, classModalBody, classSpoilerPad, classPopover, classPopoverTitle,
     } from '../../Style.js';
 
     let componentRoot;
@@ -186,7 +187,7 @@
         }
 
         // autocorrect
-        if (form[f].value.includes('//')) {
+        if (form[f].value && form[f].value.includes('//')) {
             form[f].value = form[f].value.replaceAll('//', '/');
         }
 
@@ -196,8 +197,8 @@
         if (base != fsBrowseCurrentBase) {
             requireQuery = true;
             fsBrowseCurrentBase = base;
-
         }
+
         // if the current input is a valid directory - append a slash and query its content
         if (form[f].value != '' && base == form[f].value) {
             if (!form[f].value.endsWith('/')) {
@@ -219,7 +220,7 @@
         }
     }
 
-    function fsBrowseQueryNew(f: 'playbook_file'|'inventory_file', base: str|null = null) {
+    function fsBrowseQueryNew(f: 'playbook_file'|'inventory_file', base: string|null = null) {
         if (!base) {
             base = fsBrowseBase(f);
         }
@@ -232,7 +233,7 @@
 
     function fsBrowseSubstringFilter(f: 'playbook_file'|'inventory_file') {
         // filter choices by sub-string
-        let [_, current] = fsBrowsePathCurrent(f);
+        let [_, current] = fsBrowseGetPathCurrent(f);
         if (!current) {
             fsBrowseChoicesActive = JSON.parse(JSON.stringify(fsBrowseChoices));
             return;
@@ -268,7 +269,7 @@
         // get directory-path without (partial-) files
         let full = form[f].value;
         let base = '';
-        let [path, current] = fsBrowsePathCurrent(f);
+        let [path, current] = fsBrowseGetPathCurrent(f);
 
         if (current && fsBrowseChoices.dirs.includes(current)) {
             base = full;
@@ -279,8 +280,11 @@
         return base;
     }
 
-    function fsBrowsePathCurrent(f: 'playbook_file'|'inventory_file') : [string|null, string|null] {
+    function fsBrowseGetPathCurrent(f: 'playbook_file'|'inventory_file') : [string|null, string|null] {
         let full = form[f].value;
+        if (!full) {
+            return [null, null];
+        }
         if (!full.includes('/')) {
             return [null, full];
         }
@@ -290,7 +294,7 @@
     }
 
     function fsBrowseSetCurrent(f: 'playbook_file'|'inventory_file', current: string) {
-        let [path, _] = fsBrowsePathCurrent(f);
+        let [path, _] = fsBrowseGetPathCurrent(f);
         if (path) {
             form[f].value = `${path}/${current}`;
         } else {
@@ -310,14 +314,12 @@
 
     function fsBrowseValidate(f: 'playbook_file'|'inventory_file') {
         // checks if the current input (without base-path) is a valid choice
-        let [path, current] = fsBrowsePathCurrent(f);
+        let [path, current] = fsBrowseGetPathCurrent(f);
 
-        console.log(
-            path,
-            (path && fsBrowseChoices.files.includes(path)),
-            current,
-            (current && fsBrowseChoices.files.includes(current)),
-        )
+        if (fsBrowseChoices.files.length == 0 && fsBrowseChoices.dirs.length == 0) {
+            return;
+        }
+
         if ((path && fsBrowseChoices.files.includes(path)) || (current && fsBrowseChoices.files.includes(current))) {
             fsBrowseClearActive();
             form[f].color = 'green';
@@ -349,6 +351,197 @@
         }
 
         fsBrowse(f);
+    }
+
+    // autocomplete via api inventory-listing (limit)
+    interface inventoryListResponse {
+        hosts: string[],
+        groups: string[],
+        members: any,
+        ansible_hosts: any,
+    }
+
+    const inventoryListNone = {hosts: [], groups: [], members: {}, ansible_hosts: {}};
+    let inventoryListLoad: boolean = $state(false);
+    let inventoryListChoices: inventoryListResponse = $state(inventoryListNone);
+    let inventoryListChoicesActive: inventoryListResponse = $state(inventoryListNone);
+    let inventoryCurrentRepo: number = $state(0);
+    let inventoryCurrentFile: string = $state('');
+
+    function inventoryList(event: Event|null = null) {
+        if (!form.inventory_file.value) {
+            return;
+        }
+
+        inventoryListValidate();
+
+        // autocorrect
+        if (form.limit.value && form.limit.value.includes(',,')) {
+            form.limit.value = form.limit.value.replaceAll(',,', ',');
+        }
+
+        inventoryListSubstringFilter();
+        if (event && event.data) {
+            // ignore backspace
+            inventoryListAutoComplete();
+        }
+        inventoryListQueryNew();
+    }
+
+    function inventoryListSubstringFilter() {
+        // filter choices by sub-string
+        let limits = inventoryListGet();
+        if (limits.length == 0 || form.limit.value.endsWith(',')) {
+            inventoryListChoicesActive = JSON.parse(JSON.stringify(inventoryListChoices));
+            return;
+        }
+        let current = limits.pop();
+        if (!current) {
+            return;
+        }
+
+        let newChoices: inventoryListResponse = JSON.parse(JSON.stringify(inventoryListNone));
+        for (let g of inventoryListChoices.groups) {
+            if (g.includes(current) && !limits.includes(g)) {
+                newChoices.groups.push(g);
+            }
+        }
+        for (let h of inventoryListChoices.hosts) {
+            if (h.includes(current) && !limits.includes(h)) {
+                newChoices.hosts.push(h);
+            }
+        }
+        inventoryListChoicesActive = newChoices;
+    }
+
+    function inventoryListAutoComplete() {
+        // autocomplete if only one option is left
+        if (inventoryListChoicesActive.hosts.length == 0 && inventoryListChoicesActive.groups.length == 1) {
+            inventoryListSetCurrent(inventoryListChoicesActive.groups[0]);
+            inventoryListChoicesActive.groups = [];
+
+        } else if (inventoryListChoicesActive.hosts.length == 1 && inventoryListChoicesActive.groups.length == 0) {
+            inventoryListSetCurrent(inventoryListChoicesActive.hosts[0]);
+            inventoryListChoicesActive.hosts = [];
+        }
+    }
+
+    function inventoryListQueryNew() {
+        // we do not have to re-query the same inventory
+        let requireQuery = false;
+
+        // inventory has changed
+        if (form.inventory_file.value != inventoryCurrentFile) {
+            requireQuery = true;
+            inventoryCurrentFile = form.inventory_file.value;
+        }
+        // repo has changed
+        if (!form.repository.value) {
+            inventoryCurrentRepo = 0;
+        } else if (form.repository.value != inventoryCurrentRepo) {
+            requireQuery = true;
+            inventoryCurrentRepo = form.repository.value;
+        }
+
+        if (!requireQuery) {
+            return;
+        }
+   
+        inventoryListLoad = true;
+        apiGet(
+            `inventory/list?limit=all&inventory=${form.inventory_file.value}&repository=${form.repository.value||0}`,
+            (j: any) => {inventoryListUpdate(j)},
+        );
+    }
+
+    function inventoryListUpdate(j: any) {
+        if (j.error) {
+            return;
+        }
+
+        inventoryListChoices = j
+        inventoryListChoicesActive = JSON.parse(JSON.stringify(inventoryListChoices))
+
+        inventoryListLoad = false;
+        inventoryListValidate();
+    }
+
+    function inventoryListGet() : string[] {
+        if (!form.limit.value) {
+            return [];
+        }
+        return form.limit.value.split(',').filter(e => e !== '');
+    }
+
+    function inventoryListSetCurrent(current: string) {
+        let limits = inventoryListGet();
+        if (limits.length == 0) {
+            form.limit.value = current;
+            inventoryListValidate();
+            return;
+        }
+        if (limits.includes(current)) {
+            return;
+        }
+        let last = limits.pop();
+        if (last && (inventoryListChoices.hosts.includes(last) || inventoryListChoices.groups.includes(last))) {
+            current = `${last},${current}`;
+        }
+        if (limits.length == 0) {
+            form.limit.value = current;
+        } else {
+            form.limit.value = `${limits.join(',')},${current}`;
+        }
+
+        inventoryListValidate();
+    }
+
+    function inventoryListValidate() {
+        if (!form.limit.value || form.limit.value == '') {
+            form.limit.color = inputBaseColor;
+            return;
+        }
+        let results = [];
+        for (let v of inventoryListGet()) {
+            results.push(
+                inventoryListChoices.hosts.includes(v) || inventoryListChoices.groups.includes(v)
+            )
+        }
+
+        if (results.every(v => v === true)) {
+            form.limit.color = 'green';
+        } else {
+            form.limit.color = 'red';
+        }
+    }
+
+    function inventoryListClear() {
+        inventoryListChoices = JSON.parse(JSON.stringify(inventoryListNone));
+        inventoryListChoicesActive = JSON.parse(JSON.stringify(inventoryListNone));
+    }
+
+    function inventoryListGroupMembers(group: string) : string[] {
+        let members = inventoryListChoices.members[group];
+        if (!members) {
+            return [];
+        }
+        return members;
+    }
+
+    function inventoryListHostIP(host: string) : string|null {
+        let ansible_host = inventoryListChoices.ansible_hosts[host];
+        if (!ansible_host) {
+            return null;
+        }
+        return ansible_host;
+    }
+
+    function inventoryListHostIPStr(host: string) : string {
+        let ip = inventoryListHostIP(host);
+        if (!ip) {
+            return '';
+        }
+        return ` (${ip})`;
     }
 
     // execution prompts
@@ -533,6 +726,7 @@
             componentRoot.removeEventListener('keydown', handleKeyDown);
         }
         fsBrowseClear();
+        inventoryListClear();
     });
 
     $effect(() => {
@@ -638,7 +832,53 @@
                     <div class={classModalInput}>
                         <Label for="job_limit" class={classModalLabel}>{t('jobs.form.limit')}</Label>
                         <Input id="job_limit"
-                            bind:value={form.limit.value} bind:color={form.limit.color} />
+                            bind:value={form.limit.value} bind:color={form.limit.color}
+                            on:blur={() => {inventoryListValidate()}}
+                            on:input={(event) => {inventoryList(event)}}
+                            on:click={() => {inventoryList()}} />
+                        {#if inventoryListChoicesActive.groups.length > 0 || inventoryListChoicesActive.hosts.length > 0}
+                            <div class={classDynChoices}>
+                                {#each inventoryListChoicesActive.groups as c}
+                                    <button type="button" class={classDynChoicesItem}
+                                        onclick={(e) => {inventoryListSetCurrent(c)}}>
+                                        <FolderSolid class="inline-block" /> {c}
+                                        <span id="limit-group-members-{c}" class="ml-1">
+                                            <InfoCircleSolid class="inline-block" size="sm"/>
+                                            <span class="sr-only">{t('alerts.group')} {t('permission.members')}</span>
+                                        </span>
+                                        <Popover triggeredBy="#limit-group-members-{c}" class="{classPopover} max-h-60 overflow-y-scroll" placement="bottom-start">
+                                            <div class="p-3 space-y-2">
+                                                <h3 class={classPopoverTitle}>{t('alerts.group')} {t('permission.members')}</h3>
+                                            </div>
+                                            <div class="font-bold">{t('permission.members')}: {inventoryListGroupMembers(c).length}</div>
+                                            {#each inventoryListGroupMembers(c) as host}
+                                                <div><ServerSolid class="inline-block" /> {host}{inventoryListHostIPStr(host)}</div>
+                                            {/each}
+                                        </Popover>
+                                    </button>
+                                {/each}
+                                {#each inventoryListChoicesActive.hosts as c}
+                                    <button type="button" class={classDynChoicesItem}
+                                        onclick={(e) => {inventoryListSetCurrent(c)}}>
+                                        <ServerSolid class="inline-block" /> {c}
+                                        {#if inventoryListHostIP(c)}
+                                            <span id="limit-host-ip-{c}" class="ml-1">
+                                                <InfoCircleSolid class="inline-block" size="sm"/>
+                                                <span class="sr-only">{t('alerts.group')} {t('permission.members')}</span>
+                                            </span>
+                                            <Popover triggeredBy="#limit-host-ip-{c}" class="{classPopover} max-h-60 overflow-y-scroll" placement="bottom-start">
+                                                <div class="p-3 space-y-2">
+                                                    <h3 class={classPopoverTitle}>Ansible Host</h3>
+                                                </div>
+                                                <div class="font-bold">{inventoryListHostIP(c)}</div>
+                                            </Popover>
+                                        {/if}
+                                    </button>
+                                {/each}
+                            </div>
+                        {:else if inventoryListLoad}
+                            <div class={classSpinnerDiv}><Spinner/></div>
+                        {/if}
                         <Helper class={classModalHelp}>{@html t('jobs.form.help.limit')}</Helper>
                     </div>
                     <div class={classModalInput}>

@@ -19,6 +19,7 @@ class InventoryListResponse(BaseResponse):
     hosts = serializers.ListSerializer(child=serializers.CharField())
     groups = serializers.ListSerializer(child=serializers.CharField())
     members = serializers.DictField()
+    ansible_hosts = serializers.DictField()
 
 
 class APIInventoryList(APIView):
@@ -103,6 +104,11 @@ class APIInventoryList(APIView):
         except (JSONDecodeError, ValueError):
             return Response(data={'error': f"Failed to list inventory: {path_inventory}"}, status=500)
 
+        ansible_hosts = {}
+        for host, hostvars in inventory['_meta']['hostvars'].items():
+            if 'ansible_host' in hostvars:
+                ansible_hosts[host] = hostvars['ansible_host']
+
         members = {}
         members_raw = {}
 
@@ -149,6 +155,7 @@ class APIInventoryList(APIView):
                 'hosts': hosts,
                 'groups': groups,
                 'members': members,
+                'ansible_hosts': ansible_hosts,
             },
             status=200,
         )
