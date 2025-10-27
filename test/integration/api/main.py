@@ -107,7 +107,7 @@ def test_add():
 
         # jobs
         {'l': 'job', 'd': {
-            'name': 'job1', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/hosts.yml', 'tags': 'svc1',
+            'name': 'job1', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/empty.yml', 'tags': 'svc1',
             'limit': 'srv1',
         }},
         {'l': 'job', 'd': {
@@ -115,15 +115,15 @@ def test_add():
             'tags_skip': 'srv1', 'comment': 'heiHo', 'cmd_args': '--superArg',
         }},
         {'l': 'job', 'd': {
-            'name': 'jobby3', 'playbook_file': 'PlayUsBookUs.yml', 'inventory_file': 'hosts.yml', 'enabled': False,
+            'name': 'jobby3', 'playbook_file': 'PlayUsBookUs.yml', 'inventory_file': 'empty.yml', 'enabled': False,
             'repository': 2,
         }},
         {'l': 'job', 'd': {
-            'name': 'j4', 'playbook_file': 'nope.yml', 'inventory_file': 'hosts.yml', 'enabled': False,
+            'name': 'j4', 'playbook_file': 'nope.yml', 'inventory_file': 'empty.yml', 'enabled': False,
             'credentials_default': 3, 'mode_diff': True, 'mode_check': True,
         }},
         {'l': 'job', 'd': {
-            'name': 'jup5', 'playbook_file': 'nope_nr2.yml', 'inventory_file': 'hosts.yml', 'schedule': '5 4 * * *',
+            'name': 'jup5', 'playbook_file': 'nope_nr2.yml', 'inventory_file': 'empty.yml', 'schedule': '5 4 * * *',
             'environment_vars': 'MY=1,SUPER=2,VARS=3',
         }},
         # todo: create job with an owner-id that's not ours and validate that the backend fixed it
@@ -149,15 +149,15 @@ def test_modify():
 
         # jobs
         {'l': 'job/2', 'd': {
-            'name': 'My job2.5', 'playbook_file': 'PlayBook_New.yml', 'inventory_file': 'hosts.yml',
+            'name': 'My job2.5', 'playbook_file': 'PlayBook_New.yml', 'inventory_file': 'empty.yml',
             'schedule': '5 4 * * *', 'environment_vars': 'MY=1,SUPER=2,VARS=3', 'tags_skip': 'srv1',
         }},
         {'l': 'job/2', 'd': {
-            'name': 'My job2.6', 'playbook_file': 'nope.yml', 'inventory_file': 'hosts.yml', 'enabled': False,
+            'name': 'My job2.6', 'playbook_file': 'nope.yml', 'inventory_file': 'empty.yml', 'enabled': False,
             'credentials_default': 3, 'mode_diff': True, 'mode_check': True,
         }},
         {'l': 'job/2', 'd': {
-            'name': 'My job2.7', 'playbook_file': 'PlayUsBookUs.yml', 'inventory_file': 'hosts.yml', 'enabled': False,
+            'name': 'My job2.7', 'playbook_file': 'PlayUsBookUs.yml', 'inventory_file': 'empty.yml', 'enabled': False,
             'repository': 2,
         }},
 
