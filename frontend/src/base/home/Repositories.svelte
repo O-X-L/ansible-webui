@@ -225,7 +225,13 @@
                                     <div>
                                         <b>{t('common.status')}:</b>
                                         <span class={item.status_name == 'Failed' ? 'text-red-600' : 'text-green-600'}>
-                                            {item.status_name}
+                                            {#if item.status_name == 'Failed'}
+                                                {t('jobs.info.failed')}
+                                            {:else if item.status_name == 'Finished'}
+                                                {t('jobs.info.succeeded')}
+                                            {:else}
+                                                {t('jobs.info.running')}
+                                            {/if}
                                         </span>
                                     </div>
                                     {#if item.log_stdout_url || item.log_stderr_url}

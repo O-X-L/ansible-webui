@@ -156,6 +156,7 @@
     })
 
     // autocomplete via api filesystem-browsing (playbook/inventory)
+    // todo: inventory_file multi-input
     interface browseResponse {
         dirs: string[],
         files: string[],
@@ -340,16 +341,22 @@
     }
 
     function fsBrowseSelect(f: 'playbook_file'|'inventory_file', c: string) {
-        let p = rsplit(form[f].value, '/');
-        let path = p[0];
-        let current = p[1];
+        if (fsBrowseChoices.dirs.includes(c) && !c.endsWith('/')) {
+            c += '/';
+        }
 
-        if ((!path) || (!current && !fsBrowseChoices.dirs.includes(path))) {
+        if (form[f].value && form[f].value.endsWith('/')) {
+            form[f].value += c;
+            fsBrowse(f);
+            return;
+        }
+
+        let [path, _] = fsBrowseGetPathCurrent(f);
+        if (!path) {
             form[f].value = c;
         } else {
             form[f].value = `${path}/${c}`;
         }
-
         fsBrowse(f);
     }
 
@@ -958,6 +965,7 @@
                         <Input id="job_args" bind:value={form.cmd_args.value} bind:color={form.cmd_args.color} />
                         <Helper class={classModalHelp}>{t('jobs.form.help.cmd_args')}</Helper>
                     </div>
+                    <!-- todo: allow user to de-select hostkey-file -->
                     <div class={classModalInput}>
                         <Label for="job_ssh_hostkey_file" class={classModalLabel}>{t('system.ssh_hostkey')}</Label>
                         <Select id="job_ssh_hostkey_file" items={formInfos.choices.ssh_hostkey_file}

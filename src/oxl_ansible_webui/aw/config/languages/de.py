@@ -41,7 +41,7 @@ DE = {
     'common.success': 'Aktion erfolgreich',
     'common.actions': 'Aktionen',
     'common.search': 'Suche',
-    'common.updated_at': 'Geändert um',
+    'common.updated_at': 'Aktualisiert um',
     'common.created_at': 'Erstellt um',
     'common.click_to_copy': 'zum Kopieren klicken',
     'common.comment': 'Kommentar',
