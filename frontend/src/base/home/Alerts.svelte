@@ -240,14 +240,15 @@
                 
                                     <Button size="xs" on:click={() => {deleteAlert(item.id, alertKind)}}><TrashBinSolid/></Button>
                                     <Tooltip>{t('btn.delete')}</Tooltip>
-                                </div>
-    
-                                <AlertForm bind:open={entryActions[alertKind][item.id].edit} action='edit' kind={alertKind}
-                                    existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 
-                                <AlertForm bind:open={entryActions[alertKind][item.id].clone} action='clone' kind={alertKind}
-                                    existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-    
+                                    <div class="w-0 h-0 inline">
+                                        <AlertForm bind:open={entryActions[alertKind][item.id].edit} action='edit' kind={alertKind}
+                                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+
+                                        <AlertForm bind:open={entryActions[alertKind][item.id].clone} action='clone' kind={alertKind}
+                                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                    </div>
+                                </div>
                                 </TableBodyCell>
                         </TableBodyRow>
                     </TableBody>
@@ -361,7 +362,7 @@
                             {item.executable}
                         </TableBodyCell>
                         <TableBodyCell tdClass={classListContent}>
-                            <div class="mb-2">
+                            <div>
                                 <Button size="xs" on:click={() => (testAlert(item.id, 'plugin'))} disabled>
                                     <PlaySolid/>
                                 </Button>
@@ -376,14 +377,14 @@
             
                                 <Button size="xs" on:click={() => {deleteAlert(item.id, 'plugin')}}><TrashBinSolid/></Button>
                                 <Tooltip>{t('btn.delete')}</Tooltip>
+                                <div class="w-0 h-0 inline">
+                                    <AlertPluginForm bind:open={entryActions.plugins[item.id].edit} action='edit'
+                                        existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+
+                                    <AlertPluginForm bind:open={entryActions.plugins[item.id].clone} action='clone'
+                                        existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                </div>
                             </div>
-
-                            <AlertPluginForm bind:open={entryActions.plugins[item.id].edit} action='edit'
-                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-
-                            <AlertPluginForm bind:open={entryActions.plugins[item.id].clone} action='clone'
-                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-
                         </TableBodyCell>
                     </TableBodyRow>
                 </TableBody>

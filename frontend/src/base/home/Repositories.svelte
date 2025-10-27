@@ -246,7 +246,7 @@
                             {/if}
                             <TableBodyCell tdClass="{classListContent} action-btns">
                                 {#if repoKind == 'git'}
-                                    <div class="mt-4 mb-2">
+                                    <div class="mb-1">
                                         <Button size="xs" on:click={() => (downloadGitRepo(item.id))} disabled={isDownloadActive(item)}
                                             id="repos-btn-dl-{item.id}">
                                             <DownloadSolid/>
@@ -254,7 +254,7 @@
                                         <Tooltip>{t('btn.download')}</Tooltip>
                                     </div>
                                 {:else}
-                                <div class="mt-4 mb-2"></div>
+                                    <div></div>
                                 {/if}
                                 <div>
                                     <Button size="xs" on:click={() => {entryActions[item.id].edit = true}} id="repos-btn-edit-{item.id}">
@@ -271,14 +271,15 @@
                                         <TrashBinSolid/>
                                     </Button>
                                     <Tooltip>{t('btn.delete')}</Tooltip>
+
+                                    <div class="w-0 h-0 inline">
+                                        <RepositoryForm bind:open={entryActions[item.id].edit} action='edit' rtypeName={repoKind}
+                                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+
+                                        <RepositoryForm bind:open={entryActions[item.id].clone} action='clone' rtypeName={repoKind}
+                                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                    </div>
                                 </div>
-
-                                <RepositoryForm bind:open={entryActions[item.id].edit} action='edit' rtypeName={repoKind}
-                                existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-
-                                <RepositoryForm bind:open={entryActions[item.id].clone} action='clone' rtypeName={repoKind}
-                                existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-
                             </TableBodyCell>
                         </TableBodyRow>
                     </TableBody>

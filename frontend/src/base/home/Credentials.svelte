@@ -336,14 +336,15 @@
                                 </Button>
                                 <Tooltip>{t('btn.delete')}</Tooltip>
 
-                                <CredentialsForm bind:open={entryActions[credsKind][item.id].edit} action='edit'
-                                    existingID={item.id} kind={credsKind}
-                                    bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                <div class="w-0 h-0 inline">
+                                    <CredentialsForm bind:open={entryActions[credsKind][item.id].edit} action='edit'
+                                        existingID={item.id} kind={credsKind}
+                                        bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 
-                                <CredentialsForm bind:open={entryActions[credsKind][item.id].clone} action='clone'
-                                    existingID={item.id} kind={credsKind}
-                                    bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-
+                                    <CredentialsForm bind:open={entryActions[credsKind][item.id].clone} action='clone'
+                                        existingID={item.id} kind={credsKind}
+                                        bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                </div>
                             </TableBodyCell>
                         </TableBodyRow>
                     </TableBody>

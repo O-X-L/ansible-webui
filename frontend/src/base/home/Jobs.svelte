@@ -460,7 +460,7 @@
                 </button>
             </TableBodyCell>
             <TableBodyCell tdClass="{classListContent} action-btns">
-                <div class="mt-4">
+                <div>
                     <Button size="xs" on:click={() => {openExecutionPrompt(item)}} disabled={isJobActive(item)} id="jobs-btn-exec-{item.id}">
                         <PlaySolid/>
                     </Button>
@@ -477,7 +477,7 @@
                     </Button>
                     <Tooltip>{t('btn.logs')}</Tooltip>
                 </div>
-                <div class="mt-2">
+                <div class="mt-1">
                     <Button size="xs" on:click={() => (editJob(item.id))} id="jobs-btn-edit-{item.id}">
                         <EditSolid/>
                     </Button>
@@ -492,14 +492,15 @@
                         <TrashBinSolid/>
                     </Button>
                     <Tooltip>{t('btn.delete')}</Tooltip>
+
+                    <div class="w-0 h-0 inline">
+                        <JobForm bind:open={entryActions[item.id].edit} action='edit' existingID={item.id}
+                            bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+
+                        <JobForm bind:open={entryActions[item.id].clone} action='clone' existingID={item.id}
+                            bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                    </div>
                 </div>
-
-                <JobForm bind:open={entryActions[item.id].edit} action='edit' existingID={item.id}
-                bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-
-                <JobForm bind:open={entryActions[item.id].clone} action='clone' existingID={item.id}
-                bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-
             </TableBodyCell>
         </TableBodyRow>
     </TableBody>  

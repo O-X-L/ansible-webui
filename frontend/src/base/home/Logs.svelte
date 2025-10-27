@@ -333,7 +333,7 @@
                             {/if}
                         </TableBodyCell>
                         <TableBodyCell tdClass="{classListContent} action-btns">
-                            <div class="mt-2">
+                            <div>
                                 <Button size="xs" on:click={() => {openExecutionLogs(exec.id)}} id="logs-job-{exec.job}-{exec.id}-show"
                                     disabled={!exec.log_stdout_url}>
                                     <BookOpenSolid/>
@@ -356,9 +356,10 @@
                                 <Button size="xs" on:click={() => {redirectJob(job.id)}}><CogSolid/></Button>
                                 <Tooltip>{t('jobs.job')}</Tooltip>
                                 -->
-    
-                                <LogsView bind:open={entryExecActions[exec.id]}
-                                    jobID={exec.job} jobName={exec.job_name} bind:exec={executionList[execIdx]} />
+                                <div class="w-0 h-0 inline">
+                                    <LogsView bind:open={entryExecActions[exec.id]}
+                                        jobID={exec.job} jobName={exec.job_name} bind:exec={executionList[execIdx]} />
+                                </div>
                             </div>
                         </TableBodyCell>
                     </TableBodyRow>

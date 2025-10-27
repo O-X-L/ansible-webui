@@ -190,12 +190,13 @@
                 <Button size="xs" on:click={() => {deletePermission(item.id)}}><TrashBinSolid/></Button>
                 <Tooltip>{t('btn.delete')}</Tooltip>
 
-                <PermissionForm bind:open={entryActions[item.id].edit} action='edit'
-                    existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                <div class="w-0 h-0 inline">
+                    <PermissionForm bind:open={entryActions[item.id].edit} action='edit'
+                        existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 
-                <PermissionForm bind:open={entryActions[item.id].clone} action='clone'
-                    existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
-
+                    <PermissionForm bind:open={entryActions[item.id].clone} action='clone'
+                        existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                </div>
             </TableBodyCell>
         </TableBodyRow>
     </TableBody>
