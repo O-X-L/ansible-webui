@@ -19,6 +19,7 @@ Fixes:
 * Alert-plugin error for users that have never logged-in [#73](https://github.com/O-X-L/ansible-webui/issues/73)
 * Create missing directories [#72](https://github.com/O-X-L/ansible-webui/issues/72)
 * Security: Pass git authentication-secret via env-var instead of cli-arg [#76](https://github.com/O-X-L/ansible-webui/issues/76)
+* Weird scrollbar behavior [#33](https://github.com/O-X-L/ansible-webui/issues/33)
 
 Features:
 
@@ -29,6 +30,7 @@ Features:
 * API & Frontend to add and manage SSH-hostkeys [#77](https://github.com/O-X-L/ansible-webui/issues/77), [#6](https://github.com/O-X-L/ansible-webui/issues/6)
 * API & Form-integration for inventory-list (limit-field suggestions) [#78](https://github.com/O-X-L/ansible-webui/issues/78), [#29](https://github.com/O-X-L/ansible-webui/issues/29)
 * Playbook- & Inventory-File autocomplete and filtering [#69](https://github.com/O-X-L/ansible-webui/issues/69)
+* UI: Lowered table-row height for better overview
 
 ----
 

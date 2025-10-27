@@ -86,7 +86,7 @@
   }
   $: backdropCls = twMerge(backdropClass, classBackdrop);
   $: dialogCls = twMerge(dialogClass, classDialog, getPlacementClasses(placement));
-  $: frameCls = twMerge(defaultClass, "w-full divide-y", $$props.class);
+  $: frameCls = twMerge(defaultClass, "w-full divide-y mb-10", $$props.class);
   $: headerCls = twMerge(headerClass, classHeader);
   $: bodyCls = twMerge(bodyClass, classBody);
   $: footerCls = twMerge(footerClass, classFooter);

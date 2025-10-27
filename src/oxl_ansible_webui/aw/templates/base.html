@@ -17,13 +17,13 @@
                 You need to enable Javascript to use this app!
             </div>
         </noscript>
-        <div id="nav"></div>
-        <div id="main" class="w-full h-full">
+        <div id="main" class="w-full h-screen">
+            <div id="nav"></div>
             {% block content %}
             {% endblock %}
+            <div id="footer-bg"></div>
+            <div id="footer"></div>
         </div>
-        <div id="footer-bg"></div>
-        <div id="footer"></div>
         {% csrf_token %}
         <script type="module" src="/static/dist/main.js?v={% get_version %}"></script>
     </body>
