@@ -13,6 +13,7 @@ tbd
 Fixes:
 
 * Added missing command-execution-timeout option to repository-form [#83](https://github.com/O-X-L/ansible-webui/issues/83)
+* Unable to edit alert when no jobs were set [#60](https://github.com/O-X-L/ansible-webui/issues/60)
 
 
 Features:

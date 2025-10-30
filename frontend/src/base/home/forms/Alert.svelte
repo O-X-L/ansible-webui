@@ -239,7 +239,7 @@
             <div class={classModalInput}>
                 <Label for="alert_jobs" class={classModalLabel}>{t('home.jobs')}</Label>
                 <MultiSelect id="alert_jobs" items={formInfos.choices.jobs}
-                    disabled={formInfos.choices.jobs.length == 0}
+                    disabled={!formInfos.choices.jobs || formInfos.choices.jobs.length == 0}
                     bind:value={form.jobs.value} bind:color={form.jobs.color} />
             </div>
             <div class={classModalInput}>
