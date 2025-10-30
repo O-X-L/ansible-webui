@@ -236,6 +236,7 @@ ES = {
     'repos.form.git_lfs': 'LFS',
     'repos.form.git_playbook_base': 'Directorio base de la Estrategia (Playbook)',
     'repos.form.git_isolate': 'Directorio de aislamientos',
+    'repos.form.git_timeout': 'Tiempo de espera para la ejecución de comandos',
     'repos.form.git_hook_pre': 'Gancho Previo (Pre-Hook)',
     'repos.form.git_hook_post': 'Gancho Posterior (Post-Hook)',
     'repos.form.git_hook_cleanup': 'Gancho de limpieza (Cleanup-Hook)',

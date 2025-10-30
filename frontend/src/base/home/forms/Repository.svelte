@@ -10,10 +10,10 @@
     import Modal from '../../../flowbite-custom/Modal.svelte';
 
     import { share } from '../../Share.js';
-    import { repoKindMap } from '../../Config.js';
     import { tq } from '../../../util/translate.js';
     import { type formInfoType } from '../../Types.js';
     import { apiGet, cacheKey } from '../../../util/api.js';
+    import { repoKindMap, REGEX_FORM_INT_GT0 } from '../../Config.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
     import {
         inputBaseColor, valideInputBase, submitFormBase, getMethod,
@@ -82,7 +82,7 @@
         git_override_initialize: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         git_override_update: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         git_playbook_base: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
-        git_timeout: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
+        git_timeout: {value: '', color: inputBaseColor, required: false, regex: REGEX_FORM_INT_GT0},
         ssh_hostkey_file: {value: '', color: inputBaseColor, required: false},
     });
 
@@ -290,6 +290,12 @@
                             <Label for="repo_git_isolate" class={classModalLabel}>{t('repos.form.git_isolate')}</Label>
                             <Toggle id="repo_git_isolate" bind:checked={form.git_isolate.value} />
                             <Helper class={classModalHelp}>{t('repos.form.help.git_isolate')}</Helper>
+                        </div>
+                        <div class={classModalInput}>
+                            <Label for="repo_git_timeout" class={classModalLabel}>{t('repos.form.git_timeout')}</Label>
+                            <Input id="repo_git_timeout" type="number" bind:value={form.git_timeout.value}
+                                bind:color={form.git_timeout.color}
+                                on:input={valideInput} on:blur={valideInput} />
                         </div>
                         <div class={classModalInput}>
                             <Label for="repo_ssh_hostkey_file" class={classModalLabel}>{t('system.ssh_hostkey')}</Label>

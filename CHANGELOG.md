@@ -8,6 +8,19 @@ tbd
 
 ## Version 0
 
+### 0.9.2
+
+Fixes:
+
+* Added missing command-execution-timeout option to repository-form [#83](https://github.com/O-X-L/ansible-webui/issues/83)
+
+
+Features:
+
+* 
+
+----
+
 ### 0.9.1
 
 Fixes:

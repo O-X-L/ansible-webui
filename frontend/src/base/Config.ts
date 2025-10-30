@@ -13,3 +13,5 @@ interface repoKindMapType {
 }
 
 export const repoKindMap: repoKindMapType = {'static': 1, 'git': 2};
+
+export const REGEX_FORM_INT_GT0 = /^(|[1-9][0-9]{0,5})$/;

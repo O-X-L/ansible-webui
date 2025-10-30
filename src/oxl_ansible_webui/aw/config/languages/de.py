@@ -238,6 +238,7 @@ DE = {
     'repos.form.git_lfs': 'LFS',
     'repos.form.git_playbook_base': 'Playbook Basis-Verzeichnis',
     'repos.form.git_isolate': 'Verzeichnis isolieren',
+    'repos.form.git_timeout': 'Maximale Laufzeit von Kommandos',
     'repos.form.git_hook_pre': 'Pre-Hook',
     'repos.form.git_hook_post': 'Post-Hook',
     'repos.form.git_hook_cleanup': 'Cleanup-Hook',

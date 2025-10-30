@@ -113,6 +113,8 @@ EN = {
     'jobs.action.create': 'Job created',
     'jobs.action.update': 'Job updated',
     'jobs.action.exec_delete': 'Execution deleted',
+
+    # todo: add job-edit-form categories
     'jobs.form.repository': 'Repository',
     'jobs.form.playbook_file': 'Playbook File',
     'jobs.form.inventory_file': 'Inventory File',
@@ -236,6 +238,7 @@ EN = {
     'repos.form.git_lfs': 'LFS',
     'repos.form.git_playbook_base': 'Playbook Base-Directory',
     'repos.form.git_isolate': 'Isolate Directory',
+    'repos.form.git_timeout': 'Timeout for execution of commands',
     'repos.form.git_hook_pre': 'Pre-Hook',
     'repos.form.git_hook_post': 'Post-Hook',
     'repos.form.git_hook_cleanup': 'Cleanup-Hook',
