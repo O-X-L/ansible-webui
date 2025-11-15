@@ -24,6 +24,7 @@ DE = {
     'nav.docs': 'Dokumentation',
     'nav.repo': 'Open Source Repository',
     'nav.bugs': 'Fehler melden',
+    'nav.donate': 'Projekt unterstützen',
     'nav.user_settings': 'Benutzer Einstellungen',
     'nav.logout': 'Abmelden',
     'footer.user': 'Nutzer',

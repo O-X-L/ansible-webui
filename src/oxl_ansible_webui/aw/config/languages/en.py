@@ -26,6 +26,7 @@ EN = {
     'nav.docs': 'Documentation',
     'nav.repo': 'Open Source Repository',
     'nav.bugs': 'Report Bugs',
+    'nav.donate': 'Support the Project',
     'nav.user_settings': 'User Settings',
     'nav.logout': 'Log out',
     'footer.user': 'User',
