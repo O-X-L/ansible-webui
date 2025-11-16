@@ -1,0 +1,48 @@
+---
+
+name: Lint Frontend
+
+on:
+  push:
+    branches: [latest]
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.svelte'
+      - '.github/workflows/lint_fe.yml'
+      - 'frontend/eslint.config.js'
+      - 'scripts/frontend/lint.sh'
+  pull_request:
+    branches: [latest]
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.svelte'
+      - '.github/workflows/lint_fe.yml'
+      - 'frontend/eslint.config.js'
+      - 'scripts/frontend/lint.sh'
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: |
+          cd frontend/
+          npm install
+
+      - name: Linting
+        run: bash scripts/frontend/lint.sh

@@ -1,6 +1,6 @@
 ---
 
-name: Lint
+name: Lint Backend
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
     paths:
       - '**.py'
       - '**.yml'
-      - '.github/workflows/lint.yml'
+      - '.github/workflows/lint_be.yml'
       - 'requirements_lint.txt'
       - '.pylintrc'
       - '.yamllint'
@@ -18,7 +18,7 @@ on:
     paths:
       - '**.py'
       - '**.yml'
-      - '.github/workflows/lint.yml'
+      - '.github/workflows/lint_be.yml'
       - 'requirements_lint.txt'
       - '.pylintrc'
       - '.yamllint'

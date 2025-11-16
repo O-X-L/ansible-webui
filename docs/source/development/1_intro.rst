@@ -150,7 +150,8 @@ Run tests and lint:
     # setup dev-env
     make install
 
-    make lint
+    make lint-be
+    make lint-fe
     make test
 
     # or run single tests:

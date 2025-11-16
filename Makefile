@@ -22,8 +22,15 @@ run-dev-be-noinit:
 run-staging-local:
 	bash scripts/run_staging.sh
 
+lint-be:
+	bash scripts/lint.sh
+
+lint-fe:
+	bash scripts/frontend/lint.sh
+
 lint:
 	bash scripts/lint.sh
+	bash scripts/frontend/lint.sh
 
 test:
 	bash scripts/test.sh
