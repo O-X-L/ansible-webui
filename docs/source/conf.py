@@ -18,12 +18,9 @@ display_version = True
 sticky_navigation = True
 source_suffix = {
     '.rst': 'restructuredtext',
-    '.md': 'markdown',
+    # '.md': 'markdown',
 }
 html_theme_options = {
-    # 'banner_text': '<a href="https://github.com/O-X-L/ansible-webui">Repository on GitHub</a> | '
-    #                '<a href="https://github.com/O-X-L/ansible-webui/issues/new/choose">Report Errors</a> | '
-    #                '<a href="https://www.o-x-l.com">Get Support</a>'
     "site_url": "https://ansible-webui.oxl.app",
     "repo_url": "https://github.com/O-X-L/ansible-webui",
     "repo_name": "Ansible WebUI",
@@ -77,26 +74,41 @@ html_theme_options = {
     "version_dropdown": True,
     "version_info": [
         {
+            "version": "https://shop.oxl.app/collections/open-source",
+            "title": "Support this Project",
+            "aliases": [],
+        },
+        {
             "version": "https://demo.ansible-webui.oxl.app",
             "title": "Demo",
             "aliases": [],
         },
         {
-            "version": "https://www.O-X-L.com",
+            "version": "https://www.OXL.app",
             "title": "About OXL",
             "aliases": [],
         },
     ],
     "social": [
         {
+            "icon": "fontawesome/solid/wallet",
+            "link": "https://shop.oxl.app/collections/open-source",
+            "name": "Support this Project",
+        },
+        {
             "icon": "fontawesome/solid/globe",
-            "link": "https://www.O-X-L.com",
+            "link": "https://www.OXL.app",
             "name": "About OXL",
         },
         {
             "icon": "fontawesome/brands/github",
             "link": "https://github.com/O-X-L",
             "name": "OXL on GitHub",
+        },
+        {
+            "icon": "fontawesome/brands/git-alt",
+            "link": "https://codeberg.org/OXL",
+            "name": "OXL on Codeberg",
         },
     ],
 }
