@@ -272,7 +272,7 @@ Too Many Log Files exist
 
     MAX_LOG_AGE=7  # days
     cd ~/.local/share/ansible-webui/
-    find -type f -mtime +${MAX_LOG_AGE} -name "*.log" -delete
+    find . -type f -mtime +${MAX_LOG_AGE} -name "*.log" -delete
 
 ----
 
