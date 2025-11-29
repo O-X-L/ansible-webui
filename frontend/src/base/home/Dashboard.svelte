@@ -21,6 +21,9 @@
 
     let updateLoop: number = $state(0);
 
+    const classText = "text-gray-900 dark:text-white";
+    const classHead = `text-xl font-semibold mb-4 ${classText}`;
+    const classElement = "bg-gray-100 dark:bg-gray-800 p-6 rounded-xl shadow-lg";
     const TIME_WINDOW_CHOICES: formChoiceType[] = [
         {name: t('db.time.minutes'), value: 'm'},
         {name: t('db.time.hours'), value: 'h'},
@@ -109,7 +112,7 @@
 <header class="flex flex-col sm:flex-row justify-between items-center mb-6 p-4 dark:bg-gray-800 rounded-xl shadow-lg">
     <div class="flex justify-between w-full">
         <div>
-            <h1 class="text-3xl font-bold dark:text-white mb-4 sm:mb-0">
+            <h1 class="text-3xl font-bold {classText} mb-4 sm:mb-0">
                 Dashboard
             </h1>
         </div>
@@ -129,10 +132,10 @@
 </header>
 
 <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-    <div class="lg:col-span-3 bg-gray-100 dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+    <div class="lg:col-span-3 {classElement}">
         <div class="flex justify-between mb-2 w-full">
             <div>
-                <h2 class="text-xl font-semibold mb-4">
+                <h2 class={classHead}>
                     {t('db.chart.exec_over_time')}
                 </h2>
             </div>
@@ -147,10 +150,10 @@
         {/if}
     </div>
 
-    <div class="lg:col-span-1 bg-gray-100 dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+    <div class="lg:col-span-1 {classElement}">
         <div class="flex justify-between mb-2 w-full">
             <div>
-                <h2 class="text-xl font-semibold mb-4">
+                <h2 class={classHead}>
                     {t('db.chart.exec_by_user')}
                 </h2>
             </div>
@@ -166,10 +169,10 @@
         {/if}
     </div>
 
-    <div class="lg:col-span-2 bg-gray-100 dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+    <div class="lg:col-span-2 {classElement}">
         <div class="flex justify-between mb-2 w-full">
             <div>
-                <h2 class="text-xl font-semibold mb-4">
+                <h2 class={classHead}>
                     {t('db.chart.exec_results_by_job')}
                 </h2>
             </div>
@@ -184,10 +187,10 @@
             <ChartJobResults data={data} />
         {/if}
     </div>
-    <div class="lg:col-span-2 bg-gray-100 dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+    <div class="lg:col-span-2 {classElement}">
         <div class="flex justify-between mb-2 w-full">
             <div>
-                <h2 class="text-xl font-semibold mb-4">
+                <h2 class={classHead}>
                     {t('db.chart.exec_results_by_host')}
                 </h2>
             </div>
