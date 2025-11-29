@@ -679,6 +679,7 @@
                 <Heading tag="h2">{t('jobs.execute')}</Heading>
 
                 {#if executionPrompts.config.fields.includes('limit')}
+                    <!-- todo: implement inventory-limit-browsing -->
                     <Label for="job_prompt_{job.id}_limit" class={classModalLabel}>{t('jobs.form.limit')}</Label>
                     <Input id="job_prompt_{job.id}_limit" bind:value={executionPrompts.field_values.limit} />
                 {/if}

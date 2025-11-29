@@ -28,5 +28,6 @@ export default defineConfig({
         login_saml: "./src/login_saml.ts",
       },
     },
+    chunkSizeWarningLimit: 1500,
   },
 })

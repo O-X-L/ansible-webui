@@ -96,6 +96,7 @@ ES = {
     'jobs.info.running': 'En ejecución',
     'jobs.info.failed': 'Fallido',
     'jobs.info.succeeded': 'Realizado con éxito',
+    'jobs.info.skipped': 'Omitido',
     'jobs.info.scheduled': 'Programado',
     'jobs.info.unreachable': 'Inalcanzable',
     'jobs.info.changed': 'Cambiado',

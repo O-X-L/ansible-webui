@@ -16,9 +16,7 @@
         { name: 'Svelte', href: 'https://svelte.dev/', license: 'MIT', licenseHref: 'https://github.com/sveltejs/svelte/blob/main/LICENSE.md'},
         { name: 'Tailwind CSS', href: 'https://tailwindcss.com/', license: 'MIT', licenseHref: 'https://github.com/tailwindlabs/tailwindcss/blob/main/LICENSE' },
         { name: 'Flowbite Svelte', href: 'https://flowbite-svelte.com/', license: 'MIT', licenseHref: 'https://flowbite-svelte.com/docs/pages/license' },
-        { name: 'Chart.js', href: 'https://www.chartjs.org/', license: 'MIT', licenseHref: 'https://github.com/chartjs/Chart.js/blob/master/LICENSE.md' },
-        { name: 'date-fns', href: 'https://date-fns.org/', license: 'MIT', licenseHref: 'https://github.com/date-fns/date-fns/blob/main/LICENSE.md' },
-        { name: 'chartjs-adapter-date-fns', href: 'https://github.com/chartjs/chartjs-adapter-date-fns', license: 'MIT', licenseHref: 'https://github.com/chartjs/chartjs-adapter-date-fns/blob/master/LICENSE.md' },
+        { name: 'ECharts', href: 'https://echarts.apache.org/', license: 'Apache 2.0', licenseHref: 'https://github.com/apache/echarts/blob/master/LICENSE' },
     ];
     let linksAttributionBackend = [
         { name: 'Ansible', href: 'https://www.ansible.com/', license: 'GPLv3', licenseHref: 'https://github.com/ansible/ansible/?tab=GPL-3.0-1-ov-file#readme' },

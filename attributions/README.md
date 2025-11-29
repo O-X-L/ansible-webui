@@ -16,9 +16,7 @@ This project was forked from [ansibleguy/webui](https://github.com/ansibleguy/we
 
 ### Visualization of Stats
 
-* [Chart.js](https://www.chartjs.org/) | License: [MIT](https://github.com/chartjs/Chart.js/blob/master/LICENSE.md)
-* [date-fns](https://date-fns.org/) | License: [MIT](https://github.com/date-fns/date-fns/blob/main/LICENSE.md)
-* [chartjs-adapter-date-fns](https://github.com/chartjs/chartjs-adapter-date-fns) | License: [MIT](https://github.com/chartjs/chartjs-adapter-date-fns/blob/master/LICENSE.md)
+* [Apache ECharts](https://echarts.apache.org/) | License: [Apache 2.0](https://github.com/apache/echarts/blob/master/LICENSE)
 
 ----
 
