@@ -1,6 +1,6 @@
 export interface formChoiceType {
   name: string,
-  value: string|number,
+  value: string|number|boolean,
 }
 
 export type inputColorType = 'base' | 'green' | 'red';

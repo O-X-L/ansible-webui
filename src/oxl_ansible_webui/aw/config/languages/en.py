@@ -99,6 +99,7 @@ EN = {
     'jobs.info.running': 'Running',
     'jobs.info.failed': 'Failed',
     'jobs.info.succeeded': 'Succeeded',
+    'jobs.info.skipped': 'Skipped',
     'jobs.info.scheduled': 'Scheduled',
     'jobs.info.unreachable': 'Unreachable',
     'jobs.info.changed': 'Changed',

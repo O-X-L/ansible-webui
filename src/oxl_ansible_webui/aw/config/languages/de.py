@@ -97,6 +97,7 @@ DE = {
     'jobs.info.running': 'Aktiv',
     'jobs.info.failed': 'Fehlgeschlagen',
     'jobs.info.succeeded': 'Erfolgreich',
+    'jobs.info.skipped': 'Übersprungen',
     'jobs.info.scheduled': 'Geplant',
     'jobs.info.unreachable': 'Nicht erreichbar',
     'jobs.info.changed': 'Geändert',

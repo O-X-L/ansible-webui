@@ -135,7 +135,9 @@
     </Dropdown>
     <Tooltip placement="bottom" triggeredBy="#nav-btn-lang">{t('nav.lang')}</Tooltip>
 
-    <DarkMode id="nav-btn-darkmode" size="sm" btnClass="{classBtnBase} px-4 py-2 ml-1 sm:ml-2"></DarkMode>
+    <DarkMode id="nav-btn-darkmode" size="sm" btnClass="{classBtnBase} px-4 py-2 ml-1 sm:ml-2"
+      onmouseup={() => {setTimeout(() => {location.reload()}, 1000)}}>
+    </DarkMode>
     <Tooltip placement="bottom">{t('nav.darkLight')}</Tooltip>
 
     <Button id="nav-btn-docs" size="xs" class="ml-1 sm:ml-2 max-[390px]:hidden {classBtnLink}"

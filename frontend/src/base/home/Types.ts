@@ -84,3 +84,34 @@ export interface credentialsSharedType {
 export interface credentialsUserType extends credentialsSharedType {
     category: string,
 }
+
+interface statsJobsMapping {
+    jobs: any
+    users: any
+    status: any
+    stats: any
+    host_stats: any
+}
+export type statsExecutionHost = [
+    string,  // 0 hostname
+    number,  // 1 unreachable (0/1 boolean)
+    number,  // 2 tasks-skipped
+    number,  // 3 tasks-ok
+    number,  // 4 tasks-failed
+    number,  // 5 tasks-rescued
+    number,  // 6 tasks-ignored
+    number,  // 7 tasks-changed
+]
+export type statsExecution = [
+    number,  // 0 job id
+    number,  // 1 status id
+    number|null,  // 2 user id
+    number,  // 3 duration
+    number,  // 4 time
+    number,  // 5 failed (0/1 boolean)
+    statsExecutionHost[],  // 6
+];
+export interface statsJobs {
+    stats: statsExecution[]
+    mapping: statsJobsMapping
+}

@@ -1,5 +1,3 @@
-import { Chart, LineController, LineElement } from 'chart.js';
-
 export function getDarkLightMode() : 'dark'|'light' {
     let lastColorMode = localStorage.getItem('color-theme');
     if (lastColorMode && (lastColorMode == 'light' || lastColorMode == 'dark')) {
@@ -15,14 +13,6 @@ export function getDarkLightMode() : 'dark'|'light' {
 export function setDarkLightMode(doc: HTMLDocument, mode: string = '') {
     if (mode == '') {
         mode = getDarkLightMode();
-    }
-
-    if (mode == 'dark' && Chart.defaults) {
-      Chart.register(LineController, LineElement);
-      Chart.defaults.color = "#ADBABD";
-      Chart.defaults.borderColor = "rgba(255,255,255,0.1)";
-      Chart.defaults.backgroundColor = "rgba(255,255,0,0.1)";
-      Chart.defaults.elements.line.borderColor = "rgba(255,255,0,0.4)";
     }
 
     let h = doc.querySelector('html');
