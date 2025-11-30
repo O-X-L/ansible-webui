@@ -13,8 +13,15 @@ cd "$(dirname "$0")/../.."
 BASE_DIR="$(pwd)"
 
 echo ''
-echo '### LINTING ###'
+echo '### LINTING CODE ###'
 echo ''
 cd "${BASE_DIR}/frontend"
 
 npm run lint
+
+echo ''
+echo '### LINTING STYLES ###'
+echo ''
+cd "${BASE_DIR}/frontend"
+
+npm run style-lint

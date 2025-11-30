@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "dbaeumer.vscode-eslint",
+        "bradlc.vscode-tailwindcss",
+        "stylelint.vscode-stylelint",
+        "svelte.svelte-vscode",
+        "ms-python.python"
+    ]
+}
