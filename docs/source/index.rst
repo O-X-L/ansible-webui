@@ -33,3 +33,10 @@ Index
 
    development/*
 
+.. toctree::
+   :caption: Legal
+   :glob:
+   :maxdepth: 1
+
+   legal/*
+
