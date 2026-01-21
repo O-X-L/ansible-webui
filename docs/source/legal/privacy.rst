@@ -9,7 +9,7 @@ Privacy Policy
 Data Privacy Policy
 *******************
 
-See: `www.O-X-L.com/privacy <https:/www.oxl.app/privacy>`_
+See: `www.OXL.app/privacy <https:/www.oxl.app/privacy>`_
 
 ----
 
