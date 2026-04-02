@@ -149,7 +149,7 @@
 <APIResponseHandler bind:this={apiResponseHandler} bind:successMsg={apiSuccessMsg} />
 
 <div bind:this={componentRoot} tabindex="-1">
-<Modal bind:open={open} size="lg" autoclose={false} placement="top-center"
+<Modal bind:open={open} size="xl" autoclose={false} placement="top-center"
     backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
     <Heading tag="h2">{t('logs.job_logs')} "{jobName}"</Heading>
     {#if !logLines.length && !exec.error_s && errorCnt < MAX_ERROR_CNT}
