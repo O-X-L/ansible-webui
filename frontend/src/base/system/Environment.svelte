@@ -87,26 +87,29 @@
 
     function searchFilterMain(item: envInfoMainType, searchTerm: string) : boolean {
         let s = searchTerm.toLowerCase();
+        let v = item.version ? item.version : '';
         return (
             item.name.toLowerCase().includes(s) ||
-            item.version.toLowerCase().includes(s)
+            v.toLowerCase().includes(s)
         )
     }
 
     function searchFilterAnsCnf(item: envInfoAnsibleCnfType, searchTerm: string) : boolean {
         let s = searchTerm.toLowerCase();
+        let c = item.comment ? item.comment : '';
         return (
             item.setting.toLowerCase().includes(s) ||
             item.value.toLowerCase().includes(s) ||
-            item.comment.toLowerCase().includes(s)
+            c.toLowerCase().includes(s)
         )
     }
 
     function searchFilterAnsCol(item: envInfoAnsibleColType, searchTerm: string) : boolean {
         let s = searchTerm.toLowerCase();
+        let v = item.version ? item.version : '';
         return (
             item.name.toLowerCase().includes(s) ||
-            item.version.toLowerCase().includes(s) ||
+            v.toLowerCase().includes(s) ||
             item.path.toLowerCase().includes(s)
         )
     }
