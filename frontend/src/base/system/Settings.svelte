@@ -85,7 +85,7 @@
         audit_log: {value: true},
         logo_url: {value: 'img/logo.svg', color: inputBaseColor, required: false, regex: /^.{0,200}/},
         ara_server: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
-        global_environment_vars: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
+        global_environment_vars: {value: '', color: inputBaseColor, required: false, regex: /^.{0,1000}/},
         mail_server: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         mail_transport: {value: 0, color: inputBaseColor, required: false, regex: /^.{0,100}/},
         mail_ssl_verify: {value: false},
