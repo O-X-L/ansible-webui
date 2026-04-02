@@ -45,6 +45,7 @@
     let entryActions = $state({'shared': {}, 'user': {}});
     let updateLoop: number = $state(0);
     let updatedAt = $state(0);
+    let searchedAt = $state(0);
     let newVaultCredentialsID = $state(0);
     let newVaultCredentialsKind = $state('');
     let newVaultPlaintext = $state('');
@@ -83,6 +84,7 @@
     }
 
     function searchFilter(item: credentialsSharedType|credentialsUserType, searchTerm: string) : boolean {
+        searchedAt = Date.now();
         let s = searchTerm.toLowerCase();
         let c = '';
         if (item.category) {
@@ -250,10 +252,12 @@
                         <TableBodyRow slot="row" let:item>
                             <TableBodyCell tdClass={classListContent}>
                                 {item.name}
-                                <button id="creds-name-{credsKind}-{item.id}" class="ml-1">
-                                    <InfoCircleSolid size="sm"/>
-                                    <span class="sr-only">{t('creds.info')}</span>
-                                </button>
+                                {#key item.id}
+                                    <button id="creds-name-{credsKind}-{item.id}" class="ml-1">
+                                        <InfoCircleSolid size="sm"/>
+                                        <span class="sr-only">{t('creds.info')}</span>
+                                    </button>
+                                {/key}
                             </TableBodyCell>
                             <TableBodyCell tdClass="{classListContent} max-sm:hidden">
                                 {#if item.connect_user}
@@ -337,13 +341,15 @@
                                 <Tooltip>{t('btn.delete')}</Tooltip>
 
                                 <div class="w-0 h-0 inline">
-                                    <CredentialsForm bind:open={entryActions[credsKind][item.id].edit} action='edit'
-                                        existingID={item.id} kind={credsKind}
-                                        bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                    {#key item.id}
+                                        <CredentialsForm bind:open={entryActions[credsKind][item.id].edit} action='edit'
+                                            existingID={item.id} kind={credsKind}
+                                            bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 
-                                    <CredentialsForm bind:open={entryActions[credsKind][item.id].clone} action='clone'
-                                        existingID={item.id} kind={credsKind}
-                                        bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                        <CredentialsForm bind:open={entryActions[credsKind][item.id].clone} action='clone'
+                                            existingID={item.id} kind={credsKind}
+                                            bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                    {/key}
                                 </div>
                             </TableBodyCell>
                         </TableBodyRow>
@@ -356,6 +362,7 @@
                 </div>
                 <div>
                     {#each entryList[credsKind] as creds (creds.id)}
+                        {#key searchedAt}
                         <div id="creds-infos-{credsKind}-{creds.id}">
                             <Popover triggeredBy="#creds-name-{credsKind}-{creds.id}" class={classPopover} placement="bottom-start">
                                 <div class="p-3 space-y-2">
@@ -457,6 +464,7 @@
                                 </table>
                             </Popover>
                         </div>
+                        {/key}
                     {/each}
                 </div>
             </AccordionItem>

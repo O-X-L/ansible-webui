@@ -50,6 +50,7 @@
     let apiDataHash = $state('');
     let updateLoop: number = $state(0);
     let updatedAt = $state(0);
+    let searchedAt = $state(0);
     // todo: init search from url-param
     //let tableSearchTerm = $state('');
     let loaded = $state(false);
@@ -272,6 +273,7 @@
     }
 
     function searchFilter(item: jobType, searchTerm: string) : boolean {
+        searchedAt = Date.now();
         if (searchTerm.includes('id:')) {
             let sid = searchTerm.split(':')[1];
             return String(item.id) == sid;
@@ -445,19 +447,23 @@
         <TableBodyRow slot="row" let:item>
             <TableBodyCell tdClass={classListContent}>
                 {item.name}
-                <button id="job-name-{item.id}" class="ml-1">
-                    <InfoCircleSolid size="sm"/>
-                    <span class="sr-only">{t('jobs.info')}</span>
-                </button>
+                {#key item.id}
+                    <button id="job-name-{item.id}" class="ml-1">
+                        <InfoCircleSolid size="sm"/>
+                        <span class="sr-only">{t('jobs.info')}</span>
+                    </button>
+                {/key}
             </TableBodyCell>
             <TableBodyCell class="{classListContent} max-lg:hidden">{item.inventory_file ? item.inventory_file : '-'}</TableBodyCell>
             <TableBodyCell class="{classListContent} max-lg:hidden">{item.playbook_file}</TableBodyCell>    
             <TableBodyCell class="{classListContent} max-sm:hidden">
                 {item.next_run ? item.next_run : '-'}
-                <button id="job-schedule-{item.id}" class="ml-1">
-                    <InfoCircleSolid size="sm"/>
-                    <span class="sr-only">{t('jobs.info.execution')}</span>
-                </button>
+                {#key item.id}
+                    <button id="job-schedule-{item.id}" class="ml-1">
+                        <InfoCircleSolid size="sm"/>
+                        <span class="sr-only">{t('jobs.info.execution')}</span>
+                    </button>
+                {/key}
             </TableBodyCell>
             <TableBodyCell tdClass="{classListContent} action-btns">
                 <div>
@@ -494,11 +500,13 @@
                     <Tooltip>{t('btn.delete')}</Tooltip>
 
                     <div class="w-0 h-0 inline">
-                        <JobForm bind:open={entryActions[item.id].edit} action='edit' existingID={item.id}
-                            bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                        {#key item.id}
+                            <JobForm bind:open={entryActions[item.id].edit} action='edit' existingID={item.id}
+                                bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 
-                        <JobForm bind:open={entryActions[item.id].clone} action='clone' existingID={item.id}
-                            bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                            <JobForm bind:open={entryActions[item.id].clone} action='clone' existingID={item.id}
+                                bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                        {/key}
                     </div>
                 </div>
             </TableBodyCell>
@@ -513,6 +521,7 @@
 
 <div>
     {#each entryList as job (job.id)}
+        {#key searchedAt}
         <div id="job-infos-{job.id}">
             <Popover triggeredBy="#job-name-{job.id}" class={classPopover} placement="bottom-start">
                 <div class="p-3 space-y-2">
@@ -659,7 +668,7 @@
                                         </button>
                                     </td>
                                 </tr>
-                                {#if job.executions[0].failed}
+                                {#if job.executions[0].failed && job.executions[0].error_s?.length && job.executions[0].error_s.length > 0}
                                     <tr>
                                         <td class={classPopoverColumn1}>
                                             {t('common.error')}:
@@ -756,6 +765,7 @@
                 </div>
             </Modal>
         </div>
+        {/key}
     {/each}
 </div>
 

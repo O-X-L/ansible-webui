@@ -191,11 +191,13 @@
                 <Tooltip>{t('btn.delete')}</Tooltip>
 
                 <div class="w-0 h-0 inline">
-                    <PermissionForm bind:open={entryActions[item.id].edit} action='edit'
-                        existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                    {#key item.id}
+                        <PermissionForm bind:open={entryActions[item.id].edit} action='edit'
+                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 
-                    <PermissionForm bind:open={entryActions[item.id].clone} action='clone'
-                        existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                        <PermissionForm bind:open={entryActions[item.id].clone} action='clone'
+                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                    {/key}
                 </div>
             </TableBodyCell>
         </TableBodyRow>

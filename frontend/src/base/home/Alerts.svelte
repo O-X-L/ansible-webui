@@ -45,6 +45,7 @@
     let entryActions = $state({'global': {}, 'group': {}, 'user': {}, 'plugins': {}});
     let updateLoop: number = $state(0);
     let updatedAt = $state(0);
+    let searchedAt = $state(0);
 
     const ALERT_TYPE_PLUGIN = 1;
     const ALERT_TYPE_CHOICES = {
@@ -111,6 +112,7 @@
     }
 
     function searchAlertFilter(item: alertGlobalType|alertGroupType|alertUserType, searchTerm: string) : boolean {
+        searchedAt = Date.now();
         let s = searchTerm.toLowerCase();
         return (
             item.name.toLowerCase().includes(s) ||
@@ -120,6 +122,7 @@
     }
 
     function searchPluginFilter(item: alertPluginType, searchTerm: string) : boolean {
+        searchedAt = Date.now();
         let s = searchTerm.toLowerCase();
         return (
             item.name.toLowerCase().includes(s) ||
@@ -213,10 +216,12 @@
                         <TableBodyRow slot="row" let:item>
                             <TableBodyCell tdClass={classListContent}>
                                 {item.name}
-                                <button id="alerts-name-{item.id}" class="ml-1">
-                                    <InfoCircleSolid size="sm"/>
-                                    <span class="sr-only">{t('alerts.info')}</span>
-                                </button>
+                                {#key item.id}
+                                    <button id="alerts-name-{item.id}" class="ml-1">
+                                        <InfoCircleSolid size="sm"/>
+                                        <span class="sr-only">{t('alerts.info')}</span>
+                                    </button>
+                                {/key}
                             </TableBodyCell>
                             <TableBodyCell tdClass="{classListContent} max-sm:hidden">
                                 {ALERT_CONDITION_CHOICES[item.condition]}
@@ -242,11 +247,13 @@
                                     <Tooltip>{t('btn.delete')}</Tooltip>
 
                                     <div class="w-0 h-0 inline">
-                                        <AlertForm bind:open={entryActions[alertKind][item.id].edit} action='edit' kind={alertKind}
-                                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                        {#key item.id}
+                                            <AlertForm bind:open={entryActions[alertKind][item.id].edit} action='edit' kind={alertKind}
+                                                existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 
-                                        <AlertForm bind:open={entryActions[alertKind][item.id].clone} action='clone' kind={alertKind}
-                                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                            <AlertForm bind:open={entryActions[alertKind][item.id].clone} action='clone' kind={alertKind}
+                                                existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                        {/key}
                                     </div>
                                 </div>
                                 </TableBodyCell>
@@ -260,6 +267,7 @@
                 </div>
                 <div>
                     {#each entryLists[alertKind] as alert (alert.id)}
+                        {#key searchedAt}
                         <div id="alerts-infos-{alert.id}">
                             <Popover triggeredBy="#alerts-name-{alert.id}" class={classPopover} placement="bottom-start">
                                 <div class="p-3 space-y-2">
@@ -332,6 +340,7 @@
                                 </table>
                             </Popover>
                         </div>
+                        {/key}
                     {/each}
                 </div>
             </AccordionItem>
@@ -378,11 +387,13 @@
                                 <Button size="xs" on:click={() => {deleteAlert(item.id, 'plugin')}}><TrashBinSolid/></Button>
                                 <Tooltip>{t('btn.delete')}</Tooltip>
                                 <div class="w-0 h-0 inline">
-                                    <AlertPluginForm bind:open={entryActions.plugins[item.id].edit} action='edit'
-                                        existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                    {#key item.id}
+                                        <AlertPluginForm bind:open={entryActions.plugins[item.id].edit} action='edit'
+                                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 
-                                    <AlertPluginForm bind:open={entryActions.plugins[item.id].clone} action='clone'
-                                        existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                        <AlertPluginForm bind:open={entryActions.plugins[item.id].clone} action='clone'
+                                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                    {/key}
                                 </div>
                             </div>
                         </TableBodyCell>

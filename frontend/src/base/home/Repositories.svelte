@@ -38,6 +38,7 @@
     let entryActions = $state({});
     let updateLoop: number = $state(0);
     let updatedAt = $state(0);
+    let searchedAt = $state(0);
 
     interface repoType {
         id: number,
@@ -123,6 +124,7 @@
     }
 
     function searchFilter(item: repoType, searchTerm: string) : boolean {
+        searchedAt = Date.now();
         let s = searchTerm.toLowerCase();
         if (item.rtype_name.toLowerCase() == 'static') {
             let p = item.static_path ? item.static_path : '';
@@ -205,10 +207,12 @@
                         <TableBodyRow slot="row" let:item>
                             <TableBodyCell tdClass={classListContent}>
                                 {item.name}
-                                <button id="repos-name-{item.id}" class="ml-1">
-                                    <InfoCircleSolid size="sm"/>
-                                    <span class="sr-only">{t('repos.info')}</span>
-                                </button>
+                                {#key item.id}
+                                    <button id="repos-name-{item.id}" class="ml-1">
+                                        <InfoCircleSolid size="sm"/>
+                                        <span class="sr-only">{t('repos.info')}</span>
+                                    </button>
+                                {/key}
                             </TableBodyCell>
                             <TableBodyCell tdClass="{classListContent} max-lg:hidden">
                                 {#if item.rtype == repoKindMap['git']}
@@ -279,11 +283,13 @@
                                     <Tooltip>{t('btn.delete')}</Tooltip>
 
                                     <div class="w-0 h-0 inline">
-                                        <RepositoryForm bind:open={entryActions[item.id].edit} action='edit' rtypeName={repoKind}
-                                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                        {#key item.id}
+                                            <RepositoryForm bind:open={entryActions[item.id].edit} action='edit' rtypeName={repoKind}
+                                                existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 
-                                        <RepositoryForm bind:open={entryActions[item.id].clone} action='clone' rtypeName={repoKind}
-                                            existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                            <RepositoryForm bind:open={entryActions[item.id].clone} action='clone' rtypeName={repoKind}
+                                                existingID={item.id} bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+                                        {/key}
                                     </div>
                                 </div>
                             </TableBodyCell>
@@ -298,156 +304,158 @@
                 <div>
                     {#each entryLists[repoKind] as repo (repo.id)}
                         {#if repoKind == repo.rtype_name.toLowerCase()}
-                        <div id="repos-infos-{repo.id}">
-                            <Popover triggeredBy="#repos-name-{repo.id}" class={classPopover} placement="bottom-start">
-                                <div class="p-3 space-y-2">
-                                    <h3 class={classPopoverTitle}>{t('repos.info')}</h3>
-                                </div>
-                                <table>
-                                    <tbody>
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('common.id')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Text}>
-                                                {repo.id}
-                                            </td>
-                                        </tr>
-                                        {#if repoKind == 'static'}
+                            {#key searchedAt}
+                            <div id="repos-infos-{repo.id}">
+                                <Popover triggeredBy="#repos-name-{repo.id}" class={classPopover} placement="bottom-start">
+                                    <div class="p-3 space-y-2">
+                                        <h3 class={classPopoverTitle}>{t('repos.info')}</h3>
+                                    </div>
+                                    <table>
+                                        <tbody>
                                             <tr>
                                                 <td class={classPopoverColumn1}>
-                                                    {t('common.path')}:
+                                                    {t('common.id')}:
                                                 </td>
                                                 <td class={classPopoverColumn2Text}>
-                                                    {repo.static_path}
+                                                    {repo.id}
                                                 </td>
                                             </tr>
-                                        {:else}
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('repos.form.git_origin')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Text}>
-                                                    {repo.git_origin}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('repos.form.git_branch')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Text}>
-                                                    {repo.git_branch}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('repos.form.git_credentials')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Div}>
-                                                    <button class="cursor-default">
-                                                        <Radio class="inline-block" checked={isSet(repo.git_credentials)}></Radio>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('repos.form.git_limit_depth')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Text}>
-                                                    {repo.git_limit_depth ? repo.git_limit_depth : '-'}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('repos.form.git_playbook_base')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Text}>
-                                                    {repo.git_playbook_base ? repo.git_playbook_base : '-'}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('repos.form.git_lfs')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Div}>
-                                                    <button class="cursor-default">
-                                                        <Radio class="inline-block" checked={repo.git_lfs}></Radio>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('repos.form.git_isolate')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Div}>
-                                                    <button class="cursor-default">
-                                                        <Radio class="inline-block" checked={repo.git_isolate}></Radio>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('system.ssh_hostkey')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Text}>
-                                                    {repo.ssh_hostkey_file ? repo.ssh_hostkey_file : '-'}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('repos.form.git_hook_pre')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Div}>
-                                                    <button class="cursor-default">
-                                                        <Radio class="inline-block" checked={isSet(repo.git_hook_pre)}></Radio>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('repos.form.git_hook_post')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Div}>
-                                                    <button class="cursor-default">
-                                                        <Radio class="inline-block" checked={isSet(repo.git_hook_post)}></Radio>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('repos.form.git_hook_cleanup')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Div}>
-                                                    <button class="cursor-default">
-                                                        <Radio class="inline-block" checked={isSet(repo.git_hook_cleanup)}></Radio>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('repos.form.git_override_initialize')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Div}>
-                                                    <button class="cursor-default">
-                                                        <Radio class="inline-block" checked={isSet(repo.git_override_initialize)}></Radio>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('repos.form.git_override_update')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Div}>
-                                                    <button class="cursor-default">
-                                                        <Radio class="inline-block" checked={isSet(repo.git_override_update)}></Radio>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        {/if}
-                                    </tbody>
-                                </table>
-                            </Popover>
-                        </div>
+                                            {#if repoKind == 'static'}
+                                                <tr>
+                                                    <td class={classPopoverColumn1}>
+                                                        {t('common.path')}:
+                                                    </td>
+                                                    <td class={classPopoverColumn2Text}>
+                                                        {repo.static_path}
+                                                    </td>
+                                                </tr>
+                                            {:else}
+                                                <tr>
+                                                    <td class={classPopoverColumn1}>
+                                                        {t('repos.form.git_origin')}:
+                                                    </td>
+                                                    <td class={classPopoverColumn2Text}>
+                                                        {repo.git_origin}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class={classPopoverColumn1}>
+                                                        {t('repos.form.git_branch')}:
+                                                    </td>
+                                                    <td class={classPopoverColumn2Text}>
+                                                        {repo.git_branch}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class={classPopoverColumn1}>
+                                                        {t('repos.form.git_credentials')}:
+                                                    </td>
+                                                    <td class={classPopoverColumn2Div}>
+                                                        <button class="cursor-default">
+                                                            <Radio class="inline-block" checked={isSet(repo.git_credentials)}></Radio>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class={classPopoverColumn1}>
+                                                        {t('repos.form.git_limit_depth')}:
+                                                    </td>
+                                                    <td class={classPopoverColumn2Text}>
+                                                        {repo.git_limit_depth ? repo.git_limit_depth : '-'}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class={classPopoverColumn1}>
+                                                        {t('repos.form.git_playbook_base')}:
+                                                    </td>
+                                                    <td class={classPopoverColumn2Text}>
+                                                        {repo.git_playbook_base ? repo.git_playbook_base : '-'}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class={classPopoverColumn1}>
+                                                        {t('repos.form.git_lfs')}:
+                                                    </td>
+                                                    <td class={classPopoverColumn2Div}>
+                                                        <button class="cursor-default">
+                                                            <Radio class="inline-block" checked={repo.git_lfs}></Radio>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class={classPopoverColumn1}>
+                                                        {t('repos.form.git_isolate')}:
+                                                    </td>
+                                                    <td class={classPopoverColumn2Div}>
+                                                        <button class="cursor-default">
+                                                            <Radio class="inline-block" checked={repo.git_isolate}></Radio>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class={classPopoverColumn1}>
+                                                        {t('system.ssh_hostkey')}:
+                                                    </td>
+                                                    <td class={classPopoverColumn2Text}>
+                                                        {repo.ssh_hostkey_file ? repo.ssh_hostkey_file : '-'}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class={classPopoverColumn1}>
+                                                        {t('repos.form.git_hook_pre')}:
+                                                    </td>
+                                                    <td class={classPopoverColumn2Div}>
+                                                        <button class="cursor-default">
+                                                            <Radio class="inline-block" checked={isSet(repo.git_hook_pre)}></Radio>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class={classPopoverColumn1}>
+                                                        {t('repos.form.git_hook_post')}:
+                                                    </td>
+                                                    <td class={classPopoverColumn2Div}>
+                                                        <button class="cursor-default">
+                                                            <Radio class="inline-block" checked={isSet(repo.git_hook_post)}></Radio>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class={classPopoverColumn1}>
+                                                        {t('repos.form.git_hook_cleanup')}:
+                                                    </td>
+                                                    <td class={classPopoverColumn2Div}>
+                                                        <button class="cursor-default">
+                                                            <Radio class="inline-block" checked={isSet(repo.git_hook_cleanup)}></Radio>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class={classPopoverColumn1}>
+                                                        {t('repos.form.git_override_initialize')}:
+                                                    </td>
+                                                    <td class={classPopoverColumn2Div}>
+                                                        <button class="cursor-default">
+                                                            <Radio class="inline-block" checked={isSet(repo.git_override_initialize)}></Radio>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class={classPopoverColumn1}>
+                                                        {t('repos.form.git_override_update')}:
+                                                    </td>
+                                                    <td class={classPopoverColumn2Div}>
+                                                        <button class="cursor-default">
+                                                            <Radio class="inline-block" checked={isSet(repo.git_override_update)}></Radio>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            {/if}
+                                        </tbody>
+                                    </table>
+                                </Popover>
+                            </div>
+                            {/key}
                         {/if}
                     {/each}
                 </div>

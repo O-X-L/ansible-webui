@@ -8,6 +8,19 @@ tbd
 
 ## Version 0
 
+### 0.9.3
+
+Fixes:
+
+* Correct buttons and info-popups after filtering entries via search [#90](https://github.com/O-X-L/ansible-webui/issues/90)
+* Fix for environment-info search-filter
+
+Features:
+
+* ?
+
+----
+
 ### 0.9.2
 
 Fixes:
