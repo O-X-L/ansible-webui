@@ -288,6 +288,8 @@ ES = {
     'logs.exec_failed': 'Ejecución fallida!',
     'logs.error_short': 'Resumen',
     'logs.error_medium': 'Error',
+    'logs.btn.job_rerun': 'Reejecutar trabajo',
+    'logs.btn.job_edit': 'Editar trabajo',
 
     # system
     'system.settings': 'Settings',

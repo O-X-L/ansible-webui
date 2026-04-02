@@ -696,6 +696,9 @@
             <Modal bind:open={entryActions[job.id].exec} size="sm" autoclose={false} placement="top-center"
                 backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
                 <Heading tag="h2">{t('jobs.execute')}</Heading>
+                <div>
+                    {t('jobs.job')}: {job.name}
+                </div>
 
                 {#if executionPrompts.config.fields.includes('limit')}
                     <!-- todo: implement inventory-limit-browsing -->

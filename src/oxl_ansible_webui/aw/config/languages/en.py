@@ -290,6 +290,8 @@ EN = {
     'logs.exec_failed': 'Execution failed!',
     'logs.error_short': 'Summary',
     'logs.error_medium': 'Error',
+    'logs.btn.job_rerun': 'Rerun job',
+    'logs.btn.job_edit': 'Edit job',
 
     # system
     'system.settings': 'Settings',

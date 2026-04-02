@@ -292,6 +292,8 @@ DE = {
     'logs.exec_failed': 'Ausführung fehlgeschlagen!',
     'logs.error_short': 'Zusammenfassung',
     'logs.error_medium': 'Fehler',
+    'logs.btn.job_rerun': 'Job erneut ausführen',
+    'logs.btn.job_edit': 'Job bearbeiten',
 
     # system
     'system.settings': 'Einstellungen',

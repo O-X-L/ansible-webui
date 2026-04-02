@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
 
-    import { BookOpenSolid, StopSolid, TrashBinSolid } from 'flowbite-svelte-icons';
+    import { BookOpenSolid, StopSolid, TrashBinSolid, PlaySolid, EditSolid } from 'flowbite-svelte-icons';
     import {
         Spinner, Accordion, AccordionItem, Table, TableBody, TableBodyCell, TableBodyRow,
         TableHead, TableHeadCell, Input, Button, Tooltip, Label,
@@ -12,7 +12,7 @@
     import { tq } from '../../util/translate.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import { type jobType, type executionType } from './Types.js';
-    import { getURLHashParams, isSet, setURLHashParams } from '../../util/main.js';
+    import { getURLHashParams, isSet, setURLHashParams, redirectTo } from '../../util/main.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import { JOB_EXEC_STATI_ACTIVE, WAIT_MOUNT_MODAL, WAIT_MOUNT_SCROLL } from '../Config.js';
     import {
@@ -340,11 +340,21 @@
                                 </Button>
                                 <Tooltip>{t('btn.logs')}</Tooltip>
     
+                                <Button size="xs" id="logs-job-{exec.job}-{exec.id}-rerun" onclick={() => {redirectTo(`/ui#jobs&exec=${exec.job}`)}}>
+                                    <PlaySolid/>
+                                </Button>
+                                <Tooltip>{t('logs.btn.job_rerun')}</Tooltip>
+
                                 <Button size="xs" on:click={() => {stopJob(exec.job, exec.id)}}
                                     disabled={!isJobExecutionActive(exec)} id="logs-job-{exec.job}-{exec.id}-stop">
                                     <StopSolid/>
                                 </Button>
                                 <Tooltip>{t('btn.stop')}</Tooltip>
+
+                                <Button size="xs" id="logs-job-{exec.job}-{exec.id}-rerun" onclick={() => {redirectTo(`/ui#jobs&edit=${exec.job}`)}}>
+                                    <EditSolid/>
+                                </Button>
+                                <Tooltip>{t('logs.btn.job_edit')}</Tooltip>
 
                                 <Button size="xs" on:click={() => {cleanupJobExecution(exec.job, exec.id)}}
                                     disabled={isJobExecutionActive(exec)} id="logs-job-{exec.job}-{exec.id}-cleanup">
@@ -431,11 +441,21 @@
                                 </Button>
                                 <Tooltip>{t('btn.logs')}</Tooltip>
     
-                                <Button size="xs" on:click={() => {stopJob(job.id, exec.id)}}
-                                    disabled={!isJobExecutionActive(exec)} id="logs-job-{job.id}-{exec.id}-stop">
+                                <Button size="xs" id="logs-job-{exec.job}-{exec.id}-rerun" onclick={() => {redirectTo(`/ui#jobs&exec=${exec.job}`)}}>
+                                    <PlaySolid/>
+                                </Button>
+                                <Tooltip>{t('logs.btn.job_rerun')}</Tooltip>
+
+                                <Button size="xs" on:click={() => {stopJob(exec.job, exec.id)}}
+                                    disabled={!isJobExecutionActive(exec)} id="logs-job-{exec.job}-{exec.id}-stop">
                                     <StopSolid/>
                                 </Button>
                                 <Tooltip>{t('btn.stop')}</Tooltip>
+
+                                <Button size="xs" id="logs-job-{exec.job}-{exec.id}-rerun" onclick={() => {redirectTo(`/ui#jobs&edit=${exec.job}`)}}>
+                                    <EditSolid/>
+                                </Button>
+                                <Tooltip>{t('logs.btn.job_edit')}</Tooltip>
 
                                 <Button size="xs" on:click={() => {cleanupJobExecution(job.id, exec.id)}}
                                     disabled={isJobExecutionActive(exec)} id="logs-job-{job.id}-{exec.id}-cleanup">
