@@ -14,6 +14,7 @@ Fixes:
 
 * Correct buttons and info-popups after filtering entries via search [#90](https://github.com/O-X-L/ansible-webui/issues/90)
 * Fix for environment-info search-filter
+* Allow for the usage of `=` characters in environment-variable values [#56](https://github.com/O-X-L/ansible-webui/issues/56)
 
 Features:
 
