@@ -24,7 +24,7 @@ body:
     id: scope
     attributes:
       label: Scope
-      description: What version of our software are you running?
+      description: What section isn't working as expected?
       options:
         - Unknown
         - Frontend (User Interface)
