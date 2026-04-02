@@ -259,6 +259,16 @@
         if (job.cmd_args) {
             executionPrompts.field_values.cmd_args = job.cmd_args;
         }
+
+        // set default values as configured for dropdown-variables
+        for (const prompt_var of executionPrompts.config.vars) {
+            if (prompt_var.kind != 'dropdown') {
+                continue;
+            }
+            if (prompt_var.defaultChoice && prompt_var.choices.includes(prompt_var.defaultChoice)) {
+                executionPrompts.var_values[prompt_var.varName] = prompt_var.defaultChoice;
+            }
+        }
     }
 
     function handleExecutionCredentialsCreateResponse(s: number, j: any) {

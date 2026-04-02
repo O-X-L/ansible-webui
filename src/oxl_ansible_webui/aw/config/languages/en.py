@@ -147,6 +147,7 @@ EN = {
     'jobs.form.prompt_varname': 'Variable Name',
     'jobs.form.prompt_regex': 'Validation Regex',
     'jobs.form.prompt_choice_text': 'Text',
+    'jobs.form.prompt_default_choice': 'Default-Choice',
     ## form help
     'jobs.form.help.playbook_file': 'Playbook to execute',
     'jobs.form.help.inventory_file': 'One or multiple inventory files/directories to include for the execution. '
@@ -179,6 +180,7 @@ EN = {
                                            'user credentials at execution time',
     'jobs.form.help.enabled': 'En- or disable the schedule. Can be ignored if no schedule was set',
     'jobs.form.help.prompt_choices': 'Comma-separated list of choices.',
+    'jobs.form.help.prompt_default_choice': 'Optional: Default choice to pre-select.',
     'jobs.form.help.prompt_regex': 'You can use <a href="https://regex101.com/">Regex101.com</a> to test your input-validation. '
                                    'Make sure to select the "ECMAScript (Javascript)" flavor.',
 

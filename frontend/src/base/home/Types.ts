@@ -4,6 +4,7 @@ export interface executionPromptVarType {
     kind: 'text'|'dropdown',
     required: boolean,
     choices: string[],
+    defaultChoice: string|null,
     regex: string,
 }
 

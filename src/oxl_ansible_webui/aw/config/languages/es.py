@@ -143,6 +143,7 @@ ES = {
     'jobs.form.prompt_varname': 'Nombre de variable',
     'jobs.form.prompt_regex': 'Validación de expresión regular (Regex)',
     'jobs.form.prompt_choice_text': 'Texto',
+    'jobs.form.prompt_default_choice': 'Opción predeterminada',
     ## form help
     'jobs.form.help.playbook_file': 'Estrategia (Playbook) a ejecutar',
     'jobs.form.help.inventory_file': 'Uno o varios archivos/directorios de inventario que se deben incluir para la ejecución. '
@@ -175,6 +176,7 @@ ES = {
                                            'credenciales de usuario en el momento de la ejecución',
     'jobs.form.help.enabled': 'Activar o desactivar la programación. Se puede ignorar si no se ha establecido ninguna programación',
     'jobs.form.help.prompt_choices': 'Lista de opciones separadas por comas.',
+    'jobs.form.help.prompt_default_choice': 'Opcional: opción predeterminada para preseleccionar.',
     'jobs.form.help.prompt_regex': 'Puede usar <a href="https://regex101.com/">Regex101.com</a> para comprobar la validación de sus entradas. '
                                    'Asegúrate de seleccionar el "ECMAScript (Javascript)" sabor.',
 

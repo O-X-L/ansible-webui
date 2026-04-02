@@ -565,6 +565,7 @@
         kind: {value: 'text'|'dropdown'},
         required: {value: boolean},
         choices: {value: string[]},
+        defaultChoice: {value: string|null},
         regex: {value: string, color: inputColorType, regex: RegExp},
     }
     interface executionPromptSwitches {
@@ -625,6 +626,7 @@
                 kind: p.kind.value,
                 required: p.required.value,
                 choices: p.choices.value,
+                defaultChoice: p.defaultChoice.value,
                 regex: p.regex.value,
             };
             prompts.vars.push(prompt);
@@ -642,6 +644,7 @@
             kind: {value: p.kind},
             required: {value: p.required},
             choices: {value: p.choices},
+            defaultChoice: {value: p.defaultChoice},
             regex: {value: p.regex, color: inputBaseColor, regex: /^(?!.*\x22.*)(^.*$)$/},
         }
         executionPrompts = [...executionPrompts, p2];
@@ -654,6 +657,7 @@
             kind: 'text',
             required: false,
             choices: [],
+            defaultChoice: null,
             regex: '',
         };
         execPromptAddWithDefaults(prompt);
@@ -1090,6 +1094,11 @@
                                         <Label for="job_prompt_{p.id}_choices" class={classModalLabel}>{t('common.choices')}</Label>
                                         <MultiInput id="job_prompt_{p.id}_choices" bind:value={p.choices.value} />
                                         <Helper class={classModalHelp}>{t('jobs.form.help.prompt_choices')}</Helper>
+                                    </div>
+                                    <div class={classModalInput}>
+                                        <Label for="job_prompt_{p.id}_default_choice" class={classModalLabel}>{t('jobs.form.prompt_default_choice')}</Label>
+                                        <Input id="job_prompt_{p.id}_default_choice" bind:value={p.defaultChoice.value} />
+                                        <Helper class={classModalHelp}>{t('jobs.form.help.prompt_default_choice')}</Helper>
                                     </div>
                                 {/if}
                                 {#if p.kind.value == 'text'}

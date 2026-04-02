@@ -18,7 +18,7 @@ Fixes:
 
 Features:
 
-* ?
+* Add option to set default-value for execution-prompt choices/dropdown [#93](https://github.com/O-X-L/ansible-webui/issues/93)
 
 ----
 

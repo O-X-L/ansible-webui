@@ -143,6 +143,7 @@ DE = {
     'jobs.form.prompt_varname': 'Variablen-Name',
     'jobs.form.prompt_regex': 'Validierungs-Regex',
     'jobs.form.prompt_choice_text': 'Text',
+    'jobs.form.prompt_default_choice': 'Standard-Option',
     ## form help
     'jobs.form.help.playbook_file': 'Auszuführendes Playbook',
     'jobs.form.help.inventory_file': 'Eine oder mehrere Inventardateien/-verzeichnisse, die für die Ausführung genutzt werden sollen. '
@@ -176,6 +177,7 @@ DE = {
     'jobs.form.help.enabled': 'Die geplante Ausführung aktivieren oder deaktivieren. '
                               'Kann ignoriert werden, wenn kein Zeitplan festgelegt wurde.',
     'jobs.form.help.prompt_choices': 'Komma-separierte Liste von Optionen.',
+    'jobs.form.help.prompt_default_choice': 'Optional: Vorausgewählte Standard-Option.',
     'jobs.form.help.prompt_regex': '<a href="https://regex101.com/">Regex101.com</a> kann dazu genutzt werden, um die '
                                    'Eingabevalidierung zu testen. '
                                    "Die Variante 'ECMAScript (Javascript)' muss ausgewählt werden.",
