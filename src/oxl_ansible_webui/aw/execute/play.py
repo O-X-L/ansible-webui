@@ -1,19 +1,25 @@
 import traceback
 
 from django.db.utils import OperationalError, IntegrityError
-from ansible_runner import RunnerConfig, Runner
+from oxl_ansible_executor import ExecutionError, PreparationError
 
 from aw.config.main import config
+from aw.model.system import ANSIBLE_EXECUTOR_OXL
 from aw.model.job import Job, JobExecution, JobExecutionResult
-from aw.execute.play_util import runner_cleanup, runner_prep, parse_run_result, failure, runner_logs
-from aw.execute.util import get_path_run, is_execution_status, job_logs
+from aw.execute.play_util import executor_cleanup, executor_prep, failure
+from aw.execute.util import get_path_run, job_logs
 from aw.execute.repository import ExecuteRepository
 from aw.execute.alert import Alert
-from aw.utils.util import datetime_w_tz, is_null, timed_lru_cache  # get_ansible_versions
+from aw.utils.util import datetime_w_tz, is_null  # get_ansible_versions
 from aw.utils.handlers import AnsibleConfigError, AnsibleRepositoryError
 from aw.utils.debug import log
 from aw.utils.db_handler import close_old_mysql_connections
 from aw.utils.audit import log_audit
+from aw.execute.executor_ansible_runner import executor_ansible_runner
+from aw.execute.executor_oxl_ansible_executor import executor_oxl_ansible_executor
+from aw.execute.ssh_hostkey import get_ssh_known_hosts_file
+from aw.execute.play_credentials import get_credentials_to_use
+from aw.model.job_credential import JobUserTMPCredentials
 
 
 def _log_audit(job: Job, execution: JobExecution):
@@ -51,45 +57,50 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
     execution.save()
 
     log_files = job_logs(job=job, execution=execution)
-
-    @timed_lru_cache(seconds=1)  # check actual status every N seconds; lower DB queries
-    def _cancel_job() -> bool:
-        return is_execution_status(execution, 'Stopping')
-
+    ssh_known_hosts_file = get_ssh_known_hosts_file(job, path_run=path_run)
     exec_repo = ExecuteRepository(repository=job.repository, execution=execution, path_run=path_run)
+
+    creds = get_credentials_to_use(job=job, execution=execution)
+    if isinstance(creds, JobUserTMPCredentials):
+        creds.cleanup_secret(remove_file=False)
+
     try:
         exec_repo.create_or_update_repository()
         project_dir = exec_repo.get_project_dir()
-        opts = runner_prep(job=job, execution=execution, path_run=path_run, project_dir=project_dir)
-        close_old_mysql_connections()
-        execution.save()
-        runner_cfg = RunnerConfig(**opts, timeout=config['run_timeout'], quiet=True)
-        runner_logs(cfg=runner_cfg, log_files=log_files)
-
-        runner_cfg.prepare()
-        command = ' '.join(runner_cfg.command)
-        log(msg=f"Running job '{job.name}': '{command}'", level=5)
-        execution.command = command[command.find('ansible-playbook'):]
+        executor_options = executor_prep(job=job, execution=execution, path_run=path_run, project_dir=project_dir)
         close_old_mysql_connections()
         execution.save()
 
-        runner = Runner(config=runner_cfg, cancel_callback=_cancel_job)
-        runner.run()
+        if config['ansible_executor'] == ANSIBLE_EXECUTOR_OXL:
+            executor_oxl_ansible_executor(
+                job=job,
+                execution=execution,
+                result=result,
+                log_files=log_files,
+                ssh_known_hosts_file=ssh_known_hosts_file,
+                executor_options=executor_options,
+                creds=creds,
+            )
 
-        parse_run_result(
-            result=result,
-            execution=execution,
-            runner=runner,
-        )
-        del runner
+        else:
+            executor_ansible_runner(
+                job=job,
+                execution=execution,
+                result=result,
+                log_files=log_files,
+                ssh_known_hosts_file=ssh_known_hosts_file,
+                executor_options=executor_options,
+                creds=creds,
+            )
 
-        runner_cleanup(execution=execution, path_run=path_run, exec_repo=exec_repo)
+        executor_cleanup(execution=execution, path_run=path_run, exec_repo=exec_repo)
         Alert(job=job, execution=execution).go()
 
     except (
             AnsibleConfigError, AnsibleRepositoryError,
             OSError, ValueError, AttributeError, IndexError, KeyError,
             OperationalError, IntegrityError,
+            ExecutionError, PreparationError,
     ) as err:
         tb = traceback.format_exc(limit=1024)
         failure(

@@ -14,7 +14,8 @@ crontab
 
 # ansible
 ansible-core
-ansible-runner
+ansible-runner==2.4.*
+oxl-ansible-executor
 
 # config
 PyYAML

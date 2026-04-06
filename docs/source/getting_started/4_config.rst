@@ -265,6 +265,13 @@ These settings are also configurable using the WebUI.
   Fallback value is :code:`UTC` if all others are invalid.
 
 
+* **AW_EXECUTOR**
+
+  Set the Ansible-Executor library to use.
+
+  You can choose between the official `ansible-runner <https://github.com/ansible/ansible-runner>`_ (*Value: 0*) and our own open-source community project `oxl-ansible-executor <https://github.com/O-X-L/ansible-executor>`_ (*Value: 1; has a better integration*).
+
+
 Advanced Settings
 =================
 

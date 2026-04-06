@@ -49,9 +49,6 @@ def parsed_ansible_version(python_modules) -> dict:
             if is_null(versions['ansible_runner']) and 'oxl-ansible-runner' in python_modules:
                 versions['ansible_runner'] = python_modules['oxl-ansible-runner']['version']
 
-            if is_null(versions['ansible_runner']) and 'ansibleguy-runner' in python_modules:
-                versions['ansible_runner'] = python_modules['ansibleguy-runner']['version']
-
         if 'ansible' in python_modules:
             versions['ansible'] = python_modules['ansible']['version']
 
@@ -104,6 +101,7 @@ def get_system_versions(python_modules: dict = None, ansible_version: dict = Non
         'Git': process_cache('git --version')['stdout'].replace('git version ', ''),
         'Ansible Core': ansible_version['ansible_core'],
         'Ansible Runner': ansible_version['ansible_runner'],
+        'Ansible Executor (OXL)': python_modules['oxl-ansible-executor']['version'],
         'Django': python_modules['django']['version'],
         'Django API': python_modules['djangorestframework']['version'],
         'Gunicorn': python_modules['gunicorn']['version'],

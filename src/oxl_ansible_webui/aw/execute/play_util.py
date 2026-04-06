@@ -1,10 +1,7 @@
 from pathlib import Path
-from os import symlink
-from os import path as os_path
 from os import remove as remove_file
 from os import stat as os_stat
 
-from ansible_runner import Runner, RunnerConfig
 try:
     from ara.setup.callback_plugins import callback_plugins as ara_callback_plugins
 
@@ -13,18 +10,13 @@ except (ImportError, ModuleNotFoundError):
 
 from aw.utils.debug import log
 from aw.config.main import config
+from aw.utils.filesystem import rm_dir
 from aw.utils.util import is_set, datetime_w_tz
 from aw.model.base import JOB_EXEC_STATUS_FAILED
 from aw.execute.repository import ExecuteRepository
 from aw.utils.db_handler import close_old_mysql_connections
-from aw.execute.ssh_hostkey import get_ssh_known_hosts_file
-from aw.model.job_credential import BaseJobCredentials, JobUserTMPCredentials
-from aw.utils.filesystem import write_file_0640, overwrite_and_delete_file, rm_dir
-from aw.execute.play_credentials import get_runner_credentials_args, get_credentials_to_use
-from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, JobError
-from aw.execute.util import update_status, decode_job_env_vars, create_dirs, is_execution_status, config_error
-
-# see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
+from aw.model.job import Job, JobExecution, JobExecutionResult, JobError
+from aw.execute.util import update_status, decode_job_env_vars, create_dirs, config_error
 
 
 def _exec_log(execution: JobExecution, msg: str, level: int = 3):
@@ -33,45 +25,6 @@ def _exec_log(execution: JobExecution, msg: str, level: int = 3):
         msg=f"Job-execution '{execution.job}' @ {execution.result.time_start}: {msg}",
         level=level,
     )
-
-
-def _commandline_arguments(job: Job, execution: JobExecution, creds: (BaseJobCredentials, None), path_run: Path) -> str:
-    cmd_arguments = []
-    if is_set(job.cmd_args):
-        cmd_arguments.append(job.cmd_args)
-
-    if is_set(execution.cmd_args):
-        cmd_arguments.append(execution.cmd_args)
-
-    if execution.mode_check or job.mode_check:
-        cmd_arguments.append('--check')
-
-    if execution.mode_diff or job.mode_diff:
-        cmd_arguments.append('--diff')
-
-    ssh_known_hosts_file = get_ssh_known_hosts_file(job, path_run=path_run)
-    if ssh_known_hosts_file is not None:
-        cmd_arguments.append(
-            f"-e 'ansible_ssh_extra_args=\"-o UserKnownHostsFile={ssh_known_hosts_file}\"'"
-        )
-
-    if is_set(creds):
-        if is_set(creds.become_pass):
-            cmd_arguments.append('--ask-become-pass')
-
-        if is_set(creds.become_user):
-            cmd_arguments.append(f'--become-user {creds.become_user}')
-
-        if is_set(creds.connect_pass):
-            cmd_arguments.append('--ask-pass')
-
-        if is_set(creds.connect_user):
-            cmd_arguments.append(f'--user {creds.connect_user}')
-
-        if is_set(creds.vault_pass):
-            cmd_arguments.append('--ask-vault-pass')
-
-    return ' '.join(cmd_arguments)
 
 
 def _environmental_variables(job: Job, execution: JobExecution) -> dict:
@@ -136,8 +89,8 @@ def _execution_or_job(job: Job, execution: JobExecution, attr: str):
     return None
 
 
-def _runner_options(
-        job: Job, execution: JobExecution, path_run: Path, project_dir: str, creds: (BaseJobCredentials, None),
+def _executor_options(
+        job: Job, execution: JobExecution, path_run: Path, project_dir: str,
 ) -> dict:
     verbosity = None
     if execution.verbosity != 0:
@@ -146,7 +99,12 @@ def _runner_options(
     elif job.verbosity != 0:
         verbosity = job.verbosity
 
-    cmdline_args = _commandline_arguments(job=job, execution=execution, creds=creds, path_run=path_run)
+    cmdline_args = []
+    if is_set(job.cmd_args):
+        cmdline_args.append(job.cmd_args)
+
+    if is_set(execution.cmd_args):
+        cmdline_args.append(execution.cmd_args)
 
     opts = {
         'project_dir': project_dir,
@@ -156,17 +114,16 @@ def _runner_options(
         'skip_tags': _execution_or_job(job, execution, 'tags_skip'),
         'verbosity': verbosity,
         'envvars': _environmental_variables(job=job, execution=execution),
-        'cmdline': cmdline_args if is_set(cmdline_args) else None,
+        'cmdline': cmdline_args,
     }
 
     return opts
 
 
-def runner_prep(job: Job, execution: JobExecution, path_run: Path, project_dir: str) -> dict:
+def executor_prep(job: Job, execution: JobExecution, path_run: Path, project_dir: str) -> dict:
     update_status(execution, status='Starting')
 
-    creds = get_credentials_to_use(job=job, execution=execution)
-    opts = _runner_options(job=job, execution=execution, path_run=path_run, project_dir=project_dir, creds=creds)
+    opts = _executor_options(job=job, execution=execution, path_run=path_run, project_dir=project_dir)
     opts['playbook'] = job.playbook_file
     if is_set(job.inventory_file):
         opts['inventory'] = job.inventory_file.split(',')
@@ -185,39 +142,11 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path, project_dir: 
     create_dirs(path=path_run, desc='run')
     create_dirs(path=config['path_log'], desc='log')
 
-    creds_args = get_runner_credentials_args(creds=creds)
-    if isinstance(creds, JobUserTMPCredentials):
-        creds.cleanup_secret(remove_file=False)
-
     update_status(execution, status='Running')
-    return {
-        **opts,
-        **creds_args,
-    }
+    return opts
 
 
-def runner_logs(cfg: RunnerConfig, log_files: dict):
-    logs_src = {
-        'stdout': os_path.join(cfg.artifact_dir, 'stdout'),
-        'stderr': os_path.join(cfg.artifact_dir, 'stderr'),
-    }
-
-    for log_file in log_files.values():
-        write_file_0640(file=log_file, content='')
-
-    # link logs from artifacts to log-directory; have not found a working way of overriding the target files..
-    for log_type in ['stdout', 'stderr']:
-        try:
-            symlink(log_files[log_type], logs_src[log_type])
-
-        except FileExistsError:
-            remove_file(logs_src[log_type])
-            symlink(log_files[log_type], logs_src[log_type])
-
-
-def runner_cleanup(execution: JobExecution, path_run: Path, exec_repo: ExecuteRepository):
-    overwrite_and_delete_file(f"{path_run}/env/passwords")
-    overwrite_and_delete_file(f"{path_run}/env/ssh_key")
+def executor_cleanup(execution: JobExecution, path_run: Path, exec_repo: ExecuteRepository):
     if is_set(execution.credentials_tmp):
         execution.credentials_tmp.cleanup_secret(remove_file=True)
         execution.credentials_tmp.delete()
@@ -241,54 +170,6 @@ def runner_cleanup(execution: JobExecution, path_run: Path, exec_repo: ExecuteRe
     rm_dir(path_run)
 
 
-def _run_stats(runner: Runner, result: JobExecutionResult) -> bool:
-    any_task_failed = False
-    for host in runner.stats['processed']:
-        result_host = JobExecutionResultHost(hostname=host)
-
-        result_host.unreachable = host in runner.stats['dark']
-        result_host.tasks_skipped = runner.stats['skipped'][host] if host in runner.stats['skipped'] else 0
-        result_host.tasks_ok = runner.stats['ok'][host] if host in runner.stats['ok'] else 0
-        result_host.tasks_failed = runner.stats['failures'][host] if host in runner.stats['failures'] else 0
-        result_host.tasks_ignored = runner.stats['ignored'][host] if host in runner.stats['ignored'] else 0
-        result_host.tasks_rescued = runner.stats['rescued'][host] if host in runner.stats['rescued'] else 0
-        result_host.tasks_changed = runner.stats['changed'][host] if host in runner.stats['changed'] else 0
-
-        if result_host.unreachable:
-            any_task_failed = True
-
-        elif result_host.tasks_failed > 0:
-            any_task_failed = True
-            # todo: create errors
-
-        result_host.result = result
-        close_old_mysql_connections()
-        result_host.save()
-
-    return any_task_failed
-
-
-def parse_run_result(execution: JobExecution, result: JobExecutionResult, runner: Runner):
-    result.time_fin = datetime_w_tz()
-    result.failed = runner.errored
-    close_old_mysql_connections()
-    result.save()
-
-    any_task_failed = False
-    if runner.stats is not None:
-        any_task_failed = _run_stats(runner=runner, result=result)
-
-    if runner.errored or runner.timed_out or runner.rc != 0 or any_task_failed:
-        update_status(execution, status=JOB_EXEC_STATUS_FAILED)
-
-    else:
-        status = 'Finished'
-        if is_execution_status(execution, 'Stopping') or runner.canceled:
-            status = 'Stopped'
-
-        update_status(execution, status=status)
-
-
 def failure(
         execution: JobExecution, exec_repo: ExecuteRepository, path_run: Path,
         result: JobExecutionResult, error_s: str, error_m: str
@@ -308,4 +189,4 @@ def failure(
     close_old_mysql_connections()
     execution.save()
 
-    runner_cleanup(execution=execution, path_run=path_run, exec_repo=exec_repo)
+    executor_cleanup(execution=execution, path_run=path_run, exec_repo=exec_repo)

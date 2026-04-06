@@ -328,6 +328,7 @@ EN = {
     'config.form.path_ssh_known_hosts': 'SSH Known-Hosts File',
     'config.form.debug': 'Debug Mode',
     'config.form.audit_log': 'Audit Logging',
+    'config.form.ansible_executor': 'Ansible Executor',
     ### env-vars
     'config.form.timezone': 'Timezone',
     'config.form.db': 'Database',
@@ -385,6 +386,11 @@ EN = {
                                         'and must be issued from a trusted CA',
     'config.form.help.mail_sender': 'Mail Sender Address to use for Alert Mails. Fallback is mail-user',
     'config.form.help.mail_transport': 'The default port mapping is: 25 = Unencrypted, 465 = SSL, 587 = StartTLS',
+    'config.form.help.ansible_executor': 'What library is used to execute Ansible. You can choose between the official '
+                                         '<a href="https://github.com/ansible/ansible-runner">ansible-runner</a>, '
+                                         'or our own open-source community-project '
+                                         '<a href="https://github.com/O-X-L/ansible-executor">oxl-ansible-executor</a>'
+                                         ' (has a better integration)',
 
     # user settings
     'user_settings.action.pwd_change': 'Password updated',

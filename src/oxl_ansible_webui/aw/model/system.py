@@ -20,6 +20,12 @@ MAIL_TRANSPORT_TYPE_CHOICES = [
     (MAIL_TRANSPORT_TYPE_STARTTLS, 'StartTLS'),
 ]
 
+ANSIBLE_EXECUTOR_OFFICIAL = 0  # github.com/ansible/ansible-runner
+ANSIBLE_EXECUTOR_OXL = 1  # github.com/O-X-L/ansible-executor
+ANSIBLE_EXECUTOR_CHOICES = [
+    (ANSIBLE_EXECUTOR_OFFICIAL, 'ansible-runner (official)'),
+    (ANSIBLE_EXECUTOR_OXL, 'oxl-ansible-executor (community)'),
+]
 
 # NOTE: add default-values to config.defaults.CONFIG_DEFAULTS
 class SystemConfig(BaseModel):
@@ -32,6 +38,7 @@ class SystemConfig(BaseModel):
         'path_run', 'path_play', 'path_log', 'path_template', 'timezone', 'run_timeout', 'session_timeout',
         'path_ansible_config', 'path_ssh_known_hosts', 'debug', 'logo_url', 'ara_server', 'global_environment_vars',
         'mail_server', 'mail_transport', 'mail_ssl_verify', 'mail_sender', 'mail_user', 'audit_log',
+        'ansible_executor',
     ]
 
     # NOTE: 'AW_DB' is needed to get this config from DB and 'AW_SECRET' cannot be saved because of security breach
@@ -62,6 +69,10 @@ class SystemConfig(BaseModel):
     mail_sender = models.TextField(max_length=300, **DEFAULT_NONE)
     mail_user = models.TextField(max_length=300, **DEFAULT_NONE)
     _enc_mail_pass = models.TextField(max_length=500, **DEFAULT_NONE)
+    ansible_executor = models.PositiveSmallIntegerField(
+        default=ANSIBLE_EXECUTOR_OFFICIAL,
+        choices=ANSIBLE_EXECUTOR_CHOICES,
+    )
 
     @classmethod
     def get_set_public_env_vars(cls) -> list:

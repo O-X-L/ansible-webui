@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny
 from drf_spectacular.utils import extend_schema
 
 from aw.base import USERS
-from aw.model.system import SystemConfig, SSHHostkeyFile
+from aw.model.system import SystemConfig, SSHHostkeyFile, ANSIBLE_EXECUTOR_CHOICES
 from aw.settings import AUTH_MODE
 from aw.utils.util import get_logo
 from aw.utils.version import get_version
@@ -251,6 +251,10 @@ class APIFormInfosConfig(GenericAPIView):
         data = _build_model_defaults_choices(SystemConfig, user)
 
         data['choices']['timezone'] = sorted(all_timezones)
+        data['choices']['ansible_executor'] = [
+            {'name': option[1], 'value': option[0]}
+            for option in ANSIBLE_EXECUTOR_CHOICES
+        ]
         data['defaults']['path_run'] = CONFIG_DEFAULTS['path_run']
         data['defaults']['path_play'] = CONFIG_DEFAULTS['path_play']
         data['defaults']['path_log'] = CONFIG_DEFAULTS['path_log']

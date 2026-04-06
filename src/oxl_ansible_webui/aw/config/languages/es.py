@@ -326,6 +326,7 @@ ES = {
     'config.form.path_ssh_known_hosts': 'Archivo SSH Known-Hosts',
     'config.form.debug': 'Modo de depuración',
     'config.form.audit_log': 'Registro de auditoría',
+    'config.form.ansible_executor': 'Ejecutor de Ansible',
 
     ### env-vars
     'config.form.timezone': 'Zona horaria',
@@ -384,7 +385,11 @@ ES = {
                                         'y debe ser emitido por una CA de confianza',
     'config.form.help.mail_sender': 'Dirección del remitente del correo electrónico que se utilizará para los correos electrónicos de alerta. La opción alternativa es mail-user',
     'config.form.help.mail_transport': 'La asignación de puertos predeterminada es: 25 = Sin cifrar, 465 = SSL, 587 = StartTLS',
-
+    'config.form.help.ansible_executor': '¿Qué biblioteca se utiliza para ejecutar Ansible?  Puedes elegir entre el '
+                                         '<a href="https://github.com/ansible/ansible-runner">ansible-runner</a>, '
+                                         'oficial o nuestro propio proyecto de código abierto de la comunidad, '
+                                         '<a href="https://github.com/O-X-L/ansible-executor">oxl-ansible-executor</a>'
+                                         ' (que ofrece una mejor integración).',
     # user settings
     'user_settings.action.pwd_change': 'Contraseña actualizada',
     'user_settings.btn.change_pwd': 'Cambiar contraseña',

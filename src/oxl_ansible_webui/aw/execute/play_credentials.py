@@ -108,27 +108,3 @@ def get_credentials_to_use(job: Job, execution: JobExecution) -> (BaseJobCredent
         )
 
     return credentials
-
-
-def get_runner_credentials_args(creds: BaseJobCredentials) -> dict:
-    args = {}
-
-    if not is_set(creds):
-        return args
-
-    if is_set(creds.ssh_key):
-        args['ssh_key'] = f'{creds.ssh_key}'
-
-    if is_set(creds.connect_pass) or is_set(creds.become_pass) or is_set(creds.vault_pass):
-        args['passwords'] = {}
-
-        if is_set(creds.connect_pass):
-            args['passwords'][r'^SSH\spassword:\s*$'] = f'{creds.connect_pass}'
-
-        if is_set(creds.become_pass):
-            args['passwords'][r'^BECOME\spassword.*:\s*$'] = f'{creds.become_pass}'
-
-        if is_set(creds.vault_pass):
-            args['passwords'][r'^Vault\spassword:\s*$'] = f'{creds.vault_pass}'
-
-    return args

@@ -57,6 +57,7 @@
         mail_ssl_verify: boolean
         mail_sender: string|null
         mail_user: string|null
+        ansible_executor: number
     }
     interface settingsReadType extends settingsBaseType {
         db: string
@@ -92,6 +93,7 @@
         mail_sender: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         mail_user: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         mail_pass: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
+        ansible_executor: {value: 0, color: inputBaseColor, required: false},
     });
 
     function t(code: string) : string {
@@ -252,6 +254,17 @@
         </span>
 
         <div class={classModalInputDiv}>
+            <div class={classModalInput}>
+                <Label for="cnf_executor" class={classModalLabel}>{t('config.form.ansible_executor')}</Label>
+                <Select id="cnf_executor" items={formInfos.choices.ansible_executor}
+                    bind:value={form.ansible_executor.value}
+                    disabled={isRO('ansible_executor')} />
+                {#if isRO('ansible_executor')}
+                    <Tooltip>{t('config.is_read_only')}</Tooltip>
+                {/if}
+                <Helper class={classModalHelp}>{@html t('config.form.help.ansible_executor')}</Helper>
+            </div>
+
             <div class={classModalInput}>
                 <Label for="cnf_ara" class={classModalLabel}>{t('config.form.ara_server')}</Label>
                 <Input id="cnf_ara" bind:value={form.ara_server.value} bind:color={form.ara_server.color}

@@ -103,7 +103,7 @@ def get_system_environment() -> dict:
     return {
         **env_system,
         **_parsed_aws_versions(),
-        'Ansible WebUI': get_version(),
+        'Ansible WebUI (OXL)': get_version(),
         'User': getuser(),
         'Ansible ARA': _parsed_ara_version(python_modules),
         'Ansible Playbook': _parsed_ansible_playbook(),
