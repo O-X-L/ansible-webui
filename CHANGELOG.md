@@ -20,6 +20,7 @@ Features:
 
 * Add option to set default-value for execution-prompt choices/dropdown [#93](https://github.com/O-X-L/ansible-webui/issues/93)
 * Add buttons to log-view for job-rerun and job-edit [#94](https://github.com/O-X-L/ansible-webui/issues/94)
+* Implemented [oxl-ansible-executor](https://github.com/O-X-L/ansible-executor) as alternative execution-library to [ansible-runner](https://github.com/ansible/ansible-runner) [#52](https://github.com/O-X-L/ansible-webui/issues/52)
 
 ----
 
