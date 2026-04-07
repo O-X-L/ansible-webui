@@ -26,6 +26,23 @@ on:
 
 jobs:
   test:
+    strategy:
+      matrix:
+        include:
+          # ansible-runner
+          - ansible_executor: '0'
+            python_version: '3.12'  # failing with >3.13 - see issue: #52
+
+          # oxl-ansible-executor
+          - ansible_executor: '1'
+            python_version: '3.12'
+
+          - ansible_executor: '1'
+            python_version: '3.13'
+
+          - ansible_executor: '1'
+            python_version: '3.14'
+
     runs-on: ubuntu-latest
     timeout-minutes: 5
     defaults:
@@ -67,3 +84,4 @@ jobs:
           exit 1
         env:
           PYTHONUNBUFFERED: 1
+          AW_EXECUTOR: "${{ matrix.ansible_executor }}"

@@ -11,6 +11,7 @@ from requests import Session
 BASE_URL = 'http://127.0.0.1:8000/api'
 API_USER = environ['AW_ADMIN']
 API_KEY = environ['AW_API_KEY']
+AW_EXECUTOR = 'ansible-runner' if environ.get('AW_EXECUTOR', '0') == '0' else 'oxl-ansible-executor'
 SINGLE_TIMEOUT = 10
 
 api = Session()
@@ -103,7 +104,13 @@ def test_simple(jid: int = 1):
     assert e['failed'] is False
     assert e['job_comment'] is None
     assert e['comment'] is None
-    assert e['command'] == 'ansible-playbook -i inv/empty.yml --limit srv1 play1.yml'
+
+    if AW_EXECUTOR == 'oxl-ansible-executor':
+        assert e['command'] == 'ansible-playbook -i inv/empty.yml -l srv1 play1.yml'
+
+    else:
+        assert e['command'] == 'ansible-playbook -i inv/empty.yml --limit srv1 play1.yml'
+
     assert e['log_stdout'] is not None
     assert Path(e['log_stdout']).is_file()
 
@@ -137,7 +144,13 @@ def test_params(jid: int = 2):
     assert e['status_name'] == 'Finished'
     assert e['failed'] is False
     assert e['comment'] == comment
-    assert e['command'] == f'ansible-playbook {cmd_args} --check --diff -i inv/empty.yml play1.yml'
+
+    if AW_EXECUTOR == 'oxl-ansible-executor':
+        assert e['command'] == f'ansible-playbook -i inv/empty.yml -C -D {cmd_args} play1.yml'
+
+    else:
+        assert e['command'] == f'ansible-playbook {cmd_args} --check --diff -i inv/empty.yml play1.yml'
+
     assert e['log_stdout'] is not None
     assert Path(e['log_stdout']).is_file()
 
@@ -161,8 +174,14 @@ def test_params(jid: int = 2):
 
     assert e['status_name'] == 'Finished'
     assert e['failed'] is False
-    assert e['command'] == (f'ansible-playbook --check -i inv/empty.yml --limit {limit} --tags {tags} '
-                            f'--skip-tags {tags_skip} play1.yml')
+
+    if AW_EXECUTOR == 'oxl-ansible-executor':
+        assert e['command'] == (f'ansible-playbook -i inv/empty.yml -C -l {limit} -t {tags} '
+                                f'--skip-tags {tags_skip} play1.yml')
+
+    else:
+        assert e['command'] == (f'ansible-playbook --check -i inv/empty.yml --limit {limit} --tags {tags} '
+                                f'--skip-tags {tags_skip} play1.yml')
 
 
 def test_creds(jid: int = 3):
@@ -200,8 +219,18 @@ def test_creds(jid: int = 3):
 
     assert e['status_name'] == 'Finished'
     assert e['failed'] is False
-    assert e['command'] == (f'ansible-playbook --ask-become-pass --become-user {become_user} --ask-pass '
-                            f'--user {connect_user} --ask-vault-pass -i inv/empty.yml play1.yml')
+
+    if AW_EXECUTOR == 'oxl-ansible-executor':
+        # we have no way of knowing the random temporary credentials-paths here
+        assert e['command'].startswith('ansible-playbook -i inv/empty.yml -u ')
+        assert '--conn-pass-file' in e['command']
+        assert '--become-pass-file' in e['command']
+        assert '--vault-pass-file' in e['command']
+        assert e['command'].endswith(' play1.yml')
+
+    else:
+        assert e['command'] == (f'ansible-playbook --ask-become-pass --become-user {become_user} --ask-pass '
+                                f'--user {connect_user} --ask-vault-pass -i inv/empty.yml play1.yml')
 
     assert e['log_stdout'] is not None
     assert Path(e['log_stdout']).is_file()
