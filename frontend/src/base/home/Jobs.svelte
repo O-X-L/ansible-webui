@@ -98,6 +98,7 @@
     let usableCredentialChoices = $derived(buildCredentialChoices(usableCredentials));
     let addTMPCredsModal = $state(false);
     let addTMPCredsModalId = $state(Date.now());
+    let executionPromptJumpToLogs = $state(false);
 
     function t(code: string) : string {
       return tq($share, code);
@@ -220,6 +221,9 @@
         apiSuccessMsg = 'jobs.action.start';
         apiEdit('post', `job/${jobId}`, promptData, apiResponseHandler.handleRes);
         entryActions[jobId].exec = false;
+        if (executionPromptJumpToLogs) {
+            redirectLogs(jobId);
+        }
         setURLHashParams(URL_HASH, null);
     }
 
@@ -231,6 +235,7 @@
     }
 
     function updateExecutionPrompts(job: jobType) {
+        executionPromptJumpToLogs = false;
         executionPrompts = JSON.parse(JSON.stringify(executionPromptsDefault));
         if (!job.execution_prompts_json) {
             return;
@@ -766,6 +771,15 @@
                             {t('jobs.execute.tmp_credentials')}
                         </Button>
                     {/if}
+                </div>
+                <hr/>
+                <div>
+                    <div class={classCenterChildDiv}>
+                        <Label for="job_prompt_{job.id}_jump_to_logs" class={classModalLabel}>{t('jobs.form.execution_jump_to_logs')}</Label>
+                    </div>
+                    <div class={classCenterChildDiv}>
+                        <Toggle id="job_prompt_{job.id}_jump_to_logs" bind:checked={executionPromptJumpToLogs} />
+                    </div>
                 </div>
                 <div class={classModalBtns}>
                     <Button id="jobs-btn-exec-start" type="button" on:click={() => {startJob(job.id)}}><PlaySolid/></Button>

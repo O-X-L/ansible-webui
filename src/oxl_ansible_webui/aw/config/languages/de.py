@@ -132,6 +132,7 @@ DE = {
     'jobs.form.credentials_category': 'Zugangsdaten-Kategorie',
     'jobs.form.execution_prompts': 'Ausführungs-Abfragen',
     'jobs.form.execution_prompts_enforce': 'Abfragen erzwingen',
+    'jobs.form.execution_jump_to_logs': 'Logs nach Start öffnen',
     'jobs.form.verbosity': 'Verbosity',
     'jobs.form.credentials': 'Zugangsdaten',
     'jobs.form.prompt_limit_req': 'Limit erzwingen',

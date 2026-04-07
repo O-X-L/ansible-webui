@@ -132,6 +132,7 @@ ES = {
     'jobs.form.credentials_category': 'Categoría de credenciales',
     'jobs.form.execution_prompts': 'Indicaciones de ejecución',
     'jobs.form.execution_prompts_enforce': 'Forzar indicaciones de ejecución',
+    'jobs.form.execution_jump_to_logs': 'Abrir registros tras el inicio',
     'jobs.form.verbosity': 'Verbosidad',
     'jobs.form.credentials': 'Credenciales',
     'jobs.form.prompt_limit_req': 'Límite requerido',

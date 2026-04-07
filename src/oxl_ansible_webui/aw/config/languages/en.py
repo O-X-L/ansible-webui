@@ -136,6 +136,7 @@ EN = {
     'jobs.form.credentials_category': 'Credentials Category',
     'jobs.form.execution_prompts': 'Execution Prompts',
     'jobs.form.execution_prompts_enforce': 'Enforce Prompts',
+    'jobs.form.execution_jump_to_logs': 'Open Logs after Start',
     'jobs.form.verbosity': 'Verbosity',
     'jobs.form.credentials': 'Credentials',
     'jobs.form.prompt_limit_req': 'Require Limit',
