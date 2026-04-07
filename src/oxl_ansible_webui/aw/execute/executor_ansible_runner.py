@@ -6,10 +6,10 @@ from os import remove as remove_file
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
 from ansible_runner import Runner, RunnerConfig
 
-from aw.utils.debug import log
 from aw.config.main import config
 from aw.model.base import JOB_EXEC_STATUS_FAILED
 from aw.model.job_credential import BaseJobCredentials
+from aw.execute.play_util import log_save_ansible_command
 from aw.utils.db_handler import close_old_mysql_connections
 from aw.execute.util import update_status, is_execution_status
 from aw.utils.util import datetime_w_tz, timed_lru_cache, is_set
@@ -87,7 +87,7 @@ def _runner_logs(cfg: RunnerConfig, log_files: dict):
 def _commandline_arguments(
         job: Job, execution: JobExecution, creds: (BaseJobCredentials, None),
         ssh_known_hosts_file: (None, str, Path),
-) -> str:
+) -> list[str]:
     cmd_arguments = []
     if execution.mode_check or job.mode_check:
         cmd_arguments.append('--check')
@@ -116,7 +116,7 @@ def _commandline_arguments(
         if is_set(creds.vault_pass):
             cmd_arguments.append('--ask-vault-pass')
 
-    return ' '.join(cmd_arguments)
+    return cmd_arguments
 
 
 def _get_credentials_args(creds: BaseJobCredentials) -> dict:
@@ -133,13 +133,13 @@ def _get_credentials_args(creds: BaseJobCredentials) -> dict:
     if is_set(creds.connect_pass) or is_set(creds.become_pass) or is_set(creds.vault_pass):
         args['passwords'] = {}
         if is_set(creds.connect_pass):
-            args['passwords'][r'^SSH\spassword:\s*$'] = f'{creds.connect_pass}'
+            args['passwords'][r'^SSH\spassword:\s*$'] = str(creds.connect_pass)
 
         if is_set(creds.become_pass):
-            args['passwords'][r'^BECOME\spassword.*:\s*$'] = f'{creds.become_pass}'
+            args['passwords'][r'^BECOME\spassword.*:\s*$'] = str(creds.become_pass)
 
         if is_set(creds.vault_pass):
-            args['passwords'][r'^Vault\spassword:\s*$'] = f'{creds.vault_pass}'
+            args['passwords'][r'^Vault\spassword:\s*$'] = str(creds.vault_pass)
 
     else:
         args['passwords'] = None
@@ -149,7 +149,7 @@ def _get_credentials_args(creds: BaseJobCredentials) -> dict:
 
 def _extend_options(
         job: Job, execution: (JobExecution, None), creds: BaseJobCredentials,
-        ssh_known_hosts_file: (None, str, Path), executor_options: dict,
+        ssh_known_hosts_file: (None, str, Path), executor_kwargs: dict,
 ) -> dict:
     cmdline_args = _commandline_arguments(
         job=job,
@@ -157,11 +157,17 @@ def _extend_options(
         creds=creds,
         ssh_known_hosts_file=ssh_known_hosts_file,
     )
-    executor_options['cmdline'].extend(cmdline_args)
+    executor_kwargs['cmdline'].extend(cmdline_args)
+    if len(executor_kwargs['cmdline']) == 0:
+        executor_kwargs['cmdline'] = None
+
+    else:
+        # sadly passing a list[str] will throw an exception (as it wants to split a string)
+        executor_kwargs['cmdline'] = ' '.join(executor_kwargs['cmdline'])
 
     creds_args = _get_credentials_args(creds=creds)
     return {
-        **executor_options,
+        **executor_kwargs,
         **creds_args,
     }
 
@@ -169,36 +175,36 @@ def _extend_options(
 def executor_ansible_runner(
         job: Job, execution: (JobExecution, None), result: JobExecutionResult, creds: BaseJobCredentials,
         log_files: dict, ssh_known_hosts_file: (None, str, Path),
-        executor_options: dict,
+        executor_kwargs: dict,
 ):
     @timed_lru_cache(seconds=1)  # check actual status every N seconds; lower DB queries
     def _cancel_job() -> bool:
         return is_execution_status(execution, 'Stopping')
 
-    opts = _extend_options(
+    kwargs = _extend_options(
         job=job,
         execution=execution,
         creds=creds,
         ssh_known_hosts_file=ssh_known_hosts_file,
-        executor_options=executor_options,
+        executor_kwargs=executor_kwargs,
     )
-    path_run = opts.pop('private_data_dir')
+    path_run = kwargs.pop('private_data_dir')
     runner_cfg = RunnerConfig(
         # user config
-        project_dir=opts.pop('project_dir'),
-        playbook=opts.pop('playbook'),
-        inventory=opts.pop('inventory'),
-        passwords=opts.pop('passwords'),
-        ssh_key=opts.pop('ssh_key'),
-        limit=opts.pop('limit'),
-        tags=opts.pop('tags'),
-        skip_tags=opts.pop('skip_tags'),
-        verbosity=opts.pop('verbosity'),
-        envvars=opts.pop('envvars'),
+        project_dir=kwargs.pop('project_dir'),
+        playbook=kwargs.pop('playbook'),
+        inventory=kwargs.pop('inventory'),
+        passwords=kwargs.pop('passwords'),
+        ssh_key=kwargs.pop('ssh_key'),
+        limit=kwargs.pop('limit'),
+        tags=kwargs.pop('tags'),
+        skip_tags=kwargs.pop('skip_tags'),
+        verbosity=kwargs.pop('verbosity'),
+        envvars=kwargs.pop('envvars'),
         ## contains check-mode, diff-mode, extra-vars, ssh-known-hosts-file, users & password-flags, vault-id
-        cmdline=opts.pop('cmdline'),
-        ## whatever we might've missed..
-        **opts,
+        cmdline=kwargs.pop('cmdline'),
+        ## whatever we might've missed
+        **kwargs,
         # system-relevant
         private_data_dir=path_run,
         timeout=config['run_timeout'],
@@ -208,11 +214,9 @@ def executor_ansible_runner(
     _runner_logs(cfg=runner_cfg, log_files=log_files)
 
     runner_cfg.prepare()
-    command = ' '.join(runner_cfg.command)
-    log(msg=f"Running job '{job.name}': '{command}'", level=5)
-    execution.command = command[command.find('ansible-playbook'):]
-    close_old_mysql_connections()
-    execution.save()
+
+    command_str = ' '.join(runner_cfg.command)
+    log_save_ansible_command(job=job, execution=execution, command=command_str)
 
     runner = Runner(config=runner_cfg, cancel_callback=_cancel_job)
     runner.run()

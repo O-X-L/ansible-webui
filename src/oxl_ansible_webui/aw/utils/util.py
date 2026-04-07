@@ -245,3 +245,13 @@ def get_client_ip(request) -> str:
             return request.headers['X-Real-IP ']
 
     return request.META.get('REMOTE_ADDR')
+
+
+def ensure_list(value: (str, list, None)) -> list:
+    if value is None:
+        return []
+
+    if isinstance(value, list):
+        return value
+
+    return [value]

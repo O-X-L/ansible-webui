@@ -63,7 +63,7 @@ def _environmental_variables(job: Job, execution: JobExecution) -> dict:
 
     # ansible-runner will default to 'False' if it's not set :(
     if 'ANSIBLE_HOST_KEY_CHECKING' not in env_vars:
-        env_vars['ANSIBLE_HOST_KEY_CHECKING'] = True
+        env_vars['ANSIBLE_HOST_KEY_CHECKING'] = 'True'
 
     # pass aw-metadata to ansible (https://github.com/O-X-L/ansible-webui/issues/5)
     if is_set(job.owner):
@@ -89,7 +89,7 @@ def _execution_or_job(job: Job, execution: JobExecution, attr: str):
     return None
 
 
-def _executor_options(
+def _executor_kwargs(
         job: Job, execution: JobExecution, path_run: Path, project_dir: str,
 ) -> dict:
     verbosity = None
@@ -106,8 +106,10 @@ def _executor_options(
     if is_set(execution.cmd_args):
         cmdline_args.append(execution.cmd_args)
 
-    opts = {
+    kwargs = {
         'project_dir': project_dir,
+        'playbook': job.playbook_file,
+        'inventory': None,
         'private_data_dir': path_run,
         'limit': _execution_or_job(job, execution, 'limit'),
         'tags': _execution_or_job(job, execution, 'tags'),
@@ -117,33 +119,40 @@ def _executor_options(
         'cmdline': cmdline_args,
     }
 
-    return opts
+    if is_set(job.inventory_file):
+        kwargs['inventory'] = job.inventory_file.split(',')
+
+    return kwargs
 
 
 def executor_prep(job: Job, execution: JobExecution, path_run: Path, project_dir: str) -> dict:
     update_status(execution, status='Starting')
 
-    opts = _executor_options(job=job, execution=execution, path_run=path_run, project_dir=project_dir)
-    opts['playbook'] = job.playbook_file
-    if is_set(job.inventory_file):
-        opts['inventory'] = job.inventory_file.split(',')
+    kwargs = _executor_kwargs(job=job, execution=execution, path_run=path_run, project_dir=project_dir)
 
     # https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout
-    ppf = Path(opts['project_dir']) / opts['playbook']
+    ppf = Path(kwargs['project_dir']) / kwargs['playbook']
     if not Path(ppf).is_file():
         config_error(f"Configured playbook not found: '{ppf}'")
-
-    if 'inventory' in opts:
-        for inventory in opts['inventory']:
-            pi = Path(opts['project_dir']) / inventory
-            if not Path(pi).exists():
-                config_error(f"Configured inventory not found: '{pi}'")
 
     create_dirs(path=path_run, desc='run')
     create_dirs(path=config['path_log'], desc='log')
 
     update_status(execution, status='Running')
-    return opts
+    return kwargs
+
+
+def log_save_ansible_command(job: Job, execution: JobExecution, command: str):
+    log(msg=f"Running job '{job.name}': '{command}'", level=5)
+    cmd_start_idx = command.find('ansible-playbook')
+    if cmd_start_idx == -1:
+        execution.command = command
+
+    else:
+        execution.command = command[cmd_start_idx:]
+
+    close_old_mysql_connections()
+    execution.save()
 
 
 def executor_cleanup(execution: JobExecution, path_run: Path, exec_repo: ExecuteRepository):

@@ -67,7 +67,7 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
     try:
         exec_repo.create_or_update_repository()
         project_dir = exec_repo.get_project_dir()
-        executor_options = executor_prep(job=job, execution=execution, path_run=path_run, project_dir=project_dir)
+        executor_kwargs = executor_prep(job=job, execution=execution, path_run=path_run, project_dir=project_dir)
         close_old_mysql_connections()
         execution.save()
 
@@ -78,7 +78,7 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
                 result=result,
                 log_files=log_files,
                 ssh_known_hosts_file=ssh_known_hosts_file,
-                executor_options=executor_options,
+                executor_kwargs=executor_kwargs,
                 creds=creds,
             )
 
@@ -89,7 +89,7 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
                 result=result,
                 log_files=log_files,
                 ssh_known_hosts_file=ssh_known_hosts_file,
-                executor_options=executor_options,
+                executor_kwargs=executor_kwargs,
                 creds=creds,
             )
 
