@@ -38,7 +38,7 @@ This project has set it as a priority to stay as lightweight as possible.
 
 It should be accessible for newcomers to Ansible.
 
-It is built as Python 3 package, the same as `Ansible-Core <https://github.com/ansible/ansible>`_ and `Ansible-Runner <https://github.com/ansible/ansible-runner>`_ themself.
+It is built as Python 3 package, the same as `Ansible-Core <https://github.com/ansible/ansible>`_ itself.
 
 You can install it with **1 simple command**!
 

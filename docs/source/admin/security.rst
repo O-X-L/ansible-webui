@@ -81,7 +81,13 @@ Security considerations this project does take into account:
 
 * Job secrets like passwords are never returned to the user/Web-UI
 
-* Runtime handling of secrets is done by the official `ansible-runner <https://ansible.readthedocs.io/projects/runner/en/latest/intro>`_ module (using :code:`pexpect` and :code:`ssh-agent`)
+* Runtime handling of secrets is done by the execution-library.
+
+  You can choose between:
+
+  * The official `ansible-runner <https://ansible.readthedocs.io/projects/runner/en/latest/intro>`_ module (using :code:`pexpect` to pass the secrets to Ansible via interactive-prompts and :code:`ssh-agent` to make the SSH-key available only for this session)
+
+  * Our `oxl-ansible-executor <https://github.com/O-X-L/ansible-executor>`_ module (using :code:`read-once FIFO/Pipes` to pass the secrets to Ansible and :code:`ssh-agent` to make the SSH-key available only for this session)
 
 * Usage of GitHub's `dependabot <https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-supply-chain-security#what-is-dependabot>`_ and `CodeQL <https://docs.github.com/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/about-code-scanning-with-codeql>`_
 
