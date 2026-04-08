@@ -14,7 +14,8 @@ from aw.base import USERS
 from aw.model.repository import Repository
 from aw.utils.util import get_choice_key_by_value, get_choice_value_by_key, datetime_from_db_str, is_null, \
     datetime_from_db, pretty_timedelta_str
-from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED
+from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED, JOB_EXEC_STATI_PLAY_ACTIVE, \
+    JOB_EXEC_STATUS_STOPPING, JOB_EXEC_STATUS_RUN
 from aw.utils.db_handler import close_old_mysql_connections
 from aw.model.system import SSHHostkeyFile
 
@@ -322,8 +323,25 @@ class JobExecution(BaseJob):
         return self.status in JOB_EXEC_STATI_ACTIVE
 
     @property
+    def is_play_active(self) -> bool:
+        return self.status in JOB_EXEC_STATI_PLAY_ACTIVE
+
+    @property
     def has_failed(self) -> bool:
         return self.status == JOB_EXEC_STATUS_FAILED
+
+    @property
+    def is_stopping(self) -> bool:
+        return self._query_status_from_db() == JOB_EXEC_STATUS_STOPPING
+
+    def _query_status_from_db(self) -> int:
+        # sometimes another thread changes the state after this instance was initialized (like an API-call from the user)
+        close_old_mysql_connections()
+        return JobExecution.objects.get(id=self.id).status
+
+    @property
+    def is_running(self) -> bool:
+        return self.status == JOB_EXEC_STATUS_RUN
 
     def get_stats(self) -> dict:
         stats = {}

@@ -1,39 +1,39 @@
 from pathlib import Path
+from time import sleep, time
 
 from oxl_ansible_executor import Execution, ExecutionConfig, \
     ConfigError, SetupError, ExecutionStatus
 
 from aw.config.main import config
+from aw.execute.util import update_status
 from aw.utils.deployment import deployment_dev
 from aw.utils.util import datetime_w_tz, is_set
 from aw.utils.handlers import AnsibleConfigError
-from aw.model.base import JOB_EXEC_STATUS_FAILED
 from aw.config.environment import AW_ENV_VARS_SECRET
 from aw.model.job_credential import BaseJobCredentials
 from aw.execute.play_util import log_save_ansible_command
 from aw.utils.db_handler import close_old_mysql_connections
-from aw.execute.util import update_status, is_execution_status
 from aw.model.job import Job, JobExecution, JobExecutionResult  # JobExecutionResultHost
+from aw.model.base import JOB_EXEC_STATUS_FAILED, JOB_EXEC_STATUS_SUCCESS, JOB_EXEC_STATUS_STOPPED
 
 
 def _parse_run_result(execution: JobExecution, db_result: JobExecutionResult, executor_result: ExecutionStatus):
     db_result.time_fin = datetime_w_tz()
-    db_result.failed = executor_result.failed
     close_old_mysql_connections()
     db_result.save()
 
     # any_task_failed = False
     # todo: generate per-host stats (_run_stats) and check if any task failed (any_task_failed)
 
-    if executor_result.failed or executor_result.timed_out:
-        update_status(execution, status=JOB_EXEC_STATUS_FAILED)
+    final_status = JOB_EXEC_STATUS_SUCCESS
+    if execution.is_stopping or executor_result.canceled:
+        final_status = JOB_EXEC_STATUS_STOPPED
 
-    else:
-        status = 'Finished'
-        if is_execution_status(execution, 'Stopping') or executor_result.canceled:
-            status = 'Stopped'
+    elif executor_result.failed or executor_result.timed_out:
+        db_result.failed = True
+        final_status = JOB_EXEC_STATUS_FAILED
 
-        update_status(execution, status=status)
+    update_status(execution, status=final_status)
 
 
 def _build_credentials(creds: BaseJobCredentials) -> dict:
@@ -72,6 +72,18 @@ def _build_credentials(creds: BaseJobCredentials) -> dict:
     return kwargs
 
 
+def _execution_run_loop(job_exec: JobExecution, executor: Execution):
+    was_stopped = False
+    time_start = time()
+    run_timeout = config['run_timeout']
+
+    while job_exec.is_play_active and not executor.status.finished and (time() - run_timeout)  < time_start:
+        sleep(1)
+        if not was_stopped and job_exec.is_stopping:
+            was_stopped = True
+            executor.stop()
+
+
 # pylint: disable=R0914
 def executor_oxl_ansible_executor(
         job: Job, execution: (JobExecution, None), result: JobExecutionResult, creds: BaseJobCredentials,
@@ -81,6 +93,7 @@ def executor_oxl_ansible_executor(
     kwargs = executor_kwargs
     kwargs_creds = _build_credentials(creds=creds)
     debug = deployment_dev() or config['debug']
+    job_exec = execution
 
     try:
         c = ExecutionConfig(
@@ -88,8 +101,8 @@ def executor_oxl_ansible_executor(
             playbook_dir=kwargs['project_dir'],
             playbook_file=kwargs['playbook'],
             inventory_files=kwargs['inventory'],
-            mode_diff=execution.mode_diff or job.mode_diff,
-            mode_check=execution.mode_check or job.mode_check,
+            mode_diff=job_exec.mode_diff or job.mode_diff,
+            mode_check=job_exec.mode_check or job.mode_check,
             ssh_known_hosts_file=ssh_known_hosts_file,
             ssh_key_value=kwargs_creds['ssh_key'],
             connect_user=kwargs_creds['connect_user'],
@@ -115,18 +128,21 @@ def executor_oxl_ansible_executor(
             run_dir=kwargs['private_data_dir'],
             # todo: containerization support
         )
-        e = Execution(c)
+        executor = Execution(c)
 
-        command_str = ' '.join(e.status.ansible_command)
-        log_save_ansible_command(job=job, execution=execution, command=command_str)
+        command_str = ' '.join(executor.status.ansible_command)
+        log_save_ansible_command(job=job, execution=job_exec, command=command_str)
 
-        e.run(blocking=True)
+        update_status(job_exec, status='Running')
+        executor.run(blocking=False)
+
+        _execution_run_loop(job_exec=job_exec, executor=executor)
+
+        _parse_run_result(
+            execution=execution,
+            db_result=result,
+            executor_result=executor.status,
+        )
 
     except (ConfigError, SetupError) as e:
         raise AnsibleConfigError(e)
-
-    _parse_run_result(
-        execution=execution,
-        db_result=result,
-        executor_result=e.status,
-    )

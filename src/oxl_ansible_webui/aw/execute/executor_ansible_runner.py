@@ -7,14 +7,14 @@ from os import remove as remove_file
 from ansible_runner import Runner, RunnerConfig
 
 from aw.config.main import config
-from aw.model.base import JOB_EXEC_STATUS_FAILED
+from aw.execute.util import update_status
 from aw.model.job_credential import BaseJobCredentials
 from aw.execute.play_util import log_save_ansible_command
 from aw.utils.db_handler import close_old_mysql_connections
-from aw.execute.util import update_status, is_execution_status
 from aw.utils.util import datetime_w_tz, timed_lru_cache, is_set
 from aw.utils.filesystem import write_file_0640, overwrite_and_delete_file
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost
+from aw.model.base import JOB_EXEC_STATUS_FAILED, JOB_EXEC_STATUS_SUCCESS, JOB_EXEC_STATUS_STOPPED
 
 
 def _run_stats(runner: Runner, result: JobExecutionResult) -> bool:
@@ -54,15 +54,14 @@ def _parse_run_result(execution: JobExecution, result: JobExecutionResult, runne
     if runner.stats is not None:
         any_task_failed = _run_stats(runner=runner, result=result)
 
-    if runner.errored or runner.timed_out or runner.rc != 0 or any_task_failed:
-        update_status(execution, status=JOB_EXEC_STATUS_FAILED)
+    final_status = JOB_EXEC_STATUS_SUCCESS
+    if execution.is_stopping or runner.canceled:
+        final_status = JOB_EXEC_STATUS_STOPPED
 
-    else:
-        status = 'Finished'
-        if is_execution_status(execution, 'Stopping') or runner.canceled:
-            status = 'Stopped'
+    elif runner.errored or runner.timed_out or runner.rc != 0 or any_task_failed:
+        final_status = JOB_EXEC_STATUS_FAILED
 
-        update_status(execution, status=status)
+    update_status(execution, status=final_status)
 
 
 def _runner_logs(cfg: RunnerConfig, log_files: dict):
@@ -178,8 +177,8 @@ def executor_ansible_runner(
         executor_kwargs: dict,
 ):
     @timed_lru_cache(seconds=1)  # check actual status every N seconds; lower DB queries
-    def _cancel_job() -> bool:
-        return is_execution_status(execution, 'Stopping')
+    def _callback_cancel_job() -> bool:
+        return execution.is_stopping
 
     kwargs = _extend_options(
         job=job,
@@ -218,7 +217,9 @@ def executor_ansible_runner(
     command_str = ' '.join(runner_cfg.command)
     log_save_ansible_command(job=job, execution=execution, command=command_str)
 
-    runner = Runner(config=runner_cfg, cancel_callback=_cancel_job)
+    runner = Runner(config=runner_cfg, cancel_callback=_callback_cancel_job)
+
+    update_status(execution, status='Running')
     runner.run()
 
     _parse_run_result(

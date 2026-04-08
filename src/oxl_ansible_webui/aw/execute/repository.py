@@ -277,6 +277,7 @@ def create_update_git_repo(repo: Repository) -> bool:
         return False
 
     def _create_update(r: Repository):
+        # pylint: disable=W0718
         try:
             ExecuteRepository(r).create_or_update_repository()
 

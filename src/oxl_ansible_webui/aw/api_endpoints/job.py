@@ -8,24 +8,24 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
 
-from aw.config.hardcoded import JOB_EXECUTION_LIMIT
+from aw.base import USERS
+from aw.utils.debug import log
+from aw.utils.audit import log_audit
+from aw.execute.queue import queue_add
+from aw.execute.util import update_status
 from aw.model.job import Job, JobExecution
+from aw.config.hardcoded import JOB_EXECUTION_LIMIT
+from aw.model.job_credential import JobSharedCredentials
+from aw.utils.util import is_set, ansible_log_html, ansible_log_text
+from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_EXECUTE, \
     CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
-from aw.model.job_credential import JobSharedCredentials
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, \
     LogDownloadResponse, api_docs_put, api_docs_delete, api_docs_post, validate_no_xss, GenericErrorResponse, \
     response_data_if_changed, API_PARAM_HASH
 from aw.api_endpoints.job_util import get_viewable_jobs_serialized, JobReadResponse, get_job_executions_serialized, \
     JobExecutionReadResponse, get_viewable_jobs, get_job_execution_serialized, get_log_file_content
 from aw.utils.permission import has_job_permission, has_credentials_permission, has_manager_privileges
-from aw.execute.queue import queue_add
-from aw.execute.util import update_status, is_execution_status
-from aw.utils.util import is_set, ansible_log_html, ansible_log_text
-from aw.model.base import JOB_EXEC_STATI_ACTIVE, JOB_EXEC_STATUS_FAILED
-from aw.base import USERS
-from aw.utils.audit import log_audit
-from aw.utils.debug import log
 
 
 class JobWriteRequest(serializers.ModelSerializer):
@@ -386,11 +386,14 @@ class APIJobExecutionItem(APIView):
                 if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_EXECUTE):
                     return Response(data={'error': f"Not privileged to stop the job '{job.name}'"}, status=403)
 
-                if not is_execution_status(execution, 'Running'):
+                if not execution.is_running:
                     JobExecution.objects.filter(
                         status__in=JOB_EXEC_STATI_ACTIVE, job=job,
                     ).update(status=JOB_EXEC_STATUS_FAILED)
-                    return Response(data={'error': f"Job execution '{job.name}' is not running"}, status=400)
+                    return Response(
+                        data={'error': f"Job execution '{job.name}' is not running ({execution.status_name})"},
+                        status=400,
+                    )
 
                 update_status(execution, 'Stopping')
                 log_audit(

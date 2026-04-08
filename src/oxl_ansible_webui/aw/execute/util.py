@@ -47,13 +47,6 @@ def update_status(obj: (JobExecution, Repository), status: (str, int)):
         pass
 
 
-def is_execution_status(execution: JobExecution, status: str) -> bool:
-    close_old_mysql_connections()
-    is_status = JobExecution.objects.get(id=execution.id).status
-    check_status = execution.status_id_from_name(status)
-    return is_status == check_status
-
-
 def get_path_run() -> Path:
     # build unique temporary execution directory
     path_run = config['path_run']

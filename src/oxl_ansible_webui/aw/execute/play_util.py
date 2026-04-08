@@ -126,8 +126,6 @@ def _executor_kwargs(
 
 
 def executor_prep(job: Job, execution: JobExecution, path_run: Path, project_dir: str) -> dict:
-    update_status(execution, status='Starting')
-
     kwargs = _executor_kwargs(job=job, execution=execution, path_run=path_run, project_dir=project_dir)
 
     # https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout
@@ -137,8 +135,6 @@ def executor_prep(job: Job, execution: JobExecution, path_run: Path, project_dir
 
     create_dirs(path=path_run, desc='run')
     create_dirs(path=config['path_log'], desc='log')
-
-    update_status(execution, status='Running')
     return kwargs
 
 

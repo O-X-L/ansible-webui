@@ -3,23 +3,23 @@ import traceback
 from django.db.utils import OperationalError, IntegrityError
 from oxl_ansible_executor import ExecutionError, PreparationError
 
-from aw.config.main import config
-from aw.model.system import ANSIBLE_EXECUTOR_OXL
-from aw.model.job import Job, JobExecution, JobExecutionResult
-from aw.execute.play_util import executor_cleanup, executor_prep, failure
-from aw.execute.util import get_path_run, job_logs
-from aw.execute.repository import ExecuteRepository
-from aw.execute.alert import Alert
-from aw.utils.util import datetime_w_tz, is_null  # get_ansible_versions
-from aw.utils.handlers import AnsibleConfigError, AnsibleRepositoryError
 from aw.utils.debug import log
-from aw.utils.db_handler import close_old_mysql_connections
+from aw.config.main import config
+from aw.execute.alert import Alert
 from aw.utils.audit import log_audit
-from aw.execute.executor_ansible_runner import executor_ansible_runner
-from aw.execute.executor_oxl_ansible_executor import executor_oxl_ansible_executor
-from aw.execute.ssh_hostkey import get_ssh_known_hosts_file
-from aw.execute.play_credentials import get_credentials_to_use
+from aw.utils.util import datetime_w_tz, is_null  # get_ansible_versions
+from aw.model.system import ANSIBLE_EXECUTOR_OXL
+from aw.execute.repository import ExecuteRepository
 from aw.model.job_credential import JobUserTMPCredentials
+from aw.execute.ssh_hostkey import get_ssh_known_hosts_file
+from aw.utils.db_handler import close_old_mysql_connections
+from aw.execute.play_credentials import get_credentials_to_use
+from aw.model.job import Job, JobExecution, JobExecutionResult
+from aw.execute.util import get_path_run, job_logs, update_status
+from aw.execute.executor_ansible_runner import executor_ansible_runner
+from aw.utils.handlers import AnsibleConfigError, AnsibleRepositoryError
+from aw.execute.play_util import executor_cleanup, executor_prep, failure
+from aw.execute.executor_oxl_ansible_executor import executor_oxl_ansible_executor
 
 
 def _log_audit(job: Job, execution: JobExecution):
@@ -39,6 +39,8 @@ def _log_audit(job: Job, execution: JobExecution):
 
 
 def ansible_playbook(job: Job, execution: (JobExecution, None)):
+    update_status(execution, status='Starting')
+
     time_start = datetime_w_tz()
     path_run = get_path_run()
     path_run.mkdir(mode=0o750, parents=True, exist_ok=True)

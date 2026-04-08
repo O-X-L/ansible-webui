@@ -2,7 +2,7 @@ from django.db import models
 
 from aw.config.main import config
 from aw.config.hardcoded import SHORT_TIME_FORMAT
-from aw.model.base import BaseModel, DEFAULT_NONE, CHOICES_BOOL, CHOICES_JOB_EXEC_STATUS
+from aw.model.base import BaseModel, DEFAULT_NONE, CHOICES_BOOL, CHOICES_JOB_EXEC_STATUS, JOB_EXEC_STATUS_RUN
 from aw.model.job_credential import JobSharedCredentials
 from aw.utils.util import get_choice_value_by_key, get_choice_key_by_value, datetime_from_db_str, is_null
 from aw.model.system import SSHHostkeyFile
@@ -94,6 +94,10 @@ class Repository(BaseModel):
     @staticmethod
     def status_id_from_name(name: str) -> int:
         return get_choice_key_by_value(choices=CHOICES_JOB_EXEC_STATUS, find=name)
+
+    @property
+    def is_running(self) -> bool:
+        return self.status == JOB_EXEC_STATUS_RUN
 
     @property
     def log_stdout_url(self) -> str:

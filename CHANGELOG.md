@@ -8,12 +8,20 @@ tbd
 
 ## Version 0
 
-### 0.9.3-3
+### 0.9.4
 
 Fixes:
 
 * Fix possible repository create/update race-condition
 * Log errors on background-create/update for repositories
+* Add missing job-cancel logic for [oxl-ansible-executor](https://github.com/O-X-L/ansible-executor) [#52](https://github.com/O-X-L/ansible-webui/issues/52)
+* Ensure status of canceled executions is set to 'stopped'
+
+Features:
+
+* Add execution-status 'canceled' to Logs-UI
+
+----
 
 ### 0.9.3
 

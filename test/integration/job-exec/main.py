@@ -52,7 +52,7 @@ def _api_request(location: str, method: str = None, data: dict = None) -> dict:
     return res.json()
 
 
-def _check_status_until_finished_or_timeout(job_id: int, exec_count: int):
+def _check_job_status_until_not_status_or_timeout(job_id: int, exec_count: int, not_status: list[str]) -> (dict, None):
     time_start = time()
     e = None
     while time() - SINGLE_TIMEOUT < time_start:
@@ -60,14 +60,42 @@ def _check_status_until_finished_or_timeout(job_id: int, exec_count: int):
         assert 'executions' in res and len(res['executions']) == exec_count
         e = res['executions'][0]
 
-        if e['status_name'] in ['Waiting', 'Running']:
+        if e['status_name'] in not_status:
             sleep(1)
             continue
 
         print(' =>', e)
+        return e
 
-        # verbose output for troubleshooting
+    raise TimeoutError(f"Last response: {e}")
+
+
+def _check_status_until_running_or_timeout(job_id: int, exec_count: int) -> (dict, None):
+    return _check_job_status_until_not_status_or_timeout(
+        job_id=job_id,
+        exec_count=exec_count,
+        not_status=['Waiting', 'Starting'],
+    )
+
+
+def _check_status_until_canceled_or_timeout(job_id: int, exec_count: int) -> (dict, None):
+    return _check_job_status_until_not_status_or_timeout(
+        job_id=job_id,
+        exec_count=exec_count,
+        not_status=['Waiting', 'Starting', 'Running', 'Stopping'],
+    )
+
+
+def _check_status_until_finished_or_timeout(job_id: int, exec_count: int) -> (dict, None):
+    e = _check_job_status_until_not_status_or_timeout(
+        job_id=job_id,
+        exec_count=exec_count,
+        not_status=['Waiting', 'Starting', 'Running'],
+    )
+
+    if e is not None:
         if e['failed']:
+            # verbose output for troubleshooting
             for log_kind, log_key in {'STDOUT': 'log_stdout', 'STDERR': 'log_stderr'}.items():
                 if e[log_key] is None or not Path(e[log_key]).is_file():
                     continue
@@ -78,8 +106,7 @@ def _check_status_until_finished_or_timeout(job_id: int, exec_count: int):
 
         return e
 
-    print(' =>', e)
-    raise TimeoutError()
+    return None
 
 
 def test_simple(jid: int = 1):
@@ -332,6 +359,40 @@ def test_repo_git(jid: int = 4):
         assert log.find(f"git clone --branch {branch} {origin} {path_repo}") != -1
 
 
+def test_user_cancels(jid: int = 5):
+    print('USER CANCELS | ADD JOB')
+    cmd_args = '-e test=run3'  # just waits until it can be stopped
+    _api_request(
+        'job',
+        'post',
+        {
+            'name': f'job{jid}', 'playbook_file': 'play1.yml', 'cmd_args': cmd_args,
+        }
+    )
+
+    print('USER CANCELS | EXECUTE')
+    create_response = _api_request(f'job/{jid}', 'post')
+    exec_id = create_response['id']
+
+    print('USER CANCELS | WAIT FOR IT TO START')
+    _check_status_until_running_or_timeout(jid, 1)
+    sleep(1)
+
+    print('USER CANCELS | STOPPING JOB')
+    _api_request(f'job/{jid}/{exec_id}', 'delete')
+
+    print('USER CANCELS | CHECK')
+    e = _check_status_until_canceled_or_timeout(jid, 1)
+
+    assert e['user_name'] == API_USER
+    assert e['status_name'] == 'Stopped'
+    assert e['time_fin'] is not None
+    assert e['failed'] is False
+    assert e['command'] == f'ansible-playbook {cmd_args} play1.yml'
+    assert e['log_stdout'] is not None
+    assert Path(e['log_stdout']).is_file()
+
+
 def test_execution_cleanup(jid: int = 1, exec_id: int = 1):
     print('EXEC CLEANUP | DELETE')
     _api_request(f'job/{jid}/{exec_id}/cleanup', 'delete')
@@ -351,6 +412,7 @@ def main():
     test_params()
     test_creds()
     test_repo_git()
+    test_user_cancels()
     test_execution_cleanup()
 
 
