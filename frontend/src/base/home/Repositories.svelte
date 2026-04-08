@@ -16,7 +16,7 @@
     import { isSet } from '../../util/main.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import RepositoryForm from './forms/Repository.svelte';
-    import { REPO_EXEC_STATI_ACTIVE, repoKindMap } from '../Config.js';
+    import { REPO_EXEC_STATI_ACTIVE, repoKindMap, EXEC_STATUS_FAILED, EXEC_STATUS_SUCCESS } from '../Config.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
         classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
@@ -228,10 +228,10 @@
                                     </div>
                                     <div>
                                         <b>{t('common.status')}:</b>
-                                        <span class={item.status_name == 'Failed' ? 'text-red-600' : 'text-green-600'}>
-                                            {#if item.status_name == 'Failed'}
+                                        <span class={item.status == EXEC_STATUS_FAILED ? 'text-red-600' : 'text-green-600'}>
+                                            {#if item.status == EXEC_STATUS_FAILED}
                                                 {t('jobs.info.failed')}
-                                            {:else if item.status_name == 'Finished'}
+                                            {:else if item.status == EXEC_STATUS_SUCCESS}
                                                 {t('jobs.info.succeeded')}
                                             {:else}
                                                 {t('jobs.info.running')}

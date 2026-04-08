@@ -17,7 +17,6 @@
     import JobForm from './forms/Job.svelte';
     import { tq } from '../../util/translate.js';
     import { classModalLabel } from '../Style.js';
-    import { JOB_EXEC_STATI_ACTIVE } from '../Config.js';
     import { choicesFromArray } from '../../util/form.js';
     import { redirectTo, isSet } from '../../util/main.js';
     import CredentialsForm from './forms/Credentials.svelte';
@@ -25,6 +24,7 @@
     import { type jobType, type executionPromptsType,} from './Types.js';
     import { type formChoiceType, type formInfoType } from '../Types.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
+    import { JOB_EXEC_STATI_ACTIVE, EXEC_STATUS_FAILED } from '../Config.js';
     import { getURLHashParams, setURLHashParams, URL_HASH_PARAM_SEPARATOR, URL_HASH_PARAM_KV } from '../../util/main.js';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
@@ -661,7 +661,7 @@
                                     <td class={classPopoverColumn1}>
                                         {t('common.status')}:
                                     </td>
-                                    <td class="{classPopoverColumn2Text} {job.executions[0].status_name == 'Failed' ? 'text-red-600' : 'text-green-600'}">
+                                    <td class="{classPopoverColumn2Text} {job.executions[0].status == EXEC_STATUS_FAILED ? 'text-red-600' : 'text-green-600'}">
                                         {job.executions[0].status_name}
                                     </td>
                                 </tr>

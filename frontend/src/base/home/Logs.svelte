@@ -14,7 +14,7 @@
     import { type jobType, type executionType } from './Types.js';
     import { getURLHashParams, isSet, setURLHashParams, redirectTo } from '../../util/main.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
-    import { JOB_EXEC_STATI_ACTIVE, WAIT_MOUNT_MODAL, WAIT_MOUNT_SCROLL } from '../Config.js';
+    import { JOB_EXEC_STATI_ACTIVE, WAIT_MOUNT_MODAL, WAIT_MOUNT_SCROLL, EXEC_STATUS_CANCELED } from '../Config.js';
     import {
         classSpinnerDiv, classListContent, classListHeader, classFooterSpacing, classSpoilerItem, classSpoilerPad,
     } from '../Style.js';
@@ -49,6 +49,13 @@
             return false;
         }
         return JOB_EXEC_STATI_ACTIVE.includes(exec.status);
+    }
+
+    function isJobExecutionCanceled(exec: executionType) : boolean {
+        if (!exec) {
+            return false;
+        }
+        return exec.status == EXEC_STATUS_CANCELED;
     }
 
     function stopJob(jobId: number, executionId: number) {
@@ -310,6 +317,8 @@
                             <div>{t('common.status')}:
                                 {#if isJobExecutionActive(exec)}
                                     <span class="text-blue-600">{t('jobs.info.running')}</span>
+                                {:else if isJobExecutionCanceled(exec)}
+                                    <span class="text-orange-600">{t('jobs.info.canceled')}</span>
                                 {:else if exec.failed}
                                     <span class="text-red-600">{t('jobs.info.failed')}</span>
                                 {:else}
@@ -411,6 +420,8 @@
                             <div>{t('common.status')}:
                                 {#if isJobExecutionActive(exec)}
                                     <span class="text-blue-600">{t('jobs.info.running')}</span>
+                                {:else if isJobExecutionCanceled(exec)}
+                                    <span class="text-orange-600">{t('jobs.info.canceled')}</span>
                                 {:else if exec.failed}
                                     <span class="text-red-600">{t('jobs.info.failed')}</span>
                                 {:else}

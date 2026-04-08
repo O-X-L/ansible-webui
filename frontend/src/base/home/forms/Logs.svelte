@@ -10,8 +10,8 @@
     import { tq } from '../../../util/translate.js';
     // import { type executionType } from '../Types.js';
     import { apiGet, apiEdit } from '../../../util/api.js';
-    import { JOB_EXEC_STATI_ACTIVE } from '../../Config.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
+    import { JOB_EXEC_STATI_ACTIVE, EXEC_STATUS_CANCELED } from '../../Config.js';
     import {
         classModalBackdrop, classSpinnerDiv, classCenterChildDiv, classModalBody, classModalDialog,
     } from '../../Style.js';
@@ -88,6 +88,10 @@
 
     function isExecActive() : boolean {
         return JOB_EXEC_STATI_ACTIVE.includes(exec.status);
+    }
+
+    function isJobExecutionCanceled() : boolean {
+        return exec.status == EXEC_STATUS_CANCELED;
     }
 
     function isInactive() : boolean {
@@ -222,7 +226,11 @@
             </tbody>
         </table>
     {/if}
-    {#if exec.failed}
+    {#if isJobExecutionCanceled()}
+        <div class="mt-20 mb-10 font-bold text-lg {classCenterChildDiv} text-orange-600">
+            <InfoCircleSolid class="inline-block mr-2" /> {t('logs.exec_canceled')}
+        </div>
+    {:else if exec.failed}
         {#if exec.error_s}
             <Alert color="red" class="mx-10 my-5">
                 <div class="font-bold text-lg mb-3">{t('logs.error_short')}</div>
