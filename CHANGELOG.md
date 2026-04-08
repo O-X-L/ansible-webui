@@ -8,6 +8,13 @@ tbd
 
 ## Version 0
 
+### 0.9.3-3
+
+Fixes:
+
+* Fix possible repository create/update race-condition
+* Log errors on background-create/update for repositories
+
 ### 0.9.3
 
 Fixes:

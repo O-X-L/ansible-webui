@@ -5,6 +5,7 @@ from re import sub as regex_replace
 
 from django.utils import timezone
 
+from aw.utils.debug import log
 from aw.config.main import config
 from aw.utils.subps import process
 from aw.model.job import  JobExecution
@@ -94,6 +95,10 @@ class ExecuteRepository:
 
     def create_or_update_repository(self):
         if is_null(self.repository) or self.repository.rtype_name == REPOSITORY_TYPE_STATIC:
+            return
+
+        if not self.repository.git_isolate and self.repository.is_running:
+            # race condition
             return
 
         if self.execution is not None:
@@ -272,7 +277,12 @@ def create_update_git_repo(repo: Repository) -> bool:
         return False
 
     def _create_update(r: Repository):
-        ExecuteRepository(r).create_or_update_repository()
+        try:
+            ExecuteRepository(r).create_or_update_repository()
+
+        except Exception as e:
+            error_lines = ' | '.join(str(e).split('\n'))
+            log(msg=f"Got error creating/updating repository: {error_lines}", level=2)
 
     Thread(
         target=_create_update,
