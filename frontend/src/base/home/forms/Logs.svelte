@@ -155,7 +155,7 @@
 <div bind:this={componentRoot} tabindex="-1">
 <Modal bind:open={open} size="xl" autoclose={false} placement="top-center"
     backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
-    <Heading tag="h2">{t('logs.job_logs')} "{jobName}"</Heading>
+    <Heading tag="h2">{t('logs.job_logs')}: "{jobName}"</Heading>
     {#if !logLines.length && !exec.error_s && errorCnt < MAX_ERROR_CNT}
         <div class={classSpinnerDiv}><Spinner/></div>
     {:else}
@@ -169,6 +169,16 @@
                     <td class={classProp}>{t('logs.time_start')}:</td>
                     <td class={classText}>{exec.time_start ? exec.time_start : '-'}</td>
                 </tr>
+                {#if exec.time_fin}
+                <tr>
+                    <td class={classProp}>{t('logs.time_fin')}:</td>
+                    <td class={classText}>{exec.time_fin ? exec.time_fin : '-'}</td>
+                </tr>
+                <tr>
+                    <td class={classProp}>{t('jobs.info.duration')}:</td>
+                    <td class={classText}>{exec.time_duration ? exec.time_duration : '-'}</td>
+                </tr>
+                {/if}
                 <tr>
                     <td class={classProp}>{t('logs.executed_by')}:</td>
                     <td class={classText}>{exec.user_name ? exec.user_name : '-'}</td>

@@ -115,7 +115,8 @@ def executor_oxl_ansible_executor(
             tags=kwargs['tags'],
             skip_tags=kwargs['skip_tags'],
             verbosity=kwargs['verbosity'],
-            cmd_args=kwargs['cmdline'],  # currently also used for 'extra_vars'
+            cmd_args=kwargs['cmdline'],
+            extra_vars=kwargs['extra_vars'],
             env_vars=kwargs['envvars'],
             # system-relevant
             env_vars_strip=AW_ENV_VARS_SECRET,

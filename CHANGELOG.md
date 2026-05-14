@@ -13,11 +13,15 @@ tbd
 Features:
 
 * Disable schedule when cloning jobs [#105](https://github.com/O-X-L/ansible-webui/issues/105)
+* Show entry-name in edit-form title
+* Added execution finish-time & duration to log-view 
 
 Fixes:
 
 * Don't reload edit-forms if some entry-status changed [#99](https://github.com/O-X-L/ansible-webui/issues/99)
 * Better handling for job-execution log-redirect [#97](https://github.com/O-X-L/ansible-webui/issues/97)
+* Double form-submit on save with ALT+S
+* Changed Job-Form section-titles to use language-codes
 
 Project:
 

@@ -1,5 +1,7 @@
 from pathlib import Path
 from os import remove as remove_file
+from json import JSONDecodeError
+from json import loads as json_loads
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
@@ -34,11 +36,14 @@ class JobWriteRequest(serializers.ModelSerializer):
         fields = Job.api_fields_write
 
     name = serializers.CharField(validators=[])  # uc on update
+    extra_vars = serializers.CharField(
+        max_length=1000, required=False, default=None, allow_blank=True, allow_null=True,
+    )
 
     def validate(self, attrs: dict):
         for field in Job.api_fields_write:
             if field in attrs:
-                if field in Job.fields_json:
+                if field in Job.fields_disable_xss_check:
                     continue
 
                 if field in Job.fields_allow_sq:
@@ -54,6 +59,10 @@ class JobExecutionRequest(serializers.ModelSerializer):
     class Meta:
         model = JobExecution
         fields = JobExecution.api_fields_exec
+
+    extra_vars = serializers.CharField(
+        max_length=1000, required=False, default=None, allow_blank=True, allow_null=True,
+    )
 
 
 def _find_job(job_id: int) -> (Job, None):
@@ -111,6 +120,21 @@ def _has_credentials_permission(user: USERS, data: dict) -> bool:
             pass
 
     return True
+
+
+def _handle_extra_vars(validated_data: dict) -> bool:
+    extra_vars = validated_data.pop('extra_vars')
+    validated_data['_extra_vars'] = ''
+    if not is_set(extra_vars) or extra_vars.strip() == '{}':
+        return True
+
+    try:
+        json_loads(extra_vars)
+        validated_data['_extra_vars'] = extra_vars
+        return True
+
+    except (JSONDecodeError, TypeError):
+        return False
 
 
 class APIJob(APIView):
@@ -179,6 +203,12 @@ class APIJob(APIView):
             )
 
         serializer.validated_data['owner'] = user
+        extra_vars_valid = _handle_extra_vars(serializer.validated_data)
+        if not extra_vars_valid:
+            return Response(
+                data={'error': 'Provided job data is not valid (bad extra-vars)'},
+                status=400,
+            )
 
         try:
             o = serializer.save()
@@ -291,6 +321,12 @@ class APIJobItem(APIView):
                     )
 
                 serializer.validated_data['owner'] = user
+                extra_vars_valid = _handle_extra_vars(serializer.validated_data)
+                if not extra_vars_valid:
+                    return Response(
+                        data={'error': 'Provided job data is not valid (bad extra-vars)'},
+                        status=400,
+                    )
 
                 try:
                     log_audit(user=user, title='Job edit', msg=f"Job edited: ID '{job_id}', Name '{job.name}'")

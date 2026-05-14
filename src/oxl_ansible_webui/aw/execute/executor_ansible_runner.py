@@ -202,6 +202,7 @@ def executor_ansible_runner(
         envvars=kwargs.pop('envvars'),
         ## contains check-mode, diff-mode, extra-vars, ssh-known-hosts-file, users & password-flags, vault-id
         cmdline=kwargs.pop('cmdline'),
+        extravars=kwargs.pop('extra_vars'),
         ## whatever we might've missed
         **kwargs,
         # system-relevant

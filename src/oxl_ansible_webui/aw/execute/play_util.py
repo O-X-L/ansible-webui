@@ -117,6 +117,7 @@ def _executor_kwargs(
         'verbosity': verbosity,
         'envvars': _environmental_variables(job=job, execution=execution),
         'cmdline': cmdline_args,
+        'extra_vars': _execution_or_job(job, execution, 'extra_vars_as_dict'),
     }
 
     if is_set(job.inventory_file):

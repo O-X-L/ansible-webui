@@ -67,7 +67,7 @@ class JobSharedCredentialsWriteRequest(serializers.ModelSerializer):
 
     def validate(self, attrs: dict):
         for field in JobSharedCredentials.api_fields_write:
-            if field in attrs and field not in BaseJobCredentials.SECRET_ATTRS:
+            if field in attrs and field not in BaseJobCredentials.fields_disable_xss_check:
                 validate_no_xss(value=attrs[field], field=field)
 
         return attrs
@@ -80,7 +80,7 @@ class JobUserCredentialsWriteRequest(JobSharedCredentialsWriteRequest):
 
     def validate(self, attrs: dict):
         for field in JobUserCredentials.api_fields_write:
-            if field in attrs and field not in BaseJobCredentials.SECRET_ATTRS:
+            if field in attrs and field not in BaseJobCredentials.fields_disable_xss_check:
                 validate_no_xss(value=attrs[field], field=field)
 
         return attrs
@@ -93,7 +93,7 @@ class JobTMPCredentialsWriteRequest(JobSharedCredentialsWriteRequest):
 
     def validate(self, attrs: dict):
         for field in JobUserCredentials.api_fields_write:
-            if field in attrs and field not in BaseJobCredentials.SECRET_ATTRS:
+            if field in attrs and field not in BaseJobCredentials.fields_disable_xss_check:
                 validate_no_xss(value=attrs[field], field=field)
 
         return attrs

@@ -12,6 +12,9 @@ def is_null(data) -> bool:
     if data is None:
         return True
 
+    if isinstance(data, (dict, list)):
+        return len(data) == 0
+
     return str(data).strip() == ''
 
 

@@ -60,6 +60,7 @@ export interface jobType {
     comment: string|null,
     environment_vars: string|null,
     cmd_args: string|null,
+    extra_vars: string|null,
     credentials_default: number|null,
     credentials_needed: boolean,
     credentials_category: string|null,

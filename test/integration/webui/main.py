@@ -241,7 +241,7 @@ def test_js_actions():
                 ['#nav-btn-lang', '#nav-btn-lang-en'],
                 [
                     '#jobs-btn-add', '.job-form-main', '.job-form-exec', '.job-form-creds', '.job-form-schedule',
-                    '.job-form-misc', '.job-form-prompts',
+                    '.job-form-extra-vars', '.job-form-misc', '.job-form-prompts',
                     '#job-btn-discard'
                 ],
                 # todo: test job-execution

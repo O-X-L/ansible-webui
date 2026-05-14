@@ -44,6 +44,7 @@
     let apiResponseHandler: APIResponseHandler = $state();
     let formInfos: formInfoType = $state({defaults: {}, choices: {}});
     let loaded = $state(false);
+    let submitted = $state(false);
     let existing: jobType = $state({});
     let method: formMethod = $derived(getMethod(action));
     let actionNew = $derived(['add', 'clone'].includes(action));
@@ -52,8 +53,41 @@
     let formWarningMsgs: string[] = $state([]);
     let pressedKeyAlt = $state(false);
     let pressedKeyS = $state(false);
+ 
+    interface FormField<T> {
+        value: T;
+        color?: string;
+        required?: boolean;
+        blank?: boolean;
+        regex?: RegExp;
+    }
 
-    let form = $state({
+    interface FormState {
+        name: FormField<string>;
+        comment: FormField<string>;
+        repository: FormField<number | null>;
+        playbook_file: FormField<string>;
+        inventory_file: FormField<string>;
+        limit: FormField<string>;
+        tags: FormField<string>;
+        tags_skip: FormField<string>;
+        mode_diff: FormField<boolean>;
+        mode_check: FormField<boolean>;
+        verbosity: FormField<number>;
+        credentials_needed: FormField<boolean>;
+        credentials_default: FormField<string>;
+        credentials_category: FormField<string>;
+        schedule: FormField<string>;
+        enabled: FormField<boolean>;
+        environment_vars: FormField<string>;
+        cmd_args: FormField<string>;
+        extra_vars: FormField<string>;
+        execution_prompts: FormField<string>;
+        execution_prompts_json: FormField<string>;
+        owner: FormField<number | string>; // Based on your user_id type
+        ssh_hostkey_file: FormField<string>;
+    }
+    let form: FormState = $state({
         name: {value: '', color: inputBaseColor, required: true},
         comment: {value: '', color: inputBaseColor},
         repository: {value: null, color: inputBaseColor},
@@ -76,6 +110,7 @@
         enabled: {value: true},
         environment_vars: {value: '', color: inputBaseColor},
         cmd_args: {value: '', color: inputBaseColor},
+        extra_vars: {value: '', color: inputBaseColor},
         execution_prompts: {value: '', color: inputBaseColor},  // legacy prompts
         execution_prompts_json: {value: '', color: inputBaseColor},
         owner: {value: $share.backend.user_id},
@@ -101,11 +136,17 @@
             open = false;
         } else {
             apiResponseHandler.handleRes(s, j);
+            submitted = false;
         }
     }
 
     function submitForm() {
+        if (submitted) {
+            return;
+        }
         execPromptsEncode();
+        extraVarsEncode();
+        submitted = true;
         let [valid, errors] = submitFormBase(
             form, method, url, handleSubmitResponse, t, 'jobs.form.',
         );
@@ -138,6 +179,7 @@
             }
         }
         execPromptsDecode();
+        extraVarsDecode();
         loaded = true;
     }
 
@@ -623,7 +665,7 @@
             }
             let prompt: executionPromptVarType = {
                 name: p.name.value,
-                varName: p.varName.value,
+                varName: sanitizeAnsibleVariableName(p.varName.value),
                 kind: p.kind.value,
                 required: p.required.value,
                 choices: p.choices.value,
@@ -672,6 +714,45 @@
             }
         }
         executionPrompts = filtered;
+    }
+
+    // extra-vars
+    let extraVars: Record<string, string> = $state({});
+    let extraVarAddName: string = $state('');
+    let extraVarKey: number = $state(Date.now());
+
+    function sanitizeAnsibleVariableName(input: string): string {
+        // see ansible-docs: https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html
+        // valid: letters, numbers, and underscores
+        let sanitized = input.replace(/[^a-zA-Z0-9_]/g, '');
+        sanitized = sanitized.replace(/^[0-9]+/, '');
+        return sanitized;
+    }
+
+    function extraVarsEncode() {
+        if (extraVars && Object.keys(extraVars).length > 0) {
+            form.extra_vars.value = JSON.stringify(extraVars);
+        }
+    }
+
+    function extraVarsDecode() {
+        if (!existing.extra_vars) {
+            return;
+        }
+        extraVars = JSON.parse(existing.extra_vars);
+    }
+
+    function extraVarsAdd() {
+        if (!extraVars) {
+            extraVars = {};
+        }
+        extraVars[sanitizeAnsibleVariableName(extraVarAddName)] = "";
+        extraVarAddName = "";
+    }
+
+    function extraVarsRemove(varName: string) {
+        delete extraVars[varName];
+        extraVarKey = Date.now();
     }
 
     // update isolated git repo
@@ -751,7 +832,9 @@
 <div bind:this={componentRoot} tabindex="-1" class="inline-block">
 <Modal bind:open={open} size="lg" autoclose={false} placement="top-center"
     backdropClass={classModalBackdrop} dialogClass={classModalDialog} bodyClass={classModalBody}>
-    <Heading tag="h2">{title}</Heading>
+    <Heading tag="h2">
+        {title}{#if !actionNew}: "{form.name.value}"{/if}
+    </Heading>
     {#if !loaded}
         <div class={classSpinnerDiv}><Spinner/></div>
     {:else}
@@ -759,7 +842,7 @@
 
         <Accordion class={classModalForm}>
             <AccordionItem defaultClass="{classSpoilerItem} job-form-main" paddingDefault={classSpoilerPad}>
-                <span slot="header">Main</span>
+                <span slot="header">{t('env.main')}</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
                         <Label for="job_name" class={classModalLabel}>{t('common.name')}</Label>
@@ -839,7 +922,7 @@
                 </div>
             </AccordionItem>
             <AccordionItem defaultClass="{classSpoilerItem} job-form-exec" paddingDefault={classSpoilerPad}>
-                <span slot="header">Execution</span>
+                <span slot="header">{t('config.execution')}</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
                         <Label for="job_limit" class={classModalLabel}>{t('jobs.form.limit')}</Label>
@@ -920,7 +1003,7 @@
                 </div>
             </AccordionItem>
             <AccordionItem defaultClass="{classSpoilerItem} job-form-creds" paddingDefault={classSpoilerPad}>
-                <span slot="header">Credentials</span>
+                <span slot="header">{t('home.creds')}</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
                         <Label for="job_creds" class={classModalLabel}>{t('jobs.form.credentials_needed')}</Label>
@@ -942,7 +1025,7 @@
                 </div>
             </AccordionItem>
             <AccordionItem defaultClass="{classSpoilerItem} job-form-schedule" paddingDefault={classSpoilerPad}>
-                <span slot="header">Scheduling</span>
+                <span slot="header">{t('jobs.form.schedule')}</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
                         <Label for="job_cron" class={classModalLabel}>{t('jobs.form.schedule')}</Label>
@@ -957,8 +1040,38 @@
                     </div>
                 </div>
             </AccordionItem>
+            <AccordionItem defaultClass="{classSpoilerItem} job-form-extra-vars" paddingDefault={classSpoilerPad}>
+                <span slot="header">{t('jobs.form.extra_vars')}</span>
+                <div class={classModalInputDiv}>
+                    {#key extraVarKey}
+                    {#each Object.keys(extraVars) as extraVarName, varId (extraVarName)}
+                        <div class={classModalInputDiv}>
+                            <div class={classModalInput}>
+                                <Label for="job_extra_var_{varId}_value" class={classModalLabel}>'{extraVarName}'</Label>
+                                <Input id="job_extra_var_{varId}_value" bind:value={extraVars[extraVarName]} />
+                            </div>
+                            <div class="mr-5 mt-10">
+                                <Button type="button" on:click={() => {extraVarsRemove(extraVarName)}}><TrashBinSolid/></Button>
+                                <Tooltip>{t('btn.delete')}</Tooltip>
+                            </div>    
+                        </div>
+                        <hr class="mt-10 mb-2">
+                    {/each}
+                    {/key}
+                </div>
+                <div class="{classModalInputDiv} mt-10">
+                    <div class={classModalInput}>
+                        <Label for="job_extra_var_new_name" class={classModalLabel}>{t('jobs.form.extra_vars_new')}</Label>
+                        <Input id="job_extra_var_new_name" bind:value={extraVarAddName} />
+                    </div>
+                    <div class={classModalBtns}>
+                        <Button type="button" on:click={extraVarsAdd}><CirclePlusSolid/></Button>
+                        <Tooltip>{t('btn.add')}</Tooltip>
+                    </div>
+                </div>
+            </AccordionItem>
             <AccordionItem defaultClass="{classSpoilerItem} job-form-misc" paddingDefault={classSpoilerPad}>
-                <span slot="header">Additional</span>
+                <span slot="header">{t('jobs.form.additional')}</span>
                 <div class={classModalInputDiv}>
                     <div class={classModalInput}>
                         <Label for="job_env" class={classModalLabel}>{t('jobs.form.environment_vars')}</Label>

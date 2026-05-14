@@ -1,5 +1,8 @@
 from datetime import datetime
 from datetime import timedelta
+from json import JSONDecodeError
+from json import dumps as json_dumps
+from json import loads as json_loads
 
 from crontab import CronTab
 from django.db import models
@@ -56,6 +59,7 @@ class BaseJob(BaseModel):
     tags = models.TextField(max_length=500, **DEFAULT_NONE)
     tags_skip = models.TextField(max_length=500, **DEFAULT_NONE)
     cmd_args = models.TextField(max_length=1000, **DEFAULT_NONE)
+    _extra_vars = models.TextField(max_length=1000, **DEFAULT_NONE)
 
     class Meta:
         abstract = True
@@ -69,6 +73,48 @@ class BaseJob(BaseModel):
                     raise ValidationError(
                         f"Found one or more bad flags in commandline arguments: {self.BAD_ANSIBLE_FLAGS} (prompts)"
                     )
+
+    @property
+    def extra_vars(self) -> str:
+        if is_null(self._extra_vars):
+            return ''
+
+        try:
+            json_loads(self._extra_vars)
+            return self._extra_vars
+
+        except (JSONDecodeError, TypeError):
+            # todo: log?
+            return ''
+
+    @extra_vars.setter
+    def extra_vars(self, value: (str, dict)):
+        if is_null(value):
+            return
+
+        if isinstance(value, dict):
+            self._extra_vars = json_dumps(value, default=str)
+
+        else:
+            try:
+                json_loads(value)
+                self._extra_vars = value
+
+            except (JSONDecodeError, TypeError):
+                # todo: log?
+                pass
+
+    @property
+    def extra_vars_as_dict(self) -> dict:
+        if is_null(self._extra_vars):
+            return {}
+
+        try:
+            return json_loads(self._extra_vars)
+
+        except JSONDecodeError:
+            # todo: log?
+            return {}
 
 
 def validate_cronjob(value):
@@ -84,7 +130,7 @@ class Job(BaseJob):
     form_fields = [
         'name', 'playbook_file', 'inventory_file', 'repository', 'schedule', 'enabled', 'limit', 'verbosity',
         'mode_diff', 'mode_check', 'tags', 'tags_skip', 'verbosity', 'comment', 'environment_vars', 'cmd_args',
-        'credentials_default', 'credentials_needed', 'credentials_category', 'owner', 'ssh_hostkey_file',
+        'credentials_default', 'credentials_needed', 'credentials_category', 'owner', 'ssh_hostkey_file', 'extra_vars',
     ]
     CHANGE_FIELDS = form_fields.copy()
     CHANGE_FIELDS.extend(['execution_prompts', 'execution_prompts_json'])
@@ -94,7 +140,7 @@ class Job(BaseJob):
     api_fields_write = api_fields_read.copy()
     api_fields_read.append('next_run')
     fields_allow_sq = ['comment']
-    fields_json = ['execution_prompts_json']
+    fields_disable_xss_check = ['cmd_args', 'execution_prompts_json', 'extra_vars']
 
     name = models.CharField(max_length=150, null=False, blank=False)
     playbook_file = models.CharField(max_length=150)
@@ -241,7 +287,7 @@ class JobExecution(BaseJob):
     ]
     api_fields_exec = [
         'comment', 'limit', 'verbosity', 'mode_diff', 'mode_check', 'environment_vars', 'tags', 'tags_skip',
-        'cmd_args', 'credentials_shared', 'credentials_user', 'credentials_tmp',
+        'cmd_args', 'credentials_shared', 'credentials_user', 'credentials_tmp', 'extra_vars',
     ]
     log_file_fields = ['log_stdout', 'log_stderr', 'log_stdout_repo', 'log_stderr_repo']
 
