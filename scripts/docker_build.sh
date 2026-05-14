@@ -11,6 +11,7 @@ fi
 set -u
 
 VERSION="$1"
+VERSION_IMAGE="$(echo "$VERSION" | cut -d '-' -f1)"
 
 cd "$(dirname "$0")/../docker"
 
@@ -21,7 +22,7 @@ read -r -p "Build version ${VERSION} as latest? [y/N] " -n 1
 echo ''
 echo "### CLEANUP ###"
 
-if docker image ls | grep "$IMAGE_REPO" | grep -q "$VERSION"
+if docker image ls | grep "$IMAGE_REPO" | grep -q "$VERSION_IMAGE"
 then
   for img in $(docker image ls | egrep "^${IMAGE_REPO}" | awk '{print $1":"$2}')
   do
@@ -49,7 +50,7 @@ function build() {
 
 echo ''
 echo "### BUILDING FRONTEND ###"
-docker build -f "Dockerfile_builder_frontend" -t "${IMAGE_REPO}-builder-fe:${VERSION}" --network host --build-arg "AW_VERSION=${VERSION}" --no-cache .
+docker build -f "Dockerfile_builder_frontend" -t "${IMAGE_REPO}-builder-fe:${VERSION_IMAGE}" --network host --build-arg "AW_VERSION=${VERSION}" --no-cache .
 
 for img in "${IMAGES[@]}"
 do
@@ -59,7 +60,7 @@ do
   set +u
   if [ -n "${DOCKERFILES_DEBIAN["$img"]+_}" ]
   then
-    build "$img" "${DOCKERFILES_DEBIAN["$img"]}" "${VERSION}-debian" "0"
+    build "$img" "${DOCKERFILES_DEBIAN["$img"]}" "${VERSION_IMAGE}-debian" "0"
     if [[ "$REPLY" =~ ^[Yy]$ ]]
     then
       build "$img" "${DOCKERFILES_DEBIAN["$img"]}" "latest-debian" "1"
@@ -69,7 +70,7 @@ do
   set +u
   if [ -n "${DOCKERFILES_ALPINE["$img"]+_}" ]
   then
-    build "$img" "${DOCKERFILES_ALPINE["$img"]}" "${VERSION}-alpine" "0"
+    build "$img" "${DOCKERFILES_ALPINE["$img"]}" "${VERSION_IMAGE}-alpine" "0"
     if [[ "$REPLY" =~ ^[Yy]$ ]]
     then
       build "$img" "${DOCKERFILES_ALPINE["$img"]}" "latest-alpine" "1"

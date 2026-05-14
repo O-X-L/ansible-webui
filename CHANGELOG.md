@@ -14,6 +14,10 @@ Features:
 
 * Disable schedule when cloning jobs [#105](https://github.com/O-X-L/ansible-webui/issues/105)
 
+Project:
+
+* Remove hotfix-versions from docker-image-tags [#98](https://github.com/O-X-L/ansible-webui/issues/98)
+
 ----
 
 ### 0.9.4

@@ -11,6 +11,7 @@ fi
 set -u
 
 VERSION="$1"
+VERSION_IMAGE="$(echo "$VERSION" | cut -d '-' -f1)"
 cd "$(dirname "$0")/../docker"
 
 source ./build_config.sh
@@ -34,7 +35,7 @@ do
   set +u
   if [ -n "${DOCKERFILES_DEBIAN["$img"]+_}" ]
   then
-    push "$img" "${VERSION}-debian"
+    push "$img" "${VERSION_IMAGE}-debian"
     if [[ "$REPLY" =~ ^[Yy]$ ]]
     then
       push "$img" "latest-debian"
@@ -44,7 +45,7 @@ do
   set +u
   if [ -n "${DOCKERFILES_ALPINE["$img"]+_}" ]
   then
-    push "$img" "${VERSION}-alpine"
+    push "$img" "${VERSION_IMAGE}-alpine"
     if [[ "$REPLY" =~ ^[Yy]$ ]]
     then
       push "$img" "latest-alpine"
