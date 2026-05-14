@@ -14,16 +14,17 @@ def test_params(jid: int = 2):
         }
     )
 
-    print('PARAMS | EXECUTE (vars, modes & comment)')
+    print('PARAMS | EXECUTE (vars, modes, extra-vars & comment)')
     cmd_args = '-e test=run2'
     comment = 'Test XYZ'
     env_var = 'SomeRandomValue'
+    extra_vars_json = '{"service":"apache2","port":8080}'
     api_request(
         f'job/{jid}',
         'post',
         {
             'cmd_args': cmd_args, 'comment': comment, 'mode_check': True, 'mode_diff': True,
-            'environment_vars': f'TEST1_VAR2={env_var}',
+            'environment_vars': f'TEST1_VAR2={env_var}', 'extra_vars': extra_vars_json,
         }
     )
 
@@ -35,10 +36,11 @@ def test_params(jid: int = 2):
     assert e['comment'] == comment
 
     if AW_EXECUTOR == 'oxl-ansible-executor':
-        assert e['command'] == f'ansible-playbook -i inv/empty.yml -C -D {cmd_args} play1.yml'
+        assert e['command'] == f'ansible-playbook -i inv/empty.yml -C -D -e {extra_vars_json} {cmd_args} play1.yml'
 
     else:
-        assert e['command'] == f'ansible-playbook {cmd_args} --check --diff -i inv/empty.yml play1.yml'
+        assert e['command'] == (f'ansible-playbook {cmd_args} --check --diff -i inv/empty.yml -e {extra_vars_json} '
+                                f'play1.yml')
 
     assert e['log_stdout'] is not None
     assert Path(e['log_stdout']).is_file()

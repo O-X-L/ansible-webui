@@ -8,7 +8,7 @@ from requests import Session, Response
 BASE_URL = 'http://127.0.0.1:8000/api'
 API_USER = environ['AW_ADMIN']
 API_KEY = environ['AW_API_KEY']
-INSIDE_CI = environ['CI']
+INSIDE_CI = environ.get('CI', '') != ''
 
 api = Session()
 api.headers['X-Api-Key'] = API_KEY
@@ -126,6 +126,10 @@ def test_add():
             'name': 'jup5', 'playbook_file': 'nope_nr2.yml', 'inventory_file': 'empty.yml', 'schedule': '5 4 * * *',
             'environment_vars': 'MY=1,SUPER=2,VARS=3',
         }},
+        {'l': 'job', 'd': {
+            'name': 'more-vars', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/empty.yml',
+            'extra_vars': '{"service":"apache2","port":8080,"app":"test_abc"}',
+        }},
         # todo: create job with an owner-id that's not ours and validate that the backend fixed it
 
         # perms
@@ -159,6 +163,10 @@ def test_modify():
         {'l': 'job/2', 'd': {
             'name': 'My job2.7', 'playbook_file': 'PlayUsBookUs.yml', 'inventory_file': 'empty.yml', 'enabled': False,
             'repository': 2,
+        }},
+        {'l': 'job/2', 'd': {
+            'name': 'My job2.8', 'playbook_file': 'PlayUsBookUs.yml', 'inventory_file': 'empty.yml', 'enabled': False,
+            'extra_vars': '{"service":"nginx","port":8080,"app":"test_efg"}',
         }},
 
         # alerts
