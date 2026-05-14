@@ -107,6 +107,7 @@ DE = {
     'jobs.execute.required_var': 'Erforderliche Variable fehlt',  # '<msg>: "<varname>"'
     'jobs.execute.required_credentials': 'Zugangsdaten sind erforderlich',
     'jobs.execute.regex_mismatch': 'Eingabe entspricht nicht dem erforderlichen Format',
+    'jobs.execute.extra_vars_json_invalid': 'Zusätzliche-Variablen müssen in validem JSON-Format sein',
     ## form fields
     'jobs.action.start': 'Job in Warteschlange',
     'jobs.action.stop': 'Job-Stop initiiert',
@@ -121,6 +122,7 @@ DE = {
     'jobs.form.schedule': 'Geplante Ausführung',
     'jobs.form.extra_vars': 'Zusätzliche Variablen',
     'jobs.form.extra_vars_new': 'Zusätliche Variable erstellen',
+    'jobs.form.extra_vars_json': 'Zusätzliche Variablen (als JSON)',
     'jobs.form.additional': 'Weitere Optionen',
     'jobs.form.cron': 'Zeitplan Cron',
     'jobs.form.enabled': 'Zeitplan aktiviert',

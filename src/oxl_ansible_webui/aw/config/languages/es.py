@@ -106,6 +106,7 @@ ES = {
     'jobs.execute.required_var': 'Falta variable requerida',
     'jobs.execute.required_credentials': 'Credenciales requeridas',
     'jobs.execute.regex_mismatch': 'La entrada no cumple con el patrón requerido',
+    'jobs.execute.extra_vars_json_invalid': 'Las variables adicionales deben estar en formato JSON válido',
 
     ## form fields
     'jobs.action.start': 'Trabajo en cola',
@@ -121,6 +122,7 @@ ES = {
     'jobs.form.schedule': 'Calendario',
     'jobs.form.extra_vars': 'Variables adicionales',
     'jobs.form.extra_vars_new': 'Crear una variable adicional',
+    'jobs.form.extra_vars_json': 'Variables adicionales (en JSON)',
     'jobs.form.additional': 'Otras opciones',
     'jobs.form.cron': 'Programación Cron',
     'jobs.form.enabled': 'Programación habilitada',

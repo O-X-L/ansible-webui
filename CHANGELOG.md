@@ -15,6 +15,7 @@ Features:
 * Disable schedule when cloning jobs [#105](https://github.com/O-X-L/ansible-webui/issues/105)
 * Show entry-name in edit-form title
 * Added execution finish-time & duration to log-view 
+* Enabled supplying extra-vars in key-value pairs/structured JSON [#104](https://github.com/O-X-L/ansible-webui/issues/104)
 
 Fixes:
 

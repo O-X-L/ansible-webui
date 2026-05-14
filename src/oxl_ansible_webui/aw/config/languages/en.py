@@ -109,6 +109,7 @@ EN = {
     'jobs.execute.required_var': 'Required variable missing',  # '<msg>: "<varname>"'
     'jobs.execute.required_credentials': 'Credentials are required',
     'jobs.execute.regex_mismatch': 'Input does not satisfy the required pattern',
+    'jobs.execute.extra_vars_json_invalid': 'Extra-Variable value has to be valid JSON-string',
     ## form fields
     'jobs.action.start': 'Job queued',
     'jobs.action.stop': 'Job stop initiated',
@@ -125,6 +126,7 @@ EN = {
     'jobs.form.schedule': 'Schedule',
     'jobs.form.extra_vars': 'Extra Variables',
     'jobs.form.extra_vars_new': 'Create additional variable',
+    'jobs.form.extra_vars_json': 'Extra Variables (as JSON)',
     'jobs.form.additional': 'Additional Options',
     'jobs.form.cron': 'Schedule Cron',
     'jobs.form.enabled': 'Schedule Enabled',

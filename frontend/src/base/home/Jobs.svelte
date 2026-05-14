@@ -72,6 +72,7 @@
         credentials_req: boolean,
         comment: string|null,
         verbosity: number,
+        extra_vars: string,
     }
     interface executionPromptsFullType {
         config: executionPromptsType,
@@ -92,7 +93,7 @@
         config: {fields: [], vars: []},
         field_values: {
             tags: '', tags_skip: '', mode_check: false, mode_diff: false, limit: '',
-            environment_vars: '', cmd_args: '', credentials: null, credentials_req: false,
+            environment_vars: '', extra_vars: '', cmd_args: '', credentials: null, credentials_req: false,
             comment: '', verbosity: 0,
         },
         var_values: {},
@@ -152,11 +153,20 @@
         entryActions[jobId].exec = false;
     }
 
+    function isValidJSON(value: string): boolean {
+        try {
+            JSON.parse(value);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    }
+
     function startJob(jobId: number) {
         if (!jobId) {
             return;
         }
-        let promptData: Record<any, any> = {};
+        let promptData: Record<string, any> = {};
 
         // validation
         if (executionPrompts.config.fields.includes('limit_req') && !isSet(executionPrompts.field_values.limit)) {
@@ -167,6 +177,13 @@
 
         if (executionPrompts.config.fields.includes('credentials_req') && !isSet(executionPrompts.field_values.credentials)) {
             apiErrorMsg = t('jobs.execute.required_credentials');
+            apiError = true;
+            return;
+        }
+
+        const extraVarsSupplied = executionPrompts.config.fields.includes('extra_vars') && isSet(executionPrompts.field_values.extra_vars);
+        if (extraVarsSupplied && !isValidJSON(executionPrompts.field_values.extra_vars)) {
+            apiErrorMsg = t('jobs.execute.extra_vars_json_invalid');
             apiError = true;
             return;
         }
@@ -209,19 +226,21 @@
         }
 
         if (executionPrompts.config.vars.length) {
-            let c: string[] = [];
+            const promptExtraVars: Record<string, string> = {};
 
             for (let [k, v] of Object.entries(executionPrompts.var_values)) {
                 if (v && v.trim()) {
-                    c.push(`-e "${k}='${v}'"`)
+                    promptExtraVars[k] = v.trim();
                 }
             }
 
-            if (c.length) {
-                if (!executionPrompts.config.fields.includes('cmd_args')) {
-                    promptData['cmd_args'] = '';
+            if (Object.keys(promptExtraVars).length > 0) {
+                if (extraVarsSupplied) {
+                    const userSuppliedExtraVars: Record<any, any> = JSON.parse(promptData['extra_vars']);
+                    promptData['extra_vars'] = JSON.stringify({...userSuppliedExtraVars, ...promptExtraVars});
+                } else {
+                    promptData['extra_vars'] = JSON.stringify(promptExtraVars);
                 }
-                promptData['cmd_args'] += ` ${c.join(' ')}`
             }
         }
 
@@ -280,6 +299,9 @@
         }
         if (job.cmd_args) {
             executionPrompts.field_values.cmd_args = job.cmd_args;
+        }
+        if (job.extra_vars) {
+            executionPrompts.field_values.extra_vars = job.extra_vars;
         }
 
         // set default values as configured for dropdown-variables
@@ -758,6 +780,10 @@
                 {#if executionPrompts.config.fields.includes('cmd_args')}
                     <Label for="job_prompt_{job.id}_cmd_args" class={classModalLabel}>{t('jobs.form.cmd_args')}</Label>
                     <Input id="job_prompt_{job.id}_cmd_args" bind:value={executionPrompts.field_values.cmd_args} />
+                {/if}
+                {#if executionPrompts.config.fields.includes('extra_vars')}
+                    <Label for="job_prompt_{job.id}_extra_vars" class={classModalLabel}>{t('jobs.form.extra_vars_json')}</Label>
+                    <Input id="job_prompt_{job.id}_extra_vars" bind:value={executionPrompts.field_values.extra_vars} />
                 {/if}
                 {#if executionPrompts.config.fields.includes('credentials') && !executionPrompts.config.fields.includes('credentials_tmp')}
                     <Label for="job_prompt_{job.id}_creds" class={classModalLabel}>{t('jobs.form.credentials')}</Label>

@@ -625,12 +625,13 @@
         credentials_req: boolean,
         credentials_tmp: boolean,
         comment: boolean,
+        extra_vars: boolean,
     }
 
     let executionPromptsSimple: executionPromptSwitches = $state({
         tags: false, tags_skip: false, mode_check: true, mode_diff: false, limit: true, limit_req: false,
         environment_vars: false, cmd_args: false, verbosity: true, credentials: true, comment: true,
-        credentials_req: false, credentials_tmp: false,
+        credentials_req: false, credentials_tmp: false, extra_vars: false,
     });
     let executionPrompts: executionPrompt[] = $state([]);
     let executionPromptId = 0;
@@ -1143,6 +1144,12 @@
                             <Label for="job_exec_prompt_env_vars" class={classModalLabel}>{t('jobs.form.environment_vars')}</Label>
                             <div class={classCenterChildDiv}>
                                 <Toggle id="job_exec_prompt_env_vars" bind:checked={executionPromptsSimple.environment_vars} />
+                            </div>
+                        </div>
+                        <div>
+                            <Label for="job_exec_prompt_extra_vars" class={classModalLabel}>{t('jobs.form.extra_vars_json')}</Label>
+                            <div class={classCenterChildDiv}>
+                                <Toggle id="job_exec_prompt_extra_vars" bind:checked={executionPromptsSimple.extra_vars} />
                             </div>
                         </div>
                         <div>
