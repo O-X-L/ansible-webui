@@ -8,6 +8,14 @@ tbd
 
 ## Version 0
 
+### 0.9.5
+
+Features:
+
+* Disable schedule when cloning jobs [#105](https://github.com/O-X-L/ansible-webui/issues/105)
+
+----
+
 ### 0.9.4
 
 Fixes:

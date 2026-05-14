@@ -17,9 +17,9 @@
     import { tq } from '../../../util/translate.js';
     import { isSet, rsplit } from '../../../util/main.js';
     import { apiGet, apiEdit, cacheKey } from '../../../util/api.js';
-    import { type formInfoType, type inputColorType } from '../../Types.js';
+    import type { formInfoType, inputColorType } from '../../Types.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
-    import { type executionPromptsType, type executionPromptVarType } from '../Types.js';
+    import type { executionPromptsType, executionPromptVarType, jobType } from '../Types.js';
     import {
         inputBaseColor, valideInputBase, submitFormBase, getMethod,
         type formMethod,
@@ -44,7 +44,7 @@
     let apiResponseHandler: APIResponseHandler = $state();
     let formInfos: formInfoType = $state({defaults: {}, choices: {}});
     let loaded = $state(false);
-    let existing = $state({});
+    let existing: jobType = $state({});
     let method: formMethod = $derived(getMethod(action));
     let actionNew = $derived(['add', 'clone'].includes(action));
     let url = $derived(actionNew ? 'job' : urlExisting);
@@ -130,6 +130,7 @@
         existing = j;
         if (action == 'clone') {
             existing.name = `${existing.name} - Copy`;
+            existing.enabled = false;
         }
         for (let [k, v] of Object.entries(existing)) {
             if (k in form) {
