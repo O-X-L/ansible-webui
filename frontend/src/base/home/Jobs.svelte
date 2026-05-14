@@ -52,6 +52,7 @@
     let apiError = $state(false);
     let apiSuccess = $state(false);
     let apiDataHash = $state('');
+    let apiJobStarted = $state(false);
     let updateLoop: number = $state(0);
     let updatedAt = $state(0);
     let searchedAt = $state(0);
@@ -225,12 +226,22 @@
         }
 
         apiSuccessMsg = 'jobs.action.start';
-        apiEdit('post', `job/${jobId}`, promptData, apiResponseHandler.handleRes);
+        apiJobStarted = false;
+        apiEdit('post', `job/${jobId}`, promptData, jobStartCallback);
         entryActions[jobId].exec = false;
         if (executionPromptJumpToLogs) {
-            redirectLogs(jobId);
+            setTimeout(() => {
+                if (apiJobStarted) {
+                    redirectLogs(jobId)
+                }
+            }, 1000);
         }
         setURLHashParams(URL_HASH, null);
+    }
+
+    function jobStartCallback(s: number, j: any) {
+        apiJobStarted = true;
+        apiResponseHandler.handleRes(s, j);
     }
 
     function redirectLogs(jobId: number) {
