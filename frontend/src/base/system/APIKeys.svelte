@@ -93,6 +93,10 @@
             // tab in background
             return;
         }
+        if (newModal) {
+            // user currently adding entry
+            return;
+        }
         apiGet(`key?hash=${apiDataHash}`, loadApiKeyList);
     }
 

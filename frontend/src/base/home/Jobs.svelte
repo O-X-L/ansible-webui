@@ -21,10 +21,10 @@
     import { redirectTo, isSet } from '../../util/main.js';
     import CredentialsForm from './forms/Credentials.svelte';
     import { apiEdit, apiGet, cacheKey } from '../../util/api.js';
-    import { type jobType, type executionPromptsType,} from './Types.js';
-    import { type formChoiceType, type formInfoType } from '../Types.js';
+    import type { jobType, executionPromptsType } from './Types.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import { JOB_EXEC_STATI_ACTIVE, EXEC_STATUS_FAILED } from '../Config.js';
+    import type { formChoiceType, formInfoType, entryActionStateExec } from '../Types.js';
     import { getURLHashParams, setURLHashParams, URL_HASH_PARAM_SEPARATOR, URL_HASH_PARAM_KV } from '../../util/main.js';
     import {
         classModalBackdrop, classModalBtns, classPopover, classPopoverTitle, classPopoverColumn1,
@@ -38,11 +38,15 @@
 
     let { open = $bindable(false) } = $props();
 
+    interface entryActionsType {
+        [id: number]: entryActionStateExec;
+    }
+
     let apiResponseHandler: APIResponseHandler = $state();
     let addModal = $state(false);
     let addModalId = $state(Date.now());
     let entryList: jobType[] = $state([]);
-    let entryActions = $state({});
+    let entryActions: entryActionsType = $state({});
     let apiErrorMsg = $state('');
     let apiSuccessMsg = $state('');
     let apiError = $state(false);
@@ -71,7 +75,7 @@
     interface executionPromptsFullType {
         config: executionPromptsType,
         field_values: executionPromptsFieldValues,
-        var_values: any,
+        var_values: Record<string, any>,
     }
     interface credentialType {
         id: number,
@@ -151,7 +155,7 @@
         if (!jobId) {
             return;
         }
-        let promptData = {};
+        let promptData: Record<any, any> = {};
 
         // validation
         if (executionPrompts.config.fields.includes('limit_req') && !isSet(executionPrompts.field_values.limit)) {
@@ -191,10 +195,12 @@
                         continue;
                     }
                     let credsKind = 'credentials_shared';
-                    if (executionPrompts.field_values.credentials.includes('user-')) {
+                    if (executionPrompts.field_values.credentials && executionPrompts.field_values.credentials.includes('user-')) {
                         credsKind = 'credentials_user';
                     }
-                    promptData[credsKind] = parseInt(executionPrompts.field_values.credentials?.split('-')[1], 10);
+                    if (executionPrompts.field_values.credentials) {
+                        promptData[credsKind] = parseInt(executionPrompts.field_values.credentials.split('-')[1], 10);
+                    }
                 }
             } else if (f != 'credentials_req') {
                 promptData[f] = executionPrompts.field_values[f];
@@ -363,12 +369,16 @@
             // tab in background
             return;
         }
+        if (addModal || isUserEditingOrExecuting()) {
+            // user currently adding/editing entry
+            return;
+        }
         apiGet(`job?executions=true&execution_count=1&hash=${apiDataHash}`, loadJobList);
     }
 
     function openModalByURL() {
         let params = getURLHashParams();
-        let action = null;
+        let action: 'clone'|'edit'|'exec'|null = null;
         let value = null;
 
         // only one possible
@@ -394,21 +404,19 @@
         }
     }
 
+    function isUserEditingOrExecuting(): boolean {
+        let any_open = Object.values(entryActions).some(job => job.exec || job.edit);
+        return any_open;
+    }
+
     function updateURLHash(_: any) {
-      // remove hash-params from URL if modals were closed
-      if (!loaded) {
-        return;
-      }
-      let any_open = false;
-      for (let job of Object.keys(entryActions)) {
-        if (entryActions[job].exec || entryActions[job].edit) {
-            any_open = true;
-            break;
+        // remove hash-params from URL if modals were closed
+        if (!loaded) {
+            return;
         }
-      }
-      if (!any_open) {
-        setURLHashParams(URL_HASH, null);
-      } 
+        if (!isUserEditingOrExecuting()) {
+            setURLHashParams(URL_HASH, null);
+        } 
     }
 
     $effect(() => {

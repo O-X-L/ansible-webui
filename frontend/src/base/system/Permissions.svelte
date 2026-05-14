@@ -9,7 +9,8 @@
 
     import { share } from '../Share.js';
     import { tq } from '../../util/translate.js';
-    import { apiEdit, apiGet, formJSON } from '../../util/api.js';
+    import type { entryActionState } from '../Types.js';
+    import { apiEdit, apiGet } from '../../util/api.js';
     import PermissionForm from './forms/Permission.svelte';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
@@ -18,6 +19,10 @@
  
     let { open = $bindable(false) } = $props();
 
+    interface entryActionsType {
+        [id: number]: entryActionState;
+    }
+
     let apiResponseHandler: APIResponseHandler = $state();
     let addModal = $state(false);
     let addModalId = $state(Date.now());
@@ -25,7 +30,7 @@
     let apiSuccessMsg = $state('');
     let apiSuccess = $state(false);
     let apiDataHash = $state('');
-    let entryActions = $state({});
+    let entryActions: entryActionsType = $state({});
     let updateLoop: number = $state(0);
     let updatedAt = $state(0);
 
@@ -74,10 +79,10 @@
 
     function getMembersSummary(perm: permissionType) {
         let m = [];
-        if (perm.users.length > 0) {
+        if (perm.users && perm.users.length > 0) {
             m.push(t('permission.users'));
         }
-        if (perm.groups.length > 0) {
+        if (perm.groups && perm.groups.length > 0) {
             m.push(t('permission.groups'));
         }
         if (m.length == 0) {
@@ -88,13 +93,13 @@
 
     function getPermittedSummary(perm: permissionType) {
         let m = [];
-        if (perm.jobs.length > 0 || perm.jobs_all) {
+        if (perm.jobs && perm.jobs.length > 0 || perm.jobs_all) {
             m.push(t('home.jobs'));
         }
-        if (perm.credentials.length > 0 || perm.credentials_all) {
+        if (perm.credentials && perm.credentials.length > 0 || perm.credentials_all) {
             m.push(t('home.creds'));
         }
-        if (perm.repositories.length > 0 || perm.repositories_all) {
+        if (perm.repositories && perm.repositories.length > 0 || perm.repositories_all) {
             m.push(t('home.repos'));
         }
         if (m.length == 0) {
@@ -130,7 +135,16 @@
             // tab in background
             return;
         }
+        if (addModal || isUserEditing()) {
+            // user currently adding/editing entry
+            return;
+        }
         apiGet(`permission?hash=${apiDataHash}`, loadPermList);
+    }
+
+    function isUserEditing(): boolean {
+        let any_open = Object.values(entryActions).some(state => state.edit);;
+        return any_open;
     }
 
     onMount(() => {

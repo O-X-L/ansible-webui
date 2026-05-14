@@ -17,10 +17,11 @@
     import { share } from '../Share.js';
     import { tq } from '../../util/translate.js';
     import { clickToCopy } from '../../util/main.js';
+    import type { entryActionState } from '../Types.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import CredentialsForm from './forms/Credentials.svelte';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
-    import { type credentialsUserType, type credentialsSharedType} from './Types.js';
+    import type { credentialsUserType, credentialsSharedType } from './Types.js';
     import {
         classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
         classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle, classFooterSpacing,
@@ -33,6 +34,12 @@
 
     let { open = $bindable(false) } = $props();
 
+    interface entryActionsType {
+        [category: string]: {
+            [id: number]: entryActionState;
+        };
+    }
+
     let apiResponseHandler: APIResponseHandler = $state();
     let addUserModal = $state(false);
     let addSharedModal = $state(false);
@@ -42,7 +49,7 @@
     let apiSuccessMsg = $state('');
     let apiSuccess = $state(false);
     let apiDataHash = $state('');
-    let entryActions = $state({'shared': {}, 'user': {}});
+    let entryActions: entryActionsType = $state({'shared': {}, 'user': {}});
     let updateLoop: number = $state(0);
     let updatedAt = $state(0);
     let searchedAt = $state(0);
@@ -118,6 +125,10 @@
             // tab in background
             return;
         }
+        if (addUserModal || addSharedModal || isUserEditing()) {
+            // user currently adding/editing entry
+            return;
+        }
         apiGet(`credentials?hash=${apiDataHash}`, loadCredentialsList);
     }
 
@@ -127,6 +138,14 @@
             newVaultLoad = false;
         }
         apiResponseHandler.handleRes(s, j);
+    }
+
+    function isUserEditing(): boolean {
+        let any_open = Object.values(entryActions.user).some(state => state.edit);
+        if (!any_open) {
+            any_open = Object.values(entryActions.shared).some(state => state.edit)
+        }
+        return any_open;
     }
 
     function vaultEncryptPlaintext() {

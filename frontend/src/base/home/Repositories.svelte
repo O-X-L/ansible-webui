@@ -15,6 +15,7 @@
     import { tq } from '../../util/translate.js';
     import { isSet } from '../../util/main.js';
     import { apiEdit, apiGet } from '../../util/api.js';
+    import type { entryActionStateExec } from '../Types.js';
     import RepositoryForm from './forms/Repository.svelte';
     import { REPO_EXEC_STATI_ACTIVE, repoKindMap, EXEC_STATUS_FAILED, EXEC_STATUS_SUCCESS } from '../Config.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
@@ -26,6 +27,10 @@
  
     let { open = $bindable(false) } = $props();
 
+    interface entryActionsType {
+        [id: number]: entryActionStateExec;
+    }
+
     let apiResponseHandler: APIResponseHandler = $state();
     let addGitModal = $state(false);
     let addStaticModal = $state(false);
@@ -35,7 +40,7 @@
     let apiSuccessMsg = $state('');
     let apiSuccess = $state(false);
     let apiDataHash = $state('');
-    let entryActions = $state({});
+    let entryActions: entryActionsType = $state({});
     let updateLoop: number = $state(0);
     let updatedAt = $state(0);
     let searchedAt = $state(0);
@@ -148,7 +153,16 @@
             // tab in background
             return;
         }
+        if (addGitModal || addStaticModal || isUserEditing()) {
+            // user currently adding/editing entry
+            return;
+        }
         apiGet(`repository?hash=${apiDataHash}`, loadRepoList);
+    }
+
+    function isUserEditing(): boolean {
+        let any_open = Object.values(entryActions).some(state => state.edit);;
+        return any_open;
     }
 
     onMount(() => {

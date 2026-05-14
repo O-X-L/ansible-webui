@@ -14,6 +14,7 @@
     import { share } from '../Share.js';
     import { tq } from '../../util/translate.js';
     import AlertForm from './forms/Alert.svelte';
+    import type { entryActionState } from '../Types.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import AlertPluginForm from './forms/AlertPlugin.svelte';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
@@ -29,6 +30,12 @@
 
     let { open = $bindable(false) } = $props();
 
+    interface entryActionsType {
+        [category: string]: {
+            [id: number]: entryActionState;
+        };
+    }
+
     let apiResponseHandler: APIResponseHandler = $state();
     let addGlobalModal = $state(false);
     let addGroupModal = $state(false);
@@ -42,17 +49,17 @@
     let apiSuccessMsg = $state('');
     let apiSuccess = $state(false);
     let apiDataHash = $state('');
-    let entryActions = $state({'global': {}, 'group': {}, 'user': {}, 'plugins': {}});
+    let entryActions: entryActionsType = $state({'global': {}, 'group': {}, 'user': {}, 'plugins': {}});
     let updateLoop: number = $state(0);
     let updatedAt = $state(0);
     let searchedAt = $state(0);
 
-    const ALERT_TYPE_PLUGIN = 1;
-    const ALERT_TYPE_CHOICES = {
+    const ALERT_TYPE_PLUGIN: number = 1;
+    const ALERT_TYPE_CHOICES: Record<number, string> = {
         0: t('alerts.type.email'),
         ALERT_TYPE_PLUGIN: t('alerts.plugin'),
     }
-    const ALERT_CONDITION_CHOICES = {
+    const ALERT_CONDITION_CHOICES: Record<number, string> = {
         0: t('alerts.condition.failure'),
         1: t('alerts.condition.success'),
         2: t('alerts.condition.always'),
@@ -160,7 +167,25 @@
             // tab in background
             return;
         }
+        if (addGlobalModal || addGroupModal || addUserModal || addPluginModal || isUserEditing()) {
+            // user currently adding/editing entry
+            return;
+        }
         apiGet(`alert?hash=${apiDataHash}`, loadAlertList);
+    }
+
+    function isUserEditing(): boolean {
+        let any_open = Object.values(entryActions.global).some(state => state.edit);
+        if (!any_open) {
+            any_open = Object.values(entryActions.user).some(state => state.edit)
+        }
+        if (!any_open) {
+            any_open = Object.values(entryActions.group).some(state => state.edit)
+        }
+        if (!any_open) {
+            any_open = Object.values(entryActions.plugin).some(state => state.edit)
+        }
+        return any_open;
     }
 
     onMount(() => {
