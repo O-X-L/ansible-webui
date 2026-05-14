@@ -47,7 +47,7 @@
 </script>
   
 <Footer class="fixed bottom-0 start-0 w-full flex flex-wrap items-center justify-between pt-2 pb-1 pl-5 pr-5 border-t {classNavFooter}">
-  <FooterCopyright by="OXL IT Services" href="https://github.com/O-X-L" copyrightMessage="" classA={classFooterText} />
+  <FooterCopyright by="Rath P." href="https://github.com/superstes" copyrightMessage="" classA={classFooterText} />
   <FooterLinkGroup>
     <div class={classFooterText}>
       <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" class={classFooterText}>{t('footer.oss.license')}: GPLv3</a> |
