@@ -3,7 +3,7 @@
     
     import { CloseCircleSolid, FloppyDiskSolid } from 'flowbite-svelte-icons';
     import {
-        Heading, Button, Input, Label, Spinner, Tooltip, Helper, Select, Toggle,
+        Heading, Button, Input, Label, Spinner, Tooltip, Select, Toggle,
         MultiSelect,  // Modal
     } from 'flowbite-svelte';
 
@@ -39,6 +39,7 @@
     let apiResponseHandler: APIResponseHandler = $state();
     let formInfos: formInfoType = $state({defaults: {}, choices: {}});
     let loaded = $state(false);
+    let submitted = $state(false);
     let existing = $state({});
     let method: formMethod = $derived(getMethod(action));
     let actionNew = $derived(['add', 'clone'].includes(action));
@@ -76,10 +77,15 @@
             open = false;
         } else {
             apiResponseHandler.handleRes(s, j);
+            submitted = false;
         }
     }
 
     function submitForm() {
+        if (submitted) {
+            return;
+        }
+        submitted = true;
         let [valid, errors] = submitFormBase(
             form, method, url, handleSubmitResponse, t, 'permission.form.', [],
         );
@@ -199,7 +205,9 @@
 <div bind:this={componentRoot} tabindex="-1" class="inline-block">
 <Modal bind:open={open} size="lg" autoclose={false} placement="top-center"
     backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
-    <Heading tag="h2">{title}</Heading>
+    <Heading tag="h2">
+        {title}{#if !actionNew}: "{form.name.value}"{/if}
+    </Heading>
     {#if !loaded}
         <div class={classSpinnerDiv}><Spinner/></div>
     {:else}
