@@ -42,6 +42,8 @@ class SystemConfigSettings(BaseResponse):
     mail_ssl_verify = serializers.BooleanField()
     audit_log = serializers.BooleanField()
     ansible_executor = serializers.IntegerField()
+    ansible_executor_engine = serializers.IntegerField()
+    ansible_executor_container_image = serializers.CharField()
 
     # SystemConfig.api_fields_read_only
     db = serializers.CharField()

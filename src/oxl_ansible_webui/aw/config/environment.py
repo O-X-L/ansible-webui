@@ -37,7 +37,9 @@ AW_ENV_VARS = {
     'audit': ['AW_AUDIT'],
     'auth_mode': ['AW_AUTH'],
     'saml_config': [ENV_KEY_SAML],
-    'ansible_executor': ['AW_EXECUTOR']
+    'ansible_executor': ['AW_EXECUTOR'],
+    'ansible_executor_engine': ['AW_ENGINE'],
+    'ansible_executor_container_image': ['AW_CT_IMAGE'],
 }
 AW_ENV_VARS_SECRET = ['secret', 'init_admin', 'init_admin_pwd', 'saml_config', 'db_pwd']
 

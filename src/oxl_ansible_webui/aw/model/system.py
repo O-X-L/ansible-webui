@@ -26,6 +26,18 @@ ANSIBLE_EXECUTOR_CHOICES = [
     (ANSIBLE_EXECUTOR_OFFICIAL, 'ansible-runner (official)'),
     (ANSIBLE_EXECUTOR_OXL, 'oxl-ansible-executor (community)'),
 ]
+ANSIBLE_EXECUTOR_ENGINE_LOCAL = 0
+ANSIBLE_EXECUTOR_ENGINE_DOCKER = 1
+ANSIBLE_EXECUTOR_ENGINE_PODMAN = 2
+ANSIBLE_EXECUTOR_ENGINE_CONTAINERS = {
+    ANSIBLE_EXECUTOR_ENGINE_DOCKER: 'docker',
+    ANSIBLE_EXECUTOR_ENGINE_PODMAN: 'podman',
+}
+ANSIBLE_EXECUTOR_ENGINE_CHOICES = [
+    (ANSIBLE_EXECUTOR_ENGINE_LOCAL, 'Local'),
+    (ANSIBLE_EXECUTOR_ENGINE_DOCKER, 'Docker container'),
+    (ANSIBLE_EXECUTOR_ENGINE_PODMAN, 'Podman container'),
+]
 
 # NOTE: add default-values to config.defaults.CONFIG_DEFAULTS
 class SystemConfig(BaseModel):
@@ -38,7 +50,7 @@ class SystemConfig(BaseModel):
         'path_run', 'path_play', 'path_log', 'path_template', 'timezone', 'run_timeout', 'session_timeout',
         'path_ansible_config', 'path_ssh_known_hosts', 'debug', 'logo_url', 'ara_server', 'global_environment_vars',
         'mail_server', 'mail_transport', 'mail_ssl_verify', 'mail_sender', 'mail_user', 'audit_log',
-        'ansible_executor',
+        'ansible_executor', 'ansible_executor_engine', 'ansible_executor_container_image',
     ]
 
     # NOTE: 'AW_DB' is needed to get this config from DB and 'AW_SECRET' cannot be saved because of security breach
@@ -73,6 +85,11 @@ class SystemConfig(BaseModel):
         default=ANSIBLE_EXECUTOR_OFFICIAL,
         choices=ANSIBLE_EXECUTOR_CHOICES,
     )
+    ansible_executor_engine = models.PositiveSmallIntegerField(
+        default=ANSIBLE_EXECUTOR_ENGINE_LOCAL,
+        choices=ANSIBLE_EXECUTOR_ENGINE_CHOICES,
+    )
+    ansible_executor_container_image = models.CharField(max_length=255, **DEFAULT_NONE)
 
     @classmethod
     def get_set_public_env_vars(cls) -> list:

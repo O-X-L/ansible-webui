@@ -12,6 +12,7 @@ tbd
 
 Features:
 
+* Implemented containerized execution-engine - docker & podman [#71](https://github.com/O-X-L/ansible-webui/issues/71) & [ansible-executor #2](https://github.com/O-X-L/ansible-executor/issues/2)
 * Disable schedule when cloning jobs [#105](https://github.com/O-X-L/ansible-webui/issues/105)
 * Show entry-name in edit-form title
 * Added execution finish-time & duration to log-view 

@@ -337,7 +337,10 @@ EN = {
     'config.form.path_ssh_known_hosts': 'SSH Known-Hosts File',
     'config.form.debug': 'Debug Mode',
     'config.form.audit_log': 'Audit Logging',
+    'config.form.ansible_executor_container_image': 'Container-Image to run Ansible',
+    'config.form.ansible_executor_engine': 'Ansible Executor Engine',
     'config.form.ansible_executor': 'Ansible Executor',
+
     ### env-vars
     'config.form.timezone': 'Timezone',
     'config.form.db': 'Database',
@@ -400,6 +403,9 @@ EN = {
                                          'or our own open-source community-project '
                                          '<a href="https://github.com/O-X-L/ansible-executor">oxl-ansible-executor</a>'
                                          ' (has a better integration)',
+    'config.form.help.ansible_executor_engine': 'What engine should be used to execute Ansible. Containerized is more '
+                                                "secure than local! Currently only supported for "
+                                                "'oxl-ansible-executor'.",
 
     # user settings
     'user_settings.action.pwd_change': 'Password updated',

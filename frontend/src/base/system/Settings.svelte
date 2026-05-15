@@ -58,6 +58,8 @@
         mail_sender: string|null
         mail_user: string|null
         ansible_executor: number
+        ansible_executor_engine: number,
+        ansible_executor_container_image: string|null,
     }
     interface settingsReadType extends settingsBaseType {
         db: string
@@ -94,6 +96,8 @@
         mail_user: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         mail_pass: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         ansible_executor: {value: 0, color: inputBaseColor, required: false},
+        ansible_executor_engine: {value: 0, color: inputBaseColor, required: false},
+        ansible_executor_container_image: {value: '', color: inputBaseColor, required: false, regex: /^[a-zA-Z0-9_\-\.\/:]{0,255}$/},
     });
 
     function t(code: string) : string {
@@ -265,6 +269,33 @@
                 <Helper class={classModalHelp}>{@html t('config.form.help.ansible_executor')}</Helper>
             </div>
 
+            <div class={classModalInput}>
+                <Label for="cnf_executor" class={classModalLabel}>{t('config.form.ansible_executor_engine')}</Label>
+                <Select id="cnf_executor" items={formInfos.choices.ansible_executor_engine}
+                    bind:value={form.ansible_executor_engine.value}
+                    disabled={isRO('ansible_executor_engine') || form.ansible_executor.value == 0} />
+                {#if isRO('ansible_executor_engine')}
+                    <Tooltip>{t('config.is_read_only')}</Tooltip>
+                {/if}
+                <Helper class={classModalHelp}>{@html t('config.form.help.ansible_executor_engine')}</Helper>
+            </div>
+
+            <div class={classModalInput}>
+                <Label for="cnf_executor" class={classModalLabel}>{t('config.form.ansible_executor_container_image')}</Label>
+                <Input id="cnf_to_run" bind:value={form.ansible_executor_container_image.value} bind:color={form.ansible_executor_container_image.color}
+                    on:input={valideInput} on:blur={valideInput} required={form.ansible_executor_container_image.required}
+                    type="text" disabled={isRO('ansible_executor_container_image')} />
+                {#if isRO('ansible_executor_container_image')}
+                    <Tooltip>{t('config.is_read_only')}</Tooltip>
+                {/if}
+                <Helper class={classModalHelp}>
+                    <a href="https://github.com/O-X-L/ansible-executor/blob/latest/src/oxl_ansible_executor/container/Dockerfile_fallback">
+                        Template
+                    </a>
+                </Helper>
+            </div>
+
+            
             <div class={classModalInput}>
                 <Label for="cnf_ara" class={classModalLabel}>{t('config.form.ara_server')}</Label>
                 <Input id="cnf_ara" bind:value={form.ara_server.value} bind:color={form.ara_server.color}

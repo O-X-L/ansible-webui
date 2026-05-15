@@ -13,6 +13,7 @@ from aw.config.environment import AW_ENV_VARS_SECRET
 from aw.model.job_credential import BaseJobCredentials
 from aw.execute.play_util import log_save_ansible_command
 from aw.utils.db_handler import close_old_mysql_connections
+from aw.model.system import ANSIBLE_EXECUTOR_ENGINE_CONTAINERS
 from aw.model.job import Job, JobExecution, JobExecutionResult  # JobExecutionResultHost
 from aw.model.base import JOB_EXEC_STATUS_FAILED, JOB_EXEC_STATUS_SUCCESS, JOB_EXEC_STATUS_STOPPED
 
@@ -95,6 +96,16 @@ def executor_oxl_ansible_executor(
     debug = deployment_dev() or config['debug']
     job_exec = execution
 
+    containerized = False
+    container_engine = None
+    container_image = None
+    if config['ansible_executor_engine'] in ANSIBLE_EXECUTOR_ENGINE_CONTAINERS:
+        containerized = True
+        container_engine = ANSIBLE_EXECUTOR_ENGINE_CONTAINERS[config['ansible_executor_engine']]
+
+    if is_set(config['ansible_executor_container_image']):
+        container_image = config['ansible_executor_container_image']
+
     try:
         c = ExecutionConfig(
             # user config
@@ -127,7 +138,10 @@ def executor_oxl_ansible_executor(
             debug=debug,
             output_color=True,
             run_dir=kwargs['private_data_dir'],
-            # todo: containerization support
+            # engine
+            containerized=containerized,
+            container_engine=container_engine,
+            container_image=container_image,
         )
         executor = Execution(c)
 

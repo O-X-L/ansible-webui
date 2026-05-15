@@ -339,6 +339,8 @@ DE = {
     'config.form.path_ssh_known_hosts': 'SSH Known-Hosts Datei',
     'config.form.debug': 'Debug-Modus',
     'config.form.audit_log': 'Audit-Protokollierung',
+    'config.form.ansible_executor_container_image': 'Container-Image zur Ansible-Ausführung',
+    'config.form.ansible_executor_engine': 'Ansible Ausführungs-Platform',
     'config.form.ansible_executor': 'Ansible Ausführer',
     ### env-vars
     'config.form.timezone': 'Zeitzone',
@@ -407,6 +409,9 @@ DE = {
                                          'sowie unser eigenes Open-Source Community-Projekt '
                                          '<a href="https://github.com/O-X-L/ansible-executor">oxl-ansible-executor</a>'
                                          ' (etwas bessere Integration)',
+    'config.form.help.ansible_executor_engine': 'Die Platform, welche zur Ausführung von Ansible genutzt wird. '
+                                                "Containerized ist sicherer als Lokal! Zurzeit nur mit "
+                                                "'oxl-ansible-executor' verfügbar.",
 
     # user settings
     'user_settings.action.pwd_change': 'Passwort geändert',

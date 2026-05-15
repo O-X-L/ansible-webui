@@ -272,6 +272,28 @@ These settings are also configurable using the WebUI.
   You can choose between the official `ansible-runner <https://github.com/ansible/ansible-runner>`_ (*Value: 0*) and our own open-source community project `oxl-ansible-executor <https://github.com/O-X-L/ansible-executor>`_ (*Value: 1; has a better integration*).
 
 
+* **AW_ENGINE**
+
+  Set the Engine that should be used to execute Ansible.
+
+  Containerized execution is more secure as it is isolated from the web-service and database!
+
+  Currently this option is only valid when using the :code:`oxl-ansible-executor`.
+
+  Choices:
+
+  * :code:`0` => Local execution (*default*)
+  * :code:`1` => Docker container
+  * :code:`2` => Podman container
+
+
+* **AW_CT_IMAGE**
+
+  Optional: Container-image to use with docker/podman execution-engines.
+
+  Use `the default-image of oxl-ansible-executor <https://github.com/O-X-L/ansible-executor/blob/latest/src/oxl_ansible_executor/container/Dockerfile_fallback>`_ as a template.
+
+
 Advanced Settings
 =================
 

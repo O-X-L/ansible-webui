@@ -32,6 +32,7 @@ jobs:
           # ansible-runner
           - ansible_executor: 'ansible-runner'
             python_version: '3.12'
+            ansible_engine: 'local'
 
           # failing with >3.13 - see issue: #52
           # - ansible_executor: 'ansible-runner'
@@ -43,12 +44,27 @@ jobs:
           # oxl-ansible-executor
           - ansible_executor: 'oxl-ansible-executor'
             python_version: '3.12'
+            ansible_engine: 'local'
+
+          - ansible_executor: 'oxl-ansible-executor'
+            python_version: '3.12'
+            ansible_engine: 'docker'
 
           - ansible_executor: 'oxl-ansible-executor'
             python_version: '3.13'
+            ansible_engine: 'local'
+
+          - ansible_executor: 'oxl-ansible-executor'
+            python_version: '3.13'
+            ansible_engine: 'docker'
 
           - ansible_executor: 'oxl-ansible-executor'
             python_version: '3.14'
+            ansible_engine: 'local'
+
+          - ansible_executor: 'oxl-ansible-executor'
+            python_version: '3.14'
+            ansible_engine: 'docker'
 
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -80,6 +96,12 @@ jobs:
             export AW_EXECUTOR=1
           else
             export AW_EXECUTOR=0
+          fi
+          if [[ "${{ matrix.ansible_engine }}" == "docker" ]]
+          then
+            export AW_ENGINE=1
+          else
+            export AW_ENGINE=0
           fi
 
           for i in {1..3}

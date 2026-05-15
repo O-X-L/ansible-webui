@@ -335,6 +335,8 @@ ES = {
     'config.form.path_ssh_known_hosts': 'Archivo SSH Known-Hosts',
     'config.form.debug': 'Modo de depuración',
     'config.form.audit_log': 'Registro de auditoría',
+    'config.form.ansible_executor_container_image': 'Imagen de contenedor para ejecutar Ansible',
+    'config.form.ansible_executor_engine': 'Motor de ejecución de Ansible',
     'config.form.ansible_executor': 'Ejecutor de Ansible',
 
     ### env-vars
@@ -399,6 +401,10 @@ ES = {
                                          'oficial o nuestro propio proyecto de código abierto de la comunidad, '
                                          '<a href="https://github.com/O-X-L/ansible-executor">oxl-ansible-executor</a>'
                                          ' (que ofrece una mejor integración).',
+    'config.form.help.ansible_executor_engine': '¿Qué motor se debe utilizar para ejecutar Ansible? '
+                                                '¡En contenedores es más seguro que en el equipo local! Actualmente '
+                                                "solo es compatible con 'oxl-ansible-executor'.",
+
     # user settings
     'user_settings.action.pwd_change': 'Contraseña actualizada',
     'user_settings.btn.change_pwd': 'Cambiar contraseña',
