@@ -31,6 +31,7 @@
     let loaded = $state(false);
     let pressedKeyAlt = $state(false);
     let pressedKeyS = $state(false);
+    let openSettings: Record<string, boolean> = $state({exec: false, paths: false, mailing: false, internal: false});
 
     interface formInfoExtType extends formInfoType {
         env_vars: any
@@ -101,7 +102,7 @@
     });
 
     function t(code: string) : string {
-      return tq($share, code);
+        return tq($share, code);
     }
 
     function submitForm() {
@@ -158,11 +159,23 @@
             // tab in background
             return;
         }
+        if (isUserEditing()) {
+            // user currently adding/editing entry
+            return;
+        }
         apiGet(`config?hash=${apiDataHash}`, loadSettings);
     }
 
     function fetchInfos() {
         apiGet(`frontend/form/config?${cacheKey($share)}`, setFormInfos)
+    }
+
+    function isUserEditing(): boolean {
+        if (apiDataHash == '') {
+            return false;
+        }
+        let any_open = openSettings.exec || openSettings.paths || openSettings.mailing || openSettings.internal;
+        return any_open;
     }
 
     onMount(() => {
@@ -252,7 +265,7 @@
     <div class={classSpinnerDiv}><Spinner/></div>
 {:else}
 <Accordion>
-    <AccordionItem defaultClass="{classSpoilerItem} settings-exec" paddingDefault={classSpoilerPad}>
+    <AccordionItem bind:open={openSettings.exec} defaultClass="{classSpoilerItem} settings-exec" paddingDefault={classSpoilerPad}>
         <span slot="header">
             <TerminalSolid class="inline-block"/> {t('config.execution')}
         </span>
@@ -329,7 +342,7 @@
             </div>
         </div>
     </AccordionItem>
-    <AccordionItem defaultClass="{classSpoilerItem} settings-paths" paddingDefault={classSpoilerPad}>
+    <AccordionItem bind:open={openSettings.paths} defaultClass="{classSpoilerItem} settings-paths" paddingDefault={classSpoilerPad}>
         <span slot="header">
             <FolderDuplicateSolid class="inline-block"/> {t('config.paths')}
         </span>
@@ -402,7 +415,7 @@
             </div>
         </div>
     </AccordionItem>
-    <AccordionItem defaultClass="{classSpoilerItem} settings-mailing" paddingDefault={classSpoilerPad}>
+    <AccordionItem bind:open={openSettings.mailing} defaultClass="{classSpoilerItem} settings-mailing" paddingDefault={classSpoilerPad}>
         <span slot="header">
             <EnvelopeSolid class="inline-block"/> {t('config.mailing')}
         </span>
@@ -473,7 +486,7 @@
             </div>
         </div>
     </AccordionItem>
-    <AccordionItem defaultClass="{classSpoilerItem} settings-internal" paddingDefault={classSpoilerPad}>
+    <AccordionItem bind:open={openSettings.internal} defaultClass="{classSpoilerItem} settings-internal" paddingDefault={classSpoilerPad}>
         <span slot="header">
             <LayersSolid class="inline-block"/> {t('config.internal')}
         </span>

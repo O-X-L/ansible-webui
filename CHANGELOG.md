@@ -8,6 +8,14 @@ tbd
 
 ## Version 0
 
+### 0.9.6
+
+Fixes:
+
+* Don't reload system-settings while user is editing [#99](https://github.com/O-X-L/ansible-webui/issues/99)
+
+----
+
 ### 0.9.5
 
 Features:
