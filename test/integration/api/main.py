@@ -128,7 +128,7 @@ def test_add():
         }},
         {'l': 'job', 'd': {
             'name': 'more-vars', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/empty.yml',
-            'extra_vars': '{"service":"apache2","port":8080,"app":"test_abc"}',
+            'extra_vars': '{"service":"apache2","port":"8080","app":"test_abc"}',
         }},
         # todo: create job with an owner-id that's not ours and validate that the backend fixed it
 
@@ -166,7 +166,7 @@ def test_modify():
         }},
         {'l': 'job/2', 'd': {
             'name': 'My job2.8', 'playbook_file': 'PlayUsBookUs.yml', 'inventory_file': 'empty.yml', 'enabled': False,
-            'extra_vars': '{"service":"nginx","port":8080,"app":"test_efg"}',
+            'extra_vars': '{"service":"nginx","port":"8080","app":"test_efg"}',
         }},
 
         # alerts

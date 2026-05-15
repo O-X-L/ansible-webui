@@ -18,7 +18,7 @@ def test_params(jid: int = 2):
     cmd_args = '-e test=run2'
     comment = 'Test XYZ'
     env_var = 'SomeRandomValue'
-    extra_vars_json = '{"service":"apache2","port":8080}'
+    extra_vars_json = '{"service":"apache2","port":"8080"}'
     api_request(
         f'job/{jid}',
         'post',

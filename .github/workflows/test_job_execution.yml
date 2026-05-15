@@ -27,6 +27,7 @@ on:
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         include:
           # ansible-runner
