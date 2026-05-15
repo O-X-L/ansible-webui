@@ -438,6 +438,9 @@
     }
 
     function isUserEditingOrExecuting(): boolean {
+        if (updatedAt == 0) {
+            return false;
+        }
         let any_open = Object.values(entryActions).some(job => job.exec || job.edit);
         return any_open;
     }

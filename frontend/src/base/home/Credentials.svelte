@@ -141,6 +141,9 @@
     }
 
     function isUserEditing(): boolean {
+        if (updatedAt == 0) {
+            return false;
+        }
         let any_open = Object.values(entryActions.user).some(state => state.edit);
         if (!any_open) {
             any_open = Object.values(entryActions.shared).some(state => state.edit)

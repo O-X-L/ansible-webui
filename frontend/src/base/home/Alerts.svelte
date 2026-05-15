@@ -175,6 +175,9 @@
     }
 
     function isUserEditing(): boolean {
+        if (updatedAt == 0) {
+            return false;
+        }
         let any_open = Object.values(entryActions.global).some(state => state.edit);
         if (!any_open) {
             any_open = Object.values(entryActions.user).some(state => state.edit)
@@ -183,7 +186,7 @@
             any_open = Object.values(entryActions.group).some(state => state.edit)
         }
         if (!any_open) {
-            any_open = Object.values(entryActions.plugin).some(state => state.edit)
+            any_open = Object.values(entryActions.plugins).some(state => state.edit)
         }
         return any_open;
     }

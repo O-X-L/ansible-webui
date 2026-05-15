@@ -161,6 +161,9 @@
     }
 
     function isUserEditing(): boolean {
+        if (updatedAt == 0) {
+            return false;
+        }
         let any_open = Object.values(entryActions).some(state => state.edit);;
         return any_open;
     }
