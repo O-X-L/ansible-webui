@@ -5,7 +5,6 @@ from os import remove as remove_file
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
 from ansible_runner import Runner, RunnerConfig
-from ansible.executor.stats import AggregateStats as RunnerAggregateStats
 
 from aw.config.main import config
 from aw.execute.util import update_status
@@ -18,20 +17,19 @@ from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResu
 from aw.model.base import JOB_EXEC_STATUS_FAILED, JOB_EXEC_STATUS_SUCCESS, JOB_EXEC_STATUS_STOPPED
 
 
-def _run_stats(pb_stats: RunnerAggregateStats, db_result: JobExecutionResult) -> bool:
+def _run_stats(pb_stats: dict, db_result: JobExecutionResult) -> bool:
     any_task_failed = False
 
-    for host in pb_stats.processed.keys():
-        host_stats = pb_stats.summarize(host)
+    for host in pb_stats['processed']:
         result_host = JobExecutionResultHost(hostname=host)
 
-        result_host.tasks_ok = host_stats['ok']
-        result_host.tasks_changed = host_stats['changed']
-        result_host.unreachable = host_stats['unreachable'] > 0
-        result_host.tasks_failed = host_stats['failures']
-        result_host.tasks_skipped = host_stats['skipped']
-        result_host.tasks_rescued = host_stats['rescued']
-        result_host.tasks_ignored = host_stats['ignored']
+        result_host.unreachable = host in pb_stats['dark']
+        result_host.tasks_skipped = pb_stats['skipped'].get(host, 0)
+        result_host.tasks_ok = pb_stats['ok'].get(host, 0)
+        result_host.tasks_failed = pb_stats['failures'].get(host, 0)
+        result_host.tasks_ignored = pb_stats['ignored'].get(host, 0)
+        result_host.tasks_rescued = pb_stats['rescued'].get(host, 0)
+        result_host.tasks_changed = pb_stats['changed'].get(host, 0)
 
         if result_host.unreachable:
             any_task_failed = True
