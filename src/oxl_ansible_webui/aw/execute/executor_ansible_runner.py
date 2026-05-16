@@ -228,8 +228,8 @@ def executor_ansible_runner(
     runner.run()
 
     _parse_run_result(
-        result=result,
         execution=execution,
+        db_result=result,
         runner=runner,
     )
     del runner
