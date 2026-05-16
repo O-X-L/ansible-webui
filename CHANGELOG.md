@@ -10,6 +10,10 @@ tbd
 
 ### 0.9.6
 
+Features:
+
+* Implemented playbook-execution-stats for [oxl-ansible-executor](https://github.com/O-X-L/ansible-executor/issues/1)
+
 Fixes:
 
 * Don't reload system-settings while user is editing [#99](https://github.com/O-X-L/ansible-webui/issues/99)

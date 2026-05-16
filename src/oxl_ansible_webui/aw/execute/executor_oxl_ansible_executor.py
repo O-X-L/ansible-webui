@@ -2,7 +2,7 @@ from pathlib import Path
 from time import sleep, time
 
 from oxl_ansible_executor import Execution, ExecutionConfig, \
-    ConfigError, SetupError, ExecutionStatus
+    ConfigError, SetupError, ExecutionStatus, AnsiblePlaybookStatsByHost
 
 from aw.config.main import config
 from aw.execute.util import update_status
@@ -14,8 +14,36 @@ from aw.model.job_credential import BaseJobCredentials
 from aw.execute.play_util import log_save_ansible_command
 from aw.utils.db_handler import close_old_mysql_connections
 from aw.model.system import ANSIBLE_EXECUTOR_ENGINE_CONTAINERS
-from aw.model.job import Job, JobExecution, JobExecutionResult  # JobExecutionResultHost
+from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost
 from aw.model.base import JOB_EXEC_STATUS_FAILED, JOB_EXEC_STATUS_SUCCESS, JOB_EXEC_STATUS_STOPPED
+
+
+def _run_stats(pb_stats: AnsiblePlaybookStatsByHost, db_result: JobExecutionResult) -> bool:
+    any_task_failed = False
+
+    for host, host_stats in pb_stats.items():
+        result_host = JobExecutionResultHost(hostname=host)
+
+        result_host.tasks_ok = host_stats['ok']
+        result_host.tasks_changed = host_stats['changed']
+        result_host.unreachable = host_stats['unreachable'] > 0
+        result_host.tasks_failed = host_stats['failures']
+        result_host.tasks_skipped = host_stats['skipped']
+        result_host.tasks_rescued = host_stats['rescued']
+        result_host.tasks_ignored = host_stats['ignored']
+
+        if result_host.unreachable:
+            any_task_failed = True
+
+        elif result_host.tasks_failed > 0:
+            any_task_failed = True
+            # todo: create errors
+
+        result_host.result = db_result
+        close_old_mysql_connections()
+        result_host.save()
+
+    return any_task_failed
 
 
 def _parse_run_result(execution: JobExecution, db_result: JobExecutionResult, executor_result: ExecutionStatus):
@@ -23,14 +51,16 @@ def _parse_run_result(execution: JobExecution, db_result: JobExecutionResult, ex
     close_old_mysql_connections()
     db_result.save()
 
-    # any_task_failed = False
-    # todo: generate per-host stats (_run_stats) and check if any task failed (any_task_failed)
+    any_task_failed = False
+    pb_stats = executor_result.status.stats
+    if pb_stats is not None:
+        any_task_failed = _run_stats(pb_stats=pb_stats, db_result=db_result)
 
     final_status = JOB_EXEC_STATUS_SUCCESS
     if execution.is_stopping or executor_result.canceled:
         final_status = JOB_EXEC_STATUS_STOPPED
 
-    elif executor_result.failed or executor_result.timed_out:
+    elif executor_result.failed or executor_result.timed_out or any_task_failed:
         db_result.failed = True
         final_status = JOB_EXEC_STATUS_FAILED
 
@@ -133,12 +163,16 @@ def executor_oxl_ansible_executor(
             env_vars_strip=AW_ENV_VARS_SECRET,
             log_stdout_file=log_files['stdout'],
             log_stderr_file=log_files['stderr'],
+            load_log_stdout=False,
+            load_log_stderr=False,
             log_file_mode=0o640,
             timeout_sec_run=config['run_timeout'],
             debug=debug,
             output_color=True,
             run_dir=kwargs['private_data_dir'],
             # engine
+            stats_live=True,
+            stats_recap=True,
             containerized=containerized,
             container_engine=container_engine,
             container_image=container_image,

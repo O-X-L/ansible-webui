@@ -5,6 +5,7 @@ from os import remove as remove_file
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
 from ansible_runner import Runner, RunnerConfig
+from ansible.executor.stats import AggregateStats as RunnerAggregateStats
 
 from aw.config.main import config
 from aw.execute.util import update_status
@@ -17,18 +18,20 @@ from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResu
 from aw.model.base import JOB_EXEC_STATUS_FAILED, JOB_EXEC_STATUS_SUCCESS, JOB_EXEC_STATUS_STOPPED
 
 
-def _run_stats(runner: Runner, result: JobExecutionResult) -> bool:
+def _run_stats(pb_stats: RunnerAggregateStats, db_result: JobExecutionResult) -> bool:
     any_task_failed = False
-    for host in runner.stats['processed']:
+
+    for host in pb_stats.processed.keys():
+        host_stats = pb_stats.summarize(host)
         result_host = JobExecutionResultHost(hostname=host)
 
-        result_host.unreachable = host in runner.stats['dark']
-        result_host.tasks_skipped = runner.stats['skipped'][host] if host in runner.stats['skipped'] else 0
-        result_host.tasks_ok = runner.stats['ok'][host] if host in runner.stats['ok'] else 0
-        result_host.tasks_failed = runner.stats['failures'][host] if host in runner.stats['failures'] else 0
-        result_host.tasks_ignored = runner.stats['ignored'][host] if host in runner.stats['ignored'] else 0
-        result_host.tasks_rescued = runner.stats['rescued'][host] if host in runner.stats['rescued'] else 0
-        result_host.tasks_changed = runner.stats['changed'][host] if host in runner.stats['changed'] else 0
+        result_host.tasks_ok = host_stats['ok']
+        result_host.tasks_changed = host_stats['changed']
+        result_host.unreachable = host_stats['unreachable'] > 0
+        result_host.tasks_failed = host_stats['failures']
+        result_host.tasks_skipped = host_stats['skipped']
+        result_host.tasks_rescued = host_stats['rescued']
+        result_host.tasks_ignored = host_stats['ignored']
 
         if result_host.unreachable:
             any_task_failed = True
@@ -37,22 +40,23 @@ def _run_stats(runner: Runner, result: JobExecutionResult) -> bool:
             any_task_failed = True
             # todo: create errors
 
-        result_host.result = result
+        result_host.result = db_result
         close_old_mysql_connections()
         result_host.save()
 
     return any_task_failed
 
 
-def _parse_run_result(execution: JobExecution, result: JobExecutionResult, runner: Runner):
-    result.time_fin = datetime_w_tz()
-    result.failed = runner.errored
+def _parse_run_result(execution: JobExecution, db_result: JobExecutionResult, runner: Runner):
+    db_result.time_fin = datetime_w_tz()
+    db_result.failed = runner.errored
     close_old_mysql_connections()
-    result.save()
+    db_result.save()
 
     any_task_failed = False
-    if runner.stats is not None:
-        any_task_failed = _run_stats(runner=runner, result=result)
+    pb_stats = runner.stats
+    if pb_stats is not None:
+        any_task_failed = _run_stats(pb_stats=pb_stats, db_result=db_result)
 
     final_status = JOB_EXEC_STATUS_SUCCESS
     if execution.is_stopping or runner.canceled:
