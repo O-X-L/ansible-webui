@@ -268,8 +268,20 @@
         }
     }
 
+    // update isolated git repo
+    function nullCallback() {}
+
+    function updateCreateGitRepo() {
+        if (isSet(job.repository)) {
+            apiEdit('post', `repository/${job.repository}`, null, nullCallback);
+        }
+    }
+
     onMount(() => {
         initExecutionPrompts();
+        if (executionPrompts.config.fields.includes('limit')) {
+            updateCreateGitRepo();
+        }
     });
 </script>
 

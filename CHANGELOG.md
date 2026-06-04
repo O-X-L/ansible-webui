@@ -20,6 +20,7 @@ Features:
 Fixes:
 
 * Don't reload system-settings while user is editing [#99](https://github.com/O-X-L/ansible-webui/issues/99)
+* Updated inventory-list logic to allow for dynamic-inventories [#89](https://github.com/O-X-L/ansible-webui/issues/89)
 
 Project:
 

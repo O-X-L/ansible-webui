@@ -17,6 +17,7 @@ from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResu
 from aw.model.base import JOB_EXEC_STATUS_FAILED, JOB_EXEC_STATUS_SUCCESS, JOB_EXEC_STATUS_STOPPED
 
 
+# pylint: disable=R0801
 def _run_stats(pb_stats: dict, db_result: JobExecutionResult) -> bool:
     any_task_failed = False
 

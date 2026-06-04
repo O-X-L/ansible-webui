@@ -10,7 +10,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from aw.utils.subps import process
 from aw.model.repository import Repository
 from aw.utils.repository import get_path_play
-from aw.execute.repository import create_update_git_repo
 from aw.utils.db_handler import close_old_mysql_connections
 from aw.api_endpoints.base import API_PERMISSION, BaseResponse, GenericErrorResponse
 
@@ -20,6 +19,61 @@ class InventoryListResponse(BaseResponse):
     groups = serializers.ListSerializer(child=serializers.CharField())
     members = serializers.DictField()
     ansible_hosts = serializers.DictField()
+
+
+def _build_ansible_inventory(ansible_inventory_result: dict) -> dict:
+    ansible_hosts = {}
+    for host, hostvars in ansible_inventory_result['_meta']['hostvars'].items():
+        if 'ansible_host' in hostvars:
+            ansible_hosts[host] = hostvars['ansible_host']
+
+    members = {}
+    members_raw = {}
+
+    for group, value in ansible_inventory_result.items():
+        if group == '_meta':
+            continue
+
+        members[group] = set()
+        members_raw[group] = value
+
+    # pylint: disable=C0206
+    # children can be nested - we try to resolve them with a max-depth of 10
+    for _ in range(10):
+        for child_group in members:
+            if len(members_raw[child_group].get('children', [])) > 0:
+                continue
+
+            hosts = set(members_raw[child_group].get('hosts', []))
+            members[child_group].update(hosts)
+            hosts.update(members[child_group])
+
+            for parent_group in members_raw:
+                if child_group in members_raw[parent_group].get('children', []):
+                    members[parent_group].update(hosts)
+                    members_raw[parent_group]['children'].remove(child_group)
+
+    hosts = set()
+    for group in members:
+        hosts.update(members[group])
+        members[group] = list(members[group])
+        members[group].sort()
+
+    hosts = list(hosts)
+    hosts.sort()
+
+    groups = list(members.keys())
+    groups.sort()
+    for group in groups:
+        if len(members[group]) == 0:
+            members.pop(group)
+
+    return {
+        'hosts': hosts,
+        'groups': groups,
+        'members': members,
+        'ansible_hosts': ansible_hosts,
+    }
 
 
 class APIInventoryList(APIView):
@@ -32,7 +86,6 @@ class APIInventoryList(APIView):
         request=None,
         responses={
             200: InventoryListResponse,
-            400: OpenApiResponse(response=GenericErrorResponse, description='Inventory file is required'),
             403: OpenApiResponse(response=GenericErrorResponse, description='Traversal not allowed'),
             404: OpenApiResponse(
                 response=GenericErrorResponse,
@@ -56,14 +109,6 @@ class APIInventoryList(APIView):
         ],
     )
     def get(request):
-        # pylint: disable=R0912,R0801,R0914,R0915
-        inventory = request.GET.get('inventory', None)
-        if inventory is None:
-            return Response(data={'error': 'Inventory file is required'}, status=400)
-
-        if inventory.find('..') != -1:
-            return Response(data={'error': 'Traversal not allowed'}, status=403)
-
         repo_id = request.GET.get('repository', None)
         limit = request.GET.get('limit', 'all')
         repo = None
@@ -75,8 +120,6 @@ class APIInventoryList(APIView):
                 if repo is None:
                     raise ObjectDoesNotExist()
 
-                create_update_git_repo(repo)
-
             except ObjectDoesNotExist:
                 return Response(data={'error': 'Provided repository does not exist'}, status=404)
 
@@ -84,78 +127,37 @@ class APIInventoryList(APIView):
         if path_play is None:
             return Response(data={'error': 'Provided playbook-dir does not exist'}, status=404)
 
-        path_inventory = path_play / inventory
-        if not path_inventory.is_file():
-            return Response(data={'error': f"Inventory file does not exist: {path_inventory}"}, status=404)
+        inventory = request.GET.get('inventory', None)
+        if inventory is None or inventory.strip() == '':
+            inventory = 'dynamic'
+            inventory_arg = ''
 
-        inventory = process(
+        else:
+            if inventory.find('..') != -1:
+                return Response(data={'error': 'Traversal not allowed'}, status=403)
+
+            path_inventory = path_play / inventory
+            if not path_inventory.is_file():
+                return Response(data={'error': f"Inventory file does not exist: {path_inventory}"}, status=404)
+
+            inventory_arg = f'--inventory {path_inventory}'
+
+        result_raw = process(
             'ansible-inventory --list '
             f"--playbook-dir {path_play} "
-            f"--inventory {path_play / inventory} "
-            f"--limit {limit}",
+            f"--limit {limit} {inventory_arg}",
         )
         # NOTE: older versions might require 'response_format json'
         try:
-            if inventory['rc'] != 0:
+            if result_raw['rc'] != 0:
                 raise ValueError()
 
-            inventory = json_loads(inventory['stdout'])
+            result = json_loads(result_raw['stdout'])
 
         except (JSONDecodeError, ValueError):
-            return Response(data={'error': f"Failed to list inventory: {path_inventory}"}, status=500)
-
-        ansible_hosts = {}
-        for host, hostvars in inventory['_meta']['hostvars'].items():
-            if 'ansible_host' in hostvars:
-                ansible_hosts[host] = hostvars['ansible_host']
-
-        members = {}
-        members_raw = {}
-
-        for group, value in inventory.items():
-            if group in ['_meta']:
-                continue
-
-            members[group] = set()
-            members_raw[group] = value
-
-        # pylint: disable=C0206
-        # children can be nested - we try to resolve them with a max-depth of 10
-        for _ in range(10):
-            for child_group in members:
-                if len(members_raw[child_group].get('children', [])) > 0:
-                    continue
-
-                hosts = set(members_raw[child_group].get('hosts', []))
-                members[child_group].update(hosts)
-                hosts.update(members[child_group])
-
-                for parent_group in members_raw:
-                    if child_group in members_raw[parent_group].get('children', []):
-                        members[parent_group].update(hosts)
-                        members_raw[parent_group]['children'].remove(child_group)
-
-        hosts = set()
-        for group in members:
-            hosts.update(members[group])
-            members[group] = list(members[group])
-            members[group].sort()
-
-        hosts = list(hosts)
-        hosts.sort()
-
-        groups = list(members.keys())
-        groups.sort()
-        for group in groups:
-            if len(members[group]) == 0:
-                members.pop(group)
+            return Response(data={'error': f"Failed to list inventory: {inventory}"}, status=500)
 
         return Response(
-            data={
-                'hosts': hosts,
-                'groups': groups,
-                'members': members,
-                'ansible_hosts': ansible_hosts,
-            },
+            data=_build_ansible_inventory(result),
             status=200,
         )

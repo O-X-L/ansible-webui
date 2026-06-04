@@ -53,8 +53,8 @@
     let loading: boolean = $state(false);
     let listChoices: inventoryListResponse = $state(inventoryListNone);
     let listChoicesActive: inventoryListResponse = $state(inventoryListNone);
-    let currentRepo: number = $state(0);
-    let currentFile: string|null = $state('');
+    let queriedRepo: number = $state(0);
+    let queriedInventory: string|null = $state('');
 
     function inventoryListClick(_: Event|null = null) {
         inventoryListFieldInFocus = elementID;
@@ -63,9 +63,6 @@
     }
 
     function inventoryListInput(event: Event|null = null) {
-        if (!inventoryFile) {
-            return;
-        }
         inventoryListFieldInFocus = elementID;
 
         inventoryListValidate();
@@ -126,16 +123,19 @@
         let requireQuery = !loaded;
 
         // inventory has changed
-        if (inventoryFile != currentFile) {
+        if (inventoryFile === null) {
+            // dynamic inventory
             requireQuery = true;
-            currentFile = inventoryFile;
+        } else if (inventoryFile != queriedInventory) {
+            requireQuery = true;
+            queriedInventory = inventoryFile;
         }
         // repo has changed
         if (!repositoryID) {
-            currentRepo = 0;
-        } else if (repositoryID != currentRepo) {
+            queriedRepo = 0;
+        } else if (repositoryID != queriedRepo) {
             requireQuery = true;
-            currentRepo = repositoryID;
+            queriedRepo = repositoryID;
         }
 
         if (!requireQuery) {
