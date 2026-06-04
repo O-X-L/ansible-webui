@@ -108,7 +108,7 @@
         return true;
     }
 
-    function startJob() {
+    function prepareJob() {
         if (!job.id) {
             return;
         }
@@ -129,6 +129,12 @@
 
         const extraVarsSupplied = executionPrompts.config.fields.includes('extra_vars') && isSet(executionPrompts.field_values.extra_vars);
         if (extraVarsSupplied && !isValidJSON(executionPrompts.field_values.extra_vars)) {
+            apiErrorMsg = t('jobs.execute.extra_vars_json_invalid');
+            apiError = true;
+            return;
+        }
+
+        if (job.extra_vars && !isValidJSON(job.extra_vars)) {
             apiErrorMsg = t('jobs.execute.extra_vars_json_invalid');
             apiError = true;
             return;
@@ -184,12 +190,19 @@
                 if (extraVarsSupplied) {
                     const userSuppliedExtraVars: Record<any, any> = JSON.parse(promptData['extra_vars']);
                     promptData['extra_vars'] = JSON.stringify({...userSuppliedExtraVars, ...promptExtraVars});
+                } else if (job.extra_vars) {
+                    const jobExtraVars: Record<any, any> = JSON.parse(job.extra_vars);
+                    promptData['extra_vars'] = JSON.stringify({...jobExtraVars, ...promptExtraVars});
                 } else {
                     promptData['extra_vars'] = JSON.stringify(promptExtraVars);
                 }
             }
         }
 
+        startJob(promptData);
+    }
+
+    function startJob(promptData: Record<string, any>) {
         apiSuccessMsg = 'jobs.action.start';
         jobStarted = false;
         apiEdit('post', `job/${job.id}`, promptData, jobStartCallback);
@@ -375,7 +388,7 @@
         </div>
     </div>
     <div class={classModalBtns}>
-        <Button id="jobs-btn-exec-start" type="button" on:click={() => {startJob()}}><PlaySolid/></Button>
+        <Button id="jobs-btn-exec-start" type="button" on:click={() => {prepareJob()}}><PlaySolid/></Button>
         <Tooltip>{t('btn.execute')}</Tooltip>
 
         <Button id="jobs-btn-exec-close" on:click={() => (closeExecutionPrompt())} class="inline-block ml-2">
