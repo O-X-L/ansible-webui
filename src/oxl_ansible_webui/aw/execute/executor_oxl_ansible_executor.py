@@ -52,7 +52,7 @@ def _parse_run_result(execution: JobExecution, db_result: JobExecutionResult, ex
     db_result.save()
 
     any_task_failed = False
-    pb_stats = executor_result.status.stats
+    pb_stats = executor_result.stats
     if pb_stats is not None:
         any_task_failed = _run_stats(pb_stats=pb_stats, db_result=db_result)
 
