@@ -294,6 +294,11 @@ These settings are also configurable using the WebUI.
   Use `the default-image of oxl-ansible-executor <https://github.com/O-X-L/ansible-executor/blob/latest/src/oxl_ansible_executor/container/Dockerfile_fallback>`_ as a template.
 
 
+* **AW_ARA_SERVER**
+
+  Configure the URL of the `ARA server <administration_integrations>` to send ansible-execution-logs to.
+
+
 Advanced Settings
 =================
 

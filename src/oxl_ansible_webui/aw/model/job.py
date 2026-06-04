@@ -181,7 +181,6 @@ class Job(BaseJob):
 
 
 class JobExecutionResult(BareModel):
-    # ansible_runner.runner.Runner
     time_start = models.DateTimeField(default=timezone.now)
     time_fin = models.DateTimeField(**DEFAULT_NONE)
 

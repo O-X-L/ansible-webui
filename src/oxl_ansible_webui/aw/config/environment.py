@@ -40,6 +40,7 @@ AW_ENV_VARS = {
     'ansible_executor': ['AW_EXECUTOR'],
     'ansible_executor_engine': ['AW_ENGINE'],
     'ansible_executor_container_image': ['AW_CT_IMAGE'],
+    'ara_server': ['AW_ARA_SERVER', 'AW_ARA_URL'],
 }
 AW_ENV_VARS_SECRET = ['secret', 'init_admin', 'init_admin_pwd', 'saml_config', 'db_pwd']
 
