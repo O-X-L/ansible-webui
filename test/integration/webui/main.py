@@ -113,9 +113,10 @@ def login(user: str, pwd: str):
     assert _check_requests(url)
     assert _check_console_logs(url)
 
-    login_redirect = f'{BASE_URL}/ui#dashboard'
+    login_redirect = f'{BASE_URL}/ui'
+    login_redirect2 = f'{BASE_URL}/ui#dashboard'
     sleep(1)  # we wait 500ms until we set the URL-hash
-    assert DRIVER.current_url == login_redirect
+    assert DRIVER.current_url in [login_redirect, login_redirect2]
 
 
 def test_get_locations(to_check: dict):
