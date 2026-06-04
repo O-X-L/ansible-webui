@@ -18,10 +18,11 @@
     import { isSet } from '../../../util/main.js';
     import { redirectLogs } from '../util/JobUtils';
     import CredentialsForm from './Credentials.svelte';
+    import InventoryListField from './fields/InventoryListField.svelte';
     import { apiEdit } from '../../../util/api.js';
     import type { jobType, executionPromptsType } from '../Types.js';
     import APIResponseHandler from '../../snippets/ApiResponseHandler.svelte';
-    import type { formChoiceType } from '../../Types.js';
+    import type { formChoiceType, inputColorType } from '../../Types.js';
     import { setURLHashParams } from '../../../util/main.js';
     import {
         classModalBackdrop, classModalBtns, classCenterChildDiv, classModalDialog, classModalBody,
@@ -87,6 +88,7 @@
     let addTMPCredsModal = $state(false);
     let addTMPCredsModalId = $state(Date.now());
     let executionPromptJumpToLogs = $state(false);
+    let colorLimit: inputColorType = $state('base');
 
     function t(code: string) : string {
         return tq($share, code);
@@ -279,9 +281,11 @@
     </div>
 
     {#if executionPrompts.config.fields.includes('limit')}
-        <!-- todo: implement inventory-limit-browsing -->
         <Label for="job_prompt_{job.id}_limit" class={classModalLabel}>{t('jobs.form.limit')}</Label>
-        <Input id="job_prompt_{job.id}_limit" bind:value={executionPrompts.field_values.limit} />
+        <InventoryListField elementID="job_prompt_{job.id}_limit" required={executionPrompts.config.fields.includes('limit_req')}
+            inventoryListFieldInFocus=''
+            bind:value={executionPrompts.field_values.limit} bind:color={colorLimit}
+            bind:repositoryID={job.repository} bind:inventoryFile={job.inventory_file} />
     {/if}
     <div>
         {#if executionPrompts.config.fields.includes('mode_check')}

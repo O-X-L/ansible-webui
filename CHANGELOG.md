@@ -13,6 +13,8 @@ tbd
 Features:
 
 * Implemented playbook-execution-stats for [oxl-ansible-executor](https://github.com/O-X-L/ansible-executor/issues/1)
+* Implemented limit-suggestions for execution-form [#82](https://github.com/O-X-L/ansible-webui/issues/82)
+* Minor adjustments of limit-suggestions and file-browsing input-field-widgets
 
 Fixes:
 
