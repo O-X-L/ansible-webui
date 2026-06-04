@@ -12,6 +12,7 @@
     import { tq } from '../../util/translate.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import { type jobType, type executionType } from './Types.js';
+    import ConfirmActionPrompt from './forms/ConfirmAction.svelte';
     import { getURLHashParams, isSet, setURLHashParams, redirectTo } from '../../util/main.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import { JOB_EXEC_STATI_ACTIVE, WAIT_MOUNT_MODAL, WAIT_MOUNT_SCROLL, EXEC_STATUS_CANCELED } from '../Config.js';
@@ -256,6 +257,38 @@
         updateOpenJob(entryJobActions);
     });
 
+    // action confirmation-prompt
+    let confirmAction: string = $state('btn.delete');
+    let confirmActionOpen: boolean = $state(false);
+    let confirmActionProceed: boolean = $state(false);
+    let confirmActionText: string = $state('');
+    let confirmActionHoldJobID: number = $state(0);
+    let confirmActionHoldExecID: number = $state(0);
+
+    function confirmCleanupJobExecution(jobID: number, executionID: number, jobName: string) {
+        confirmActionProceed = false;
+        confirmActionHoldJobID = jobID;
+        confirmActionHoldExecID = executionID;
+        confirmAction = 'btn.delete';
+        confirmActionText = `${t('jobs.job')} "${jobName}" - ${t('config.execution')} #${executionID}`;
+        confirmActionOpen = true;
+    }
+
+    function checkActionConfirmed() {
+        if (!confirmActionProceed || confirmActionHoldJobID == 0) {
+            return;
+        }
+        if (confirmAction == 'btn.delete') {
+            cleanupJobExecution(confirmActionHoldJobID, confirmActionHoldExecID);
+        }
+    }
+
+    $effect(() => {
+        if (!confirmActionOpen) {
+            checkActionConfirmed();
+        }
+    });
+
     onMount(() => {
         buildUpdateJobList();
 
@@ -365,7 +398,7 @@
                                 </Button>
                                 <Tooltip>{t('logs.btn.job_edit')}</Tooltip>
 
-                                <Button size="xs" on:click={() => {cleanupJobExecution(exec.job, exec.id)}}
+                                <Button size="xs" on:click={() => {confirmCleanupJobExecution(exec.job, exec.id, exec.job_name)}}
                                     disabled={isJobExecutionActive(exec)} id="logs-job-{exec.job}-{exec.id}-cleanup">
                                     <TrashBinSolid/>
                                 </Button>
@@ -468,7 +501,7 @@
                                 </Button>
                                 <Tooltip>{t('logs.btn.job_edit')}</Tooltip>
 
-                                <Button size="xs" on:click={() => {cleanupJobExecution(job.id, exec.id)}}
+                                <Button size="xs" on:click={() => {confirmCleanupJobExecution(job.id, exec.id, job.name)}}
                                     disabled={isJobExecutionActive(exec)} id="logs-job-{job.id}-{exec.id}-cleanup">
                                     <TrashBinSolid/>
                                 </Button>
@@ -491,6 +524,14 @@
         </AccordionItem>
     {/each}
 </Accordion>
+
+{#key confirmActionHoldJobID}
+{#key confirmActionHoldExecID}
+    <ConfirmActionPrompt bind:open={confirmActionOpen} bind:action={confirmAction}
+        bind:confirmed={confirmActionProceed} bind:confirmText={confirmActionText}
+    />
+{/key}
+{/key}
 
 <div class={classFooterSpacing}></div>
 <div id="loaded" class="h-0 w-0"></div>

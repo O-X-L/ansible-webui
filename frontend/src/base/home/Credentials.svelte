@@ -17,6 +17,7 @@
     import { apiEdit, apiGet } from '../../util/api.js';
     import CredentialsForm from './forms/Credentials.svelte';
     import VaultEncryptForm from './forms/VaultEncrypt.svelte';
+    import ConfirmActionPrompt from './forms/ConfirmAction.svelte';
     import CredentialInfoPopover from './popovers/CredentialList.svelte';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import type { credentialsUserType, credentialsSharedType } from './Types.js';
@@ -142,6 +143,39 @@
         newVaultCredentialsID = credentialsID;
         newVaultModal = true;
     }
+
+    // action confirmation-prompt
+    let confirmAction: string = $state('btn.delete');
+    let confirmActionOpen: boolean = $state(false);
+    let confirmActionProceed: boolean = $state(false);
+    let confirmActionText: string = $state('');
+    let confirmActionHoldEntryID: number = $state(0);
+    let confirmActionHoldEntryKind: string = $state('');
+
+    function confirmDeleteAlert(credsKind: string, credsID: number, credsName: string) {
+        confirmActionProceed = false;
+        confirmActionHoldEntryID = credsID;
+        confirmActionHoldEntryKind = credsKind;
+        confirmAction = 'btn.delete';
+        const languageCodeKind = t(`creds.${credsKind}`);
+        confirmActionText = `${languageCodeKind} "${credsName}"`;
+        confirmActionOpen = true;
+    }
+
+    function checkActionConfirmed() {
+        if (!confirmActionProceed || confirmActionHoldEntryID == 0) {
+            return;
+        }
+        if (confirmAction == 'btn.delete') {
+            deleteCredentials(confirmActionHoldEntryID, confirmActionHoldEntryKind);
+        }
+    }
+
+    $effect(() => {
+        if (!confirmActionOpen) {
+            checkActionConfirmed();
+        }
+    });
 
     onMount(() => {
         buildUpdateCredsList();
@@ -322,7 +356,7 @@
                                 </Button>
                                 <Tooltip>{t('btn.clone')}</Tooltip>
             
-                                <Button size="xs" on:click={() => {deleteCredentials(item.id, credsKind)}}
+                                <Button size="xs" on:click={() => {confirmDeleteAlert(credsKind, item.id, item.name)}}
                                     id="creds-btn-delete-{credsKind}-{item.id}">
                                     <TrashBinSolid/>
                                 </Button>
@@ -392,6 +426,13 @@
         bind:apiResponseHandler={apiResponseHandler}
         bind:apiSuccessMsg={apiSuccessMsg} bind:apiSuccess={apiSuccess} />
 {/if}
+{#key confirmActionHoldEntryID}
+{#key confirmActionHoldEntryKind}
+    <ConfirmActionPrompt bind:open={confirmActionOpen} bind:action={confirmAction}
+        bind:confirmed={confirmActionProceed} bind:confirmText={confirmActionText}
+    />
+{/key}
+{/key}
 
 <div class={classFooterSpacing}></div>
 <div id="loaded" class="h-0 w-0"></div>

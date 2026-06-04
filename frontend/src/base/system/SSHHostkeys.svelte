@@ -12,6 +12,7 @@
     import { share } from '../Share.js';
     import { tq } from '../../util/translate.js';
     import { apiEdit, apiGet } from '../../util/api.js';
+    import ConfirmActionPrompt from '../home/forms/ConfirmAction.svelte';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
         classListHeader, classListContent, classFooterSpacing, classModalBackdrop, classModalHelp, classSpinnerDiv,
@@ -110,6 +111,36 @@
         apiGet(`ssh-hostkey?hash=${apiDataHash}`, loadHostkeyList);
     }
 
+    // action confirmation-prompt
+    let confirmAction: string = $state('btn.delete');
+    let confirmActionOpen: boolean = $state(false);
+    let confirmActionProceed: boolean = $state(false);
+    let confirmActionText: string = $state('');
+    let confirmActionHoldEntryID: string = $state('');
+
+    function confirmDeleteHost(host: string) {
+        confirmActionProceed = false;
+        confirmActionHoldEntryID = host;
+        confirmAction = 'btn.delete';
+        confirmActionText = `${t('system.ssh_hostkey')} "${host}"`;
+        confirmActionOpen = true;
+    }
+
+    function checkActionConfirmed() {
+        if (!confirmActionProceed || confirmActionHoldEntryID == '') {
+            return;
+        }
+        if (confirmAction == 'btn.delete') {
+            deleteHost(confirmActionHoldEntryID);
+        }
+    }
+
+    $effect(() => {
+        if (!confirmActionOpen) {
+            checkActionConfirmed();
+        }
+    });
+
     $effect(() => {
         if (!scanModal) {
             scanArgs = EMPTY_SCAN_ARGS;
@@ -163,7 +194,7 @@
                 {/each}
             </TableBodyCell>
             <TableBodyCell tdClass="{classListContent} action-btns">
-                <Button size="xs" on:click={() => {deleteHost(item.host)}}><TrashBinSolid/></Button>
+                <Button size="xs" on:click={() => {confirmDeleteHost(item.host)}}><TrashBinSolid/></Button>
                 <Tooltip>{t('btn.delete')}</Tooltip>
 
                 <Button size="xs" on:click={() => {updateHost(item)}}><RefreshOutline/></Button>
@@ -222,6 +253,12 @@
         {/if}
     </div>
 </Modal>
+
+{#key confirmActionHoldEntryID}
+    <ConfirmActionPrompt bind:open={confirmActionOpen} bind:action={confirmAction}
+        bind:confirmed={confirmActionProceed} bind:confirmText={confirmActionText}
+    />
+{/key}
 
 <div class={classFooterSpacing}></div>
 <div id="loaded" class="h-0 w-0"></div>

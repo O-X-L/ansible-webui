@@ -13,6 +13,7 @@
     import { tq } from '../../util/translate.js';
     import { clickToCopy } from '../../util/main.js';
     import { apiEdit, apiGet } from '../../util/api.js';
+    import ConfirmActionPrompt from '../home/forms/ConfirmAction.svelte';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
         classSpinnerDiv, classListHeader, classListContent, classFooterSpacing, classModalBackdrop,
@@ -147,6 +148,36 @@
         }
     });
 
+    // action confirmation-prompt
+    let confirmAction: string = $state('btn.delete');
+    let confirmActionOpen: boolean = $state(false);
+    let confirmActionProceed: boolean = $state(false);
+    let confirmActionText: string = $state('');
+    let confirmActionHoldEntryID: string = $state('');
+
+    function confirmDeleteAPIKey(token: string) {
+        confirmActionProceed = false;
+        confirmActionHoldEntryID = token;
+        confirmAction = 'btn.delete';
+        confirmActionText = `${t('api_keys.token')} "${token}"`;
+        confirmActionOpen = true;
+    }
+
+    function checkActionConfirmed() {
+        if (!confirmActionProceed || confirmActionHoldEntryID == '') {
+            return;
+        }
+        if (confirmAction == 'btn.delete') {
+            deleteAPIKey(confirmActionHoldEntryID);
+        }
+    }
+
+    $effect(() => {
+        if (!confirmActionOpen) {
+            checkActionConfirmed();
+        }
+    });
+
     onMount(() => {
         buildUpdateAPIKeyList();
 
@@ -191,7 +222,7 @@
             <TableBodyCell tdClass="{classListContent} max-sm:hidden">{item.token}</TableBodyCell>
             <TableBodyCell tdClass={classListContent}>{item.comment ? item.comment : '-'}</TableBodyCell>
             <TableBodyCell tdClass="{classListContent} action-btns">
-                <Button size="xs" on:click={() => {deleteAPIKey(item.token)}}><TrashBinSolid/></Button>
+                <Button size="xs" on:click={() => {confirmDeleteAPIKey(item.token)}}><TrashBinSolid/></Button>
                 <Tooltip>{t('btn.delete')}</Tooltip>
             </TableBodyCell>
         </TableBodyRow>
@@ -251,6 +282,12 @@
     </div>
 </Modal>
 </div>
+
+{#key confirmActionHoldEntryID}
+    <ConfirmActionPrompt bind:open={confirmActionOpen} bind:action={confirmAction}
+        bind:confirmed={confirmActionProceed} bind:confirmText={confirmActionText}
+    />
+{/key}
 
 <div class={classFooterSpacing}></div>
 <div id="loaded" class="h-0 w-0"></div>

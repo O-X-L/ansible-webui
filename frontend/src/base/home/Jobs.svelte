@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount, onDestroy } from 'svelte';
+    import { onMount, onDestroy, type Component } from 'svelte';
 
     import {
         InfoCircleSolid, PlaySolid, StopSolid, TrashBinSolid, EditSolid, FileCloneSolid, BookOpenSolid,
@@ -13,6 +13,7 @@
     import JobForm from './forms/Job.svelte';
     import JobExecutionForm from './forms/JobExecution.svelte';
     import JobInfoPopovers from './popovers/JobList.svelte';
+    import ConfirmActionPrompt from './forms/ConfirmAction.svelte';
     import { tq } from '../../util/translate.js';
     import { redirectLogs } from './util/JobUtils';
     import { apiEdit, apiGet, cacheKey } from '../../util/api.js';
@@ -238,7 +239,37 @@
     }
 
     $effect(() => {
-      updateURLHash(entryActions);
+        updateURLHash(entryActions);
+    });
+
+    // action confirmation-prompt
+    let confirmAction: string = $state('btn.delete');
+    let confirmActionOpen: boolean = $state(false);
+    let confirmActionProceed: boolean = $state(false);
+    let confirmActionText: string = $state('');
+    let confirmActionHoldEntryID: number = $state(0);
+
+    function confirmDeleteJob(jobID: number, jobName: string) {
+        confirmActionProceed = false;
+        confirmActionHoldEntryID = jobID;
+        confirmAction = 'btn.delete';
+        confirmActionText = `${t('jobs.job')} "${jobName}"`;
+        confirmActionOpen = true;
+    }
+
+    function checkActionConfirmed() {
+        if (!confirmActionProceed || confirmActionHoldEntryID == 0) {
+            return;
+        }
+        if (confirmAction == 'btn.delete') {
+            deleteJob(confirmActionHoldEntryID);
+        }
+    }
+
+    $effect(() => {
+        if (!confirmActionOpen) {
+            checkActionConfirmed();
+        }
     });
 
     onMount(() => {
@@ -335,7 +366,7 @@
                     </Button>
                     <Tooltip>{t('btn.clone')}</Tooltip>
 
-                    <Button size="xs" on:click={() => {deleteJob(item.id)}} id="jobs-btn-delete-{item.id}">
+                    <Button size="xs" on:click={() => {confirmDeleteJob(item.id, item.name)}} id="jobs-btn-delete-{item.id}">
                         <TrashBinSolid/>
                     </Button>
                     <Tooltip>{t('btn.delete')}</Tooltip>
@@ -390,7 +421,11 @@
 {#key addModalId}
     <JobForm bind:open={addModal} action='add' bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 {/key}
-
+{#key confirmActionHoldEntryID}
+    <ConfirmActionPrompt bind:open={confirmActionOpen} bind:action={confirmAction}
+        bind:confirmed={confirmActionProceed} bind:confirmText={confirmActionText}
+    />
+{/key}
 
 <div class={classFooterSpacing}></div>
 <div id="loaded" class="h-0 w-0"></div>

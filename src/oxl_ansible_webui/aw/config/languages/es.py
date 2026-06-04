@@ -17,6 +17,7 @@ ES = {
     'btn.update': 'Actualizar',
     'btn.scroll_down': 'Desplazar hacia abajo',
     'btn.encrypt': 'Encriptado con Ansible-Vault',
+    'prompt.confirm': 'Confirmar',
     'nav.home': 'Inicio',
     'nav.system': 'Sistema',
     'nav.lang': 'Lenguaje',

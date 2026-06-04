@@ -19,6 +19,7 @@ EN = {
     'btn.update': 'Update',
     'btn.scroll_down': 'Scroll down',
     'btn.encrypt': 'Ansible-Vault Encrypt',
+    'prompt.confirm': 'Confirm',
     'nav.home': 'Home',
     'nav.system': 'System',
     'nav.lang': 'Language',

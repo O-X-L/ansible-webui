@@ -6,7 +6,7 @@
         EditSolid, FileCloneSolid, CodeBranchSolid, FolderOpenSolid, DownloadSolid,
     } from 'flowbite-svelte-icons';
     import {
-        Spinner, Button, Tooltip, Popover, Radio,
+        Spinner, Button, Tooltip,
         Table, TableHead, TableHeadCell, TableBody, TableBodyCell, TableBodyRow,
         Dropdown, DropdownItem, Accordion, AccordionItem,
     } from 'flowbite-svelte';
@@ -17,6 +17,7 @@
     import type { repoType} from './Types.js';
     import type { entryActionStateExec } from '../Types.js';
     import RepositoryForm from './forms/Repository.svelte';
+    import ConfirmActionPrompt from './forms/ConfirmAction.svelte';
     import RepositoryInfoPopover from './popovers/RepositoryList.svelte';
     import { REPO_EXEC_STATI_ACTIVE, repoKindMap, EXEC_STATUS_FAILED, EXEC_STATUS_SUCCESS } from '../Config.js';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
@@ -139,6 +140,37 @@
         let any_open = Object.values(entryActions).some(state => state.edit);;
         return any_open;
     }
+
+    // action confirmation-prompt
+    let confirmAction: string = $state('btn.delete');
+    let confirmActionOpen: boolean = $state(false);
+    let confirmActionProceed: boolean = $state(false);
+    let confirmActionText: string = $state('');
+    let confirmActionHoldEntryID: number = $state(0);
+
+    function confirmDeleteAlert(repoKind: string, repoID: number, repoName: string) {
+        confirmActionProceed = false;
+        confirmActionHoldEntryID = repoID;
+        confirmAction = 'btn.delete';
+        const languageCodeKind = t(`repos.${repoKind}`);
+        confirmActionText = `${languageCodeKind} "${repoName}"`;
+        confirmActionOpen = true;
+    }
+
+    function checkActionConfirmed() {
+        if (!confirmActionProceed || confirmActionHoldEntryID == 0) {
+            return;
+        }
+        if (confirmAction == 'btn.delete') {
+            deleteRepository(confirmActionHoldEntryID);
+        }
+    }
+
+    $effect(() => {
+        if (!confirmActionOpen) {
+            checkActionConfirmed();
+        }
+    });
 
     onMount(() => {
         buildUpdateRepoList();
@@ -266,7 +298,7 @@
                                     </Button>
                                     <Tooltip>{t('btn.clone')}</Tooltip>
                 
-                                    <Button size="xs" on:click={() => {deleteRepository(item.id)}} id="repos-btn-delete-{item.id}">
+                                    <Button size="xs" on:click={() => {confirmDeleteAlert(repoKind, item.id, item.name)}} id="repos-btn-delete-{item.id}">
                                         <TrashBinSolid/>
                                     </Button>
                                     <Tooltip>{t('btn.delete')}</Tooltip>
@@ -328,6 +360,11 @@
 {#key addStaticModalId}
     <RepositoryForm bind:open={addStaticModal} action='add' rtypeName='static'
         bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+{/key}
+{#key confirmActionHoldEntryID}
+    <ConfirmActionPrompt bind:open={confirmActionOpen} bind:action={confirmAction}
+        bind:confirmed={confirmActionProceed} bind:confirmText={confirmActionText}
+    />
 {/key}
 
 <div class={classFooterSpacing}></div>

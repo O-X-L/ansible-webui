@@ -286,6 +286,7 @@ def test_js_actions():
                 [
                     # delete user-creds
                     f'{QUERY_SELECTOR}.aw-accordion[0]', f"#creds-btn-delete-user-{start_ids['creds_user'] + 1}",
+                    '#confirm-prompt-btn-confirm',
                 ],
                 [
                     # ansible-vault-encrypt text

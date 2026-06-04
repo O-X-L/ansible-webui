@@ -18,6 +18,7 @@
     import { apiEdit, apiGet } from '../../util/api.js';
     import AlertPluginForm from './forms/AlertPlugin.svelte';
     import AlertInfoPopover from './popovers/AlertList.svelte';
+    import ConfirmActionPrompt from './forms/ConfirmAction.svelte';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import type { alertGlobalType, alertGroupType, alertUserType } from './Types.js';
     import {
@@ -177,6 +178,39 @@
         return any_open;
     }
 
+    // action confirmation-prompt
+    let confirmAction: string = $state('btn.delete');
+    let confirmActionOpen: boolean = $state(false);
+    let confirmActionProceed: boolean = $state(false);
+    let confirmActionText: string = $state('');
+    let confirmActionHoldEntryID: number = $state(0);
+    let confirmActionHoldEntryKind: string = $state('');
+
+    function confirmDeleteAlert(alertKind: string, alertID: number, alertName: string) {
+        confirmActionProceed = false;
+        confirmActionHoldEntryID = alertID;
+        confirmActionHoldEntryKind = alertKind;
+        confirmAction = 'btn.delete';
+        const languageCodeKind = t(`alerts.${alertKind}`);
+        confirmActionText = `${languageCodeKind} "${alertName}"`;
+        confirmActionOpen = true;
+    }
+
+    function checkActionConfirmed() {
+        if (!confirmActionProceed || confirmActionHoldEntryID == 0) {
+            return;
+        }
+        if (confirmAction == 'btn.delete') {
+            deleteAlert(confirmActionHoldEntryID, confirmActionHoldEntryKind);
+        }
+    }
+
+    $effect(() => {
+        if (!confirmActionOpen) {
+            checkActionConfirmed();
+        }
+    });
+
     onMount(() => {
         buildUpdateAlertList();
 
@@ -257,7 +291,7 @@
                                     <Button size="xs" on:click={() => {entryActions[alertKind][item.id].clone = true}}><FileCloneSolid/></Button>
                                     <Tooltip>{t('btn.clone')}</Tooltip>
                 
-                                    <Button size="xs" on:click={() => {deleteAlert(item.id, alertKind)}}><TrashBinSolid/></Button>
+                                    <Button size="xs" on:click={() => {confirmDeleteAlert(alertKind, item.id, item.name)}}><TrashBinSolid/></Button>
                                     <Tooltip>{t('btn.delete')}</Tooltip>
 
                                     <div class="w-0 h-0 inline">
@@ -330,7 +364,7 @@
                                 <Button size="xs" on:click={() => {entryActions.plugins[item.id].clone = true}}><FileCloneSolid/></Button>
                                 <Tooltip>{t('btn.clone')}</Tooltip>
             
-                                <Button size="xs" on:click={() => {deleteAlert(item.id, 'plugin')}}><TrashBinSolid/></Button>
+                                <Button size="xs" on:click={() => {confirmDeleteAlert('plugin', item.id, item.name)}}><TrashBinSolid/></Button>
                                 <Tooltip>{t('btn.delete')}</Tooltip>
                                 <div class="w-0 h-0 inline">
                                     {#key item.id}
@@ -391,6 +425,14 @@
 {#key addPluginModalId}
     <AlertPluginForm bind:open={addPluginModal} action='add'
         bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+{/key}
+
+{#key confirmActionHoldEntryID}
+{#key confirmActionHoldEntryKind}
+    <ConfirmActionPrompt bind:open={confirmActionOpen} bind:action={confirmAction}
+        bind:confirmed={confirmActionProceed} bind:confirmText={confirmActionText}
+    />
+{/key}
 {/key}
 
 <div class={classFooterSpacing}></div>

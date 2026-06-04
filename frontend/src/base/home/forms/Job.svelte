@@ -155,6 +155,7 @@
         );
         if (!valid) {
             formWarningMsgs = errors;
+            submitted = false;
         }
     }
 

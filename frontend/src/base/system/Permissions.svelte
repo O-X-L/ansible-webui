@@ -12,6 +12,7 @@
     import type { entryActionState } from '../Types.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import PermissionForm from './forms/Permission.svelte';
+    import ConfirmActionPrompt from '../home/forms/ConfirmAction.svelte';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import {
         classSpinnerDiv, classListHeader, classListContent, classFooterSpacing,
@@ -150,6 +151,36 @@
         return any_open;
     }
 
+    // action confirmation-prompt
+    let confirmAction: string = $state('btn.delete');
+    let confirmActionOpen: boolean = $state(false);
+    let confirmActionProceed: boolean = $state(false);
+    let confirmActionText: string = $state('');
+    let confirmActionHoldEntryID: number = $state(0);
+
+    function confirmDeletePermission(permID: number, permName: string) {
+        confirmActionProceed = false;
+        confirmActionHoldEntryID = permID;
+        confirmAction = 'btn.delete';
+        confirmActionText = `${t('system.permission')} "${permName}"`;
+        confirmActionOpen = true;
+    }
+
+    function checkActionConfirmed() {
+        if (!confirmActionProceed || confirmActionHoldEntryID == 0) {
+            return;
+        }
+        if (confirmAction == 'btn.delete') {
+            deletePermission(confirmActionHoldEntryID);
+        }
+    }
+
+    $effect(() => {
+        if (!confirmActionOpen) {
+            checkActionConfirmed();
+        }
+    });
+
     onMount(() => {
         buildUpdatePermList();
     
@@ -204,7 +235,7 @@
                 <Button size="xs" on:click={() => {entryActions[item.id].clone = true}}><FileCloneSolid/></Button>
                 <Tooltip>{t('btn.clone')}</Tooltip>
 
-                <Button size="xs" on:click={() => {deletePermission(item.id)}}><TrashBinSolid/></Button>
+                <Button size="xs" on:click={() => {confirmDeletePermission(item.id, item.name)}}><TrashBinSolid/></Button>
                 <Tooltip>{t('btn.delete')}</Tooltip>
 
                 <div class="w-0 h-0 inline">
@@ -236,6 +267,11 @@
 {#key addModalId}
     <PermissionForm bind:open={addModal} action='add'
         bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
+{/key}
+{#key confirmActionHoldEntryID}
+    <ConfirmActionPrompt bind:open={confirmActionOpen} bind:action={confirmAction}
+        bind:confirmed={confirmActionProceed} bind:confirmText={confirmActionText}
+    />
 {/key}
 
 <div class={classFooterSpacing}></div>

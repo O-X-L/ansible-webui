@@ -16,11 +16,13 @@ Features:
 * Implemented limit-suggestions for execution-form [#82](https://github.com/O-X-L/ansible-webui/issues/82)
 * Minor adjustments of limit-suggestions and file-browsing input-field-widgets
 * Enable users to provide ARA-server URL via env-variable or config-file [#108](https://github.com/O-X-L/ansible-webui/issues/108)
+* Prompt user for confirmation when deleting entries [#109](https://github.com/O-X-L/ansible-webui/issues/109)
 
 Fixes:
 
 * Don't reload system-settings while user is editing [#99](https://github.com/O-X-L/ansible-webui/issues/99)
 * Updated inventory-list logic to allow for dynamic-inventories [#89](https://github.com/O-X-L/ansible-webui/issues/89)
+* Form-submit not working after a previous validation-error
 
 Project:
 
