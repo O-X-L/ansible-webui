@@ -45,7 +45,7 @@
     let newKeyPair: apiKeyPair = $state(EMPTY_KEYPAIR);
 
     function t(code: string) : string {
-      return tq($share, code);
+        return tq($share, code);
     }
 
     function searchFilter(item: apiToken, searchTerm: string) : boolean {

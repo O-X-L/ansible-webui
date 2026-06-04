@@ -46,7 +46,7 @@
     let scanArgs: sshHostkeyScan = $state(EMPTY_SCAN_ARGS);
 
     function t(code: string) : string {
-      return tq($share, code);
+        return tq($share, code);
     }
 
     function searchFilter(item: sshHostKey, searchTerm: string) : boolean {

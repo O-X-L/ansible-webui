@@ -20,7 +20,7 @@
     } = $props();
 
     function t(code: string) : string {
-      return tq($share, code);
+        return tq($share, code);
     }
 </script>
 

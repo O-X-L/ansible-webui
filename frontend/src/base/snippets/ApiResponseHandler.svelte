@@ -28,7 +28,7 @@
     let showWarning = $derived(warningMsgsTranslated.length > 0);
 
     function t(code: string) : string {
-      return tq($share, code);
+        return tq($share, code);
     }
 
     function tSub(s: string) : string {

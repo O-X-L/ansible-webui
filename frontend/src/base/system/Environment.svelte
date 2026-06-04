@@ -83,7 +83,7 @@
     let envInfosMain: envInfoMainType[] = $state([]);
 
     function t(code: string) : string {
-      return tq($share, code);
+        return tq($share, code);
     }
 
     function searchFilterMain(item: envInfoMainType, searchTerm: string) : boolean {

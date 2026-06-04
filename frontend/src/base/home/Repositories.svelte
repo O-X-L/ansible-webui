@@ -53,7 +53,7 @@
     let entryLists: repoLists = $state({'static': [], 'git': []});
 
     function t(code: string) : string {
-      return tq($share, code);
+        return tq($share, code);
     }
 
     function loadRepoList(j: any, h: string) {

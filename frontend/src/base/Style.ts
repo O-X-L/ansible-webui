@@ -31,3 +31,6 @@ export const classTab = 'px-1 sm:px-5 h-screen';
 export const classTabButtonDiv = 'flex flex-row overflow-auto space-x-2 rtl:space-x-reverse';
 export const classTabDiv = 'p-1 sm:p-4 rounded-lg mt-4 mb-10 h-full';
 const bg = 'w-full h-full';
+export const classDynChoices = 'bg-gray-100 dark:bg-gray-600 text-gray-800 p-2 dark:text-gray-50 text-sm ml-5 mt-1 mb-3 max-h-80 overflow-y-scroll rounded-b';
+export const classDynChoicesRow = 'block w-full text-left py-1 round';
+export const classDynChoicesItem = `${classDynChoicesRow} hover:bg-primary-200 dark:hover:bg-primary-600`;

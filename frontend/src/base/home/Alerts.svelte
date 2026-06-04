@@ -82,7 +82,7 @@
     let entryLists: alertsFullType = $state({'global': [], 'group': [], 'user': [], 'plugins': []});
 
     function t(code: string) : string {
-      return tq($share, code);
+        return tq($share, code);
     }
 
     function loadAlertList(j: any, h: string) {

@@ -20,7 +20,7 @@ Fixes:
 
 Project:
 
-* Cleanup: Separated some frontend-logic of list-views into components
+* Cleanup: Separated some frontend-logic of list- & form-views into components
 
 ----
 

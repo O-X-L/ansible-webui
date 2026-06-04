@@ -57,7 +57,7 @@
     let entryList: permissionType[] = $state([]);
 
     function t(code: string) : string {
-      return tq($share, code);
+        return tq($share, code);
     }
 
     function searchFilter(item: permissionType, searchTerm: string) : boolean {

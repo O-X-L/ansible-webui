@@ -18,7 +18,7 @@
     let alerts: formAlertType[] = $state([]);
 
     function t(code: string) : string {
-      return tq($share, code);
+        return tq($share, code);
     }
 
     function showBackendFormErrors() {
