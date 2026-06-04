@@ -18,6 +18,10 @@ Fixes:
 
 * Don't reload system-settings while user is editing [#99](https://github.com/O-X-L/ansible-webui/issues/99)
 
+Project:
+
+* Cleanup: Separated some frontend-logic of list-views into components
+
 ----
 
 ### 0.9.5

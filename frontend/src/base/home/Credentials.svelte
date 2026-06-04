@@ -3,31 +3,26 @@
 
     import {
         InfoCircleSolid, UserSolid, UsersGroupSolid, ChevronDownOutline, TrashBinSolid,
-        EditSolid, FileCloneSolid, LockSolid, CloseCircleSolid, PlaySolid,
+        EditSolid, FileCloneSolid, LockSolid,
     } from 'flowbite-svelte-icons';
     import {
-        Spinner, Button, Tooltip, Popover, Radio,
+        Spinner, Button, Tooltip,
         Table, TableHead, TableHeadCell, TableBody, TableBodyCell, TableBodyRow,
         Dropdown, DropdownItem, Accordion, AccordionItem,
-        Heading, Label, Input, Helper,
     } from 'flowbite-svelte';
-
-    import Modal from '../../flowbite-custom/Modal.svelte';
 
     import { share } from '../Share.js';
     import { tq } from '../../util/translate.js';
-    import { clickToCopy } from '../../util/main.js';
     import type { entryActionState } from '../Types.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import CredentialsForm from './forms/Credentials.svelte';
+    import VaultEncryptForm from './forms/VaultEncrypt.svelte';
+    import CredentialInfoPopover from './popovers/CredentialList.svelte';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
     import type { credentialsUserType, credentialsSharedType } from './Types.js';
     import {
-        classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
-        classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle, classFooterSpacing,
+        classSpinnerDiv, classListHeader, classListContent, classFooterSpacing,
         classSpoilerItem, classSpoilerPad, classSpoilerBtn,
-        classModalBackdrop, classModalBody, classModalForm, classModalInput, classModalHelp, classModalBtns,
-        classModalLabel, classModalDialog,
     } from '../Style.js';
  
     const credentialsKind = ['user', 'shared'];
@@ -53,12 +48,10 @@
     let updateLoop: number = $state(0);
     let updatedAt = $state(0);
     let searchedAt = $state(0);
-    let newVaultCredentialsID = $state(0);
-    let newVaultCredentialsKind = $state('');
-    let newVaultPlaintext = $state('');
-    let newVaultCiphertext = $state('');
-    let newVaultLoad = $state(false);
-    let newVaultModal = $state(false);
+    let loaded: boolean = $state(false);
+    let newVaultModal: boolean = $state(false);
+    let newVaultCredentialsID: number = $state(0);
+    let newVaultCredentialsKind: string = $state('');
 
     interface credentialsFullType {
         shared: credentialsSharedType[],
@@ -68,7 +61,7 @@
     let entryList: credentialsFullType = $state({'shared': [], 'user': []});
 
     function t(code: string) : string {
-      return tq($share, code);
+        return tq($share, code);
     }
 
     function loadCredentialsList(j: any, h: string) {
@@ -88,6 +81,7 @@
         entryList = j;
         apiDataHash = h;
         updatedAt = Date.now();
+        loaded = true;
     }
 
     function searchFilter(item: credentialsSharedType|credentialsUserType, searchTerm: string) : boolean {
@@ -132,14 +126,6 @@
         apiGet(`credentials?hash=${apiDataHash}`, loadCredentialsList);
     }
 
-    function handleVaultEncryptSubmitResponse(s: number, j: any) {
-        if (s == 200 && j.error === undefined) {
-            newVaultCiphertext = j.ciphertext;
-            newVaultLoad = false;
-        }
-        apiResponseHandler.handleRes(s, j);
-    }
-
     function isUserEditing(): boolean {
         if (updatedAt == 0) {
             return false;
@@ -151,31 +137,11 @@
         return any_open;
     }
 
-    function vaultEncryptPlaintext() {
-        newVaultLoad = true;
-        apiSuccessMsg = 'creds.action.vault_encrypt';
-        apiEdit(
-            'post',
-            `credentials/${newVaultCredentialsKind}/${newVaultCredentialsID}/vault_encrypt`,
-            {plaintext: newVaultPlaintext},
-            handleVaultEncryptSubmitResponse,
-        );
-    }
-
-    function showVaultEncryptModal(credentialsID: number, kind: string) {
+    function showVaultEncryptForm(credentialsID: number, kind: string) {
         newVaultCredentialsKind = kind;
         newVaultCredentialsID = credentialsID;
         newVaultModal = true;
     }
-
-    function clearVaultEncryptModal(_: boolean) {
-        newVaultCiphertext = '';
-        newVaultPlaintext = '';
-    }
-
-    $effect(() => {
-        clearVaultEncryptModal(newVaultModal);
-    });
 
     onMount(() => {
         buildUpdateCredsList();
@@ -337,7 +303,7 @@
                                 {/if}
                             </TableBodyCell>
                             <TableBodyCell tdClass="{classListContent} action-btns">
-                                <Button size="xs" on:click={() => {showVaultEncryptModal(item.id, credsKind)}}
+                                <Button size="xs" on:click={() => {showVaultEncryptForm(item.id, credsKind)}}
                                     id="creds-btn-vaultencrypt-{credsKind}-{item.id}"
                                     disabled={!item.vault_pass_is_set && !item.vault_file && !item.vault_id}>
                                     <LockSolid/>
@@ -383,108 +349,10 @@
                   {/if}
                 </div>
                 <div>
-                    {#each entryList[credsKind] as creds (creds.id)}
+                    {#each entryList[credsKind] as creds, credsIdx (creds.id)}
                         {#key searchedAt}
                         <div id="creds-infos-{credsKind}-{creds.id}">
-                            <Popover triggeredBy="#creds-name-{credsKind}-{creds.id}" class={classPopover} placement="bottom-start">
-                                <div class="p-3 space-y-2">
-                                    <h3 class={classPopoverTitle}>{t('creds.info')}</h3>
-                                </div>
-                                <table>
-                                    <tbody>
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('common.id')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Text}>
-                                                {creds.id}
-                                            </td>
-                                        </tr>
-                                        {#if credsKind == 'user'}
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('creds.form.category')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Text}>
-                                                    {creds.category ? creds.category : '-'}
-                                                </td>
-                                            </tr>
-                                        {/if}
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('creds.form.connect_user')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Text}>
-                                                {creds.connect_user ? creds.connect_user : '-'}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('creds.form.connect_pwd')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Div}>
-                                                <button class="cursor-default">
-                                                    <Radio class="inline-block" checked={creds.connect_pass_is_set}></Radio>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('creds.form.ssh_key')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Div}>
-                                                <button class="cursor-default">
-                                                    <Radio class="inline-block" checked={creds.ssh_key_is_set}></Radio>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('creds.form.become_user')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Text}>
-                                                {creds.become_user ? creds.become_user : '-'}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('creds.form.become_pwd')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Div}>
-                                                <button class="cursor-default">
-                                                    <Radio class="inline-block" checked={creds.become_pass_is_set}></Radio>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('creds.form.vault_pwd')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Div}>
-                                                <button class="cursor-default">
-                                                    <Radio class="inline-block" checked={creds.vault_pass_is_set}></Radio>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('creds.form.vault_file')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Text}>
-                                                {creds.vault_file ? creds.vault_file : '-'}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('creds.form.vault_id')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Text}>
-                                                {creds.vault_id ? creds.vault_id : '-'}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </Popover>
+                            <CredentialInfoPopover bind:creds={entryList[credsKind][credsIdx]} credsKind={credsKind} />
                         </div>
                         {/key}
                     {/each}
@@ -518,46 +386,12 @@
         bind:successMsg={apiSuccessMsg} bind:success={apiSuccess} />
 {/key}
 
-<Modal bind:open={newVaultModal} size="lg" autoclose={false} placement="top-center"
-    backdropClass={classModalBackdrop} bodyClass={classModalBody} dialogClass={classModalDialog}>
-    <div class={classModalForm}>
-        <Heading tag="h2">{t('creds.vault_encrypt')}</Heading>
-
-        {#if newVaultLoad}
-            <div class={classSpinnerDiv}><Spinner/></div>
-        {:else if !newVaultCiphertext}
-            <div class={classModalInput}>
-                <Label for="creds_vaultencrypt_plaintext" class={classModalLabel}>{t('creds.form.vault_encrypt')}</Label>
-                <Input id="creds_vaultencrypt_plaintext" bind:value={newVaultPlaintext} />
-                <Helper class={classModalHelp}>{@html t('creds.form.help.vault_encrypt')}</Helper>
-            </div>
-            <div class={classModalBtns}>
-                <Button id="creds-btn-vaultencrypt-submit" on:click={() => {vaultEncryptPlaintext()}}><PlaySolid/></Button>
-                <Tooltip>{t('btn.encrypt')}</Tooltip>
-
-                <Button id="creds-btn-vaultencrypt-close" on:click={() => (newVaultModal = false)} class="inline-block ml-2">
-                    <CloseCircleSolid/>
-                </Button>
-                <Tooltip>{t('btn.close')}</Tooltip>
-            </div>
-        {:else}
-            <Label class={classModalLabel}>{t('api_keys.token')}</Label>
-            <button onclick={clickToCopy} class="mr-10">
-<pre class="whitespace-pre-wrap break-normal text-xs">
-{newVaultCiphertext}
-</pre>
-            </button>
-            <Tooltip>{t('common.click_to_copy')}</Tooltip>
-
-            <div class={classModalBtns}>
-                <Button id="creds-btn-vaultencrypt-close" on:click={() => (newVaultModal = false)} class="inline-block ml-2">
-                    <CloseCircleSolid/>
-                </Button>
-                <Tooltip>{t('btn.close')}</Tooltip>
-            </div>
-        {/if}
-    </div>
-</Modal>
+{#if loaded && apiResponseHandler}
+    <VaultEncryptForm bind:open={newVaultModal} 
+        bind:credsKind={newVaultCredentialsKind} bind:credsID={newVaultCredentialsID} 
+        bind:apiResponseHandler={apiResponseHandler}
+        bind:apiSuccessMsg={apiSuccessMsg} bind:apiSuccess={apiSuccess} />
+{/if}
 
 <div class={classFooterSpacing}></div>
 <div id="loaded" class="h-0 w-0"></div>

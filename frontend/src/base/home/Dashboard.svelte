@@ -12,10 +12,10 @@
     import { classFooterSpacing } from '../Style.js';
     import type { formChoiceType } from '../Types.js';
     import type { statsJobs, statsExecution } from './Types.js';
-    import ChartExecOverTime from './components/DashboardChartExecOverTime.svelte';
-    import ChartUserExecs from './components/DashboardChartUserExecs.svelte';
-    import ChartJobResults from './components/DashboardChartJobResults.svelte';
-    import ChartHostJobExecResults from './components/DashboardChartHostExecResults.svelte';
+    import ChartExecOverTime from './charts/DashboardChartExecOverTime.svelte';
+    import ChartUserExecs from './charts/DashboardChartUserExecs.svelte';
+    import ChartJobResults from './charts/DashboardChartJobResults.svelte';
+    import ChartHostJobExecResults from './charts/DashboardChartHostExecResults.svelte';
 
     let { open = $bindable(false) } = $props();
 

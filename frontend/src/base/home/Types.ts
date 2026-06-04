@@ -117,3 +117,49 @@ export interface statsJobs {
     stats: statsExecution[]
     mapping: statsJobsMapping
 }
+
+export interface repoType {
+    id: number,
+    name: string,
+    rtype: number,
+    rtype_name: string,
+    static_path: string|null,
+    git_origin: string|null,
+    git_credentials: string|null,
+    git_branch: string|null,
+    git_isolate: boolean,
+    git_lfs: boolean,
+    git_limit_depth: number|null,
+    git_hook_pre: string|null,
+    git_hook_post: string|null,
+    git_hook_cleanup: string|null,
+    git_override_initialize: string|null,
+    git_override_update: string|null,
+    git_playbook_base: string|null,
+    git_timeout: number|null,
+    time_update: string,
+    status: number,
+    status_name: string,
+    log_stdout: string|null,
+    log_stdout_url: string|null,
+    log_stderr: string|null,
+    log_stderr_url: string|null,
+    ssh_hostkey_file: string|null,
+}
+
+interface alertBaseType {
+    id: number,
+    name: string,
+    alert_type: number,
+    plugin: number,
+    jobs_all: boolean,
+    jobs: number[],
+    condition: number,
+}
+export interface alertGlobalType extends alertBaseType {}
+export interface alertGroupType extends alertBaseType {
+    group: number,
+}
+export interface alertUserType extends alertBaseType {
+    user: number,
+}

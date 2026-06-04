@@ -6,7 +6,7 @@
         EditSolid, FileCloneSolid, FileCodeSolid, DribbbleSolid, PlaySolid,
     } from 'flowbite-svelte-icons';
     import {
-        Spinner, Button, Tooltip, Popover, Radio,
+        Spinner, Button, Tooltip, 
         Table, TableHead, TableHeadCell, TableBody, TableBodyCell, TableBodyRow,
         Dropdown, DropdownItem, Accordion, AccordionItem,
     } from 'flowbite-svelte';
@@ -17,10 +17,11 @@
     import type { entryActionState } from '../Types.js';
     import { apiEdit, apiGet } from '../../util/api.js';
     import AlertPluginForm from './forms/AlertPlugin.svelte';
+    import AlertInfoPopover from './popovers/AlertList.svelte';
     import APIResponseHandler from '../snippets/ApiResponseHandler.svelte';
+    import type { alertGlobalType, alertGroupType, alertUserType } from './Types.js';
     import {
-        classSpinnerDiv, classPopoverColumn1, classListHeader, classListContent,
-        classPopover, classPopoverColumn2Div, classPopoverColumn2Text, classPopoverTitle, classFooterSpacing,
+        classSpinnerDiv, classListHeader, classListContent, classFooterSpacing,
         classSpoilerItem, classSpoilerPad,
     } from '../Style.js';
  
@@ -54,6 +55,7 @@
     let updatedAt = $state(0);
     let searchedAt = $state(0);
 
+    // todo: de-duplicate (popover)
     const ALERT_TYPE_PLUGIN: number = 1;
     const ALERT_TYPE_CHOICES: Record<number, string> = {
         0: t('alerts.type.email'),
@@ -65,22 +67,6 @@
         2: t('alerts.condition.always'),
     }
 
-    interface alertBaseType {
-        id: number,
-        name: string,
-        alert_type: number,
-        plugin: number,
-        jobs_all: boolean,
-        jobs: number[],
-        condition: number,
-    }
-    interface alertGlobalType extends alertBaseType {}
-    interface alertGroupType extends alertBaseType {
-        group: number,
-    }
-    interface alertUserType extends alertBaseType {
-        user: number,
-    }
     interface alertPluginType {
         id: number,
         name: string,
@@ -294,79 +280,11 @@
                     {/if}
                 </div>
                 <div>
-                    {#each entryLists[alertKind] as alert (alert.id)}
+                    {#each entryLists[alertKind] as alert, alertIdx (alert.id)}
                         {#key searchedAt}
                         <div id="alerts-infos-{alert.id}">
-                            <Popover triggeredBy="#alerts-name-{alert.id}" class={classPopover} placement="bottom-start">
-                                <div class="p-3 space-y-2">
-                                    <h3 class={classPopoverTitle}>{t('alerts.info')}</h3>
-                                </div>
-                                <table>
-                                    <tbody>
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('common.id')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Text}>
-                                                {alert.id}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('common.name')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Text}>
-                                                {alert.name}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('common.kind')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Text}>
-                                                {ALERT_TYPE_CHOICES[alert.alert_type]}
-                                            </td>
-                                        </tr>
-                                        {#if alert.alert_type == ALERT_TYPE_PLUGIN}
-                                            <tr>
-                                                <td class={classPopoverColumn1}>
-                                                    {t('alerts.plugin')}:
-                                                </td>
-                                                <td class={classPopoverColumn2Text}>
-                                                    {getPluginNameByID(alert.plugin)}
-                                                </td>
-                                            </tr>
-                                        {/if}
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('alerts.form.condition')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Text}>
-                                                {ALERT_CONDITION_CHOICES[alert.condition]}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('alerts.form.jobs_all')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Div}>
-                                                <button class="cursor-default">
-                                                    <Radio class="inline-block" checked={alert.jobs_all}></Radio>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class={classPopoverColumn1}>
-                                                {t('home.jobs')}:
-                                            </td>
-                                            <td class={classPopoverColumn2Text}>
-                                                <!-- todo: get job names from ids.. -->
-                                                {alert.jobs ? alert.jobs : '-'}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </Popover>
+                            <AlertInfoPopover bind:alert={entryLists[alertKind][alertIdx]} 
+                                pluginName={getPluginNameByID(alert.plugin)} />
                         </div>
                         {/key}
                     {/each}
