@@ -3,9 +3,10 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from drf_spectacular.utils import extend_schema
+from django.core.exceptions import ObjectDoesNotExist
 
 from aw.base import USERS
-from aw.model.system import SystemConfig, SSHHostkeyFile, ANSIBLE_EXECUTOR_CHOICES
+from aw.model.system import SystemConfig, SSHHostkeyFile, ANSIBLE_EXECUTOR_CHOICES, UserExtended
 from aw.settings import AUTH_MODE
 from aw.utils.util import get_logo
 from aw.utils.version import get_version
@@ -141,7 +142,7 @@ class APIBackendInfo(GenericAPIView):
     def get(request):
         states = {
             'authenticated': False, 'sso': False, 'user': None, 'user_id': None,
-            'version': get_version(),
+            'version': get_version(), 'language': 'en',
             'logo': get_logo(),
         }
 
@@ -159,6 +160,13 @@ class APIBackendInfo(GenericAPIView):
             states['user_id'] = user.id
             states['authenticated'] = user.is_authenticated
 
+            try:
+                user_extended = UserExtended.objects.get(user=user)
+                states['language'] = user_extended.language
+
+            except ObjectDoesNotExist:
+                pass
+
         return Response(data=states, status=200)
 
 
@@ -175,6 +183,7 @@ class APIBackendTranslations(GenericAPIView):
         operation_id='backend_translations',
     )
     def get(request):
+        # todo: only return translations for user-selected language once it is propagated from frontend to backend
         del request
         return Response(data=TRANSLATIONS, status=200, headers=HDR_CACHE_1W)
 

@@ -177,6 +177,9 @@ def test_modify():
 
         # perms; todo: fix
         # {'l': 'permission/1', 'd': {'name': 'perm1'}},
+
+        # user settings
+        {'l': 'user/language', 'd': {'language': 'en'}},
     ])
 
 

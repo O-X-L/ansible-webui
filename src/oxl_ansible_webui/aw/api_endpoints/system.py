@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from oxl_utils.valid.dns import valid_domain
 
 from aw.config.main import config
-from aw.model.system import SystemConfig, get_config_from_db, SSHHostkeys, SSHHostkeyFile
+from aw.model.system import SystemConfig, get_config_from_db, SSHHostkeys, SSHHostkeyFile, UserExtended
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, GenericErrorResponse, \
     HDR_CACHE_1W, response_data_if_changed, API_PARAM_HASH
 from aw.utils.util_no_config import is_set, is_null
@@ -20,6 +20,8 @@ from aw.config.environment import check_aw_env_var_is_set
 from aw.config.hardcoded import SECRET_HIDDEN
 from aw.utils.audit import log_audit
 from aw.execute.known_hosts import create_or_update_ssh_hostkeys
+from aw.config.language import LANGUAGE_CHOICES
+from aw.utils.db_handler import close_old_mysql_connections
 
 
 class SystemConfigSettings(BaseResponse):
@@ -227,6 +229,45 @@ class APIUserPasswordChange(APIView):
         user.save()
         log_audit(user=user, title='Password change', msg='Password changed')
         return Response({'msg': 'Password updated'}, status=200)
+
+
+class UserLanguageChangeRequest(BaseResponse):
+    language = serializers.CharField()
+
+
+class APIUserLanguage(APIView):
+    http_method_names = ['put']
+    serializer_class = GenericResponse
+    permission_classes = API_PERMISSION
+
+    @extend_schema(
+        request=UserLanguageChangeRequest,
+        responses={
+            200: OpenApiResponse(response=GenericResponse, description='Language updated'),
+            400: OpenApiResponse(response=GenericErrorResponse, description='Invalid language provided'),
+        },
+        summary='Update the current users language.',
+        operation_id='system_user_language',
+    )
+    def put(self, request):
+        user = get_api_user(request)
+        language = request.data['language']
+
+        if language not in LANGUAGE_CHOICES:
+            return Response({'error': 'Invalid language provided'}, status=400)
+
+        try:
+            user_extended = UserExtended.objects.get(user=user)
+
+        except ObjectDoesNotExist:
+            user_extended = UserExtended(user=user)
+
+        user_extended.language = language
+        close_old_mysql_connections()
+        user_extended.save()
+
+        log_audit(user=user, title='Language change', msg='Language changed')
+        return Response({'msg': 'Language updated'}, status=200)
 
 
 class APISSHHostkeyFileRequestResponse(serializers.ModelSerializer):

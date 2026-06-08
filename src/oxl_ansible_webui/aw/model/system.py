@@ -9,6 +9,7 @@ from aw.config.main import VERSION
 from aw.utils.util import is_null, is_set
 from aw.utils.crypto import decrypt, encrypt
 from aw.utils.db_handler import close_old_mysql_connections
+from aw.config.language import LANGUAGE_CHOICES
 
 MAIL_TRANSPORT_TYPE_PLAIN = 0
 MAIL_TRANSPORT_TYPE_SSL = 1
@@ -176,6 +177,7 @@ class UserExtended(models.Model):
     user = models.OneToOneField(USERS, on_delete=models.CASCADE)
     phone = models.CharField(max_length=100, **DEFAULT_NONE)
     description = models.TextField(max_length=1000, **DEFAULT_NONE)
+    language = models.CharField(choices=LANGUAGE_CHOICES, default='en', max_length=10)
 
     class Meta:
         constraints = [

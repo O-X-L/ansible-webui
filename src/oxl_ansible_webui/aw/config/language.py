@@ -8,3 +8,9 @@ TRANSLATIONS = {
     'de': DE,
     'es': ES,
 }
+
+LANGUAGE_CHOICES = {
+    'en': 'English',
+    'de': 'Deutsch',
+    'es': 'Español',
+}

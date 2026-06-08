@@ -13,6 +13,7 @@ tbd
 Features:
 
 * Enable users to configure session-expiration on browser-close via env-variable or config-file [#119](https://github.com/O-X-L/ansible-webui/issues/119)
+* Save/handle user-language on the backend [#116](https://github.com/O-X-L/ansible-webui/issues/116)
 
 
 Fixes:
