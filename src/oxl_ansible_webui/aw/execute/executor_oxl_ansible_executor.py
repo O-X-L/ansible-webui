@@ -172,7 +172,7 @@ def executor_oxl_ansible_executor(
             output_color=True,
             run_dir=kwargs['private_data_dir'],
             # engine
-            stats_live=True,
+            stats_live=False,
             stats_recap=True,
             containerized=containerized,
             container_engine=container_engine,
