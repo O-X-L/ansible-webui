@@ -24,6 +24,7 @@ Fixes:
 * Updated inventory-list logic to allow for dynamic-inventories [#89](https://github.com/O-X-L/ansible-webui/issues/89)
 * Form-submit not working after a previous validation-error
 * Job-specific extra-vars not merged with execution-prompt-vars [#112](https://github.com/O-X-L/ansible-webui/issues/112)
+* Improved page-loading [#95](https://github.com/O-X-L/ansible-webui/issues/95)
 
 Project:
 
