@@ -242,11 +242,6 @@ These settings are also configurable using the WebUI.
   You might want to lower this value to a sane value for your use-cases.
 
 
-* **AW_SESSION_TIMEOUT**
-
-  Timeout for WebUI sessions in seconds. Default: 43.200 (12h)
-
-
 * **AW_SSH_KNOWN_HOSTS**
 
   Define the path to the known-hosts file that should be used. You can use :code:`${AW_PATH_PLAY}` to reference paths relative to your playbook base-directory!
@@ -302,7 +297,17 @@ These settings are also configurable using the WebUI.
 Advanced Settings
 =================
 
-Normal users will not have to use these.
+Normal users might not have to use these.
+
+* **AW_SESSION_TIMEOUT**
+
+  Timeout for WebUI sessions in seconds. Default: 43.200 (12h)
+
+
+* **AW_SESSION_EXPIRE_AT_BROWSER_CLOSE**
+
+  If WebUI sessions should be terminated whenever the user closes the browser. Default: True
+
 
 * **AW_DEBUG**
 

@@ -335,8 +335,6 @@ DE = {
     'config.form.path_log': 'Verzeichnis für Ausführungs-Logs',
     'config.form.path_template': 'Verzeichnis für Vorlagen (Templates)',
     'config.form.run_timeout': 'Maximale Laufzeit für Ausführungen',
-    'config.form.session_timeout': 'Zeitlimit für WebUI-Sitzungen',
-    'config.form.session_expire_at_browser_close': 'WebUI-Sitzungen nach Schließung des Browsers beenden',
     'config.form.path_ansible_config': 'Ansible-Konfigurationsdatei',
     'config.form.path_ssh_known_hosts': 'SSH Known-Hosts Datei',
     'config.form.debug': 'Debug-Modus',

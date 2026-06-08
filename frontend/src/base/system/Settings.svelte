@@ -45,7 +45,6 @@
         path_template: string|null
         timezone: string
         run_timeout: number|string
-        session_timeout: number|string
         path_ansible_config: string|null
         path_ssh_known_hosts: string|null
         debug: boolean
@@ -82,7 +81,6 @@
         path_template: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         timezone: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         run_timeout: {value: 60*60, color: inputBaseColor, required: true},
-        session_timeout: {value: 60*60*12, color: inputBaseColor, required: true},
         path_ansible_config: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         path_ssh_known_hosts: {value: '', color: inputBaseColor, required: false, regex: /^.{0,100}/},
         debug: {value: false},
@@ -497,16 +495,6 @@
                 <Select id="cnf_tz" items={choicesFromArray(formInfos.choices.timezone)}
                     bind:value={form.timezone.value} disabled={isRO('timezone')} />
                 {#if isRO('timezone')}
-                    <Tooltip>{t('config.is_read_only')}</Tooltip>
-                {/if}
-            </div>
-
-            <div class={classModalInput}>
-                <Label for="cnf_to_session" class={classModalLabel}>{t('config.form.session_timeout')}</Label>
-                <Input id="cnf_to_session" bind:value={form.session_timeout.value} bind:color={form.session_timeout.color}
-                    on:input={valideInput} on:blur={valideInput} required={form.path_log.required}
-                    type="number" disabled={isRO('session_timeout')} />
-                {#if isRO('session_timeout')}
                     <Tooltip>{t('config.is_read_only')}</Tooltip>
                 {/if}
             </div>

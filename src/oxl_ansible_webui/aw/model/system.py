@@ -59,7 +59,15 @@ class SystemConfig(BaseModel):
     api_fields_write = api_fields_read.copy()
     api_fields_write.extend(SECRET_ATTRS)
     form_fields = api_fields_read.copy()
-    api_fields_read_only = ['db', 'db_migrate', 'serve_static', 'deployment', 'version']
+    api_fields_read_only = [
+        'db', 'db_migrate', 'serve_static', 'deployment', 'version',
+        'session_timeout', 'session_expire_at_browser_close',
+    ]
+
+    # NOTE: these are required at django-initialization - thus they might not yet be loaded from DB (env-var only)
+    session_timeout = models.PositiveIntegerField(default=CONFIG_DEFAULTS['session_timeout'])
+    session_expire_at_browser_close = models.BooleanField(default=CONFIG_DEFAULTS['session_expire_at_browser_close'])
+    debug = models.BooleanField(default=False, choices=CHOICES_BOOL)
 
     path_run = models.TextField(max_length=500, default='/tmp/ansible-webui')
     path_play = models.TextField(max_length=500, default=None)
@@ -67,11 +75,8 @@ class SystemConfig(BaseModel):
     path_template = models.TextField(max_length=500, **DEFAULT_NONE)
     timezone = models.TextField(max_length=300, default='UTC')  # UTC to keep model migrations static
     run_timeout = models.PositiveIntegerField(default=CONFIG_DEFAULTS['run_timeout'])
-    session_timeout = models.PositiveIntegerField(default=CONFIG_DEFAULTS['session_timeout'])
-    session_expire_at_browser_close = models.BooleanField(default=CONFIG_DEFAULTS['session_expire_at_browser_close'])
     path_ansible_config = models.TextField(max_length=500, **DEFAULT_NONE)
     path_ssh_known_hosts = models.TextField(max_length=500, **DEFAULT_NONE)
-    debug = models.BooleanField(default=False, choices=CHOICES_BOOL)
     audit_log = models.BooleanField(default=True, choices=CHOICES_BOOL)
     logo_url = models.TextField(max_length=500, **DEFAULT_NONE)
     ara_server = models.TextField(max_length=300, **DEFAULT_NONE)

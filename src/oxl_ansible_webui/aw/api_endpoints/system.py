@@ -31,7 +31,6 @@ class SystemConfigSettings(BaseResponse):
     path_log = serializers.CharField()
     timezone = serializers.CharField()
     run_timeout = serializers.IntegerField()
-    session_timeout = serializers.IntegerField()
     path_ansible_config = serializers.CharField()
     path_ssh_known_hosts = serializers.CharField()
     logo_url = serializers.CharField()
