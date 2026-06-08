@@ -51,6 +51,7 @@ class SystemConfig(BaseModel):
         'path_ansible_config', 'path_ssh_known_hosts', 'debug', 'logo_url', 'ara_server', 'global_environment_vars',
         'mail_server', 'mail_transport', 'mail_ssl_verify', 'mail_sender', 'mail_user', 'audit_log',
         'ansible_executor', 'ansible_executor_engine', 'ansible_executor_container_image',
+        'session_expire_at_browser_close',
     ]
 
     # NOTE: 'AW_DB' is needed to get this config from DB and 'AW_SECRET' cannot be saved because of security breach
@@ -66,6 +67,7 @@ class SystemConfig(BaseModel):
     timezone = models.TextField(max_length=300, default='UTC')  # UTC to keep model migrations static
     run_timeout = models.PositiveIntegerField(default=CONFIG_DEFAULTS['run_timeout'])
     session_timeout = models.PositiveIntegerField(default=CONFIG_DEFAULTS['session_timeout'])
+    session_expire_at_browser_close = models.BooleanField(default=CONFIG_DEFAULTS['session_expire_at_browser_close'])
     path_ansible_config = models.TextField(max_length=500, **DEFAULT_NONE)
     path_ssh_known_hosts = models.TextField(max_length=500, **DEFAULT_NONE)
     debug = models.BooleanField(default=False, choices=CHOICES_BOOL)

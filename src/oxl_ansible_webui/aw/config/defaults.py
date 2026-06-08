@@ -56,6 +56,7 @@ CONFIG_DEFAULTS = {
     'timezone': tzname[0],
     'secret': ''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(50)),
     'session_timeout': 12 * 60 * 60,  # 12h
+    'session_expire_at_browser_close': True,
     'path_ansible_config': _get_existing_ansible_config_file(),
     'path_ssh_known_hosts': _get_defaults_docker('path_ssh_known_hosts'),
     'debug': False,

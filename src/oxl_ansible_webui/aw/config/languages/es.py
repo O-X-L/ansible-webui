@@ -332,6 +332,7 @@ ES = {
     'config.form.path_template': 'Directorio de plantillas',
     'config.form.run_timeout': 'Tiempo de espera para la ejecución de Estrategias (playbook)',
     'config.form.session_timeout': 'Tiempo de espera para inicio de sesión en la interfaz de usuario web',
+    'config.form.session_expire_at_browser_close': 'Cerrar la sesión de inicio de sesión en la interfaz web al cerrar el navegador',
     'config.form.path_ansible_config': 'Archivo de configuración de Ansible',
     'config.form.path_ssh_known_hosts': 'Archivo SSH Known-Hosts',
     'config.form.debug': 'Modo de depuración',

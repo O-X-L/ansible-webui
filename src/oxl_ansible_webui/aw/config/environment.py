@@ -30,6 +30,7 @@ AW_ENV_VARS = {
     'path_ansible_config': ['ANSIBLE_CONFIG'],
     'path_log': ['AW_PATH_LOG'],
     'session_timeout': ['AW_SESSION_TIMEOUT'],
+    'session_expire_at_browser_close': ['AW_SESSION_EXPIRE_AT_BROWSER_CLOSE'],
     'path_ssh_known_hosts': ['AW_SSH_KNOWN_HOSTS'],
     'ssl_file_crt': ['AW_SSL_CERT'],
     'ssl_file_key': ['AW_SSL_KEY'],

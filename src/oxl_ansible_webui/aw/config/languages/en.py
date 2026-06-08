@@ -334,6 +334,7 @@ EN = {
     'config.form.path_template': 'Directory for templates',
     'config.form.run_timeout': 'Timeout for playbook execution',
     'config.form.session_timeout': 'Timeout for WebUI login-sessions',
+    'config.form.session_expire_at_browser_close': 'Terminate WebUI login-session when browser is closed',
     'config.form.path_ansible_config': 'Ansible Config-File',
     'config.form.path_ssh_known_hosts': 'SSH Known-Hosts File',
     'config.form.debug': 'Debug Mode',

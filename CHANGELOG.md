@@ -8,6 +8,19 @@ tbd
 
 ## Version 0
 
+### 0.9.7
+
+Features:
+
+* Enable users to configure session-expiration on browser-close via env-variable or config-file [#119](https://github.com/O-X-L/ansible-webui/issues/119)
+
+
+Fixes:
+
+* Improved page-loading [#95](https://github.com/O-X-L/ansible-webui/issues/95)
+
+----
+
 ### 0.9.6
 
 Features:
@@ -24,7 +37,6 @@ Fixes:
 * Updated inventory-list logic to allow for dynamic-inventories [#89](https://github.com/O-X-L/ansible-webui/issues/89)
 * Form-submit not working after a previous validation-error
 * Job-specific extra-vars not merged with execution-prompt-vars [#112](https://github.com/O-X-L/ansible-webui/issues/112)
-* Improved page-loading [#95](https://github.com/O-X-L/ansible-webui/issues/95)
 
 Project:
 

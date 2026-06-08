@@ -248,7 +248,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Security
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = config['session_expire_at_browser_close']
 SESSION_COOKIE_AGE = config['session_timeout']
 SECRET_KEY = config['secret']
 CSRF_COOKIE_AGE = None  # session-based
