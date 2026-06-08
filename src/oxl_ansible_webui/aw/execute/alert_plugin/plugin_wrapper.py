@@ -15,12 +15,12 @@ from aw.model.system import UserExtended
 from aw.utils.util import datetime_from_db
 from aw.settings import get_main_web_address
 from aw.utils.filesystem import write_file_0600
-from aw.model.alert import BaseAlert, AlertUser, AlertGroup
+from aw.model.alert import AlertUser, AlertGroup, AlertGlobal
 from aw.utils.db_handler import close_old_mysql_connections
 
 
 def alert_plugin_wrapper(
-        alert: BaseAlert, user: USERS, stats: dict, execution: JobExecution, failed: bool,
+        alert: AlertUser|AlertGroup|AlertGlobal, user: USERS, stats: dict, execution: JobExecution, failed: bool,
         error_msgs: dict,
 ):
     if not Path(alert.plugin.executable).is_file():

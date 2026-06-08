@@ -27,6 +27,7 @@ class Alert:
 
         self.error_msgs = {'html': [], 'text': []}
         self._get_task_errors()
+        self._users_alerted_by_plugin = {}
 
     def _get_task_errors(self):
         if self.failed and Path(self.execution.log_stdout).is_file():
@@ -52,8 +53,23 @@ class Alert:
 
         return matching
 
-    def _route(self, alert: BaseAlert, user: USERS):
+    def _user_was_already_alerted(self, plugin: str, user: USERS) -> bool:
+        if plugin not in self._users_alerted_by_plugin:
+            self._users_alerted_by_plugin[plugin] = [user]
+            return False
+
+        if user not in self._users_alerted_by_plugin[plugin]:
+            self._users_alerted_by_plugin[plugin].append(user)
+            return False
+
+        return True
+
+    def _route(self, alert: AlertUser|AlertGroup|AlertGlobal, user: USERS):
         if alert.alert_type == ALERT_TYPE_PLUGIN:
+            plugin_key = f"plugin_{alert.plugin_name}"
+            if self._user_was_already_alerted(plugin=plugin_key, user=user):
+                return
+
             alert_plugin_wrapper(
                 alert=alert,
                 user=user,
@@ -64,6 +80,9 @@ class Alert:
             )
 
         else:
+            if self._user_was_already_alerted(plugin='email', user=user):
+                return
+
             alert_plugin_email(
                 user=user,
                 stats=self.execution.get_stats(),
