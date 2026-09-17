@@ -19,6 +19,12 @@ Features:
 Fixes:
 
 * Improved page-loading [#95](https://github.com/O-X-L/ansible-webui/issues/95)
+* Ensure users do not get alerted multiple times for a single execution [#80](https://github.com/O-X-L/ansible-webui/issues/80)
+
+
+Chore:
+
+* Bumped Django version from 5.1 to 5.2
 
 ----
 
