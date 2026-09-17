@@ -20,6 +20,7 @@ Fixes:
 
 * Improved page-loading [#95](https://github.com/O-X-L/ansible-webui/issues/95)
 * Ensure users do not get alerted multiple times for a single execution [#80](https://github.com/O-X-L/ansible-webui/issues/80)
+* Do not trigger git-repo-update for all jobs in job-list-view - only when job is opened [#123](https://github.com/O-X-L/ansible-webui/issues/123)
 
 
 Chore:
