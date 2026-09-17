@@ -1,11 +1,5 @@
 # Simple WebUI for using Ansible
 
-<p align="center">
-    <a title="Support this Project (Donate, Support-Licenses)" href="https://shop.oxl.app/collections/open-source">
-        <img src="https://files.oxl.at/img/badge-oss-support.svg" alt="Support Badge (Donate, Support-Licenses)"/>
-    </a>
-</p>
-
 ----
 
 [![Lint](https://github.com/O-X-L/ansible-webui/actions/workflows/lint.yml/badge.svg?branch=latest)](https://github.com/O-X-L/ansible-webui/actions/workflows/lint.yml)
