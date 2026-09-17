@@ -10,6 +10,7 @@ on:
       - 'src/oxl_ansible_webui/db.py'
       - '.github/workflows/test_dbs.yml'
       - 'src/oxl_ansible_webui/aw/migrations/*.py'  # to be released
+      - 'requirements.txt'
 
   pull_request:
     branches: [latest]
@@ -17,6 +18,7 @@ on:
       - 'src/oxl_ansible_webui/db.py'
       - '.github/workflows/test_dbs.yml'
       - 'src/oxl_ansible_webui/aw/migrations/*.py'  # to be released
+      - 'requirements.txt'
 
 jobs:
   test:

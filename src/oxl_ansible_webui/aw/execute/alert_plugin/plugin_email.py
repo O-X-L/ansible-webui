@@ -16,14 +16,14 @@ from aw.settings import get_main_web_address
 from aw.model.system import MAIL_TRANSPORT_TYPE_SSL, MAIL_TRANSPORT_TYPE_STARTTLS
 
 
-def _email_send(server: SMTP, user: USERS, stats: dict, execution: JobExecution, error_msgs: dict):
+def _email_send(server: SMTP, user_email: str, stats: dict, execution: JobExecution, error_msgs: dict):
     if is_set(config['mail_pass']):
         server.login(user=config['mail_user'], password=config['mail_pass'])
 
     msg = MIMEMultipart('alternative')
     msg['Subject'] = f"Ansible WebUI - Job '{execution.job.name}' - {execution.status_name}"
     msg['From'] = config['mail_sender'] if is_set(config['mail_sender']) else config['mail_user']
-    msg['To'] = user.email
+    msg['To'] = user_email
 
     tmpl_html, tmpl_text = 'email/alert.html', 'email/alert.txt'
     if is_set(config['path_template']):  # custom templates
@@ -46,14 +46,20 @@ def _email_send(server: SMTP, user: USERS, stats: dict, execution: JobExecution,
 
     server.sendmail(
         from_addr=config['mail_sender'],
-        to_addrs=user.email,
+        to_addrs=user_email,
         msg=msg.as_string()
     )
 
 
 def alert_plugin_email(user: USERS, stats: dict, execution: JobExecution, error_msgs: dict):
-    if user.email.endswith('@localhost') or not valid_email(user.email):
-        log(msg=f"User has an invalid email address configured: {user.username} ({user.email})", level=3)
+    if valid_email(user.email) and not user.email.endswith('@localhost'):
+        user_email = user.email
+
+    elif valid_email(user.username):
+        user_email = user.username
+
+    else:
+        log(msg=f"User has no valid email address configured: {user.username} ({user.email})", level=3)
         return
 
     try:
@@ -75,16 +81,28 @@ def alert_plugin_email(user: USERS, stats: dict, execution: JobExecution, error_
 
         if config['mail_transport'] == MAIL_TRANSPORT_TYPE_SSL:
             with SMTP_SSL(server, port, context=ssl_context) as server:
-                _email_send(server=server, user=user, stats=stats, execution=execution, error_msgs=error_msgs)
+                _email_send(
+                    server=server,
+                    user_email=user_email,
+                    stats=stats,
+                    execution=execution,
+                    error_msgs=error_msgs,
+                )
 
         else:
             with SMTP(server, port) as server:
                 if config['mail_transport'] == MAIL_TRANSPORT_TYPE_STARTTLS:
                     server.starttls(context=ssl_context)
 
-                _email_send(server=server, user=user, stats=stats, execution=execution, error_msgs=error_msgs)
+                _email_send(
+                    server=server,
+                    user_email=user_email,
+                    stats=stats,
+                    execution=execution,
+                    error_msgs=error_msgs,
+                )
 
-        log(msg=f"Sent alert email to: {user.username} ({user.email})", level=6)
+        log(msg=f"Sent alert email to: {user.username} ({user_email})", level=6)
 
     except (SMTPResponseException, OSError) as e:
         log(msg=f"Got error sending alert mail: {e}", level=2)

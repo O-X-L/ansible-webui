@@ -419,7 +419,6 @@
             componentRoot.addEventListener('keyup', handleKeyUp);
             componentRoot.addEventListener('keydown', handleKeyDown);
         }
-        updateCreateGitRepo();
     });
 
     onDestroy(()=>{
@@ -429,6 +428,15 @@
         }
     });
 
+    // update git-repo when opened
+    $effect(() => {
+        if (!open) {
+            return;
+        }
+        updateCreateGitRepo();
+    })
+
+    // update git-repo if repo was changed
     $effect(() => {
         if (isSet(form.repository.value)) {
             updateCreateGitRepo();

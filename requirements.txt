@@ -1,6 +1,6 @@
 # webui
 gunicorn
-Django==5.1.*
+Django==5.2.*
 pytz
 pycryptodome
 
