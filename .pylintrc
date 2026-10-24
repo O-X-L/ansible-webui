@@ -433,7 +433,8 @@ disable=C0114, C0115, C0116,  # no inline docs
         W0511,  # todo comments
         W0707,  # has reasons
         R0903,  # todo: exclude models
-        E0401
+        E0401,
+        W0718,  # only used when really needed
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
