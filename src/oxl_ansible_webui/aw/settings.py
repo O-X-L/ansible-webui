@@ -1,10 +1,10 @@
 from pathlib import Path
 from os import environ
+from json import loads as json_loads
+from json import JSONDecodeError
 
 from yaml import safe_load as yaml_load
 from yaml import YAMLError
-from json import loads as json_loads
-from json import JSONDecodeError
 
 try:
     from aw.config.main import config, VERSION
