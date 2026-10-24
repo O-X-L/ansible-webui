@@ -15,6 +15,10 @@ Features:
 * Make gunicorn web-worker count configurable [#130](https://github.com/O-X-L/ansible-webui/issues/130)
 * Make django db-options configurable [#131](https://github.com/O-X-L/ansible-webui/issues/131)
 
+Chore:
+
+* Migrated Django-Plugin for SAML-authentication [#121](https://github.com/O-X-L/ansible-webui/issues/121)
+
 ----
 
 ### 0.9.7

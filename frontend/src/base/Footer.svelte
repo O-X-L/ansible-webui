@@ -27,7 +27,7 @@
         { name: 'pycryptodome', href: 'https://www.pycryptodome.org/', license: 'Public Domain / BSD', licenseHref: 'https://github.com/Legrandin/pycryptodome/blob/master/LICENSE.rst' },
         { name: 'pytz', href: 'https://pythonhosted.org/pytz/', license: 'MIT', licenseHref: 'https://github.com/stub42/pytz/blob/master/LICENSE.txt' },
         { name: 'pyyaml', href: 'https://pyyaml.org/', license: 'MIT', licenseHref: 'https://github.com/yaml/pyyaml/blob/main/LICENSE' },
-        { name: 'grafana-django-saml2-auth', href: 'https://github.com/grafana/django-saml2-auth', license: 'MIT', licenseHref: 'https://github.com/grafana/django-saml2-auth/blob/main/LICENSE' },
+        { name: 'django-saml2-auth-community', href: 'https://github.com/mostafa/django-saml2-auth', license: 'MIT', licenseHref: 'https://github.com/mostafa/django-saml2-auth/blob/main/LICENSE' },
         { name: 'djangorestframework-api-key', href: 'https://florimondmanca.github.io/djangorestframework-api-key/', license: 'MIT', licenseHref: 'https://github.com/florimondmanca/djangorestframework-api-key/blob/master/LICENSE' },
         { name: 'drf-spectacular', href: 'https://drf-spectacular.readthedocs.io/', license: 'BSD 3-Clause', licenseHref: 'https://github.com/tfranzel/drf-spectacular/blob/master/LICENSE' },
         { name: 'crontab', href: 'https://pypi.org/project/crontab/', license: 'LGPLv3', licenseHref: 'https://github.com/josiahcarlson/parse-crontab/blob/master/LICENSE3' },

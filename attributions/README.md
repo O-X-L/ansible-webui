@@ -46,7 +46,7 @@ This project was forked from [ansibleguy/webui](https://github.com/ansibleguy/we
 
 ### Authentication via SAML (SSO)
 
-* [grafana-django-saml2-auth](https://github.com/grafana/django-saml2-auth) | License: [MIT](https://github.com/grafana/django-saml2-auth/blob/main/LICENSE)
+* [django-saml2-auth-community](https://github.com/mostafa/django-saml2-auth) | License: [MIT](https://github.com/mostafa/django-saml2-auth/blob/main/LICENSE)
 
 ### Alert-Mail CSS
 

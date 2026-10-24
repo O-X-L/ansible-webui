@@ -6,4 +6,4 @@ requests
 # patched fork for >python3.11 usage
 git+https://github.com/O-X-L/selenium-wire@master
 
-grafana-django-saml2-auth
+django-saml2-auth-community
