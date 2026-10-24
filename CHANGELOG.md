@@ -8,6 +8,14 @@ tbd
 
 ## Version 0
 
+### 0.9.8
+
+Features:
+
+* Make gunicorn web-worker count configurable [#130](https://github.com/O-X-L/ansible-webui/issues/130)
+
+----
+
 ### 0.9.7
 
 Features:

@@ -215,6 +215,10 @@ Some settings are only available as environmental variables.
 
   For non-local auth you will have to install the dependencies: :code:`oxl-ansible-webui[saml]` or :code:`oxl-ansible-webui[ldap]`
 
+* **AW_WEB_WORKERS**
+
+  The number of gunicorn web-workers to spawn. Default: (CPU-cores * 2) + 1
+
 
 General System Settings
 =======================

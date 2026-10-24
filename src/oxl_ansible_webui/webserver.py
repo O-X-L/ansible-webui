@@ -1,5 +1,4 @@
 from pathlib import Path
-from multiprocessing import cpu_count
 from ssl import SSLContext, TLSVersion
 from ssl import CERT_NONE as VERIFY_CERT_NONE
 
@@ -57,7 +56,7 @@ def ssl_context(conf, default_ssl_context_factory) -> SSLContext:
 def init_webserver():
     gunicorn.SERVER = 'Ansible WebUI'
     opts = {
-        'workers': (cpu_count() * 2) + 1,
+        'workers': get_aw_env_var_or_default('web_workers'),
         **OPTIONS_PROD
     }
     if deployment_dev():
