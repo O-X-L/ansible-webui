@@ -98,7 +98,7 @@ jobs:
 #      - name: Install AUTH SAML dependencies
 #        run: |
 #          sudo apt install xmlsec1 >/dev/null
-#          pip install grafana-django-saml2-auth >/dev/null
+#          pip install django-saml2-auth-community >/dev/null
 #
 #      - name: Running Integration Tests - AUTH SAML
 #        run: |

@@ -13,7 +13,7 @@ for p in metadata.packages_distributions().values():
 
 @cache
 def saml_installed() -> bool:
-    return 'grafana-django-saml2-auth' in INSTALLED_MODULES and shell('which xmlsec1 >/dev/null') == 0
+    return 'django-saml2-auth-community' in INSTALLED_MODULES and shell('which xmlsec1 >/dev/null') == 0
 
 
 @cache
