@@ -1,5 +1,7 @@
 from pathlib import Path
 from os import environ
+from json import loads as json_loads
+from json import JSONDecodeError
 
 from yaml import safe_load as yaml_load
 from yaml import YAMLError
@@ -107,6 +109,15 @@ if DB_TYPE == 'sqlite':
             DB_FILE = BASE_DIR / DB_FILE
 
 
+db_options_json = get_aw_env_var_or_default('db_options')
+DB_OPTIONS = {}
+if db_options_json is not None:
+    try:
+        DB_OPTIONS = json_loads(db_options_json)
+
+    except JSONDecodeError:
+        pass
+
 AW_DB_ENGINES = {
     'sqlite': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -127,7 +138,7 @@ AW_DB_ENGINES = {
         'PORT': get_aw_env_var_or_default('db_port'),
         'CONN_HEALTH_CHECKS': True,
         'CONN_MAX_AGE': 0,
-        'OPTIONS': {},
+        'OPTIONS': DB_OPTIONS,
     },
     'psql': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -136,6 +147,9 @@ AW_DB_ENGINES = {
         'PASSWORD': get_aw_env_var_or_default('db_pwd'),
         'HOST': get_aw_env_var_or_default('db_host'),
         'PORT': get_aw_env_var_or_default('db_port'),
+        'CONN_HEALTH_CHECKS': True,
+        'CONN_MAX_AGE': 0,
+        'OPTIONS': DB_OPTIONS,
     },
 }
 

@@ -216,6 +216,17 @@ Some settings are only available as environmental variables.
   For non-local auth you will have to install the dependencies: :code:`oxl-ansible-webui[saml]` or :code:`oxl-ansible-webui[ldap]`
 
 
+* **AW_WEB_WORKERS**
+
+  The number of gunicorn web-workers to spawn. Default: (CPU-cores * 2) + 1
+
+
+* **AW_DB_OPTIONS**
+
+  Optional provide `Django DB-options <https://docs.djangoproject.com/en/6.1/ref/databases/>`_ for MySQL/MariaDB or PSQL. Have to be supplied in JSON-format.
+
+
+
 General System Settings
 =======================
 
