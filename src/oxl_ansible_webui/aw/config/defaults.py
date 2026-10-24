@@ -70,4 +70,5 @@ CONFIG_DEFAULTS = {
     'jwt_algo': 'HS256',
     'jwt_secret': ''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(30)),
     'web_workers': (cpu_count() * 2) + 1,
+    'db_options': None,
 }
