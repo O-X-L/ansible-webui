@@ -198,7 +198,7 @@ Note: The SAML config-file is only reloaded on restart.
 
 * :code:`CSRF validation failed` - the ACS url may not be configured correctly
 
-* If you see a page with an error-code - you can look-up `their references here <https://github.com/grafana/django-saml2-auth/blob/main/django_saml2_auth/errors.py>`_
+* If you see a page with an error-code - you can look-up `their references here <https://github.com/mostafa/django-saml2-auth/blob/main/django_saml2_auth/errors.py>`_
 
   Per example:
 

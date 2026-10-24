@@ -15,7 +15,7 @@ SAML SSO
 
 **Tested config examples**: `Google Workspace <https://github.com/O-X-L/ansible-webui/blob/latest/examples/saml_google_workspace.yml>`_
 
-This app is integrating the `grafana/django-saml2-auth module <https://github.com/grafana/django-saml2-auth>`_ (indirect `pysaml2 <https://github.com/IdentityPython/pysaml2>`_).
+This app is integrating the `django-saml2-auth-community <https://github.com/mostafa/django-saml2-auth>`_ (indirect `pysaml2 <https://github.com/IdentityPython/pysaml2>`_).
 
 If you have troubles with getting SAML to work - check out :ref:`Administration - Troubleshooting - SAML <administration_troubleshooting_saml>`
 
@@ -26,7 +26,7 @@ Setup
 
 1. Add the :code:`SAML` config-block to your config-file. See: :ref:`Getting Started - Config - File <start_config_file>`
 
-  For options see: `Module settings <https://github.com/grafana/django-saml2-auth?tab=readme-ov-file#module-settings>`_
+  For options see: `Module settings <https://github.com/mostafa/django-saml2-auth?tab=readme-ov-file#module-settings>`_
 
   Example:
 
