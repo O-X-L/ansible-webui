@@ -74,11 +74,6 @@ html_theme_options = {
     "version_dropdown": True,
     "version_info": [
         {
-            "version": "https://shop.oxl.app/collections/open-source",
-            "title": "Support this Project",
-            "aliases": [],
-        },
-        {
             "version": "https://demo.ansible-webui.oxl.app",
             "title": "Demo",
             "aliases": [],
@@ -90,11 +85,6 @@ html_theme_options = {
         },
     ],
     "social": [
-        {
-            "icon": "fontawesome/solid/wallet",
-            "link": "https://shop.oxl.app/collections/open-source",
-            "name": "Support this Project",
-        },
         {
             "icon": "fontawesome/solid/globe",
             "link": "https://www.OXL.app",

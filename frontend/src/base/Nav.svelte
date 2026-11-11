@@ -151,7 +151,7 @@
     <Tooltip placement="bottom">{t('nav.bugs')}</Tooltip>
     <!--
     <Button id="nav-btn-donate" size="xs" class="ml-1 sm:ml-2 max-sm:hidden {classBtnLink}"
-      href="https://shop.oxl.app/collections/open-source"><CashSolid /></Button>
+      href="#"><CashSolid /></Button>
     <Tooltip placement="bottom">{t('nav.donate')}</Tooltip>
     -->
 
