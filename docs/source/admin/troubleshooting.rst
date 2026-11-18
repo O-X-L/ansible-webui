@@ -211,6 +211,59 @@ Note: The SAML config-file is only reloaded on restart.
 Note: SAML testing has been done using the `mocksaml.com <https://mocksaml.com/>`_ service
 
 
+----
+
+.. _administration_troubleshooting_ldap:
+
+LDAP Issues
+===========
+
+To get more information - you can enable its logging by adding this block to the config file:
+
+.. code-block:: yaml
+
+    ...
+
+    LDAP:
+        ...
+
+        LOGGING:  # DO NOT PERMANENTLY ENABLE! overrides application-logging
+            version: 1
+            formatters:
+                simple:
+                    format: '[%(asctime)s] [%(levelname)s] [%(name)s.%(funcName)s] %(message)s'
+            handlers:
+                stdout:
+                    class: 'logging.StreamHandler'
+                    stream: 'ext://sys.stdout'
+                    level: 'DEBUG'
+                    formatter: 'simple'
+            loggers:
+                django_auth_ldap:
+                    level: 'DEBUG'
+            root:
+                level: 'WARNING'
+                handlers: ['stdout']
+
+Note: The LDAP config-file is only reloaded on restart.
+
+**Common errors you might encounter**:
+
+* :code:`LDAP bind failed: ... invalidCredentials (49)` - wrong bind-user/password or the user-DN was not found.
+  Note that many LDAP-servers (e.g: Samba-AD) reject plain simple-binds:
+  use :code:`ldaps://` or :code:`START_TLS: true`
+
+* :code:`(91) Server Down` / connection-refused - check :code:`SERVER_URI` host/port and firewall.
+  For Docker: make sure the LDAP-server is resolvable/reachable from within the container
+
+* Certificate validation errors - your LDAP-server may use an internal CA.
+  Provide it with :code:`CA_CERT_FILE` or use a publicly trusted certificate
+
+* Logins fail while :code:`ldapsearch` works - the default :code:`USER_FILTER` is :code:`(uid=%(user)s)`.
+  For Active-Directory use: :code:`(sAMAccountName=%(user)s)`.
+  Also make sure the user-attributes exist as expected (:code:`USER_ATTR_MAP`)
+
+
 Edge-Case Issues
 ****************
 

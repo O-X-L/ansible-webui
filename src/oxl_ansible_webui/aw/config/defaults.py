@@ -67,6 +67,7 @@ CONFIG_DEFAULTS = {
     'ssl_file_crt': None,
     'auth_mode': 'local',
     'saml_config': None,
+    'ldap_config': None,
     'jwt_algo': 'HS256',
     'jwt_secret': ''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(30)),
     'web_workers': (cpu_count() * 2) + 1,

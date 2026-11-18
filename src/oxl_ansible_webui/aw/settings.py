@@ -16,12 +16,14 @@ except ImportError:
     from aw.config.main import config, VERSION
 
 
-from aw.config.hardcoded import LOGIN_PATH, ENV_KEY_CONFIG, ENV_KEY_SAML
+from aw.config.hardcoded import LOGIN_PATH, ENV_KEY_CONFIG, ENV_KEY_SAML, ENV_KEY_LDAP
 from aw.config.defaults import CONFIG_DEFAULTS, inside_docker, behind_proxy
 from aw.utils.deployment import deployment_dev, deployment_prod
-from aw.config.environment import get_aw_env_var_or_default, auth_mode_saml, get_aw_env_var
+from aw.config.environment import (
+    get_aw_env_var_or_default, auth_mode_saml, auth_mode_ldap, get_aw_env_var,
+)
 from aw.utils.debug import log
-from aw.dependencies import saml_installed, mysql_installed, psql_installed, log_dependency_error
+from aw.dependencies import saml_installed, ldap_installed, mysql_installed, psql_installed, log_dependency_error
 from aw.utils.db import AbstractDBConnection, SQLiteOperationalError, MySQLError, PSQLError
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -384,3 +386,50 @@ AUTH_MODE = get_aw_env_var_or_default('auth_mode')
 SAML2_AUTH = _build_saml_config()
 if len(SAML2_AUTH) > 0:
     INSTALLED_APPS.append('django_saml2_auth')
+
+
+def _build_ldap_settings() -> dict:
+    if not auth_mode_ldap():
+        return {}
+
+    if not ldap_installed():
+        log_dependency_error('LDAP', 'ldap')
+        return {}
+
+    try:
+        with open(environ[ENV_KEY_CONFIG], 'r', encoding='utf-8') as _config:
+            ldap_cnf = yaml_load(_config.read())[environ[ENV_KEY_LDAP]]
+
+    except (YAMLError, KeyError) as err:
+        log(msg=f"Failed to load LDAP config: '{err}'", level=1)
+        return {}
+
+    # pylint: disable=C0415
+    from aw.config.ldap import map_ldap_config
+    auth_ldap, error = map_ldap_config(ldap_cnf)
+
+    if auth_ldap is None:
+        log(msg=f"Invalid LDAP config: '{error}'", level=1)
+        return {}
+
+    if 'LOGGING' in ldap_cnf:  # optional debug-logging
+        # pylint: disable=C0415
+        from logging import config as logging_config
+        logging_config.dictConfig(ldap_cnf['LOGGING'])
+
+    auth_ldap['AUTHENTICATION_BACKENDS'] = [
+        # local users are still able to login (e.g: fallback admin)
+        'django.contrib.auth.backends.ModelBackend',
+        'django_auth_ldap.backend.LDAPBackend',
+    ]
+    return auth_ldap
+
+
+LDAP_SETTINGS = _build_ldap_settings()
+if len(LDAP_SETTINGS) > 0:
+    for _setting, _value in LDAP_SETTINGS.items():
+        if _setting == 'AUTHENTICATION_BACKENDS':
+            AUTHENTICATION_BACKENDS = _value
+
+        else:
+            globals()[_setting] = _value

@@ -1,0 +1,35 @@
+---
+# Example: OpenLDAP
+#
+# Install dependency: pip install oxl-ansible-webui[ldap]
+# Config: AW_CONFIG=<this-file>
+
+HOSTNAMES: 'ansible-webui.example.com'
+AUTH: 'ldap'
+
+LDAP:
+    # START_TLS is used to upgrade plain connections to encrypted ones
+    SERVER_URI: 'ldap://ldap.example.com:389'
+    START_TLS: true
+    CA_CERT_FILE: '/etc/ssl/certs/internal-ca.pem'
+
+    BIND_DN: 'cn=svc-ansible-webui,ou=services,dc=example,dc=com'
+    BIND_PASSWORD: '<PASSWORD>'
+
+    # single base
+    USER_SEARCH_BASE: 'ou=people,dc=example,dc=com'
+    USER_FILTER: '(uid=%(user)s)'  # default
+
+    # multiple bases:
+    # USER_SEARCH_BASES:
+    #   - 'ou=people,dc=example,dc=com'
+    #   - 'ou=external,dc=example,dc=com'
+
+    # direct DN-template instead of user-search:
+    # USER_DN_TEMPLATE: 'uid=%(user)s,ou=people,dc=example,dc=com'
+
+    GROUP_SEARCH_BASE: 'ou=groups,dc=example,dc=com'
+    GROUP_TYPE: 'posix'  # posix | group-of-names | ad | ad-nested | posix-nested | group-of-names-nested
+    REQUIRE_GROUP: 'cn=ansible-webui-users,ou=groups,dc=example,dc=com'
+    GROUP_MAPPING:
+        'cn=ansible-webui-managers,ou=groups,dc=example,dc=com': 'AW Managers'

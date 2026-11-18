@@ -94,3 +94,76 @@ Example:
 
     # save all needed SAML files to /etc/ansible-webui/ on your host system
     sudo docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --env AW_CONFIG=/etc/aw/config.yml --volume /etc/ansible-webui/:/etc/aw/ oxlorg/ansible-webui:latest
+
+.. _administration_auth_ldap:
+
+LDAP
+####
+
+**Tested config examples**: `Active Directory / Samba-AD <https://github.com/O-X-L/ansible-webui/blob/latest/examples/ldap_active_directory.yml>`_, `OpenLDAP <https://github.com/O-X-L/ansible-webui/blob/latest/examples/ldap_openldap.yml>`_
+
+This app is integrating `django-auth-ldap <https://github.com/django-auth-ldap/django-auth-ldap>`_ (indirect `python-ldap <https://github.com/python-ldap/python-ldap>`_).
+
+If you have troubles with getting LDAP to work - check out: :ref:`Administration - Troubleshooting - LDAP <administration_troubleshooting_ldap>`
+
+----
+
+Setup
+*****
+
+1. Add the :code:`LDAP` config-block to your config-file. See: :ref:`Getting Started - Config - File <start_config_file>`
+
+  Example (OpenLDAP):
+
+  .. code-block:: yaml
+
+      HOSTNAMES: '<YOUR-DOMAIN>'
+      AUTH: 'ldap'
+
+      LDAP:
+          SERVER_URI: 'ldap://ldap.example.com:389'
+          START_TLS: true  # or use 'ldaps://ldap.example.com:636'
+
+          BIND_DN: 'cn=svc-ansible-webui,ou=services,dc=example,dc=com'
+          BIND_PASSWORD: '<PASSWORD>'
+
+          USER_SEARCH_BASE: 'ou=people,dc=example,dc=com'
+          # USER_FILTER: '(uid=%(user)s)'  # default
+
+          # optional: map LDAP-groups to app-privileges
+          GROUP_SEARCH_BASE: 'ou=groups,dc=example,dc=com'
+          GROUP_TYPE: 'posix'  # posix | group-of-names | ad | ad-nested | posix-nested | group-of-names-nested
+          GROUP_MAPPING:
+              'cn=ansible-webui-managers,ou=groups,dc=example,dc=com': 'AW Managers'
+              'cn=ansible-webui-executors,ou=groups,dc=example,dc=com': 'AW Job Executors'
+          USER_FLAGS_BY_GROUP:
+              'is_superuser': 'cn=ansible-webui-admins,ou=groups,dc=example,dc=com'
+              'is_staff': 'cn=ansible-webui-admins,ou=groups,dc=example,dc=com'
+
+  Settings:
+
+  * :code:`SERVER_URI` - LDAP-server URI (:code:`ldap://` or :code:`ldaps://`)
+  * :code:`START_TLS` - upgrade :code:`ldap://` connections with StartTLS (default: :code:`false`)
+  * :code:`CA_CERT_FILE` - custom CA-certificate file (default: system CAs)
+  * :code:`BIND_DN` / :code:`BIND_PASSWORD` - optional service-account used for the user-search
+  * :code:`USER_SEARCH_BASE` - where to search for users (alternatively: :code:`USER_SEARCH_BASES` for multiple bases or :code:`USER_DN_TEMPLATE` for direct DN lookups)
+  * :code:`USER_FILTER` - user search-filter (default: :code:`(uid=%(user)s)`, for AD: :code:`(sAMAccountName=%(user)s)`)
+  * :code:`USER_ATTR_MAP` - user-attribute mapping (default: first-name, last-name, email)
+  * :code:`GROUP_SEARCH_BASE` / :code:`GROUP_FILTER` / :code:`GROUP_TYPE` - optional group-search
+  * :code:`REQUIRE_GROUP` - optional: only members of this group may login
+  * :code:`GROUP_MAPPING` - optional: map LDAP-groups to app-privilege groups (e.g: :code:`AW Managers`)
+  * :code:`USER_FLAGS_BY_GROUP` - optional: map LDAP-groups to user-flags (:code:`is_superuser`, :code:`is_staff`)
+  * :code:`ALWAYS_UPDATE_USER` - update local user on every login (default: :code:`true`)
+
+2. For non-Docker setups: Install the LDAP dependency: :code:`pip install oxl-ansible-webui[ldap]`
+
+  .. note::
+
+    The :code:`python-ldap` dependency requires some system-libraries to be installed:
+    :code:`libldap2` / :code:`libsasl2` (Debian) or :code:`openldap` (Alpine). The provided Docker-images are Debian-based and already include them.
+
+3. Local users can still login at the regular login-page - so you do not lock yourself out (e.g: the fallback admin)
+
+
+You should now be able to see :code:`[INFO] [main] Using Auth-Mode: ldap` logged on startup.
+

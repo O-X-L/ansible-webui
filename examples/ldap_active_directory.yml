@@ -1,0 +1,36 @@
+---
+# Example: Active Directory / Samba-AD
+#
+# Install dependency: pip install oxl-ansible-webui[ldap]
+# Config: AW_CONFIG=<this-file>
+#
+# Notes:
+#   * AD usually requires encrypted connections:
+#     either use LDAPS (ldaps://) or START_TLS with an ldap:// URI
+#   * AD only allows signed/sealed simple-binds - plain binds on port 389 are rejected
+#   * filter for AD usernames: (sAMAccountName=%(user)s)
+
+HOSTNAMES: 'ansible-webui.example.com'
+AUTH: 'ldap'
+
+LDAP:
+    SERVER_URI: 'ldaps://ad.example.com:636'
+    # CA_CERT_FILE: '/etc/ssl/certs/internal-ca.pem'  # optional: custom CA (system CAs are used by default)
+
+    # optional service-account for user-search (anonymous bind is used if not set)
+    BIND_DN: 'cn=svc-ansible-webui,ou=service-accounts,dc=example,dc=com'
+    BIND_PASSWORD: '<PASSWORD>'
+
+    USER_SEARCH_BASE: 'dc=example,dc=com'
+    USER_FILTER: '(sAMAccountName=%(user)s)'
+
+    # optional: restrict logins to one group + map LDAP-groups to app-privileges
+    GROUP_SEARCH_BASE: 'ou=groups,dc=example,dc=com'
+    GROUP_TYPE: 'ad'
+    # REQUIRE_GROUP: 'cn=ansible-webui-users,ou=groups,dc=example,dc=com'
+    GROUP_MAPPING:
+        'cn=ansible-webui-managers,ou=groups,dc=example,dc=com': 'AW Managers'
+        'cn=ansible-webui-executors,ou=groups,dc=example,dc=com': 'AW Job Executors'
+    USER_FLAGS_BY_GROUP:
+        'is_superuser': 'cn=ansible-webui-admins,ou=groups,dc=example,dc=com'
+        'is_staff': 'cn=ansible-webui-admins,ou=groups,dc=example,dc=com'
