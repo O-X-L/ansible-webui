@@ -39,6 +39,9 @@ psql = [
 saml = [
     "django-saml2-auth-community",
 ]
+ldap = [
+    "django-auth-ldap",
+]
 ara = [
     "ara",
 ]

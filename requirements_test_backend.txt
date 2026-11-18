@@ -1,3 +1,6 @@
 pytest
 pytest-cov
 pytest-django
+
+# auth integration tests
+django-auth-ldap

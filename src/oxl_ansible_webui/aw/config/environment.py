@@ -2,7 +2,7 @@ from os import environ
 from functools import cache
 
 from aw.config.defaults import CONFIG_DEFAULTS
-from aw.config.hardcoded import ENV_KEY_CONFIG, ENV_KEY_SAML
+from aw.config.hardcoded import ENV_KEY_CONFIG, ENV_KEY_SAML, ENV_KEY_LDAP
 
 AW_ENV_VARS = {
     'hostnames': ['AW_HOSTNAMES'],
@@ -38,6 +38,7 @@ AW_ENV_VARS = {
     'audit': ['AW_AUDIT'],
     'auth_mode': ['AW_AUTH'],
     'saml_config': [ENV_KEY_SAML],
+    'ldap_config': [ENV_KEY_LDAP],
     'ansible_executor': ['AW_EXECUTOR'],
     'ansible_executor_engine': ['AW_ENGINE'],
     'ansible_executor_container_image': ['AW_CT_IMAGE'],
@@ -45,7 +46,7 @@ AW_ENV_VARS = {
     'web_workers': ['AW_WEB_WORKERS'],
     'db_options': ['AW_DB_OPTIONS'],
 }
-AW_ENV_VARS_SECRET = ['secret', 'init_admin', 'init_admin_pwd', 'saml_config', 'db_pwd']
+AW_ENV_VARS_SECRET = ['secret', 'init_admin', 'init_admin_pwd', 'saml_config', 'ldap_config', 'db_pwd']
 
 AW_ENV_VARS_REV = {}
 for key_config, keys_env in AW_ENV_VARS.items():
@@ -95,4 +96,10 @@ def check_aw_env_var_true(var: str, fallback: bool = False) -> bool:
 def auth_mode_saml() -> bool:
     return get_aw_env_var_or_default('auth_mode').lower() == 'saml' and \
         ENV_KEY_SAML in environ and \
+        (ENV_KEY_CONFIG in environ and environ[ENV_KEY_CONFIG] != '0')
+
+
+def auth_mode_ldap() -> bool:
+    return get_aw_env_var_or_default('auth_mode').lower() == 'ldap' and \
+        ENV_KEY_LDAP in environ and \
         (ENV_KEY_CONFIG in environ and environ[ENV_KEY_CONFIG] != '0')

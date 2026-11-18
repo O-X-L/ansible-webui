@@ -17,6 +17,11 @@ def saml_installed() -> bool:
 
 
 @cache
+def ldap_installed() -> bool:
+    return 'django-auth-ldap' in INSTALLED_MODULES
+
+
+@cache
 def mysql_installed() -> bool:
     try:
         from MySQLdb import connect

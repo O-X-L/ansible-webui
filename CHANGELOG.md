@@ -13,6 +13,7 @@ tbd
 Features:
 
 * Make gunicorn web-worker count configurable [#130](https://github.com/O-X-L/ansible-webui/issues/130)
+* LDAP-Authentication (optional dependency) [#44](https://github.com/O-X-L/ansible-webui/issues/44)
 * Make django db-options configurable [#131](https://github.com/O-X-L/ansible-webui/issues/131)
 
 Chore:
